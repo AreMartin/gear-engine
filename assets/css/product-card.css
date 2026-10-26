@@ -1,0 +1,216 @@
+/**
+ * Gear Affiliate Engine - Product Card CSS
+ * Responsive horizontal flexbox product card with high-contrast green CTA.
+ */
+.gae-product-card {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	overflow: hidden;
+	width: 100%;
+	margin: 2rem 0;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.gae-product-card:hover {
+	box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+	.gae-product-card {
+		flex-direction: row;
+	}
+}
+
+.gae-image-wrapper {
+	flex: 0 0 40%;
+	background: #f8fafc;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-bottom: 1px solid #e2e8f0;
+	overflow: hidden;
+	position: relative;
+}
+
+@media (min-width: 768px) {
+	.gae-image-wrapper {
+		border-bottom: none;
+		border-right: 1px solid #e2e8f0;
+	}
+}
+
+.gae-image-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* Maintain a 4:3 Aspect Ratio for image area */
+.gae-image-wrapper::before {
+	content: "";
+	display: block;
+	padding-top: 75%;
+}
+
+.gae-content-wrapper {
+	padding: 1.5rem 1.75rem;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	background: #ffffff;
+}
+
+.gae-header {
+	margin-bottom: 0.75rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.gae-title {
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: #0f172a;
+	margin: 0;
+	line-height: 1.4;
+}
+
+.gae-descriptions {
+	flex: 1;
+	margin-bottom: 1.5rem;
+}
+
+.gae-standard-desc {
+	font-size: 0.95rem;
+	color: #475569;
+	line-height: 1.5;
+	margin-bottom: 1rem;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.gae-ai-summary {
+	background: #f0fdf4;
+	border: 1px solid #bbf7d0;
+	border-radius: 8px;
+	padding: 0.875rem;
+	font-size: 0.9rem;
+	color: #166534;
+	line-height: 1.5;
+	position: relative;
+}
+
+.gae-ai-summary strong {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	margin-bottom: 0.25rem;
+	color: #15803d;
+}
+
+.gae-ai-summary svg {
+	width: 14px;
+	height: 14px;
+	fill: currentColor;
+}
+
+.gae-stock-status {
+	font-size: 0.875rem;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	margin-bottom: 1rem;
+}
+
+.gae-in-stock {
+	color: #16a34a;
+}
+
+.gae-out-of-stock {
+	color: #ef4444;
+}
+
+.gae-stock-icon {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.gae-in-stock .gae-stock-icon {
+	background: #16a34a;
+}
+
+.gae-out-of-stock .gae-stock-icon {
+	background: #ef4444;
+}
+
+.gae-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: auto;
+}
+
+.gae-pricing {
+	display: flex;
+	flex-direction: column;
+}
+
+.gae-current-price {
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.gae-regular-price {
+	font-size: 0.875rem;
+	color: #94a3b8;
+	text-decoration: line-through;
+	margin-top: -2px;
+}
+
+.gae-cta-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: #16a34a;
+	color: #ffffff !important;
+	font-size: 0.95rem;
+	font-weight: 600;
+	padding: 0.65rem 1.25rem;
+	border-radius: 6px;
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+	border: none;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.gae-cta-btn:hover {
+	background: #15803d;
+	text-decoration: none;
+}
+
+/* Editor Placeholder Box */
+.gae-block-placeholder {
+	padding: 24px;
+	border: 2px dashed #cbd5e1;
+	border-radius: 8px;
+	text-align: center;
+	background: #f8fafc;
+	color: #475569;
+}

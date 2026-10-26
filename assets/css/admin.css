@@ -1,0 +1,77 @@
+/* Gear Affiliate Engine Admin Styles */
+.gae-settings-wrap {
+	max-width: 1050px;
+}
+
+.gae-admin-card {
+	background: #ffffff;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	padding: 20px 24px;
+	margin: 20px 0 25px 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.gae-status-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.gae-status-item {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	padding: 14px 16px;
+	display: flex;
+	flex-direction: column;
+}
+
+.gae-status-label {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #64748b;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.gae-status-value {
+	font-size: 18px;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.gae-sync-report-summary {
+	background: #f0fdf4;
+	border: 1px solid #bbf7d0;
+	border-radius: 6px;
+	padding: 10px 14px;
+	font-size: 13px;
+	color: #166534;
+	margin-bottom: 16px;
+}
+
+.gae-manual-actions {
+	display: flex;
+	align-items: center;
+	padding-top: 10px;
+	border-top: 1px solid #f1f5f9;
+}
+
+.gae-manual-actions .button-primary {
+	background: #16a34a !important;
+	border-color: #15803d !important;
+	text-shadow: none !important;
+	box-shadow: none !important;
+	font-weight: 600 !important;
+	padding: 4px 16px !important;
+	height: auto !important;
+}
+
+.gae-manual-actions .button-primary:hover,
+.gae-manual-actions .button-primary:focus {
+	background: #15803d !important;
+	border-color: #166534 !important;
+}
