@@ -28,6 +28,16 @@ class GAE_AI_API {
 	public const CACHE_TTL = 2592000;
 
 	/**
+	 * Transient key for caching available models from Google AI Studio.
+	 */
+	public const MODELS_CACHE_KEY = 'gae_available_gemini_models';
+
+	/**
+	 * Models cache duration: 7 days in seconds (7 * 86,400 = 604,800).
+	 */
+	public const MODELS_CACHE_TTL = 604800;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -433,6 +443,101 @@ class GAE_AI_API {
 				'items'   => $items,
 			),
 			200
+		);
+	}
+
+	/**
+	 * Retrieve available Gemini models from Google AI Studio API or cached transient,
+	 * with automatic fallback to modern default list including Gemini 3.8 Flash.
+	 *
+	 * Models are cached in a transient for 7 days to account for new model launches
+	 * and deprecations without incurring API calls on every page load.
+	 *
+	 * @param bool $force_refresh Whether to bypass transient cache.
+	 * @return array<string, string> Key: model slug (e.g. gemini-3.8-flash), Value: display label.
+	 */
+	public static function get_available_models( bool $force_refresh = false ): array {
+		if ( ! $force_refresh ) {
+			$cached = get_transient( self::MODELS_CACHE_KEY );
+			if ( is_array( $cached ) && ! empty( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$api_key = trim( (string) get_option( 'gae_google_ai_key', '' ) );
+
+		if ( ! empty( $api_key ) ) {
+			$endpoint = sprintf( 'https://generativelanguage.googleapis.com/v1beta/models?key=%s', rawurlencode( $api_key ) );
+			$response = wp_remote_get( $endpoint, array( 'timeout' => 15 ) );
+
+			if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+				$body = json_decode( wp_remote_retrieve_body( $response ), true );
+				if ( ! empty( $body['models'] ) && is_array( $body['models'] ) ) {
+					$models = array();
+
+					// Keep curated latest model at top.
+					$defaults = self::get_default_models_list();
+					if ( isset( $defaults['gemini-3.8-flash'] ) ) {
+						$models['gemini-3.8-flash'] = $defaults['gemini-3.8-flash'];
+					}
+
+					foreach ( $body['models'] as $m ) {
+						// Filter for models supporting generateContent.
+						$methods = $m['supportedGenerationMethods'] ?? array();
+						if ( ! in_array( 'generateContent', $methods, true ) ) {
+							continue;
+						}
+
+						// Strip "models/" prefix.
+						$model_id = str_replace( 'models/', '', (string) ( $m['name'] ?? '' ) );
+
+						// Filter out non-chat models (e.g. embedding, aqa, text-embedding).
+						if ( '' === $model_id || false !== strpos( $model_id, 'embedding' ) || false !== strpos( $model_id, 'aqa' ) ) {
+							continue;
+						}
+
+						$display_name = ! empty( $m['displayName'] ) ? $m['displayName'] : $model_id;
+						$version      = ! empty( $m['version'] ) ? ' (' . $m['version'] . ')' : '';
+
+						if ( ! isset( $models[ $model_id ] ) ) {
+							$models[ $model_id ] = sprintf( '%s%s', $display_name, $version );
+						}
+					}
+
+					// Merge standard fallbacks so essential models remain selectable.
+					foreach ( $defaults as $def_key => $def_label ) {
+						if ( ! isset( $models[ $def_key ] ) ) {
+							$models[ $def_key ] = $def_label;
+						}
+					}
+
+					if ( ! empty( $models ) ) {
+						set_transient( self::MODELS_CACHE_KEY, $models, self::MODELS_CACHE_TTL );
+						return $models;
+					}
+				}
+			}
+		}
+
+		// Fallback to modern default list.
+		$fallback = self::get_default_models_list();
+		set_transient( self::MODELS_CACHE_KEY, $fallback, self::MODELS_CACHE_TTL );
+		return $fallback;
+	}
+
+	/**
+	 * Default curated list of Gemini models including latest releases.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_default_models_list(): array {
+		return array(
+			'gemini-3.8-flash' => 'Gemini 3.8 Flash (Latest Next-Gen Fast - Recommended)',
+			'gemini-2.5-flash' => 'Gemini 2.5 Flash (Ultra Fast Reasoning)',
+			'gemini-2.5-pro'   => 'Gemini 2.5 Pro (Deep Reasoning)',
+			'gemini-2.0-flash' => 'Gemini 2.0 Flash (Next-Gen Fast)',
+			'gemini-1.5-flash' => 'Gemini 1.5 Flash (Standard Fast & Low Cost)',
+			'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Standard High Reasoning)',
 		);
 	}
 }

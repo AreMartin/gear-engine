@@ -430,6 +430,15 @@ assert_test( str_contains( $rendered_html, 'rel="nofollow noopener sponsored"' )
 assert_test( str_contains( $rendered_html, '13 999 kr' ), 'html_render: Formatted current price displayed' );
 assert_test( str_contains( $rendered_html, '19 999 kr' ), 'html_render: Formatted strikethrough regular price displayed' );
 
+// TEST 8: Dynamic Gemini Models List & Auto-Update
+$available_models = GAE_AI_API::get_available_models();
+assert_test( isset( $available_models['gemini-3.8-flash'] ), 'models_list: Gemini 3.8 Flash is present in available models' );
+assert_test( str_contains( $available_models['gemini-3.8-flash'], 'Recommended' ), 'models_list: Gemini 3.8 Flash marked as recommended' );
+assert_test( isset( $available_models['gemini-2.5-flash'] ), 'models_list: Gemini 2.5 Flash is present' );
+assert_test( isset( $available_models['gemini-2.0-flash'] ), 'models_list: Gemini 2.0 Flash is present' );
+$models_transient = get_transient( GAE_AI_API::MODELS_CACHE_KEY );
+assert_test( is_array( $models_transient ) && isset( $models_transient['gemini-3.8-flash'] ), 'models_caching: Models cached in transient for periodic automatic refresh' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (7/7 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (8/8 suites passed)\n";
 echo "========================================================\n";

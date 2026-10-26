@@ -34,6 +34,7 @@ class GAE_Settings {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'wp_ajax_gae_trigger_manual_sync', array( $this, 'ajax_manual_sync' ) );
+		add_action( 'wp_ajax_gae_refresh_gemini_models', array( $this, 'ajax_refresh_models' ) );
 	}
 
 	/**
@@ -226,7 +227,7 @@ class GAE_Settings {
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-				'default'           => 'gemini-1.5-flash',
+				'default'           => 'gemini-3.8-flash',
 			)
 		);
 
@@ -327,23 +328,19 @@ class GAE_Settings {
 	}
 
 	/**
-	 * Render AI model selector with custom option.
+	 * Render AI model selector with live Google AI Studio integration and custom option.
 	 *
 	 * @param array<string, mixed> $args Field arguments.
 	 */
 	public function render_field_ai_model( array $args ): void {
 		$id          = $args['id'];
-		$value       = get_option( $id, 'gemini-1.5-flash' );
+		$value       = get_option( $id, 'gemini-3.8-flash' );
 		$description = $args['description'] ?? '';
 
-		$models = array(
-			'gemini-1.5-flash' => 'Gemini 1.5 Flash (Fast & Low Cost - Recommended)',
-			'gemini-1.5-pro'   => 'Gemini 1.5 Pro (High Reasoning)',
-			'gemini-2.0-flash' => 'Gemini 2.0 Flash (Next-Gen Fast)',
-		);
-
+		$models    = GAE_AI_API::get_available_models();
 		$is_custom = ! array_key_exists( $value, $models ) && ! empty( $value );
 
+		echo '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
 		echo '<select id="' . esc_attr( $id ) . '_select" onchange="gaeToggleModelInput(this.value);" class="regular-text">';
 		foreach ( $models as $model_key => $model_label ) {
 			printf(
@@ -360,8 +357,16 @@ class GAE_Settings {
 		);
 		echo '</select>';
 
+		echo '<button type="button" id="gae-refresh-models-btn" class="button button-secondary" title="' . esc_attr__( 'Query Google AI Studio for new and updated Gemini models', 'gear-engine' ) . '">';
+		echo '<span class="dashicons dashicons-update" style="vertical-align: text-top; font-size: 16px; width: 16px; height: 16px;"></span> ';
+		esc_html_e( 'Fetch Latest Models from Google AI', 'gear-engine' );
+		echo '</button>';
+		echo '<span id="gae-models-spinner" class="spinner" style="float:none; margin: 0 4px;"></span>';
+		echo '<span id="gae-models-status" style="font-size: 13px; font-weight: 500;"></span>';
+		echo '</div>';
+
 		printf(
-			'<input type="text" id="%s" name="%s" value="%s" class="regular-text" style="%s; margin-top: 6px;" placeholder="e.g. gemini-1.5-flash" />',
+			'<input type="text" id="%s" name="%s" value="%s" class="regular-text" style="%s; margin-top: 6px;" placeholder="e.g. gemini-3.8-flash" />',
 			esc_attr( $id ),
 			esc_attr( $id ),
 			esc_attr( (string) $value ),
@@ -371,6 +376,7 @@ class GAE_Settings {
 		if ( ! empty( $description ) ) {
 			printf( '<p class="description">%s</p>', esc_html( $description ) );
 		}
+		echo '<p class="description" style="color: #64748b; margin-top: 4px;">' . esc_html__( 'The model list dynamically refreshes from Google AI Studio every 7 days (and during daily sync) to keep pace with new model releases and deprecations.', 'gear-engine' ) . '</p>';
 
 		?>
 		<script>
@@ -418,12 +424,16 @@ class GAE_Settings {
 			'gae-admin-script',
 			'gaeAdminData',
 			array(
-				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-				'syncNonce' => wp_create_nonce( 'gae_manual_sync_nonce' ),
-				'strings'   => array(
-					'syncing'     => __( 'Syncing feeds in streaming mode... Please wait.', 'gear-engine' ),
-					'syncSuccess' => __( 'Sync completed successfully!', 'gear-engine' ),
-					'syncFailed'  => __( 'Sync encountered an error.', 'gear-engine' ),
+				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
+				'syncNonce'          => wp_create_nonce( 'gae_manual_sync_nonce' ),
+				'refreshModelsNonce' => wp_create_nonce( 'gae_refresh_models_nonce' ),
+				'strings'            => array(
+					'syncing'         => __( 'Syncing feeds in streaming mode... Please wait.', 'gear-engine' ),
+					'syncSuccess'     => __( 'Sync completed successfully!', 'gear-engine' ),
+					'syncFailed'      => __( 'Sync encountered an error.', 'gear-engine' ),
+					'fetchingModels'  => __( 'Fetching live models from Google AI Studio...', 'gear-engine' ),
+					'fetchSuccess'    => __( 'Models updated successfully!', 'gear-engine' ),
+					'fetchFailed'     => __( 'Failed to fetch models. Verify your API key.', 'gear-engine' ),
 				),
 			)
 		);
@@ -547,6 +557,32 @@ class GAE_Settings {
 					absint( $report['skipped'] )
 				),
 				'report'  => $report,
+			)
+		);
+	}
+
+	/**
+	 * AJAX handler to refresh Gemini models list directly from Google AI Studio.
+	 *
+	 * @return void
+	 */
+	public function ajax_refresh_models(): void {
+		check_ajax_referer( 'gae_refresh_models_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'gear-engine' ) ), 403 );
+		}
+
+		$models = GAE_AI_API::get_available_models( true );
+
+		wp_send_json_success(
+			array(
+				'message' => sprintf(
+					/* translators: %d: count of models */
+					__( 'Updated! %d models available from Google AI.', 'gear-engine' ),
+					count( $models )
+				),
+				'models'  => $models,
 			)
 		);
 	}

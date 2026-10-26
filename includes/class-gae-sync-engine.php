@@ -100,6 +100,11 @@ class GAE_Sync_Engine {
 		// Save report for admin dashboard.
 		update_option( 'gae_last_sync_report', $report, false );
 
+		// Periodically refresh available AI models list if transient expired.
+		if ( class_exists( 'GAE_AI_API' ) ) {
+			GAE_AI_API::get_available_models();
+		}
+
 		// Release lock.
 		$this->release_lock();
 
