@@ -696,9 +696,9 @@ class GAE_Sync_Engine {
 		// 3. Description.
 		$description = $find_tag( array( 'description', 'summary', 'desc', 'long_description', 'content', 'g:description' ) );
 
-		// 4. Prices.
-		$raw_price = $find_tag( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price', 'g:price', 'g:sale_price' ) );
-		$price     = $this->clean_price( $raw_price );
+		// 4. Prices & Discounts.
+		$raw_sale_price = $find_tag( array( 'sale_price', 'g:sale_price', 'salePrice', 'discount_price' ) );
+		$raw_price      = $find_tag( array( 'price', 'g:price', 'current_price', 'product_price', 'productPrice' ) );
 
 		$raw_regular = '';
 		// Check TradeTracker <property name="fromPrice">
@@ -714,13 +714,24 @@ class GAE_Sync_Engine {
 		if ( empty( $raw_regular ) ) {
 			$raw_regular = $find_tag( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old', 'g:regular_price' ) );
 		}
-		$regular = $this->clean_price( $raw_regular );
-		if ( $regular <= 0 || $regular < $price ) {
-			$regular = $price;
+
+		if ( ! empty( $raw_sale_price ) && $this->clean_price( $raw_sale_price ) > 0 ) {
+			// In Google Shopping feeds (Adtraction), sale_price is current price and price is regular price.
+			$price   = $this->clean_price( $raw_sale_price );
+			$regular = ! empty( $raw_price ) ? $this->clean_price( $raw_price ) : $price;
+			if ( $regular <= 0 || $regular < $price ) {
+				$regular = $price;
+			}
+		} else {
+			$price   = $this->clean_price( $raw_price );
+			$regular = ! empty( $raw_regular ) ? $this->clean_price( $raw_regular ) : $price;
+			if ( $regular <= 0 || $regular < $price ) {
+				$regular = $price;
+			}
 		}
 
 		// 5. Affiliate Link.
-		$affiliate_url = $find_tag( array( 'URL', 'url', 'productUrl', 'product_url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link', 'g:link' ) );
+		$affiliate_url = $find_tag( array( 'link', 'g:link', 'URL', 'url', 'productUrl', 'product_url', 'trackingUrl', 'affiliate_url', 'deep_link' ) );
 		if ( ! empty( $affiliate_url ) ) {
 			$affiliate_url = html_entity_decode( $affiliate_url, ENT_QUOTES, 'UTF-8' );
 		}
@@ -742,11 +753,11 @@ class GAE_Sync_Engine {
 			}
 		}
 		if ( empty( $image_url ) ) {
-			$image_url = $find_tag( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link', 'g:image_link' ) );
+			$image_url = $find_tag( array( 'image_link', 'g:image_link', 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url' ) );
 		}
 
 		// 7. Merchant / Brand.
-		$merchant = $find_tag( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name', 'g:brand' ) );
+		$merchant = $find_tag( array( 'brand', 'g:brand', 'merchant', 'merchant_name', 'programName', 'shop', 'shop_name' ) );
 		if ( empty( $merchant ) && isset( $xml->properties ) ) {
 			foreach ( $xml->properties->property as $prop ) {
 				$prop_name = strtolower( (string) $prop['name'] );
@@ -757,14 +768,14 @@ class GAE_Sync_Engine {
 			}
 		}
 
-		// Extract store name from affiliate URL (e.g. partner.treningspartner.no or u=https://www.treningspartner.no)
+		// Extract store name from affiliate URL (e.g. do.loepeshop.no or url=https://loepeshop.no)
 		$store_name = '';
 		if ( ! empty( $affiliate_url ) ) {
-			if ( preg_match( '#u=https?%3A%2F%2F(?:www\.)?([^%2F]+)#i', $affiliate_url, $u_matches ) ) {
+			if ( preg_match( '#(?:url|u)=https?(?:%3A%2F%2F|://)(?:www\.)?([^%&/\?]+)#i', $affiliate_url, $u_matches ) ) {
 				$domain_parts = explode( '.', $u_matches[1] );
 				$store_name   = ucfirst( $domain_parts[0] );
 			} elseif ( $host = ( function_exists( 'wp_parse_url' ) ? wp_parse_url( $affiliate_url, PHP_URL_HOST ) : parse_url( $affiliate_url, PHP_URL_HOST ) ) ) {
-				$clean_host   = preg_replace( '/^(?:partner\.|www\.)/', '', $host );
+				$clean_host   = preg_replace( '/^(?:do\.|partner\.|www\.)/', '', $host );
 				$domain_parts = explode( '.', $clean_host );
 				$store_name   = ucfirst( $domain_parts[0] );
 			}
@@ -777,7 +788,9 @@ class GAE_Sync_Engine {
 			$brand_from_title = trim( $title_parts[0] );
 		}
 
-		if ( ! empty( $brand_from_title ) && ! empty( $store_name ) && strcasecmp( $brand_from_title, $store_name ) !== 0 ) {
+		if ( ! empty( $merchant ) && ! empty( $store_name ) && strcasecmp( $merchant, $store_name ) !== 0 ) {
+			$merchant = $merchant . ' (' . $store_name . ')';
+		} elseif ( ! empty( $brand_from_title ) && ! empty( $store_name ) && strcasecmp( $brand_from_title, $store_name ) !== 0 ) {
 			$merchant = $brand_from_title . ' (' . $store_name . ')';
 		} elseif ( ! empty( $store_name ) ) {
 			$merchant = $store_name;
@@ -799,7 +812,7 @@ class GAE_Sync_Engine {
 			}
 		}
 		if ( empty( $raw_stock ) ) {
-			$raw_stock = $find_tag( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity', 'g:availability' ) );
+			$raw_stock = $find_tag( array( 'availability', 'g:availability', 'instock', 'in_stock', 'stock', 'inStock', 'quantity' ) );
 		}
 		$in_stock = $this->parse_stock_status( $raw_stock );
 
@@ -825,7 +838,7 @@ class GAE_Sync_Engine {
 			}
 		}
 		if ( empty( $category ) ) {
-			$category = $find_tag( array( 'category', 'category_name', 'categories', 'product_category', 'department', 'g:product_type' ) );
+			$category = $find_tag( array( 'product_type', 'g:product_type', 'category', 'category_name', 'categories', 'google_product_category', 'g:google_product_category', 'department' ) );
 		}
 
 		// 10. Currency.
@@ -834,12 +847,16 @@ class GAE_Sync_Engine {
 			$currency = trim( (string) $xml->price['currency'] );
 		}
 		if ( empty( $currency ) ) {
-			$currency = $find_tag( array( 'currency', 'price_currency' ) );
+			if ( preg_match( '/\b([A-Za-z]{3})\b/', $raw_price, $c_matches ) ) {
+				$currency = strtoupper( $c_matches[1] );
+			} elseif ( preg_match( '/\b([A-Za-z]{3})\b/', $raw_sale_price, $c_matches ) ) {
+				$currency = strtoupper( $c_matches[1] );
+			}
 		}
 		if ( empty( $currency ) ) {
-			$currency = 'kr';
+			$currency = $find_tag( array( 'currency', 'price_currency' ) );
 		}
-		if ( 'NOK' === strtoupper( $currency ) ) {
+		if ( empty( $currency ) || 'NOK' === strtoupper( $currency ) ) {
 			$currency = 'kr';
 		}
 

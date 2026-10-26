@@ -338,6 +338,37 @@ assert_test( $tt_data['category'] === 'Kondisjon > Kondisjonsapparater > Spinnin
 assert_test( $tt_data['merchant'] === 'Abilica (Treningspartner)', 'tradetracker_schema: Merchant identified from brand and domain' );
 assert_test( $tt_data['currency'] === 'kr', 'tradetracker_schema: NOK normalized to kr' );
 
+// TEST 3C: Real Adtraction Google Shopping XML feed schema extraction test
+$real_adtraction_xml = <<<XML
+<item xmlns:g="http://base.google.com/ns/1.0">
+  <g:id>360246</g:id>
+  <title>Lipati Balance SS Tee L</title>
+  <description>LIPATI Balance SS Tee er en lett og enkel T-skjorte til trening</description>
+  <g:product_type>apparel &gt; løbe t-shirts - løbetrøjer</g:product_type>
+  <link>https://do.loepeshop.no/t/t?a=1850136231&amp;as=1632326892&amp;t=2&amp;tk=1&amp;cupa_sku=360246&amp;fid=2072&amp;url=https://loepeshop.no/lipati-women-s-balance-ss-tee.html</link>
+  <g:image_link>https://www.loepeshop.no/media/catalog/product/cache/test.jpg</g:image_link>
+  <g:condition>new</g:condition>
+  <g:availability>in_stock</g:availability>
+  <g:sale_price>249 NOK</g:sale_price>
+  <g:price>299 NOK</g:price>
+  <g:gtin>05740038105708</g:gtin>
+  <g:brand>Lipati</g:brand>
+</item>
+XML;
+
+$ad_sample_element = simplexml_load_string( $real_adtraction_xml );
+$ad_data = $sync_engine->extract_item_data( $ad_sample_element, 'Adtraction' );
+assert_test( $ad_data['ean'] === '05740038105708', 'adtraction_schema: g:gtin mapped to EAN/GTIN' );
+assert_test( $ad_data['title'] === 'Lipati Balance SS Tee L', 'adtraction_schema: title mapped' );
+assert_test( $ad_data['price'] === 249.0, 'adtraction_schema: g:sale_price mapped to price' );
+assert_test( $ad_data['regular_price'] === 299.0, 'adtraction_schema: g:price mapped to regular_price' );
+assert_test( $ad_data['image_url'] === 'https://www.loepeshop.no/media/catalog/product/cache/test.jpg', 'adtraction_schema: g:image_link mapped to image_url' );
+assert_test( str_contains( $ad_data['affiliate_url'], 'do.loepeshop.no' ), 'adtraction_schema: <link> mapped to affiliate_url' );
+assert_test( $ad_data['in_stock'] === true, 'adtraction_schema: g:availability mapped to in_stock' );
+assert_test( $ad_data['category'] === 'apparel > løbe t-shirts - løbetrøjer', 'adtraction_schema: g:product_type mapped to category' );
+assert_test( $ad_data['merchant'] === 'Lipati (Loepeshop)', 'adtraction_schema: Brand + store domain resolved to merchant' );
+assert_test( $ad_data['currency'] === 'kr', 'adtraction_schema: Currency NOK mapped to kr' );
+
 // TEST 3B: Detailed pre-filtering rules (max_price, min_discount_pct, only_in_stock, merchants, required keywords)
 $detailed_rules = $filter_rules;
 $detailed_rules['max_price']          = 20000.0;
