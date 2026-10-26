@@ -66,13 +66,14 @@ class GAE_Sync_Engine {
 		}
 
 		$report = array(
-			'time'      => time(),
-			'date'      => current_time( 'mysql' ),
-			'processed' => 0,
-			'inserted'  => 0,
-			'updated'   => 0,
-			'skipped'   => 0,
-			'errors'    => array(),
+			'time'         => time(),
+			'date'         => current_time( 'mysql' ),
+			'processed'    => 0,
+			'inserted'     => 0,
+			'updated'      => 0,
+			'skipped'      => 0,
+			'skip_reasons' => array(),
+			'errors'       => array(),
 		);
 
 		// Preload filter criteria from settings once.
@@ -457,8 +458,12 @@ class GAE_Sync_Engine {
 		$batch_counter++;
 
 		// Apply pre-filters in-memory BEFORE touching the database.
-		if ( ! $this->passes_pre_filters( $item, $filter_rules ) ) {
+		$skip_reason = '';
+		if ( ! $this->passes_pre_filters( $item, $filter_rules, $skip_reason ) ) {
 			$report['skipped']++;
+			if ( ! empty( $skip_reason ) ) {
+				$report['skip_reasons'][ $skip_reason ] = ( $report['skip_reasons'][ $skip_reason ] ?? 0 ) + 1;
+			}
 			return;
 		}
 
@@ -502,9 +507,9 @@ class GAE_Sync_Engine {
 			return '';
 		};
 
-		// 1. EAN / Barcode.
-		$ean = $find_key( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'sku', 'SKU', 'product_id', 'id' ) );
-		$ean = preg_replace( '/[^A-Za-z0-9]/', '', $ean ) ?? '';
+		// 1. EAN / Barcode / Unique Identifier.
+		$ean = $find_key( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'sku', 'SKU', 'product_id', 'productId', 'productID', 'article_number', 'articleNumber', 'article_id', 'id', 'ID' ) );
+		$ean = preg_replace( '/[^A-Za-z0-9_-]/', '', $ean ) ?? '';
 
 		// 2. Title.
 		$title = $find_key( array( 'name', 'title', 'product_name', 'productName', 'article_name' ) );
@@ -596,10 +601,10 @@ class GAE_Sync_Engine {
 			return '';
 		};
 
-		// 1. EAN / Barcode.
-		$ean = $find_tag( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'property:ean', 'property:gtin', 'sku', 'SKU' ) );
+		// 1. EAN / Barcode / Unique Identifier.
+		$ean = $find_tag( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'property:ean', 'property:gtin', 'sku', 'SKU', 'productID', 'productId', 'product_id', 'articleNumber', 'article_number', 'article_id', 'id', 'ID' ) );
 		// Strip any non-alphanumeric characters from EAN.
-		$ean = preg_replace( '/[^A-Za-z0-9]/', '', $ean ) ?? '';
+		$ean = preg_replace( '/[^A-Za-z0-9_-]/', '', $ean ) ?? '';
 
 		// 2. Title / Name.
 		$title = $find_tag( array( 'name', 'title', 'product_name', 'productName', 'article_name' ) );
@@ -729,28 +734,33 @@ class GAE_Sync_Engine {
 	 *
 	 * @param array<string, mixed> $item         Product data.
 	 * @param array<string, mixed> $filter_rules Pre-filter criteria.
+	 * @param string               $reason       Output variable for skip reason.
 	 * @return bool True if product passes all filters, false to skip.
 	 */
-	public function passes_pre_filters( array $item, array $filter_rules ): bool {
-		// 1. EAN must be present.
+	public function passes_pre_filters( array $item, array $filter_rules, string &$reason = '' ): bool {
+		// 1. EAN / Barcode / Unique ID must be present.
 		if ( empty( $item['ean'] ) ) {
+			$reason = 'Missing EAN or Product ID';
 			return false;
 		}
 
 		// Title must not be empty.
 		if ( empty( $item['title'] ) ) {
+			$reason = 'Missing Product Title';
 			return false;
 		}
 
 		// 2. Minimum price filter.
 		$min_price = $filter_rules['min_price'] ?? 0;
 		if ( $min_price > 0 && $item['price'] < $min_price ) {
+			$reason = sprintf( 'Price (%.0f) below min (%.0f)', $item['price'], $min_price );
 			return false;
 		}
 
 		// 3. Maximum price filter.
 		$max_price = $filter_rules['max_price'] ?? 0;
 		if ( $max_price > 0 && $item['price'] > $max_price ) {
+			$reason = sprintf( 'Price (%.0f) above max (%.0f)', $item['price'], $max_price );
 			return false;
 		}
 
@@ -760,10 +770,12 @@ class GAE_Sync_Engine {
 			$regular = (float) ( $item['regular_price'] ?? 0 );
 			$price   = (float) ( $item['price'] ?? 0 );
 			if ( $regular <= $price ) {
+				$reason = 'Not discounted (regular price <= current price)';
 				return false;
 			}
 			$discount_pct = ( ( $regular - $price ) / $regular ) * 100;
 			if ( $discount_pct < $min_discount_pct ) {
+				$reason = sprintf( 'Discount (%.0f%%) below min threshold (%.0f%%)', $discount_pct, $min_discount_pct );
 				return false;
 			}
 		}
@@ -771,6 +783,7 @@ class GAE_Sync_Engine {
 		// 5. Stock status filter (Only in-stock products).
 		$only_in_stock = ! empty( $filter_rules['only_in_stock'] );
 		if ( $only_in_stock && empty( $item['in_stock'] ) ) {
+			$reason = 'Item out of stock';
 			return false;
 		}
 
@@ -787,6 +800,7 @@ class GAE_Sync_Engine {
 				}
 			}
 			if ( ! $merchant_matched ) {
+				$reason = sprintf( 'Merchant "%s" not in allowed whitelist', $item['merchant'] ?: 'unknown' );
 				return false;
 			}
 		}
@@ -796,6 +810,7 @@ class GAE_Sync_Engine {
 		if ( ! empty( $excluded_merchants ) ) {
 			foreach ( $excluded_merchants as $excluded_m ) {
 				if ( '' !== $excluded_m && false !== mb_strpos( $item_merchant, $excluded_m ) ) {
+					$reason = sprintf( 'Merchant "%s" matched blacklisted merchants', $item['merchant'] );
 					return false;
 				}
 			}
@@ -818,6 +833,7 @@ class GAE_Sync_Engine {
 				}
 			}
 			if ( ! $category_matched ) {
+				$reason = sprintf( 'Category/Title did not match allowed categories (Cat: "%s")', $item['category'] ?: 'none' );
 				return false;
 			}
 		}
@@ -827,6 +843,7 @@ class GAE_Sync_Engine {
 		if ( ! empty( $excluded_keywords ) ) {
 			foreach ( $excluded_keywords as $keyword ) {
 				if ( '' !== $keyword && false !== mb_strpos( $searchable, $keyword ) ) {
+					$reason = sprintf( 'Matched blacklisted keyword "%s"', $keyword );
 					return false;
 				}
 			}
@@ -843,6 +860,7 @@ class GAE_Sync_Engine {
 				}
 			}
 			if ( ! $req_matched ) {
+				$reason = 'Did not contain any of the required keywords';
 				return false;
 			}
 		}
