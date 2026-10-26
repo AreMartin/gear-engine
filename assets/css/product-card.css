@@ -214,3 +214,19 @@
 	background: #f8fafc;
 	color: #475569;
 }
+
+/* Gutenberg Editor Wrapper: Ensures full block selection & click handling */
+.gae-block-editor-wrapper {
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+}
+
+.gae-block-editor-wrapper .gae-product-card {
+	margin: 1rem 0;
+}
+
+/* In the editor, disable direct link navigation so clicking CTA selects the block instead of following link */
+.gae-block-editor-wrapper .gae-cta-btn {
+	pointer-events: none;
+}

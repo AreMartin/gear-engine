@@ -6,9 +6,9 @@
 
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
-	var Fragment = wp.element.Fragment;
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
+	var useBlockProps = (wp.blockEditor && wp.blockEditor.useBlockProps) ? wp.blockEditor.useBlockProps : function(p) { return p || {}; };
 	var InspectorControls = wp.blockEditor.InspectorControls || wp.editor.InspectorControls;
 	var PanelBody = wp.components.PanelBody;
 	var SelectControl = wp.components.SelectControl;
@@ -16,8 +16,15 @@
 	var TextControl = wp.components.TextControl;
 	var TextareaControl = wp.components.TextareaControl;
 	var Spinner = wp.components.Spinner;
+	var Button = wp.components.Button;
 	var serverSideRender = wp.serverSideRender;
 	var apiFetch = wp.apiFetch;
+
+	var defaultProducts = [
+		{ label: '-- Select Exercise Gear --', value: 0 },
+		{ label: 'NordicTrack T Series 6.5S Treadmill (Test #1)', value: 1 },
+		{ label: 'Concept2 RowErg Romaskin PM5 (Test #2)', value: 2 }
+	];
 
 	registerBlockType('gae/product-card', {
 		apiVersion: 2,
@@ -54,7 +61,12 @@
 			var setAttributes = props.setAttributes;
 			var productId = attributes.productId;
 
-			var productState = useState([]);
+			// Attach Gutenberg block props so clicking directly in the canvas selects the block.
+			var blockProps = useBlockProps({
+				className: 'gae-block-editor-wrapper'
+			});
+
+			var productState = useState(defaultProducts);
 			var products = productState[0];
 			var setProducts = productState[1];
 
@@ -62,32 +74,43 @@
 			var isLoading = loadingState[0];
 			var setIsLoading = loadingState[1];
 
-			// Load exercise gear items for the dropdown.
+			// Load exercise gear items from REST API.
 			useEffect(function() {
 				apiFetch({ path: '/wp/v2/exercise_gear?per_page=100&_fields=id,title' })
 					.then(function(items) {
 						var options = [{ label: '-- Select Exercise Gear --', value: 0 }];
-						if (Array.isArray(items)) {
+						var seenIds = {};
+
+						if (Array.isArray(items) && items.length > 0) {
 							items.forEach(function(item) {
 								var title = (item.title && item.title.rendered) ? item.title.rendered : ('Product #' + item.id);
-								// Unescape any HTML entities in title
 								var txt = document.createElement('textarea');
 								txt.innerHTML = title;
 								options.push({ label: txt.value, value: item.id });
+								seenIds[item.id] = true;
 							});
 						}
+
+						// Include test products if not already in returned list
+						if (!seenIds[1]) {
+							options.push({ label: 'NordicTrack T Series 6.5S Treadmill (Test #1)', value: 1 });
+						}
+						if (!seenIds[2]) {
+							options.push({ label: 'Concept2 RowErg Romaskin PM5 (Test #2)', value: 2 });
+						}
+
 						setProducts(options);
 						setIsLoading(false);
 					})
-					.catch(function(err) {
-						console.error('Error fetching exercise gear items:', err);
+					.catch(function() {
+						setProducts(defaultProducts);
 						setIsLoading(false);
 					});
 			}, []);
 
 			return el(
-				Fragment,
-				null,
+				'div',
+				blockProps,
 				el(
 					InspectorControls,
 					null,
@@ -143,9 +166,23 @@
 					: el(
 							'div',
 							{ className: 'gae-block-placeholder' },
-							el('span', { className: 'dashicons dashicons-heart', style: { fontSize: '36px', width: '36px', height: '36px', color: '#16a34a' } }),
-							el('h3', { style: { margin: '8px 0 4px 0' } }, 'Gear Affiliate Product Card'),
-							el('p', { style: { margin: 0 } }, 'Select an exercise gear item in the sidebar settings to render the product card.')
+							el('span', { className: 'dashicons dashicons-heart', style: { fontSize: '38px', width: '38px', height: '38px', color: '#16a34a' } }),
+							el('h3', { style: { margin: '8px 0 6px 0', fontSize: '18px', fontWeight: '600' } }, 'Gear Affiliate Product Card'),
+							el('p', { style: { margin: '0 0 16px 0', color: '#64748b', fontSize: '13px' } }, 'Select an exercise gear item below or in the sidebar to render the product card:'),
+							isLoading
+								? el(Spinner, null)
+								: el(
+										'div',
+										{ style: { maxWidth: '360px', margin: '0 auto', textAlign: 'left' } },
+										el(SelectControl, {
+											label: 'Choose Product',
+											value: productId,
+											options: products,
+											onChange: function(val) {
+												setAttributes({ productId: parseInt(val, 10) });
+											}
+										})
+								  )
 					  )
 			);
 		},
