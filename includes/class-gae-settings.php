@@ -71,7 +71,7 @@ class GAE_Settings {
 			'gae_adtraction_url',
 			array(
 				'type'              => 'string',
-				'sanitize_callback' => 'esc_url_raw',
+				'sanitize_callback' => array( $this, 'sanitize_feed_url' ),
 				'default'           => '',
 			)
 		);
@@ -94,7 +94,7 @@ class GAE_Settings {
 			'gae_tradetracker_url',
 			array(
 				'type'              => 'string',
-				'sanitize_callback' => 'esc_url_raw',
+				'sanitize_callback' => array( $this, 'sanitize_feed_url' ),
 				'default'           => '',
 			)
 		);
@@ -416,6 +416,21 @@ class GAE_Settings {
 				'description' => __( 'Select or enter the Gemini model for personalized AI equipment pitches.', 'gear-engine' ),
 			)
 		);
+	}
+
+	/**
+	 * Sanitize feed URL, ensuring HTML entities like &amp; are decoded and whitespace trimmed.
+	 *
+	 * @param mixed $value Input value.
+	 * @return string
+	 */
+	public function sanitize_feed_url( $value ): string {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$url = html_entity_decode( trim( (string) $value ), ENT_QUOTES, 'UTF-8' );
+		$url = str_replace( '&amp;', '&', $url );
+		return esc_url_raw( $url );
 	}
 
 	/**
@@ -749,6 +764,11 @@ class GAE_Settings {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'gear-engine' ) ), 403 );
 		}
 
+		// Discard any output buffered before sync to prevent JSON corruption.
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
 		// Instantiate sync engine and run sync.
 		if ( ! class_exists( 'GAE_Sync_Engine' ) ) {
 			require_once GAE_PLUGIN_DIR . 'includes/class-gae-sync-engine.php';
@@ -778,18 +798,25 @@ class GAE_Settings {
 		}
 
 		$cap_notice = ! empty( $report['batch_capped'] ) ? ' — ' . sprintf( __( 'Batch cap of %d products reached.', 'gear-engine' ), (int) get_option( 'gae_max_items_per_sync', 100 ) ) : '';
+		$err_notice = ! empty( $report['errors'] ) ? ' — ' . sprintf( __( 'Errors: %s', 'gear-engine' ), implode( ' | ', $report['errors'] ) ) : '';
+
+		// Guarantee clean buffer before JSON response
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
 
 		wp_send_json_success(
 			array(
 				'message' => sprintf(
-					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary, 6: Cap notice */
-					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)%6$s', 'gear-engine' ),
+					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary, 6: Cap notice, 7: Error notice */
+					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)%6$s%7$s', 'gear-engine' ),
 					absint( $report['processed'] ?? 0 ),
 					absint( $report['inserted'] ?? 0 ),
 					absint( $report['updated'] ?? 0 ),
 					absint( $report['skipped'] ?? 0 ),
 					$reason_summary,
-					$cap_notice
+					$cap_notice,
+					$err_notice
 				),
 				'report'  => $report,
 			)

@@ -656,6 +656,12 @@ assert_test( str_contains( $card_2_html, 'kr' ), 'block_test: Test Product 2 pri
 $seeded_ids = GAE_CPT::seed_sample_products();
 assert_test( count( $seeded_ids ) === 2, 'sample_products: Both sample products seeded into exercise_gear CPT' );
 
+// TEST 12: Feed URL Sanitization & Entity Decoding
+$settings_module = new GAE_Settings();
+$raw_url_with_entities = 'https://secure.adtraction.com/productfeed.htm?type=feed&amp;format=XML&amp;encoding=UTF8';
+$clean_url = $settings_module->sanitize_feed_url( $raw_url_with_entities );
+assert_test( ! str_contains( $clean_url, '&amp;' ) && str_contains( $clean_url, '&format=XML' ), 'feed_sanitization: &amp; decoded to plain &' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (11/11 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (12/12 suites passed)\n";
 echo "========================================================\n";

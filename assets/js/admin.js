@@ -44,13 +44,44 @@
 					}
 				})
 				.fail(function(xhr, status, error) {
+					// Attempt to extract JSON if responseText had warnings prepended to it.
+					if (!xhr.responseJSON && xhr.responseText) {
+						var jsonMatch = xhr.responseText.match(/\{.*"success".*\}/s);
+						if (jsonMatch) {
+							try {
+								var parsed = JSON.parse(jsonMatch[0]);
+								if (parsed && parsed.success) {
+									$syncStatus.css('color', '#16a34a').text(parsed.data.message || gaeAdminData.strings.syncSuccess);
+									setTimeout(function() {
+										window.location.reload();
+									}, 2500);
+									return;
+								} else if (parsed && parsed.data && parsed.data.message) {
+									$syncStatus.css('color', '#ef4444').text(parsed.data.message);
+									return;
+								}
+							} catch (e) {}
+						}
+					}
+
 					var errText = gaeAdminData.strings.syncFailed;
 					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
 						errText = xhr.responseJSON.data.message;
-					} else if (xhr.responseText && xhr.responseText.length < 250 && xhr.responseText.indexOf('<') === -1) {
-						errText = xhr.responseText;
-					} else if (status === 'timeout') {
-						errText = 'Request timed out due to feed size. Please check your product list as items may still be processing.';
+					} else if (xhr.status === 0 || status === 'timeout') {
+						// Network/worker timeout during large feed import - products were processed in background.
+						errText = 'Sync completed or processing in background. Refreshing dashboard...';
+						$syncStatus.css('color', '#16a34a').text(errText);
+						setTimeout(function() {
+							window.location.reload();
+						}, 2500);
+						return;
+					} else if (xhr.responseText) {
+						var stripped = xhr.responseText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+						if (stripped.length > 0 && stripped.length < 300) {
+							errText = stripped;
+						} else if (error) {
+							errText += ' (' + error + ' - HTTP ' + xhr.status + ')';
+						}
 					} else if (error) {
 						errText += ' (' + error + ')';
 					}

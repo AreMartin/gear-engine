@@ -125,8 +125,8 @@ class GAE_Sync_Engine {
 		// Save report for admin dashboard.
 		update_option( 'gae_last_sync_report', $report, false );
 
-		// Periodically refresh available AI models list if transient expired.
-		if ( class_exists( 'GAE_AI_API' ) ) {
+		// Periodically refresh available AI models list if transient expired (only during background cron, not blocking user AJAX).
+		if ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() && class_exists( 'GAE_AI_API' ) ) {
 			GAE_AI_API::get_available_models();
 		}
 
@@ -293,11 +293,31 @@ class GAE_Sync_Engine {
 	 * @return string|\WP_Error Path to temporary file or WP_Error on failure.
 	 */
 	protected function stream_remote_feed_to_file( string $url ) {
-		if ( function_exists( 'download_url' ) ) {
+		// Clean and normalize URL (decode &amp; and trim whitespace).
+		$url = html_entity_decode( trim( $url ), ENT_QUOTES, 'UTF-8' );
+		$url = str_replace( '&amp;', '&', $url );
+
+		// For Adtraction feeds: if zip=1 or gzip=1 was provided, switch to uncompressed zip=0
+		// so XMLReader can stream it directly without memory overhead.
+		if ( false !== stripos( $url, 'adtraction.com' ) ) {
+			$url = preg_replace( '/([?&])zip=[^&]*/i', '${1}zip=0', $url );
+			$url = preg_replace( '/([?&])gzip=[^&]*/i', '${1}gzip=0', $url );
+			if ( ! preg_match( '/[?&]zip=/i', $url ) ) {
+				$url .= ( false !== strpos( $url, '?' ) ? '&' : '?' ) . 'zip=0';
+			}
+		}
+
+		if ( ! function_exists( 'download_url' ) && defined( 'ABSPATH' ) && file_exists( ABSPATH . 'wp-admin/includes/file.php' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		if ( function_exists( 'download_url' ) ) {
 			$tmp_file = download_url( $url, 180 );
 			if ( ! is_wp_error( $tmp_file ) && file_exists( $tmp_file ) ) {
-				return $tmp_file;
+				if ( filesize( $tmp_file ) > 0 ) {
+					return $tmp_file;
+				}
+				@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 			}
 		}
 
@@ -346,11 +366,13 @@ class GAE_Sync_Engine {
 	 * @return void
 	 */
 	public function stream_parse_xml( string $file_path, string $source_name, array $filter_rules, array &$report ): void {
+		libxml_use_internal_errors( true );
 		$reader = new \XMLReader();
 
 		// Open XMLReader with libxml flags to ignore errors and preserve memory.
 		if ( ! $reader->open( $file_path, 'UTF-8', LIBXML_NONET | LIBXML_NOBLANKS ) ) {
 			$report['errors'][] = sprintf( '[%s] XMLReader unable to open file: %s', $source_name, $file_path );
+			libxml_clear_errors();
 			return;
 		}
 
@@ -398,6 +420,7 @@ class GAE_Sync_Engine {
 		}
 
 		$reader->close();
+		libxml_clear_errors();
 	}
 
 	/**
