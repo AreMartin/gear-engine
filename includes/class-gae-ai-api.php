@@ -108,12 +108,16 @@ class GAE_AI_API {
 						'min_price' => array(
 							'required'          => false,
 							'type'              => 'number',
-							'sanitize_callback' => 'floatval',
+							'sanitize_callback' => function( $val ) {
+								return floatval( $val );
+							},
 						),
 						'max_price' => array(
 							'required'          => false,
 							'type'              => 'number',
-							'sanitize_callback' => 'floatval',
+							'sanitize_callback' => function( $val ) {
+								return floatval( $val );
+							},
 						),
 						'in_stock'  => array(
 							'required'          => false,

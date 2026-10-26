@@ -166,7 +166,7 @@ class GAE_CPT {
 				'single'            => true,
 				'type'              => 'number',
 				'description'       => __( 'Current affiliate price.', 'gear-engine' ),
-				'sanitize_callback' => 'floatval',
+				'sanitize_callback' => array( $this, 'sanitize_price_meta' ),
 				'auth_callback'     => array( $this, 'meta_auth_callback' ),
 			)
 		);
@@ -180,7 +180,7 @@ class GAE_CPT {
 				'single'            => true,
 				'type'              => 'number',
 				'description'       => __( 'Original / regular price before discount.', 'gear-engine' ),
-				'sanitize_callback' => 'floatval',
+				'sanitize_callback' => array( $this, 'sanitize_price_meta' ),
 				'auth_callback'     => array( $this, 'meta_auth_callback' ),
 			)
 		);
@@ -277,6 +277,19 @@ class GAE_CPT {
 	 */
 	public function meta_auth_callback(): bool {
 		return current_user_can( 'edit_posts' );
+	}
+
+	/**
+	 * Sanitize price value for post meta.
+	 *
+	 * Note: WordPress sanitize_meta() passes 4 arguments ($meta_value, $meta_key, $meta_type, $object_subtype).
+	 * In PHP 8+, internal functions like floatval() throw ArgumentCountError if passed >1 argument.
+	 *
+	 * @param mixed $value Price value.
+	 * @return float
+	 */
+	public function sanitize_price_meta( $value ): float {
+		return floatval( $value );
 	}
 
 	/**
