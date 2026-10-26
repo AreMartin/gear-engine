@@ -26,6 +26,7 @@
 					url: gaeAdminData.ajaxUrl,
 					type: 'POST',
 					dataType: 'json',
+					timeout: 300000,
 					data: {
 						action: 'gae_trigger_manual_sync',
 						nonce: gaeAdminData.syncNonce
@@ -36,14 +37,24 @@
 						$syncStatus.css('color', '#16a34a').text(response.data.message || gaeAdminData.strings.syncSuccess);
 						setTimeout(function() {
 							window.location.reload();
-						}, 2000);
+						}, 2500);
 					} else {
 						var err = (response.data && response.data.message) ? response.data.message : gaeAdminData.strings.syncFailed;
 						$syncStatus.css('color', '#ef4444').text(err);
 					}
 				})
 				.fail(function(xhr, status, error) {
-					$syncStatus.css('color', '#ef4444').text(gaeAdminData.strings.syncFailed + ' (' + error + ')');
+					var errText = gaeAdminData.strings.syncFailed;
+					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+						errText = xhr.responseJSON.data.message;
+					} else if (xhr.responseText && xhr.responseText.length < 250 && xhr.responseText.indexOf('<') === -1) {
+						errText = xhr.responseText;
+					} else if (status === 'timeout') {
+						errText = 'Request timed out due to feed size. Please check your product list as items may still be processing.';
+					} else if (error) {
+						errText += ' (' + error + ')';
+					}
+					$syncStatus.css('color', '#ef4444').text(errText);
 				})
 				.always(function() {
 					$syncBtn.prop('disabled', false);

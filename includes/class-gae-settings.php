@@ -730,7 +730,18 @@ class GAE_Settings {
 		}
 
 		$sync_engine = new GAE_Sync_Engine();
-		$report      = $sync_engine->run_sync();
+		// Force unlock orphaned locks on manual admin click.
+		$report = $sync_engine->run_sync( array(), true );
+
+		if ( isset( $report['status'] ) && 'locked' === $report['status'] ) {
+			wp_send_json_error( array( 'message' => $report['message'] ?? __( 'A sync process is already currently running.', 'gear-engine' ) ) );
+			return;
+		}
+
+		if ( ! empty( $report['errors'] ) && 0 === ( $report['processed'] ?? 0 ) ) {
+			wp_send_json_error( array( 'message' => implode( ' | ', $report['errors'] ) ) );
+			return;
+		}
 
 		$reason_summary = '';
 		if ( ! empty( $report['skip_reasons'] ) ) {
@@ -746,10 +757,10 @@ class GAE_Settings {
 				'message' => sprintf(
 					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary */
 					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)', 'gear-engine' ),
-					absint( $report['processed'] ),
-					absint( $report['inserted'] ),
-					absint( $report['updated'] ),
-					absint( $report['skipped'] ),
+					absint( $report['processed'] ?? 0 ),
+					absint( $report['inserted'] ?? 0 ),
+					absint( $report['updated'] ?? 0 ),
+					absint( $report['skipped'] ?? 0 ),
 					$reason_summary
 				),
 				'report'  => $report,

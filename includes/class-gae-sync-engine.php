@@ -46,10 +46,15 @@ class GAE_Sync_Engine {
 	 * Downloads and streams all configured feeds (Adtraction, TradeTracker) in batches.
 	 *
 	 * @param array<string, mixed> $override_feeds Optional feed URLs for manual/test runs.
+	 * @param bool                 $force_unlock   Whether to clear any existing lock (e.g. manual admin trigger).
 	 * @return array<string, mixed> Detailed execution report.
 	 */
-	public function run_sync( array $override_feeds = array() ): array {
-		// Acquire concurrency lock (2-hour TTL).
+	public function run_sync( array $override_feeds = array(), bool $force_unlock = false ): array {
+		if ( $force_unlock ) {
+			$this->release_lock();
+		}
+
+		// Acquire concurrency lock (10-minute TTL).
 		if ( ! $this->acquire_lock() ) {
 			return array(
 				'status'  => 'locked',
@@ -196,11 +201,15 @@ class GAE_Sync_Engine {
 
 		// If feed is a remote HTTP/HTTPS URL, stream it to a temporary file.
 		if ( preg_match( '#^https?://#i', $feed_source ) ) {
-			$tmp_file = $this->stream_remote_feed_to_file( $feed_source );
-			if ( ! $tmp_file || ! file_exists( $tmp_file ) ) {
+			$download_result = $this->stream_remote_feed_to_file( $feed_source );
+			if ( is_wp_error( $download_result ) ) {
+				$report['errors'][] = sprintf( '[%s] Download failed: %s', $source_name, $download_result->get_error_message() );
+				return;
+			} elseif ( ! $download_result || ! file_exists( $download_result ) ) {
 				$report['errors'][] = sprintf( '[%s] Failed to download remote feed from: %s', $source_name, $feed_source );
 				return;
 			}
+			$tmp_file    = $download_result;
 			$stream_path = $tmp_file;
 		} else {
 			$stream_path = $feed_source;
@@ -258,23 +267,50 @@ class GAE_Sync_Engine {
 	}
 
 	/**
-	 * Stream remote feed directly into a temporary file on disk using wp_remote_get.
+	 * Stream remote feed directly into a temporary file on disk using download_url or wp_remote_get.
 	 *
 	 * @param string $url Remote feed URL.
-	 * @return string|false Path to temporary file or false on failure.
+	 * @return string|\WP_Error Path to temporary file or WP_Error on failure.
 	 */
 	protected function stream_remote_feed_to_file( string $url ) {
-		if ( ! function_exists( 'download_url' ) ) {
+		if ( function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
+			$tmp_file = download_url( $url, 180 );
+			if ( ! is_wp_error( $tmp_file ) && file_exists( $tmp_file ) ) {
+				return $tmp_file;
+			}
 		}
 
-		// 300 second timeout for large catalog downloads.
-		$tmp_file = download_url( $url, 300 );
+		// Fallback: standard wp_remote_get into temporary file.
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'    => 120,
+				'sslverify'  => false,
+				'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+			)
+		);
 
-		if ( is_wp_error( $tmp_file ) ) {
-			return false;
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
 
+		$status_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== (int) $status_code ) {
+			return new \WP_Error( 'gae_http_error', sprintf( 'Remote feed returned HTTP %d', $status_code ) );
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		if ( empty( $body ) ) {
+			return new \WP_Error( 'gae_empty_feed', __( 'Remote feed returned empty response body.', 'gear-engine' ) );
+		}
+
+		$tmp_file = tempnam( sys_get_temp_dir(), 'gae_feed_' );
+		if ( ! $tmp_file ) {
+			return new \WP_Error( 'gae_tmp_failed', __( 'Unable to create local temporary file for feed streaming.', 'gear-engine' ) );
+		}
+
+		file_put_contents( $tmp_file, $body );
 		return $tmp_file;
 	}
 
@@ -1232,8 +1268,8 @@ class GAE_Sync_Engine {
 		if ( get_transient( self::LOCK_KEY ) ) {
 			return false;
 		}
-		// Set lock for 2 hours (7200 seconds).
-		return (bool) set_transient( self::LOCK_KEY, time(), 7200 );
+		// Set lock for 10 minutes (600 seconds).
+		return (bool) set_transient( self::LOCK_KEY, time(), 600 );
 	}
 
 	/**
