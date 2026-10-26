@@ -966,14 +966,14 @@ class GAE_Sync_Engine {
 		// 2. Minimum price filter.
 		$min_price = $filter_rules['min_price'] ?? 0;
 		if ( $min_price > 0 && $item['price'] < $min_price ) {
-			$reason = sprintf( 'Price (%.0f) below min (%.0f)', $item['price'], $min_price );
+			$reason = sprintf( 'Price below minimum threshold (%.0f kr)', $min_price );
 			return false;
 		}
 
 		// 3. Maximum price filter.
 		$max_price = $filter_rules['max_price'] ?? 0;
 		if ( $max_price > 0 && $item['price'] > $max_price ) {
-			$reason = sprintf( 'Price (%.0f) above max (%.0f)', $item['price'], $max_price );
+			$reason = sprintf( 'Price above maximum cap (%.0f kr)', $max_price );
 			return false;
 		}
 
