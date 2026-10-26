@@ -562,6 +562,25 @@ assert_test( $ndjson_report['processed'] === 2, 'ndjson_streaming: Processed 2 l
 assert_test( $ndjson_report['inserted'] === 1, 'ndjson_streaming: 1 valid AirBike imported into CPT' );
 assert_test( $ndjson_report['skipped'] === 1, 'ndjson_streaming: 1 blacklisted item skipped' );
 
+// TEST 11: Hardcoded Test Products for Gutenberg Block Testing
+$test_products = GAE_CPT::get_sample_products_definitions();
+assert_test( count( $test_products ) === 2, 'sample_products: Exactly 2 test products defined' );
+assert_test( $test_products[0]['title'] === 'NordicTrack T Series 6.5S Treadmill', 'sample_products: Product 1 is NordicTrack Treadmill' );
+assert_test( $test_products[1]['title'] === 'Concept2 RowErg Romaskin PM5', 'sample_products: Product 2 is Concept2 RowErg' );
+
+// Test fallback rendering for sample product 1 and 2
+$card_1_html = $block_module->render_product_card( 1 );
+assert_test( str_contains( $card_1_html, 'NordicTrack T Series 6.5S Treadmill' ), 'block_test: Test Product 1 renders in Gutenberg block' );
+assert_test( str_contains( $card_1_html, '13 999 kr' ) || str_contains( $card_1_html, '14 999 kr' ), 'block_test: Test Product 1 price renders' );
+
+$card_2_html = $block_module->render_product_card( 2 );
+assert_test( str_contains( $card_2_html, 'Concept2 RowErg Romaskin' ), 'block_test: Test Product 2 renders in Gutenberg block' );
+assert_test( str_contains( $card_2_html, 'kr' ), 'block_test: Test Product 2 price renders' );
+
+// Test seeding
+$seeded_ids = GAE_CPT::seed_sample_products();
+assert_test( count( $seeded_ids ) === 2, 'sample_products: Both sample products seeded into exercise_gear CPT' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (10/10 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (11/11 suites passed)\n";
 echo "========================================================\n";

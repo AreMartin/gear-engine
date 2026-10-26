@@ -68,6 +68,10 @@ function gae_activate_plugin(): void {
 	$cpt->register_post_type();
 	flush_rewrite_rules();
 
+	// Seed 2 sample test products for immediate Gutenberg block testing.
+	GAE_CPT::seed_sample_products();
+	update_option( 'gae_sample_products_seeded', 1, false );
+
 	// Schedule daily sync WP-Cron job if not already scheduled.
 	if ( ! wp_next_scheduled( 'gae_daily_sync_event' ) ) {
 		wp_schedule_event( time(), 'daily', 'gae_daily_sync_event' );
