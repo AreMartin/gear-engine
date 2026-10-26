@@ -126,17 +126,29 @@ class GAE_Sync_Engine {
 	/**
 	 * Load and normalize pre-filtering criteria from WordPress settings.
 	 *
-	 * @return array{min_price: float, allowed_categories: string[], excluded_keywords: string[]}
+	 * @return array{
+	 *     min_price: float,
+	 *     max_price: float,
+	 *     min_discount_pct: float,
+	 *     only_in_stock: bool,
+	 *     allowed_categories: string[],
+	 *     allowed_merchants: string[],
+	 *     excluded_merchants: string[],
+	 *     excluded_keywords: string[],
+	 *     required_keywords: string[]
+	 * }
 	 */
 	public function load_filter_rules(): array {
-		$min_price          = (float) get_option( 'gae_min_price', 0 );
-		$raw_categories     = (string) get_option( 'gae_allowed_categories', '' );
-		$raw_excluded_words = (string) get_option( 'gae_excluded_keywords', '' );
-
 		return array(
-			'min_price'          => $min_price,
-			'allowed_categories' => $this->parse_delimited_list( $raw_categories ),
-			'excluded_keywords'  => $this->parse_delimited_list( $raw_excluded_words ),
+			'min_price'          => (float) get_option( 'gae_min_price', 0 ),
+			'max_price'          => (float) get_option( 'gae_max_price', 0 ),
+			'min_discount_pct'   => (float) get_option( 'gae_min_discount_pct', 0 ),
+			'only_in_stock'      => (bool) get_option( 'gae_only_in_stock', false ),
+			'allowed_categories' => $this->parse_delimited_list( (string) get_option( 'gae_allowed_categories', '' ) ),
+			'allowed_merchants'  => $this->parse_delimited_list( (string) get_option( 'gae_allowed_merchants', '' ) ),
+			'excluded_merchants' => $this->parse_delimited_list( (string) get_option( 'gae_excluded_merchants', '' ) ),
+			'excluded_keywords'  => $this->parse_delimited_list( (string) get_option( 'gae_excluded_keywords', '' ) ),
+			'required_keywords'  => $this->parse_delimited_list( (string) get_option( 'gae_required_keywords', '' ) ),
 		);
 	}
 
@@ -201,13 +213,47 @@ class GAE_Sync_Engine {
 			return;
 		}
 
-		// Parse the XML using XMLReader for constant O(1) memory usage.
-		$this->stream_parse_xml( $stream_path, $source_name, $filter_rules, $report );
+		// Detect whether feed is JSON or XML format and stream-parse accordingly.
+		$format = $this->detect_feed_format( $stream_path );
+		if ( 'json' === $format ) {
+			$this->stream_parse_json( $stream_path, $source_name, $filter_rules, $report );
+		} else {
+			$this->stream_parse_xml( $stream_path, $source_name, $filter_rules, $report );
+		}
 
 		// Clean up temporary download file.
 		if ( $tmp_file && file_exists( $tmp_file ) ) {
 			@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 		}
+	}
+
+	/**
+	 * Detect whether the feed file content is JSON or XML.
+	 *
+	 * @param string $file_path Local feed file path.
+	 * @return string 'json' or 'xml'
+	 */
+	public function detect_feed_format( string $file_path ): string {
+		$handle = fopen( $file_path, 'r' );
+		if ( ! $handle ) {
+			return 'xml';
+		}
+
+		$sample = fread( $handle, 2048 );
+		fclose( $handle );
+
+		if ( false === $sample || '' === trim( $sample ) ) {
+			return 'xml';
+		}
+
+		$sample_trimmed = ltrim( $sample );
+
+		// JSON files begin with '{' (object) or '[' (array).
+		if ( in_array( $sample_trimmed[0], array( '{', '[' ), true ) ) {
+			return 'json';
+		}
+
+		return 'xml';
 	}
 
 	/**
@@ -257,9 +303,6 @@ class GAE_Sync_Engine {
 		while ( $reader->read() ) {
 			// Look for product/item node elements.
 			if ( \XMLReader::ELEMENT === $reader->nodeType && in_array( strtolower( $reader->localName ), array( 'product', 'item', 'article' ), true ) ) {
-				$report['processed']++;
-				$batch_counter++;
-
 				// Extract outer XML for this node into SimpleXMLElement.
 				$raw_node_xml = $reader->readOuterXml();
 				$xml_element  = false;
@@ -286,34 +329,241 @@ class GAE_Sync_Engine {
 				// Extract normalized item data.
 				$item = $this->extract_item_data( $xml_element, $source_name );
 
-				// Apply pre-filters in-memory BEFORE touching the database.
-				if ( ! $this->passes_pre_filters( $item, $filter_rules ) ) {
-					$report['skipped']++;
-					unset( $xml_element, $node, $item );
-					continue;
-				}
-
-				// Upsert product into WordPress database based on EAN deduplication key.
-				$result = $this->upsert_product( $item );
-				if ( 'inserted' === $result ) {
-					$report['inserted']++;
-				} elseif ( 'updated' === $result ) {
-					$report['updated']++;
-				} else {
-					$report['skipped']++;
-				}
+				$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
 
 				unset( $xml_element, $node, $item );
-
-				// Clean up memory cache periodically in batches.
-				if ( $batch_counter >= self::BATCH_SIZE ) {
-					$this->clear_batch_memory();
-					$batch_counter = 0;
-				}
 			}
 		}
 
 		$reader->close();
+	}
+
+	/**
+	 * Stream-parse a JSON feed file.
+	 *
+	 * Supports standard JSON containers ({"products": [...]}, {"items": [...]}, [{...}])
+	 * and Line-Delimited JSON (NDJSON) with O(1) memory usage.
+	 *
+	 * @param string               $file_path    Local JSON file path.
+	 * @param string               $source_name  Feed source label.
+	 * @param array<string, mixed> $filter_rules Pre-filter rules.
+	 * @param array<string, mixed> $report       Reference to report.
+	 * @return void
+	 */
+	public function stream_parse_json( string $file_path, string $source_name, array $filter_rules, array &$report ): void {
+		$handle = fopen( $file_path, 'r' );
+		if ( ! $handle ) {
+			$report['errors'][] = sprintf( '[%s] Unable to open JSON feed file: %s', $source_name, $file_path );
+			return;
+		}
+
+		$batch_counter = 0;
+		$depth         = 0;
+		$buffer        = '';
+		$in_string     = false;
+		$escape        = false;
+		$in_array      = false;
+
+		// Check if feed is formatted as NDJSON (JSON Lines).
+		$first_line = fgets( $handle );
+		$is_ndjson  = false;
+		if ( false !== $first_line ) {
+			$trimmed = trim( $first_line );
+			if ( ! empty( $trimmed ) && '{' === $trimmed[0] && '}' === $trimmed[ strlen( $trimmed ) - 1 ] ) {
+				$decoded = json_decode( $trimmed, true );
+				if ( is_array( $decoded ) && ( isset( $decoded['ean'] ) || isset( $decoded['name'] ) || isset( $decoded['title'] ) || isset( $decoded['price'] ) || isset( $decoded['sku'] ) ) ) {
+					$is_ndjson = true;
+				}
+			}
+		}
+		rewind( $handle );
+
+		if ( $is_ndjson ) {
+			while ( ( $line = fgets( $handle ) ) !== false ) {
+				$line = trim( $line );
+				if ( empty( $line ) ) {
+					continue;
+				}
+				$raw = json_decode( $line, true );
+				if ( is_array( $raw ) ) {
+					$item = $this->extract_json_item_data( $raw, $source_name );
+					$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
+				}
+			}
+		} else {
+			// Streaming parser for standard JSON array / object container.
+			while ( ( $chunk = fread( $handle, 8192 ) ) !== false && strlen( $chunk ) > 0 ) {
+				$len = strlen( $chunk );
+				for ( $i = 0; $i < $len; $i++ ) {
+					$c = $chunk[ $i ];
+
+					if ( $in_string ) {
+						if ( $in_array && $depth > 0 ) {
+							$buffer .= $c;
+						}
+						if ( $escape ) {
+							$escape = false;
+						} elseif ( '\\' === $c ) {
+							$escape = true;
+						} elseif ( '"' === $c ) {
+							$in_string = false;
+						}
+					} else {
+						if ( '"' === $c ) {
+							$in_string = true;
+							if ( $in_array && $depth > 0 ) {
+								$buffer .= $c;
+							}
+						} elseif ( '[' === $c ) {
+							$in_array = true;
+						} elseif ( ']' === $c ) {
+							$in_array = false;
+						} elseif ( '{' === $c && $in_array ) {
+							$depth++;
+							$buffer .= $c;
+						} elseif ( '}' === $c && $in_array ) {
+							$depth--;
+							$buffer .= $c;
+							if ( 0 === $depth && ! empty( $buffer ) ) {
+								$raw = json_decode( $buffer, true );
+								if ( is_array( $raw ) ) {
+									$item = $this->extract_json_item_data( $raw, $source_name );
+									$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
+								}
+								$buffer = '';
+							}
+						} elseif ( $in_array && $depth > 0 ) {
+							$buffer .= $c;
+						}
+					}
+				}
+			}
+		}
+
+		fclose( $handle );
+	}
+
+	/**
+	 * Process a single extracted item through pre-filters and database upsert.
+	 *
+	 * @param array<string, mixed> $item          Normalized product record.
+	 * @param array<string, mixed> $filter_rules  Pre-filter criteria.
+	 * @param array<string, mixed> $report        Reference to sync report.
+	 * @param int                  $batch_counter Reference to batch counter.
+	 * @return void
+	 */
+	public function process_single_item( array $item, array $filter_rules, array &$report, int &$batch_counter ): void {
+		$report['processed']++;
+		$batch_counter++;
+
+		// Apply pre-filters in-memory BEFORE touching the database.
+		if ( ! $this->passes_pre_filters( $item, $filter_rules ) ) {
+			$report['skipped']++;
+			return;
+		}
+
+		// Upsert product into WordPress database based on EAN deduplication key.
+		$result = $this->upsert_product( $item );
+		if ( 'inserted' === $result ) {
+			$report['inserted']++;
+		} elseif ( 'updated' === $result ) {
+			$report['updated']++;
+		} else {
+			$report['skipped']++;
+		}
+
+		// Clean up memory cache periodically in batches.
+		if ( $batch_counter >= self::BATCH_SIZE ) {
+			$this->clear_batch_memory();
+			$batch_counter = 0;
+		}
+	}
+
+	/**
+	 * Extract and normalize product data from JSON arrays or objects.
+	 *
+	 * @param array<string, mixed> $raw         Raw product data from JSON.
+	 * @param string               $source_name Feed source label.
+	 * @return array<string, mixed> Normalized product record.
+	 */
+	public function extract_json_item_data( array $raw, string $source_name ): array {
+		$find_key = static function( array $keys ) use ( $raw ): string {
+			foreach ( $keys as $k ) {
+				if ( isset( $raw[ $k ] ) && is_scalar( $raw[ $k ] ) && '' !== trim( (string) $raw[ $k ] ) ) {
+					return trim( (string) $raw[ $k ] );
+				}
+				$lower = strtolower( $k );
+				foreach ( $raw as $rk => $rv ) {
+					if ( strtolower( (string) $rk ) === $lower && is_scalar( $rv ) && '' !== trim( (string) $rv ) ) {
+						return trim( (string) $rv );
+					}
+				}
+			}
+			return '';
+		};
+
+		// 1. EAN / Barcode.
+		$ean = $find_key( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'sku', 'SKU', 'product_id', 'id' ) );
+		$ean = preg_replace( '/[^A-Za-z0-9]/', '', $ean ) ?? '';
+
+		// 2. Title.
+		$title = $find_key( array( 'name', 'title', 'product_name', 'productName', 'article_name' ) );
+
+		// 3. Description.
+		$description = $find_key( array( 'description', 'summary', 'desc', 'long_description', 'content' ) );
+
+		// 4. Prices.
+		$raw_price = $find_key( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price' ) );
+		$price     = $this->clean_price( $raw_price );
+
+		$raw_regular = $find_key( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old' ) );
+		$regular     = $this->clean_price( $raw_regular );
+		if ( $regular <= 0 || $regular < $price ) {
+			$regular = $price;
+		}
+
+		// 5. Affiliate URL.
+		$affiliate_url = $find_key( array( 'productUrl', 'product_url', 'url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link' ) );
+
+		// 6. Image URL.
+		$image_url = $find_key( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link' ) );
+
+		// 7. Merchant.
+		$merchant = $find_key( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name' ) );
+		if ( empty( $merchant ) ) {
+			$merchant = $source_name;
+		}
+
+		// 8. Stock Status.
+		$raw_stock = $find_key( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity' ) );
+		$in_stock  = $this->parse_stock_status( $raw_stock );
+
+		// 9. Category.
+		$category = $find_key( array( 'category', 'category_name', 'categories', 'product_category', 'department' ) );
+		if ( isset( $raw['categories'] ) && is_array( $raw['categories'] ) ) {
+			$category = implode( ' > ', array_filter( array_map( 'trim', $raw['categories'] ) ) );
+		}
+
+		// 10. Currency.
+		$currency = $find_key( array( 'currency', 'price_currency' ) );
+		if ( empty( $currency ) ) {
+			$currency = 'kr';
+		}
+
+		return array(
+			'ean'           => $ean,
+			'title'         => $title,
+			'description'   => $description,
+			'price'         => $price,
+			'regular_price' => $regular,
+			'affiliate_url' => $affiliate_url,
+			'image_url'     => $image_url,
+			'merchant'      => $merchant,
+			'in_stock'      => $in_stock,
+			'category'      => $category,
+			'currency'      => $currency,
+			'source'        => $source_name,
+		);
 	}
 
 	/**
@@ -498,13 +748,66 @@ class GAE_Sync_Engine {
 			return false;
 		}
 
+		// 3. Maximum price filter.
+		$max_price = $filter_rules['max_price'] ?? 0;
+		if ( $max_price > 0 && $item['price'] > $max_price ) {
+			return false;
+		}
+
+		// 4. Minimum discount percentage filter.
+		$min_discount_pct = $filter_rules['min_discount_pct'] ?? 0;
+		if ( $min_discount_pct > 0 ) {
+			$regular = (float) ( $item['regular_price'] ?? 0 );
+			$price   = (float) ( $item['price'] ?? 0 );
+			if ( $regular <= $price ) {
+				return false;
+			}
+			$discount_pct = ( ( $regular - $price ) / $regular ) * 100;
+			if ( $discount_pct < $min_discount_pct ) {
+				return false;
+			}
+		}
+
+		// 5. Stock status filter (Only in-stock products).
+		$only_in_stock = ! empty( $filter_rules['only_in_stock'] );
+		if ( $only_in_stock && empty( $item['in_stock'] ) ) {
+			return false;
+		}
+
+		$item_merchant = mb_strtolower( (string) ( $item['merchant'] ?? '' ), 'UTF-8' );
+
+		// 6. Allowed merchants filter (whitelist).
+		$allowed_merchants = $filter_rules['allowed_merchants'] ?? array();
+		if ( ! empty( $allowed_merchants ) ) {
+			$merchant_matched = false;
+			foreach ( $allowed_merchants as $allowed_m ) {
+				if ( '' !== $allowed_m && false !== mb_strpos( $item_merchant, $allowed_m ) ) {
+					$merchant_matched = true;
+					break;
+				}
+			}
+			if ( ! $merchant_matched ) {
+				return false;
+			}
+		}
+
+		// 7. Excluded merchants filter (blacklist).
+		$excluded_merchants = $filter_rules['excluded_merchants'] ?? array();
+		if ( ! empty( $excluded_merchants ) ) {
+			foreach ( $excluded_merchants as $excluded_m ) {
+				if ( '' !== $excluded_m && false !== mb_strpos( $item_merchant, $excluded_m ) ) {
+					return false;
+				}
+			}
+		}
+
 		// Normalize text for category and keyword checks.
 		$item_title = mb_strtolower( (string) $item['title'], 'UTF-8' );
 		$item_cat   = mb_strtolower( (string) ( $item['category'] ?? '' ), 'UTF-8' );
 		$item_desc  = mb_strtolower( (string) ( $item['description'] ?? '' ), 'UTF-8' );
 		$searchable = $item_title . ' ' . $item_cat . ' ' . $item_desc;
 
-		// 3. Allowed categories filter.
+		// 8. Allowed categories filter.
 		$allowed_categories = $filter_rules['allowed_categories'] ?? array();
 		if ( ! empty( $allowed_categories ) ) {
 			$category_matched = false;
@@ -519,13 +822,28 @@ class GAE_Sync_Engine {
 			}
 		}
 
-		// 4. Blacklisted keywords filter.
+		// 9. Blacklisted keywords filter.
 		$excluded_keywords = $filter_rules['excluded_keywords'] ?? array();
 		if ( ! empty( $excluded_keywords ) ) {
 			foreach ( $excluded_keywords as $keyword ) {
 				if ( '' !== $keyword && false !== mb_strpos( $searchable, $keyword ) ) {
 					return false;
 				}
+			}
+		}
+
+		// 10. Required keywords filter (product must contain at least one).
+		$required_keywords = $filter_rules['required_keywords'] ?? array();
+		if ( ! empty( $required_keywords ) ) {
+			$req_matched = false;
+			foreach ( $required_keywords as $req_kw ) {
+				if ( '' !== $req_kw && false !== mb_strpos( $searchable, $req_kw ) ) {
+					$req_matched = true;
+					break;
+				}
+			}
+			if ( ! $req_matched ) {
+				return false;
 			}
 		}
 

@@ -85,7 +85,7 @@ class GAE_Settings {
 			array(
 				'id'          => 'gae_adtraction_url',
 				'type'        => 'url',
-				'description' => __( 'Direct XML product feed URL from Adtraction.', 'gear-engine' ),
+				'description' => __( 'Direct XML or JSON product feed URL from Adtraction (supports XML, JSON, and NDJSON).', 'gear-engine' ),
 			)
 		);
 
@@ -108,7 +108,7 @@ class GAE_Settings {
 			array(
 				'id'          => 'gae_tradetracker_url',
 				'type'        => 'url',
-				'description' => __( 'Direct XML product feed URL from TradeTracker.', 'gear-engine' ),
+				'description' => __( 'Direct XML or JSON product feed URL from TradeTracker (supports XML, JSON, and NDJSON).', 'gear-engine' ),
 			)
 		);
 
@@ -120,6 +120,7 @@ class GAE_Settings {
 			self::PAGE_SLUG
 		);
 
+		// Minimum Price.
 		register_setting(
 			self::OPTION_GROUP,
 			'gae_min_price',
@@ -144,6 +145,81 @@ class GAE_Settings {
 			)
 		);
 
+		// Maximum Price.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_max_price',
+			array(
+				'type'              => 'number',
+				'sanitize_callback' => array( $this, 'sanitize_price' ),
+				'default'           => 0,
+			)
+		);
+
+		add_settings_field(
+			'gae_max_price',
+			__( 'Maximum Price Cap (NOK / kr)', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_max_price',
+				'type'        => 'number',
+				'step'        => 'any',
+				'description' => __( 'Skip commercial or ultra-expensive products above this price threshold (e.g. 60000). Set to 0 to disable.', 'gear-engine' ),
+			)
+		);
+
+		// Minimum Discount Percentage.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_min_discount_pct',
+			array(
+				'type'              => 'number',
+				'sanitize_callback' => array( $this, 'sanitize_price' ),
+				'default'           => 0,
+			)
+		);
+
+		add_settings_field(
+			'gae_min_discount_pct',
+			__( 'Minimum Discount Percentage (%)', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_min_discount_pct',
+				'type'        => 'number',
+				'step'        => '1',
+				'description' => __( 'Only import products currently on sale with at least this discount percentage (e.g. 15 for 15% off). Set to 0 to import all.', 'gear-engine' ),
+			)
+		);
+
+		// In-Stock Only Checkbox.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_only_in_stock',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+
+		add_settings_field(
+			'gae_only_in_stock',
+			__( 'Stock Availability Filter', 'gear-engine' ),
+			array( $this, 'render_field_checkbox' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_only_in_stock',
+				'label'       => __( 'Only import products that are currently in stock', 'gear-engine' ),
+				'description' => __( 'Discards out-of-stock feed items at ingest time, saving database storage and avoiding obsolete product listings.', 'gear-engine' ),
+			)
+		);
+
+		// Allowed Categories.
 		register_setting(
 			self::OPTION_GROUP,
 			'gae_allowed_categories',
@@ -167,6 +243,55 @@ class GAE_Settings {
 			)
 		);
 
+		// Allowed Merchants Whitelist.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_allowed_merchants',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'default'           => '',
+			)
+		);
+
+		add_settings_field(
+			'gae_allowed_merchants',
+			__( 'Allowed Merchants (Whitelist)', 'gear-engine' ),
+			array( $this, 'render_field_textarea' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_allowed_merchants',
+				'rows'        => 2,
+				'description' => __( 'Comma or newline separated merchant/brand names (e.g. GymGrossisten, XXL, Treningspartner). Leave empty to allow all merchants.', 'gear-engine' ),
+			)
+		);
+
+		// Excluded Merchants Blacklist.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_excluded_merchants',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'default'           => '',
+			)
+		);
+
+		add_settings_field(
+			'gae_excluded_merchants',
+			__( 'Excluded Merchants (Blacklist)', 'gear-engine' ),
+			array( $this, 'render_field_textarea' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_excluded_merchants',
+				'rows'        => 2,
+				'description' => __( 'Comma or newline separated merchant names to discard during sync.', 'gear-engine' ),
+			)
+		);
+
+		// Excluded Keywords.
 		register_setting(
 			self::OPTION_GROUP,
 			'gae_excluded_keywords',
@@ -187,6 +312,30 @@ class GAE_Settings {
 				'id'          => 'gae_excluded_keywords',
 				'rows'        => 3,
 				'description' => __( 'Comma or newline separated keywords. Any product containing these words in title, category, or description is discarded.', 'gear-engine' ),
+			)
+		);
+
+		// Required Keywords.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_required_keywords',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'default'           => '',
+			)
+		);
+
+		add_settings_field(
+			'gae_required_keywords',
+			__( 'Required Keywords (Must Match At Least One)', 'gear-engine' ),
+			array( $this, 'render_field_textarea' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_required_keywords',
+				'rows'        => 2,
+				'description' => __( 'Comma or newline separated keywords. If set, products must contain at least one of these keywords in the title or description. Leave empty to allow all.', 'gear-engine' ),
 			)
 		);
 
@@ -320,6 +469,31 @@ class GAE_Settings {
 			esc_attr( $id ),
 			absint( $rows ),
 			esc_textarea( (string) $value )
+		);
+
+		if ( ! empty( $description ) ) {
+			printf( '<p class="description">%s</p>', esc_html( $description ) );
+		}
+	}
+
+	/**
+	 * Render checkbox field.
+	 *
+	 * @param array<string, mixed> $args Field arguments.
+	 */
+	public function render_field_checkbox( array $args ): void {
+		$id          = $args['id'];
+		$value       = (bool) get_option( $id, false );
+		$label       = $args['label'] ?? '';
+		$description = $args['description'] ?? '';
+
+		printf(
+			'<label for="%s"><input type="checkbox" id="%s" name="%s" value="1"%s /> %s</label>',
+			esc_attr( $id ),
+			esc_attr( $id ),
+			esc_attr( $id ),
+			checked( $value, true, false ),
+			esc_html( $label )
 		);
 
 		if ( ! empty( $description ) ) {

@@ -294,6 +294,57 @@ $item_no_ean = $item_valid;
 $item_no_ean['ean'] = '';
 assert_test( $sync_engine->passes_pre_filters( $item_no_ean, $filter_rules ) === false, 'pre_filters: Missing EAN rejected' );
 
+// TEST 3B: Detailed pre-filtering rules (max_price, min_discount_pct, only_in_stock, merchants, required keywords)
+$detailed_rules = $filter_rules;
+$detailed_rules['max_price']          = 20000.0;
+$detailed_rules['min_discount_pct']   = 15.0; // At least 15% discount
+$detailed_rules['only_in_stock']      = true;
+$detailed_rules['allowed_merchants']  = array( 'gymgrossisten', 'xxl' );
+$detailed_rules['excluded_merchants'] = array( 'shadyretailer' );
+$detailed_rules['required_keywords']  = array( 'motor', 'intervall' );
+
+$item_detailed_valid = array(
+	'ean'           => '7071234567899',
+	'title'         => 'Pro Treadmill med sterk motor for intervall',
+	'description'   => 'Toppmodell',
+	'price'         => 12000.0,
+	'regular_price' => 16000.0, // 25% discount (passes >= 15%)
+	'in_stock'      => true,
+	'merchant'      => 'GymGrossisten',
+	'category'      => 'Tredemølle',
+);
+assert_test( $sync_engine->passes_pre_filters( $item_detailed_valid, $detailed_rules ) === true, 'detailed_filters: Valid discounted, in-stock, whitelisted product passes' );
+
+// Fail: Price above max_price
+$item_too_expensive = $item_detailed_valid;
+$item_too_expensive['price'] = 25000.0;
+assert_test( $sync_engine->passes_pre_filters( $item_too_expensive, $detailed_rules ) === false, 'detailed_filters: Product above max_price rejected' );
+
+// Fail: Discount less than min_discount_pct
+$item_low_discount = $item_detailed_valid;
+$item_low_discount['regular_price'] = 12500.0; // only 4% discount
+assert_test( $sync_engine->passes_pre_filters( $item_low_discount, $detailed_rules ) === false, 'detailed_filters: Product below min_discount_pct rejected' );
+
+// Fail: Out of stock when only_in_stock is true
+$item_out_of_stock = $item_detailed_valid;
+$item_out_of_stock['in_stock'] = false;
+assert_test( $sync_engine->passes_pre_filters( $item_out_of_stock, $detailed_rules ) === false, 'detailed_filters: Out of stock product rejected when only_in_stock=true' );
+
+// Fail: Merchant not in whitelist
+$item_unapproved_merchant = $item_detailed_valid;
+$item_unapproved_merchant['merchant'] = 'OtherStore';
+assert_test( $sync_engine->passes_pre_filters( $item_unapproved_merchant, $detailed_rules ) === false, 'detailed_filters: Unlisted merchant rejected by whitelist' );
+
+// Fail: Merchant in blacklist
+$item_blacklisted_merchant = $item_detailed_valid;
+$item_blacklisted_merchant['merchant'] = 'ShadyRetailer';
+assert_test( $sync_engine->passes_pre_filters( $item_blacklisted_merchant, $detailed_rules ) === false, 'detailed_filters: Blacklisted merchant rejected' );
+
+// Fail: Missing required keywords
+$item_missing_req_kw = $item_detailed_valid;
+$item_missing_req_kw['title'] = 'Pro Treadmill uten nøkkelord';
+assert_test( $sync_engine->passes_pre_filters( $item_missing_req_kw, $detailed_rules ) === false, 'detailed_filters: Product missing required keywords rejected' );
+
 // TEST 4: Streaming XML parsing with XMLReader (Adtraction format)
 $sample_adtraction_xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -439,6 +490,78 @@ assert_test( isset( $available_models['gemini-2.0-flash'] ), 'models_list: Gemin
 $models_transient = get_transient( GAE_AI_API::MODELS_CACHE_KEY );
 assert_test( is_array( $models_transient ) && isset( $models_transient['gemini-3.8-flash'] ), 'models_caching: Models cached in transient for periodic automatic refresh' );
 
+// TEST 9: JSON Feed Streaming Parser & Format Auto-Detection
+$sample_json = json_encode( array(
+	'products' => array(
+		array(
+			'ean'           => '7079999000001',
+			'name'          => 'Concept2 RowErg Romaskin',
+			'description'   => 'Verdens mest brukte romaskin med PM5 monitor.',
+			'price'         => 11500,
+			'regular_price' => 13500,
+			'productUrl'    => 'https://example.com/rowerg',
+			'imageUrl'      => 'https://placehold.co/600x450?text=RowErg',
+			'instock'       => 'yes',
+			'category'      => 'Romaskin',
+			'merchant'      => 'GymGrossisten',
+		),
+		array(
+			'ean'           => '7079999000002',
+			'name'          => 'Billig reservedel til romaskin', // Should be skipped by blacklist
+			'description'   => 'Reservedel',
+			'price'         => 2500,
+			'category'      => 'Romaskin',
+		),
+	),
+) );
+
+$tmp_json_file = tempnam( sys_get_temp_dir(), 'gae_json_' );
+file_put_contents( $tmp_json_file, $sample_json );
+
+assert_test( $sync_engine->detect_feed_format( $tmp_json_file ) === 'json', 'json_detect: Correctly auto-detects JSON feed format' );
+
+$json_report = array(
+	'processed' => 0,
+	'inserted'  => 0,
+	'updated'   => 0,
+	'skipped'   => 0,
+	'errors'    => array(),
+);
+
+$sync_engine->process_feed( 'AdtractionJSON', $tmp_json_file, $filter_rules, $json_report );
+unlink( $tmp_json_file );
+
+assert_test( $json_report['processed'] === 2, 'json_streaming: Processed 2 products from JSON feed' );
+assert_test( $json_report['inserted'] === 1, 'json_streaming: Exactly 1 valid product imported into CPT' );
+assert_test( $json_report['skipped'] === 1, 'json_streaming: Non-compliant product skipped by pre-filters' );
+
+// Verify the post was imported into exercise_gear CPT
+$found_rower = GAE_CPT::get_product_by_ean( '7079999000001' );
+assert_test( $found_rower !== null, 'json_cpt: Product from JSON feed directly imported into exercise_gear CPT' );
+assert_test( $found_rower->post_title === 'Concept2 RowErg Romaskin', 'json_cpt: Post title matches JSON name' );
+
+// TEST 10: NDJSON (JSON Lines) Streaming Parser
+$sample_ndjson = "{\"ean\":\"7079999000003\",\"name\":\"Assault AirBike Spinningsykkel\",\"description\":\"Klassisk AirBike\",\"price\":\"8999\",\"productUrl\":\"http://example.com/bike\",\"category\":\"Spinningsykkel\",\"merchant\":\"XXL\",\"instock\":true}\n"
+	. "{\"ean\":\"7079999000004\",\"name\":\"Sykkel reservedel skrue\",\"description\":\"Reservedeler\",\"price\":\"4999\",\"category\":\"Spinningsykkel\"}\n";
+
+$tmp_ndjson_file = tempnam( sys_get_temp_dir(), 'gae_ndjson_' );
+file_put_contents( $tmp_ndjson_file, $sample_ndjson );
+
+$ndjson_report = array(
+	'processed' => 0,
+	'inserted'  => 0,
+	'updated'   => 0,
+	'skipped'   => 0,
+	'errors'    => array(),
+);
+
+$sync_engine->stream_parse_json( $tmp_ndjson_file, 'TradeTrackerNDJSON', $filter_rules, $ndjson_report );
+unlink( $tmp_ndjson_file );
+
+assert_test( $ndjson_report['processed'] === 2, 'ndjson_streaming: Processed 2 lines from NDJSON feed' );
+assert_test( $ndjson_report['inserted'] === 1, 'ndjson_streaming: 1 valid AirBike imported into CPT' );
+assert_test( $ndjson_report['skipped'] === 1, 'ndjson_streaming: 1 blacklisted item skipped' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (8/8 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (10/10 suites passed)\n";
 echo "========================================================\n";
