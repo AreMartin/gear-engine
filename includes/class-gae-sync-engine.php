@@ -555,6 +555,16 @@ class GAE_Sync_Engine {
 			$currency = 'kr';
 		}
 
+		// Fallback: If no explicit EAN/ID was present, generate a deterministic deduplication key
+		// from the affiliate URL or merchant + title so products are never dropped.
+		if ( empty( $ean ) ) {
+			if ( ! empty( $affiliate_url ) ) {
+				$ean = 'url_' . substr( md5( $affiliate_url ), 0, 16 );
+			} elseif ( ! empty( $title ) ) {
+				$ean = 'item_' . substr( md5( $source_name . '_' . $title ), 0, 16 );
+			}
+		}
+
 		return array(
 			'ean'           => $ean,
 			'title'         => $title,
@@ -579,10 +589,10 @@ class GAE_Sync_Engine {
 	 * @return array<string, mixed> Normalized product record.
 	 */
 	public function extract_item_data( \SimpleXMLElement $xml, string $source_name ): array {
-		// Helper closure to find the first matching tag value.
+		// Helper closure to find matching values from child elements, XML attributes, or namespaces.
 		$find_tag = static function( array $tags ) use ( $xml ): string {
+			// 1. Check direct child elements.
 			foreach ( $tags as $tag ) {
-				// Handle property attributes like TradeTracker <property name="ean"><value>...</value></property>
 				if ( false !== strpos( $tag, 'property:' ) ) {
 					$prop_name = substr( $tag, 9 );
 					if ( isset( $xml->properties ) ) {
@@ -598,48 +608,83 @@ class GAE_Sync_Engine {
 					return trim( (string) $xml->{$tag} );
 				}
 			}
+
+			// 2. Check XML element attributes on the node (e.g. <product id="123">).
+			foreach ( $tags as $tag ) {
+				if ( isset( $xml[ $tag ] ) && '' !== trim( (string) $xml[ $tag ] ) ) {
+					return trim( (string) $xml[ $tag ] );
+				}
+			}
+
+			// 3. Check case-insensitive child elements.
+			$lower_map = array();
+			foreach ( $tags as $t ) {
+				$lower_map[ strtolower( $t ) ] = true;
+			}
+			foreach ( $xml->children() as $child_name => $child_val ) {
+				if ( isset( $lower_map[ strtolower( (string) $child_name ) ] ) && '' !== trim( (string) $child_val ) ) {
+					return trim( (string) $child_val );
+				}
+			}
+
+			// 4. Check namespaced tags (e.g. Google Shopping <g:id>, <g:gtin>, <g:title>).
+			$namespaces = $xml->getNamespaces( true );
+			foreach ( $namespaces as $prefix => $ns_url ) {
+				$ns_children = $xml->children( $prefix, true );
+				foreach ( $tags as $tag ) {
+					$clean_tag = str_replace( array( 'g:', 'c:', 'p:' ), '', $tag );
+					if ( isset( $ns_children->{$clean_tag} ) && '' !== trim( (string) $ns_children->{$clean_tag} ) ) {
+						return trim( (string) $ns_children->{$clean_tag} );
+					}
+				}
+			}
+
 			return '';
 		};
 
 		// 1. EAN / Barcode / Unique Identifier.
-		$ean = $find_tag( array( 'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'property:ean', 'property:gtin', 'sku', 'SKU', 'productID', 'productId', 'product_id', 'articleNumber', 'article_number', 'article_id', 'id', 'ID' ) );
-		// Strip any non-alphanumeric characters from EAN.
+		$ean = $find_tag( array(
+			'ean', 'EAN', 'gtin', 'GTIN', 'barcode', 'property:ean', 'property:gtin', 'property:productid',
+			'sku', 'SKU', 'productID', 'productId', 'product_id', 'Product_ID',
+			'articleNumber', 'article_number', 'article_id', 'articleId', 'artno', 'art_no',
+			'id', 'ID', 'item_id', 'itemId', 'mpn', 'MPN', 'model', 'g:id', 'g:gtin',
+		) );
 		$ean = preg_replace( '/[^A-Za-z0-9_-]/', '', $ean ) ?? '';
 
 		// 2. Title / Name.
-		$title = $find_tag( array( 'name', 'title', 'product_name', 'productName', 'article_name' ) );
+		$title = $find_tag( array( 'name', 'title', 'product_name', 'productName', 'article_name', 'g:title' ) );
 
 		// 3. Description.
-		$description = $find_tag( array( 'description', 'summary', 'desc', 'long_description', 'content' ) );
+		$description = $find_tag( array( 'description', 'summary', 'desc', 'long_description', 'content', 'g:description' ) );
 
 		// 4. Prices.
-		$raw_price = $find_tag( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price' ) );
+		$raw_price = $find_tag( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price', 'g:price', 'g:sale_price' ) );
 		$price     = $this->clean_price( $raw_price );
 
-		$raw_regular = $find_tag( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old' ) );
+		$raw_regular = $find_tag( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old', 'g:regular_price' ) );
 		$regular     = $this->clean_price( $raw_regular );
 		if ( $regular <= 0 || $regular < $price ) {
 			$regular = $price;
 		}
 
 		// 5. Affiliate Link.
-		$affiliate_url = $find_tag( array( 'productUrl', 'product_url', 'url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link' ) );
+		$affiliate_url = $find_tag( array( 'productUrl', 'product_url', 'url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link', 'g:link' ) );
 
 		// 6. Image Link.
-		$image_url = $find_tag( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link' ) );
+		$image_url = $find_tag( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link', 'g:image_link' ) );
 
 		// 7. Merchant / Brand.
-		$merchant = $find_tag( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name' ) );
+		$merchant = $find_tag( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name', 'g:brand' ) );
 		if ( empty( $merchant ) ) {
 			$merchant = $source_name;
 		}
 
 		// 8. Stock Status.
-		$raw_stock = $find_tag( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity' ) );
+		$raw_stock = $find_tag( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity', 'g:availability' ) );
 		$in_stock  = $this->parse_stock_status( $raw_stock );
 
 		// 9. Category.
-		$category = $find_tag( array( 'category', 'category_name', 'categories', 'product_category', 'department' ) );
+		$category = $find_tag( array( 'category', 'category_name', 'categories', 'product_category', 'department', 'g:product_type' ) );
 		// If nested category path like "Sport > Trening > Tredemølle".
 		if ( isset( $xml->categories->category ) ) {
 			$cat_list = array();
@@ -655,6 +700,16 @@ class GAE_Sync_Engine {
 		$currency = $find_tag( array( 'currency', 'price_currency' ) );
 		if ( empty( $currency ) ) {
 			$currency = 'kr';
+		}
+
+		// Fallback: If no explicit EAN/ID was present, generate a deterministic deduplication key
+		// from the affiliate URL or merchant + title so products are never dropped.
+		if ( empty( $ean ) ) {
+			if ( ! empty( $affiliate_url ) ) {
+				$ean = 'url_' . substr( md5( $affiliate_url ), 0, 16 );
+			} elseif ( ! empty( $title ) ) {
+				$ean = 'item_' . substr( md5( $source_name . '_' . $title ), 0, 16 );
+			}
 		}
 
 		return array(

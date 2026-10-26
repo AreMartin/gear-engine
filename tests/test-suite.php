@@ -289,10 +289,21 @@ $item_wrong_cat['category'] = 'Klær > Treningssokker';
 $item_wrong_cat['title'] = 'Proffe løpesokker';
 assert_test( $sync_engine->passes_pre_filters( $item_wrong_cat, $filter_rules ) === false, 'pre_filters: Unallowed category rejected' );
 
-// Should fail: Missing EAN
+// Should fail: Missing EAN and Missing URL
 $item_no_ean = $item_valid;
 $item_no_ean['ean'] = '';
-assert_test( $sync_engine->passes_pre_filters( $item_no_ean, $filter_rules ) === false, 'pre_filters: Missing EAN rejected' );
+$item_no_ean['affiliate_url'] = '';
+$item_no_ean['title'] = '';
+assert_test( $sync_engine->passes_pre_filters( $item_no_ean, $filter_rules ) === false, 'pre_filters: Missing EAN/ID and title rejected' );
+
+// Test attribute & URL fallback in XML extraction
+$xml_attr_sample = simplexml_load_string( '<product id="PRD-9988"><name>Test Gear</name><price>5000</price><url>http://example.com/item</url></product>' );
+$extracted_attr = $sync_engine->extract_item_data( $xml_attr_sample, 'Adtraction' );
+assert_test( $extracted_attr['ean'] === 'PRD-9988', 'extract_xml: Extracts ID from XML element attribute <product id="...">' );
+
+$xml_url_only_sample = simplexml_load_string( '<product><name>Test Gear 2</name><price>6000</price><productUrl>http://example.com/unique-deal-123</productUrl></product>' );
+$extracted_url_only = $sync_engine->extract_item_data( $xml_url_only_sample, 'TradeTracker' );
+assert_test( str_starts_with( $extracted_url_only['ean'], 'url_' ), 'extract_xml: Fallback to deterministic URL hash when no explicit barcode or ID' );
 
 // TEST 3B: Detailed pre-filtering rules (max_price, min_discount_pct, only_in_stock, merchants, required keywords)
 $detailed_rules = $filter_rules;
