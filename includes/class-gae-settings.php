@@ -219,6 +219,31 @@ class GAE_Settings {
 			)
 		);
 
+		// Max Products to Import per Run.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_max_items_per_sync',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+				'default'           => 100,
+			)
+		);
+
+		add_settings_field(
+			'gae_max_items_per_sync',
+			__( 'Max Products to Import per Run', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_max_items_per_sync',
+				'type'        => 'number',
+				'step'        => '1',
+				'description' => __( 'Maximum number of products to insert/update in a single sync batch (default 100). Prevents browser memory crashes in WordPress Playground. Set to 0 for unlimited.', 'gear-engine' ),
+			)
+		);
+
 		// Allowed Categories.
 		register_setting(
 			self::OPTION_GROUP,
@@ -752,16 +777,19 @@ class GAE_Settings {
 			$reason_summary = ' — Filters: ' . implode( ', ', array_slice( $labels, 0, 3 ) );
 		}
 
+		$cap_notice = ! empty( $report['batch_capped'] ) ? ' — ' . sprintf( __( 'Batch cap of %d products reached.', 'gear-engine' ), (int) get_option( 'gae_max_items_per_sync', 100 ) ) : '';
+
 		wp_send_json_success(
 			array(
 				'message' => sprintf(
-					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary */
-					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)', 'gear-engine' ),
+					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary, 6: Cap notice */
+					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)%6$s', 'gear-engine' ),
 					absint( $report['processed'] ?? 0 ),
 					absint( $report['inserted'] ?? 0 ),
 					absint( $report['updated'] ?? 0 ),
 					absint( $report['skipped'] ?? 0 ),
-					$reason_summary
+					$reason_summary,
+					$cap_notice
 				),
 				'report'  => $report,
 			)

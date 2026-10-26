@@ -30,7 +30,7 @@ class GAE_Sync_Engine {
 	/**
 	 * Batch size for periodic memory cleanup.
 	 */
-	public const BATCH_SIZE = 100;
+	public const BATCH_SIZE = 25;
 
 	/**
 	 * Constructor.
@@ -70,6 +70,17 @@ class GAE_Sync_Engine {
 			wp_raise_memory_limit( 'admin' );
 		}
 
+		// Optimization for high-volume batch imports: defer term/comment counting and disable revisions.
+		if ( function_exists( 'wp_defer_term_counting' ) ) {
+			wp_defer_term_counting( true );
+		}
+		if ( function_exists( 'wp_defer_comment_counting' ) ) {
+			wp_defer_comment_counting( true );
+		}
+		if ( function_exists( 'remove_action' ) ) {
+			remove_action( 'post_updated', 'wp_save_post_revision', 10 );
+		}
+
 		$report = array(
 			'time'         => time(),
 			'date'         => current_time( 'mysql' ),
@@ -101,6 +112,14 @@ class GAE_Sync_Engine {
 					$e->getMessage()
 				);
 			}
+		}
+
+		// Re-enable term and comment counting and recalculate deferred counts.
+		if ( function_exists( 'wp_defer_term_counting' ) ) {
+			wp_defer_term_counting( false );
+		}
+		if ( function_exists( 'wp_defer_comment_counting' ) ) {
+			wp_defer_comment_counting( false );
 		}
 
 		// Save report for admin dashboard.
@@ -146,6 +165,7 @@ class GAE_Sync_Engine {
 	 */
 	public function load_filter_rules(): array {
 		return array(
+			'max_items_per_sync' => (int) get_option( 'gae_max_items_per_sync', 100 ),
 			'min_price'          => (float) get_option( 'gae_min_price', 0 ),
 			'max_price'          => (float) get_option( 'gae_max_price', 0 ),
 			'min_discount_pct'   => (float) get_option( 'gae_min_discount_pct', 0 ),
@@ -335,9 +355,14 @@ class GAE_Sync_Engine {
 		}
 
 		$batch_counter = 0;
+		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
 
 		// Stream through the XML node by node.
 		while ( $reader->read() ) {
+			if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+				$report['batch_capped'] = true;
+				break;
+			}
 			// Look for product/item node elements.
 			if ( \XMLReader::ELEMENT === $reader->nodeType && in_array( strtolower( $reader->localName ), array( 'product', 'item', 'article' ), true ) ) {
 				// Extract outer XML for this node into SimpleXMLElement.
@@ -395,6 +420,7 @@ class GAE_Sync_Engine {
 		}
 
 		$batch_counter = 0;
+		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
 		$depth         = 0;
 		$buffer        = '';
 		$in_string     = false;
@@ -417,6 +443,10 @@ class GAE_Sync_Engine {
 
 		if ( $is_ndjson ) {
 			while ( ( $line = fgets( $handle ) ) !== false ) {
+				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+					$report['batch_capped'] = true;
+					break;
+				}
 				$line = trim( $line );
 				if ( empty( $line ) ) {
 					continue;
@@ -430,6 +460,10 @@ class GAE_Sync_Engine {
 		} else {
 			// Streaming parser for standard JSON array / object container.
 			while ( ( $chunk = fread( $handle, 8192 ) ) !== false && strlen( $chunk ) > 0 ) {
+				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+					$report['batch_capped'] = true;
+					break;
+				}
 				$len = strlen( $chunk );
 				for ( $i = 0; $i < $len; $i++ ) {
 					$c = $chunk[ $i ];
@@ -1214,6 +1248,8 @@ class GAE_Sync_Engine {
 			return;
 		}
 
+		static $term_cache = array();
+
 		// Clean up category string (e.g. take final segment if breadcrumb like "Sport > Gym > Tredemølle").
 		$parts     = explode( '>', $category );
 		$leaf_name = sanitize_text_field( trim( end( $parts ) ) );
@@ -1222,13 +1258,19 @@ class GAE_Sync_Engine {
 			return;
 		}
 
-		$term = term_exists( $leaf_name, GAE_CPT::TAXONOMY );
-		if ( ! $term ) {
-			$term = wp_insert_term( $leaf_name, GAE_CPT::TAXONOMY );
+		if ( isset( $term_cache[ $leaf_name ] ) ) {
+			$term_id = $term_cache[ $leaf_name ];
+		} else {
+			$term = term_exists( $leaf_name, GAE_CPT::TAXONOMY );
+			if ( ! $term ) {
+				$term = wp_insert_term( $leaf_name, GAE_CPT::TAXONOMY );
+			}
+			$term_id = ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) ? (int) $term['term_id'] : 0;
+			$term_cache[ $leaf_name ] = $term_id;
 		}
 
-		if ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) {
-			wp_set_object_terms( $post_id, (int) $term['term_id'], GAE_CPT::TAXONOMY, true );
+		if ( $term_id > 0 ) {
+			wp_set_object_terms( $post_id, $term_id, GAE_CPT::TAXONOMY, false );
 		}
 	}
 
