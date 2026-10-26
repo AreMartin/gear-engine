@@ -521,30 +521,66 @@ class GAE_Sync_Engine {
 		$raw_price = $find_key( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price' ) );
 		$price     = $this->clean_price( $raw_price );
 
-		$raw_regular = $find_key( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old' ) );
+		$raw_regular = $find_key( array( 'fromPrice', 'from_price', 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old' ) );
 		$regular     = $this->clean_price( $raw_regular );
 		if ( $regular <= 0 || $regular < $price ) {
 			$regular = $price;
 		}
 
 		// 5. Affiliate URL.
-		$affiliate_url = $find_key( array( 'productUrl', 'product_url', 'url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link' ) );
+		$affiliate_url = $find_key( array( 'URL', 'url', 'productUrl', 'product_url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link' ) );
+		if ( ! empty( $affiliate_url ) ) {
+			$affiliate_url = html_entity_decode( $affiliate_url, ENT_QUOTES, 'UTF-8' );
+		}
 
 		// 6. Image URL.
-		$image_url = $find_key( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link' ) );
+		$image_url = '';
+		if ( isset( $raw['images'] ) && is_array( $raw['images'] ) && ! empty( $raw['images'] ) ) {
+			$first_img = reset( $raw['images'] );
+			$image_url = is_string( $first_img ) ? trim( $first_img ) : (string) ( $first_img['url'] ?? $first_img['image'] ?? '' );
+		}
+		if ( empty( $image_url ) ) {
+			$image_url = $find_key( array( 'imageURL_large', 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link' ) );
+		}
 
 		// 7. Merchant.
 		$merchant = $find_key( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name' ) );
-		if ( empty( $merchant ) ) {
+
+		// Extract store name from URL
+		$store_name = '';
+		if ( ! empty( $affiliate_url ) ) {
+			if ( preg_match( '#u=https?%3A%2F%2F(?:www\.)?([^%2F]+)#i', $affiliate_url, $u_matches ) ) {
+				$domain_parts = explode( '.', $u_matches[1] );
+				$store_name   = ucfirst( $domain_parts[0] );
+			} elseif ( $host = ( function_exists( 'wp_parse_url' ) ? wp_parse_url( $affiliate_url, PHP_URL_HOST ) : parse_url( $affiliate_url, PHP_URL_HOST ) ) ) {
+				$clean_host   = preg_replace( '/^(?:partner\.|www\.)/', '', $host );
+				$domain_parts = explode( '.', $clean_host );
+				$store_name   = ucfirst( $domain_parts[0] );
+			}
+		}
+
+		$brand_from_title = '';
+		if ( ! empty( $title ) && false !== strpos( $title, ' - ' ) ) {
+			$title_parts      = explode( ' - ', $title );
+			$brand_from_title = trim( $title_parts[0] );
+		}
+
+		if ( ! empty( $brand_from_title ) && ! empty( $store_name ) && strcasecmp( $brand_from_title, $store_name ) !== 0 ) {
+			$merchant = $brand_from_title . ' (' . $store_name . ')';
+		} elseif ( ! empty( $store_name ) ) {
+			$merchant = $store_name;
+		} elseif ( ! empty( $brand_from_title ) ) {
+			$merchant = $brand_from_title;
+		} elseif ( empty( $merchant ) ) {
 			$merchant = $source_name;
 		}
 
 		// 8. Stock Status.
-		$raw_stock = $find_key( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity' ) );
+		$raw_stock = $find_key( array( 'availability', 'instock', 'in_stock', 'stock', 'inStock', 'quantity' ) );
 		$in_stock  = $this->parse_stock_status( $raw_stock );
 
 		// 9. Category.
-		$category = $find_key( array( 'category', 'category_name', 'categories', 'product_category', 'department' ) );
+		$category = $find_key( array( 'categoryPath', 'category_path', 'category', 'category_name', 'categories', 'product_category', 'department' ) );
 		if ( isset( $raw['categories'] ) && is_array( $raw['categories'] ) ) {
 			$category = implode( ' > ', array_filter( array_map( 'trim', $raw['categories'] ) ) );
 		}
@@ -552,6 +588,9 @@ class GAE_Sync_Engine {
 		// 10. Currency.
 		$currency = $find_key( array( 'currency', 'price_currency' ) );
 		if ( empty( $currency ) ) {
+			$currency = 'kr';
+		}
+		if ( 'NOK' === strtoupper( $currency ) ) {
 			$currency = 'kr';
 		}
 
@@ -661,32 +700,122 @@ class GAE_Sync_Engine {
 		$raw_price = $find_tag( array( 'price', 'current_price', 'product_price', 'productPrice', 'sale_price', 'g:price', 'g:sale_price' ) );
 		$price     = $this->clean_price( $raw_price );
 
-		$raw_regular = $find_tag( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old', 'g:regular_price' ) );
-		$regular     = $this->clean_price( $raw_regular );
+		$raw_regular = '';
+		// Check TradeTracker <property name="fromPrice">
+		if ( isset( $xml->properties ) ) {
+			foreach ( $xml->properties->property as $prop ) {
+				$prop_name = strtolower( (string) $prop['name'] );
+				if ( in_array( $prop_name, array( 'fromprice', 'regularprice', 'oldprice', 'regular_price' ), true ) && '' !== trim( (string) $prop->value ) ) {
+					$raw_regular = trim( (string) $prop->value );
+					break;
+				}
+			}
+		}
+		if ( empty( $raw_regular ) ) {
+			$raw_regular = $find_tag( array( 'regular_price', 'old_price', 'original_price', 'retail_price', 'rrp', 'price_old', 'g:regular_price' ) );
+		}
+		$regular = $this->clean_price( $raw_regular );
 		if ( $regular <= 0 || $regular < $price ) {
 			$regular = $price;
 		}
 
 		// 5. Affiliate Link.
-		$affiliate_url = $find_tag( array( 'productUrl', 'product_url', 'url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link', 'g:link' ) );
+		$affiliate_url = $find_tag( array( 'URL', 'url', 'productUrl', 'product_url', 'trackingUrl', 'affiliate_url', 'link', 'deep_link', 'g:link' ) );
+		if ( ! empty( $affiliate_url ) ) {
+			$affiliate_url = html_entity_decode( $affiliate_url, ENT_QUOTES, 'UTF-8' );
+		}
 
 		// 6. Image Link.
-		$image_url = $find_tag( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link', 'g:image_link' ) );
+		$image_url = '';
+		// Check TradeTracker <images><image>...</image></images>
+		if ( isset( $xml->images->image ) && '' !== trim( (string) $xml->images->image ) ) {
+			$image_url = trim( (string) $xml->images->image );
+		}
+		// Check TradeTracker <property name="imageURL_large"> or <property name="imageURL">
+		if ( empty( $image_url ) && isset( $xml->properties ) ) {
+			foreach ( $xml->properties->property as $prop ) {
+				$prop_name = strtolower( (string) $prop['name'] );
+				if ( in_array( $prop_name, array( 'imageurl_large', 'imageurl', 'image_url', 'image' ), true ) && '' !== trim( (string) $prop->value ) ) {
+					$image_url = trim( (string) $prop->value );
+					break;
+				}
+			}
+		}
+		if ( empty( $image_url ) ) {
+			$image_url = $find_tag( array( 'imageUrl', 'image_url', 'image', 'largeImageUrl', 'product_image_url', 'image_link', 'g:image_link' ) );
+		}
 
 		// 7. Merchant / Brand.
 		$merchant = $find_tag( array( 'merchant', 'merchant_name', 'programName', 'brand', 'shop', 'shop_name', 'g:brand' ) );
-		if ( empty( $merchant ) ) {
+		if ( empty( $merchant ) && isset( $xml->properties ) ) {
+			foreach ( $xml->properties->property as $prop ) {
+				$prop_name = strtolower( (string) $prop['name'] );
+				if ( in_array( $prop_name, array( 'brand', 'merchant', 'shop' ), true ) && '' !== trim( (string) $prop->value ) ) {
+					$merchant = trim( (string) $prop->value );
+					break;
+				}
+			}
+		}
+
+		// Extract store name from affiliate URL (e.g. partner.treningspartner.no or u=https://www.treningspartner.no)
+		$store_name = '';
+		if ( ! empty( $affiliate_url ) ) {
+			if ( preg_match( '#u=https?%3A%2F%2F(?:www\.)?([^%2F]+)#i', $affiliate_url, $u_matches ) ) {
+				$domain_parts = explode( '.', $u_matches[1] );
+				$store_name   = ucfirst( $domain_parts[0] );
+			} elseif ( $host = ( function_exists( 'wp_parse_url' ) ? wp_parse_url( $affiliate_url, PHP_URL_HOST ) : parse_url( $affiliate_url, PHP_URL_HOST ) ) ) {
+				$clean_host   = preg_replace( '/^(?:partner\.|www\.)/', '', $host );
+				$domain_parts = explode( '.', $clean_host );
+				$store_name   = ucfirst( $domain_parts[0] );
+			}
+		}
+
+		// Extract brand prefix from title if present (e.g. "Abilica - SP 900 Spinningsykkel")
+		$brand_from_title = '';
+		if ( ! empty( $title ) && false !== strpos( $title, ' - ' ) ) {
+			$title_parts      = explode( ' - ', $title );
+			$brand_from_title = trim( $title_parts[0] );
+		}
+
+		if ( ! empty( $brand_from_title ) && ! empty( $store_name ) && strcasecmp( $brand_from_title, $store_name ) !== 0 ) {
+			$merchant = $brand_from_title . ' (' . $store_name . ')';
+		} elseif ( ! empty( $store_name ) ) {
+			$merchant = $store_name;
+		} elseif ( ! empty( $brand_from_title ) ) {
+			$merchant = $brand_from_title;
+		} elseif ( empty( $merchant ) ) {
 			$merchant = $source_name;
 		}
 
 		// 8. Stock Status.
-		$raw_stock = $find_tag( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity', 'g:availability' ) );
-		$in_stock  = $this->parse_stock_status( $raw_stock );
+		$raw_stock = '';
+		if ( isset( $xml->properties ) ) {
+			foreach ( $xml->properties->property as $prop ) {
+				$prop_name = strtolower( (string) $prop['name'] );
+				if ( in_array( $prop_name, array( 'availability', 'stock', 'instock' ), true ) && '' !== trim( (string) $prop->value ) ) {
+					$raw_stock = trim( (string) $prop->value );
+					break;
+				}
+			}
+		}
+		if ( empty( $raw_stock ) ) {
+			$raw_stock = $find_tag( array( 'instock', 'in_stock', 'stock', 'availability', 'inStock', 'quantity', 'g:availability' ) );
+		}
+		$in_stock = $this->parse_stock_status( $raw_stock );
 
 		// 9. Category.
-		$category = $find_tag( array( 'category', 'category_name', 'categories', 'product_category', 'department', 'g:product_type' ) );
-		// If nested category path like "Sport > Trening > Tredemølle".
-		if ( isset( $xml->categories->category ) ) {
+		$category = '';
+		// Check TradeTracker <property name="categoryPath">
+		if ( isset( $xml->properties ) ) {
+			foreach ( $xml->properties->property as $prop ) {
+				if ( strcasecmp( (string) $prop['name'], 'categoryPath' ) === 0 && '' !== trim( (string) $prop->value ) ) {
+					$category = trim( (string) $prop->value );
+					break;
+				}
+			}
+		}
+		// If nested categories like <categories><category path="...">
+		if ( empty( $category ) && isset( $xml->categories->category ) ) {
 			$cat_list = array();
 			foreach ( $xml->categories->category as $c ) {
 				$cat_list[] = trim( (string) $c );
@@ -695,10 +824,22 @@ class GAE_Sync_Engine {
 				$category = implode( ' > ', $cat_list );
 			}
 		}
+		if ( empty( $category ) ) {
+			$category = $find_tag( array( 'category', 'category_name', 'categories', 'product_category', 'department', 'g:product_type' ) );
+		}
 
 		// 10. Currency.
-		$currency = $find_tag( array( 'currency', 'price_currency' ) );
+		$currency = '';
+		if ( isset( $xml->price['currency'] ) && '' !== trim( (string) $xml->price['currency'] ) ) {
+			$currency = trim( (string) $xml->price['currency'] );
+		}
 		if ( empty( $currency ) ) {
+			$currency = $find_tag( array( 'currency', 'price_currency' ) );
+		}
+		if ( empty( $currency ) ) {
+			$currency = 'kr';
+		}
+		if ( 'NOK' === strtoupper( $currency ) ) {
 			$currency = 'kr';
 		}
 

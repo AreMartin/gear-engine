@@ -305,6 +305,39 @@ $xml_url_only_sample = simplexml_load_string( '<product><name>Test Gear 2</name>
 $extracted_url_only = $sync_engine->extract_item_data( $xml_url_only_sample, 'TradeTracker' );
 assert_test( str_starts_with( $extracted_url_only['ean'], 'url_' ), 'extract_xml: Fallback to deterministic URL hash when no explicit barcode or ID' );
 
+// TEST 3A: Real TradeTracker feed XML schema extraction test
+$real_tradetracker_xml = <<<XML
+<product ID="409448">
+<campaignID>8591</campaignID>
+<name>Abilica - SP 900 Spinningsykkel</name>
+<price currency="NOK">14999.00</price>
+<URL>https://partner.treningspartner.no/c?c=8591&amp;m=2376152&amp;a=448546&amp;r=&amp;u=https%3A%2F%2Fwww.treningspartner.no%2Fabilica-sp-900-spinningsykkel%2F409448</URL>
+<images>
+<image>https://www.treningspartner.no/media/85/c0/66/1729074195/409448_Abilica%20SP900_01.jpg?ts=1729074195</image>
+</images>
+<description><![CDATA[Abilica SP 900 spinningsykkel]]></description>
+<properties>
+<property name="availability"><value>in_stock</value></property>
+<property name="categoryPath"><value>Kondisjon &gt; Kondisjonsapparater &gt; Spinningsykkel</value></property>
+<property name="fromPrice"><value>14999.00</value></property>
+<property name="imageURL_large"><value>https://www.treningspartner.no/media/85/c0/66/1729074195/409448_Abilica%20SP900_01.jpg?ts=1729074195</value></property>
+</properties>
+</product>
+XML;
+
+$tt_sample_element = simplexml_load_string( $real_tradetracker_xml );
+$tt_data = $sync_engine->extract_item_data( $tt_sample_element, 'TradeTracker' );
+assert_test( $tt_data['ean'] === '409448', 'tradetracker_schema: ID attribute correctly mapped to EAN/ID' );
+assert_test( $tt_data['title'] === 'Abilica - SP 900 Spinningsykkel', 'tradetracker_schema: Title correctly mapped' );
+assert_test( $tt_data['price'] === 14999.0, 'tradetracker_schema: Price correctly mapped' );
+assert_test( $tt_data['regular_price'] === 14999.0, 'tradetracker_schema: fromPrice mapped to regular_price' );
+assert_test( $tt_data['image_url'] === 'https://www.treningspartner.no/media/85/c0/66/1729074195/409448_Abilica%20SP900_01.jpg?ts=1729074195', 'tradetracker_schema: <images><image> mapped to image_url' );
+assert_test( str_contains( $tt_data['affiliate_url'], 'partner.treningspartner.no' ), 'tradetracker_schema: <URL> mapped to affiliate_url' );
+assert_test( $tt_data['in_stock'] === true, 'tradetracker_schema: availability in_stock mapped to boolean true' );
+assert_test( $tt_data['category'] === 'Kondisjon > Kondisjonsapparater > Spinningsykkel', 'tradetracker_schema: categoryPath mapped to category' );
+assert_test( $tt_data['merchant'] === 'Abilica (Treningspartner)', 'tradetracker_schema: Merchant identified from brand and domain' );
+assert_test( $tt_data['currency'] === 'kr', 'tradetracker_schema: NOK normalized to kr' );
+
 // TEST 3B: Detailed pre-filtering rules (max_price, min_discount_pct, only_in_stock, merchants, required keywords)
 $detailed_rules = $filter_rules;
 $detailed_rules['max_price']          = 20000.0;
