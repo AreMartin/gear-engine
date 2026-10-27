@@ -18,11 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class GAE_Chat_Agent {
 
 	/**
-	 * Default fallback Google Places API Key if not customized in settings.
-	 */
-	public const DEFAULT_PLACES_KEY = 'AIzaSyBzgcprTumb8J4J0eXY6d-pj-v70QmKYH8';
-
-	/**
 	 * Return the master clinical prompt.
 	 *
 	 * @return string
@@ -509,9 +504,9 @@ EOT;
 	 * @return array
 	 */
 	public static function search_google_places( string $location ): array {
-		$api_key = trim( (string) get_option( 'gae_google_places_key', self::DEFAULT_PLACES_KEY ) );
+		$api_key = trim( (string) get_option( 'gae_google_places_key', '' ) );
 		if ( empty( $api_key ) ) {
-			$api_key = self::DEFAULT_PLACES_KEY;
+			return array();
 		}
 
 		$url = 'https://places.googleapis.com/v1/places:searchText';
