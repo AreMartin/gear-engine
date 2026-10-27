@@ -156,6 +156,16 @@ class Gear_Engine_Exercises_CPT {
 	 * @return string
 	 */
 	public function sanitize_exorlive_id( $value ): string {
+		return self::sanitize_exorlive_id_static( $value );
+	}
+
+	/**
+	 * Static ExorLive ID sanitizer shared by the importer and query service.
+	 *
+	 * @param mixed $value Raw identifier.
+	 * @return string
+	 */
+	public static function sanitize_exorlive_id_static( $value ): string {
 		if ( ! is_scalar( $value ) ) {
 			return '';
 		}
@@ -170,6 +180,16 @@ class Gear_Engine_Exercises_CPT {
 	 * @return string
 	 */
 	public function sanitize_video_culture( $value ): string {
+		return self::sanitize_video_culture_static( $value );
+	}
+
+	/**
+	 * Static player locale sanitizer shared by the importer.
+	 *
+	 * @param mixed $value Raw locale.
+	 * @return string
+	 */
+	public static function sanitize_video_culture_static( $value ): string {
 		if ( ! is_scalar( $value ) ) {
 			return 'nb-NO';
 		}

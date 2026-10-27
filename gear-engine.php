@@ -40,6 +40,7 @@ require_once GAE_PLUGIN_DIR . 'includes/class-gae-ai-api.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-product-service.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-service.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-importer.php';
 
 // Require feature modules.
 require_once GAE_PLUGIN_DIR . 'modules/physio-chat/class-gae-physio-chat.php';
@@ -60,6 +61,7 @@ function gae_init_plugin(): void {
 	new GAE_Gutenberg_Block();
 	new GAE_AI_API();
 	new Gear_Engine_Exercises_CPT();
+	new Gear_Engine_Exercise_Importer();
 
 	// Instantiate feature modules.
 	new GAE_Physio_Chat();

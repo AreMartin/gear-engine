@@ -120,6 +120,9 @@ function delete_transient( $key ) {
 function sanitize_text_field( $str ) {
 	return is_scalar( $str ) ? strip_tags( (string) $str ) : '';
 }
+function sanitize_key( $key ) {
+	return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );
+}
 function sanitize_title( $title ) {
 	return trim( preg_replace( '/[^a-z0-9-]+/i', '-', strtolower( (string) $title ) ), '-' );
 }
@@ -131,6 +134,9 @@ function wp_unslash( $value ) {
 		return array_map( 'wp_unslash', $value );
 	}
 	return is_string( $value ) ? stripslashes( $value ) : $value;
+}
+function wp_http_validate_url( $url ) {
+	return is_string( $url ) && (bool) filter_var( $url, FILTER_VALIDATE_URL ) && in_array( strtolower( (string) parse_url( $url, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true );
 }
 function wp_parse_url( $url, $component = -1 ) {
 	return parse_url( $url, $component );
@@ -236,6 +242,7 @@ class WP_Post {
 	public string $post_content = '';
 	public string $post_excerpt = '';
 	public string $post_type = 'exercise_gear';
+	public string $post_status = 'publish';
 }
 
 function get_post( $id ) {
@@ -269,6 +276,7 @@ function wp_insert_post( $args ) {
 	$post->post_content = $args['post_content'] ?? '';
 	$post->post_excerpt = $args['post_excerpt'] ?? '';
 	$post->post_type = $args['post_type'] ?? 'exercise_gear';
+	$post->post_status = $args['post_status'] ?? 'draft';
 	$GLOBALS['wp_posts'][ $post->ID ] = $post;
 	return $post->ID;
 }
@@ -277,8 +285,13 @@ function wp_update_post( $args ) {
 	if ( isset( $GLOBALS['wp_posts'][ $id ] ) ) {
 		if ( isset( $args['post_title'] ) ) $GLOBALS['wp_posts'][ $id ]->post_title = $args['post_title'];
 		if ( isset( $args['post_content'] ) ) $GLOBALS['wp_posts'][ $id ]->post_content = $args['post_content'];
+		if ( isset( $args['post_excerpt'] ) ) $GLOBALS['wp_posts'][ $id ]->post_excerpt = $args['post_excerpt'];
+		if ( isset( $args['post_status'] ) ) $GLOBALS['wp_posts'][ $id ]->post_status = $args['post_status'];
 	}
 	return $id;
+}
+function get_post_status( $post_id ) {
+	return $GLOBALS['wp_posts'][ $post_id ]->post_status ?? false;
 }
 
 // Stub $wpdb
@@ -325,6 +338,7 @@ require_once ABSPATH . 'includes/class-gae-ai-api.php';
 require_once ABSPATH . 'includes/class-gae-product-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-importer.php';
 require_once ABSPATH . 'modules/physio-chat/class-gae-physio-chat.php';
 
 // Test runner helper
@@ -1086,6 +1100,35 @@ $exercise_cpt->save_meta_box( $exercise_ids[0], $saved_exercise_post );
 assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, true ) && 'nb-NO' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE, true ), 'exercise_cpt: Safely sanitizes invalid editor ID and locale values' );
 assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_SOURCE_URL, true ), 'exercise_cpt: Rejects non-scalar source URLs' );
 unset( $_POST );
+
+$csv_path = tempnam( sys_get_temp_dir(), 'gear-engine-exercises-' );
+file_put_contents(
+	$csv_path,
+	"\xEF\xBB\xBFexternal_key,title,description,summary,area,equipment,dosage,exorlive_id,video_culture,source_url\n"
+	. "csv-new-1,CSV curl,\"Instructions, with comma\",Short,kne;skulder,strikk,3 x 10,,nb-NO,https://example.com/reference\n"
+	. "csv-new-1,Duplicate curl,Instructions,Short,kne,strikk,3 x 10,,nb-NO,\n"
+	. "bad-id,Bad ID,Instructions,Short,kne,strikk,3 x 10,72x2,nb-NO,\n"
+);
+$csv_preview = Gear_Engine_Exercise_Importer::validate_csv_file( $csv_path );
+unlink( $csv_path );
+assert_test( is_array( $csv_preview ) && 3 === count( $csv_preview ), 'exercise_importer: Parses UTF-8 CSV and preserves quoted comma fields' );
+assert_test( empty( $csv_preview[0]['errors'] ) && 'Instructions, with comma' === $csv_preview[0]['data']['description'], 'exercise_importer: Validates and normalizes a valid row' );
+assert_test( ! empty( $csv_preview[1]['errors'] ) && ! empty( $csv_preview[2]['errors'] ), 'exercise_importer: Flags duplicate keys and invalid ExorLive IDs during preview' );
+$import_summary = Gear_Engine_Exercise_Importer::import_rows( $csv_preview );
+assert_test( 1 === $import_summary['imported'] && 2 === $import_summary['skipped'] && 0 === $import_summary['failed'], 'exercise_importer: Imports valid rows and skips invalid preview rows' );
+$imported_exercise_id = 0;
+foreach ( $GLOBALS['wp_posts'] as $candidate_post ) {
+	if ( 'CSV curl' === $candidate_post->post_title ) {
+		$imported_exercise_id = $candidate_post->ID;
+		break;
+	}
+}
+assert_test( $imported_exercise_id > 0 && 'draft' === get_post_status( $imported_exercise_id ), 'exercise_importer: Creates new exercises as drafts by default' );
+$csv_preview[0]['data']['title'] = 'Updated CSV curl';
+$update_summary = Gear_Engine_Exercise_Importer::import_rows( array( $csv_preview[0] ) );
+assert_test( 1 === $update_summary['updated'] && 'Updated CSV curl' === $GLOBALS['wp_posts'][ $imported_exercise_id ]->post_title, 'exercise_importer: Re-import upserts by external_key without creating duplicates' );
+$publish_summary = Gear_Engine_Exercise_Importer::import_rows( array( $csv_preview[0] ), true );
+assert_test( 1 === $publish_summary['updated'] && 'publish' === get_post_status( $imported_exercise_id ), 'exercise_importer: Publishing requires the explicit publish option' );
 
 echo "========================================================\n";
 echo "ALL TESTS PASSED SUCCESSFULLY! (16/16 suites passed)\n";
