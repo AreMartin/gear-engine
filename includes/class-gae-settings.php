@@ -923,18 +923,6 @@ class GAE_Settings {
 					<div class="gae-sync-report-summary">
 						<strong><?php esc_html_e( 'Last Sync Report:', 'gear-engine' ); ?></strong>
 						<span><?php printf( esc_html__( 'Inserted: %d | Updated: %d | Skipped (Filtered): %d | Total Processed: %d', 'gear-engine' ), absint( $last_report['inserted'] ?? 0 ), absint( $last_report['updated'] ?? 0 ), absint( $last_report['skipped'] ?? 0 ), absint( $last_report['processed'] ?? 0 ) ); ?></span>
-						<?php if ( ! empty( $last_report['skip_reasons'] ) ) : ?>
-							<div class="gae-skip-reasons" style="margin-top: 6px; font-size: 12px; color: #b45309;">
-								<strong><?php esc_html_e( 'Filter Skip Breakdown:', 'gear-engine' ); ?></strong>
-								<?php
-								$reason_labels = array();
-								foreach ( (array) $last_report['skip_reasons'] as $r_msg => $r_cnt ) {
-									$reason_labels[] = esc_html( $r_msg . ' (' . $r_cnt . ')' );
-								}
-								echo implode( ' · ', $reason_labels );
-								?>
-							</div>
-						<?php endif; ?>
 						<?php if ( ! empty( $last_report['errors'] ) ) : ?>
 							<div class="gae-report-errors" style="color:#ef4444; margin-top:4px;">
 								<?php echo esc_html( implode( ' | ', (array) $last_report['errors'] ) ); ?>
@@ -1184,15 +1172,6 @@ class GAE_Settings {
 			return;
 		}
 
-		$reason_summary = '';
-		if ( ! empty( $report['skip_reasons'] ) ) {
-			$labels = array();
-			foreach ( (array) $report['skip_reasons'] as $r_msg => $r_cnt ) {
-				$labels[] = $r_msg . ' (' . $r_cnt . ')';
-			}
-			$reason_summary = ' — Filters: ' . implode( ', ', array_slice( $labels, 0, 3 ) );
-		}
-
 		$cap_notice = '';
 		if ( ! empty( $report['batch_capped'] ) ) {
 			$cap_notice .= ' — ' . sprintf( __( 'Batch run cap reached (%d products).', 'gear-engine' ), (int) ( $override_rules['max_items_per_sync'] ?? get_option( 'gae_max_items_per_sync', 100 ) ) );
@@ -1213,13 +1192,12 @@ class GAE_Settings {
 		wp_send_json_success(
 			array(
 				'message' => sprintf(
-					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Reason summary, 6: Cap notice, 7: Error notice */
-					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d%5$s)%6$s%7$s', 'gear-engine' ),
+					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Cap notice, 6: Error notice */
+					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d)%5$s%6$s', 'gear-engine' ),
 					absint( $report['processed'] ?? 0 ),
 					absint( $report['inserted'] ?? 0 ),
 					absint( $report['updated'] ?? 0 ),
 					absint( $report['skipped'] ?? 0 ),
-					$reason_summary,
 					$cap_notice,
 					$err_notice
 				),
