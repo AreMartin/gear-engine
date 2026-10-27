@@ -38,6 +38,8 @@ require_once GAE_PLUGIN_DIR . 'includes/class-gae-sync-engine.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-gutenberg-block.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-ai-api.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-product-service.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercises-cpt.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-service.php';
 
 // Require feature modules.
 require_once GAE_PLUGIN_DIR . 'modules/physio-chat/class-gae-physio-chat.php';
@@ -57,6 +59,7 @@ function gae_init_plugin(): void {
 	new GAE_Sync_Engine();
 	new GAE_Gutenberg_Block();
 	new GAE_AI_API();
+	new Gear_Engine_Exercises_CPT();
 
 	// Instantiate feature modules.
 	new GAE_Physio_Chat();
@@ -73,6 +76,9 @@ function gae_activate_plugin(): void {
 	require_once GAE_PLUGIN_DIR . 'includes/class-gae-cpt.php';
 	$cpt = new GAE_CPT();
 	$cpt->register_post_type();
+	$exercise_cpt = new Gear_Engine_Exercises_CPT();
+	$exercise_cpt->register_content_types();
+	Gear_Engine_Exercises_CPT::seed_sample_exercises();
 	flush_rewrite_rules();
 
 	// Seed 2 sample test products for immediate Gutenberg block testing.

@@ -224,35 +224,42 @@
         const playOverlay = document.getElementById('modal-play-overlay');
         const videoPlayer = document.getElementById('modal-video-player');
         const hintOverlay = document.getElementById('video-hint-overlay');
+        const attributionLink = document.getElementById('modal-video-attribution');
+        const exorliveId = String(ovelse.exorlive_id || '');
+        const videoCulture = String(ovelse.video_culture || 'nb-NO');
+        const hasExorLiveVideo = /^\d+$/.test(exorliveId);
 
         if (videoPlayer) {
             videoPlayer.innerHTML = '';
             videoPlayer.classList.add('hidden');
         }
+        if (attributionLink) attributionLink.classList.add('hidden');
         if (hintOverlay) {
             hintOverlay.classList.add('hidden');
         }
         if (hintTimeoutId) clearTimeout(hintTimeoutId);
 
         if (videoContainer) {
-            if ((ovelse.bilde_url && ovelse.bilde_url.trim() !== '') || (ovelse.video_url && ovelse.video_url.trim() !== '')) {
+            if ((ovelse.bilde_url && ovelse.bilde_url.trim() !== '') || (ovelse.video_url && ovelse.video_url.trim() !== '') || hasExorLiveVideo) {
                 videoContainer.style.setProperty('display', 'flex', 'important');
                 
                 let vidUrl = ovelse.video_url || '';
                 let isYouTube = vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be');
-                let isExorLive = vidUrl.includes('exorlive.com');
+                let isExorLive = hasExorLiveVideo;
 
                 if (isExorLive && videoPlayer) {
+                    const safeCulture = /^[a-z]{2}-[A-Z]{2}$/.test(videoCulture) ? videoCulture : 'nb-NO';
+                    const exorliveUrl = `https://exorlive.com/video/?culture=${encodeURIComponent(safeCulture)}&ex=${encodeURIComponent(exorliveId)}`;
                     if (videoThumb) videoThumb.style.display = 'none';
                     if (playOverlay) playOverlay.style.setProperty('display', 'none', 'important');
                     videoPlayer.classList.remove('hidden');
+                    if (attributionLink) attributionLink.classList.remove('hidden');
                     if (hintOverlay) {
                         hintOverlay.classList.remove('hidden');
                         hintOverlay.style.opacity = '1';
                         hintTimeoutId = setTimeout(() => { hintOverlay.style.opacity = '0'; }, 4000);
                     }
-                    let sep = vidUrl.includes('?') ? '&' : '?';
-                    videoPlayer.innerHTML = `<iframe src="${vidUrl}${sep}autoplay=false&repeat=true&hd=true" class="w-full h-full absolute top-0 left-0 border-0 scale-[1.32]" style="transform-origin: center center;" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+                    videoPlayer.innerHTML = `<iframe src="${exorliveUrl}&autoplay=false&repeat=true&hd=true" class="w-full h-full absolute top-0 left-0 border-0 scale-[1.32]" style="transform-origin: center center;" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
                 } else if (isYouTube && videoPlayer) {
                     if (videoThumb) videoThumb.style.display = 'none';
                     if (playOverlay) playOverlay.style.setProperty('display', 'none', 'important');

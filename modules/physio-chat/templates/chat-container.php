@@ -128,6 +128,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</div>
 					<div id="modal-video-player" class="hidden absolute inset-0 w-full h-full bg-white z-20 overflow-hidden"></div>
 				</div>
+				<a id="modal-video-attribution" class="hidden -mt-3 mb-5 text-xs text-gray-500 underline" href="https://www.exorlive.com/no/ovelser-i-exorlive" target="_blank" rel="noopener noreferrer">Øvelse og video levert av ExorLive</a>
 				
 				<h3 id="modal-ex-title" style="font-size: 20px !important; font-weight: 700 !important; color: #1A2A3A !important; margin-bottom: 12px !important; line-height: 1.2 !important;">Navn</h3>
 				<div id="modal-ex-reps-container" class="mb-4">

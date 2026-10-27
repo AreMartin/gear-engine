@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GAE_Chat_Agent {
 
+	public const GEAR_ENGINE_MAX_EXERCISES_PER_PROGRAM = 5;
+
 	/**
 	 * Return the master clinical prompt.
 	 *
@@ -53,7 +55,7 @@ Du MÅ ALLTID inkludere 'multiselect' (boolean):
 - Sett "multiselect": true når du stiller kartleggingsspørsmål om symptomer, smertekarakter eller provoserende aktiviteter (triage) der brukeren kan ha flere plager samtidig, slik at brukeren kan velge flere alternativer.
 - Sett "multiselect": false ved vanlige valg der brukeren velger ett enkelt svar.
 
-For øvelser bruker du systemkontekst hvis det finnes relevante øvelser der. Dersom det ikke finnes relevante øvelser kan du foreslå egnede øvelser basert på fysioterapifaglig kunnskap.
+For øvelser bruker du systemkontekst hvis det finnes relevante øvelser der. Dersom CPT-biblioteket er oppgitt, bruk bare øvelsene derfra og returner CPT-ID-en i feltet "library_id" for hver valgt øvelse. Ikke finn på navn, instruksjoner eller ExorLive-ID-er. Dersom det ikke finnes relevante øvelser i systemkonteksten kan du foreslå egnede øvelser basert på fysioterapifaglig kunnskap.
 
 [PRODUKTER FLERE - type: "grid"]
 "card": { "type": "grid", "data": { "tittel": "Anbefalt utstyr", "items": [ {"tittel": "Navn", "butikk": "Butikk", "pris": "100 kr", "forpris": "150 kr", "url": "URL", "bilde_url": "URL"} ] } }
@@ -66,7 +68,8 @@ VIKTIG: Du MÅ bruke type "liste" for klinikker. Du MÅ inkludere feltene rating
 "card": { "type": "triage_resultat", "data": { "tittel": "Diagnose", "kategori": "Kne", "alvorlighetsgrad": "Lav", "forklaring": "Info", "tiltak_na": "Ro", "tiltak_videre": "Trening", "notat_anamnese": "Sammendrag.", "notat_rode_flagg": "Ingen.", "notat_hypotese": "...", "notat_icpc2": "L99", "notat_icd10": "M22.2" } }
 
 [ØVELSER - type: "exorlive"]
-"card": { "type": "exorlive", "data": { "hovedtittel": "Klinisk protokoll", "tittel": "Treningsprogram", "ovelser": [ { "navn": "Navn", "beskrivelse": "Kort", "reps": "3 x 10", "bilde_url": "", "video_url": "", "kriterier": "", "maal": "" } ] } }
+Et treningsprogram kan inneholde maksimalt fem øvelser. Når CPT_EXERCISE_LIBRARY finnes, returner bare library_id for valgte øvelser. Bruk aldri iframe-HTML eller oppdiktede øvelsesdata.
+"card": { "type": "exorlive", "data": { "hovedtittel": "Klinisk protokoll", "tittel": "Treningsprogram", "ovelser": [ { "library_id": 123 } ] } }
 EOT;
 	}
 
@@ -241,9 +244,44 @@ EOT;
 			}
 		}
 
-		$injected_context = '';
+		$injected_context    = '';
+		$exercise_candidates = array();
 
-		if ( $is_ovelser && ! empty( $detected_ovelser_file ) ) {
+		if ( $is_ovelser && class_exists( 'Gear_Engine_Exercise_Service' ) ) {
+			$area_aliases = array(
+				'kne'     => 'kne',
+				'skulder' => 'skulder',
+				'rygg'    => 'rygg',
+				'fot'     => 'fot-ankel',
+				'ankel'   => 'fot-ankel',
+				'hofte'   => 'hofte',
+				'albue'   => 'albue',
+			);
+			$search_args = array( 'limit' => self::GEAR_ENGINE_MAX_EXERCISES_PER_PROGRAM );
+			if ( isset( $area_aliases[ $detected_part ] ) ) {
+				$search_args['area'] = $area_aliases[ $detected_part ];
+			}
+
+			$exercise_candidates = Gear_Engine_Exercise_Service::search_exercises( $search_args );
+			if ( ! empty( $exercise_candidates ) ) {
+				$compact_candidates = array_map(
+					static function ( array $exercise ): array {
+						return array(
+							'library_id' => $exercise['id'],
+							'title'      => $exercise['title'],
+							'summary'    => wp_trim_words( $exercise['summary'] ?: $exercise['description'], 24 ),
+							'area'       => $exercise['area'],
+							'equipment'  => $exercise['equipment'],
+							'dosage'     => $exercise['dosage'],
+						);
+					},
+					$exercise_candidates
+				);
+				$injected_context .= "\nCPT_EXERCISE_LIBRARY (velg kun relevante øvelser og returner library_id):\n" . wp_json_encode( $compact_candidates );
+			}
+		}
+
+		if ( $is_ovelser && empty( $exercise_candidates ) && ! empty( $detected_ovelser_file ) ) {
 			$t_result = self::read_safe_json( $detected_ovelser_file );
 			if ( ! empty( $t_result ) ) {
 				$injected_context .= "\nSYSTEM-DATA (ØVELSER FUNNET for {$detected_part}):\n" . wp_json_encode( $t_result );
@@ -364,7 +402,10 @@ EOT;
 			),
 		);
 
-		$final_user_prompt = "BRUKER SIER:\n\"{$user_message}\"\n" . ( ! empty( $injected_context ) ? "\n--- USYNLIG SYSTEM KONTEKST ---\n{$injected_context}" : '' );
+		$exercise_selection_instruction = ! empty( $exercise_candidates )
+			? "\nFor treningsprogram: velg kun øvelser fra CPT_EXERCISE_LIBRARY. Returner valgt library_id per øvelse. Ikke skriv egne øvelsesdetaljer; backend fyller disse fra CPT."
+			: '';
+		$final_user_prompt = "BRUKER SIER:\n\"{$user_message}\"\n{$exercise_selection_instruction}" . ( ! empty( $injected_context ) ? "\n--- USYNLIG SYSTEM KONTEKST ---\n{$injected_context}" : '' );
 		$contents   = $history;
 		$contents[] = array( 'role' => 'user', 'parts' => array( array( 'text' => $final_user_prompt ) ) );
 
@@ -495,7 +536,7 @@ EOT;
 		}
 
 		// Normalize cards and choices.
-		$bot_data = self::normalize_bot_response( $bot_data );
+		$bot_data = self::normalize_bot_response( $bot_data, $exercise_candidates );
 
 		return new WP_REST_Response( $bot_data, 200 );
 	}
@@ -664,10 +705,11 @@ EOT;
 	/**
 	 * Normalize bot response structure, card types, and choices array.
 	 *
-	 * @param array $bot_data
+	 * @param array $bot_data            Parsed AI response.
+	 * @param array $exercise_candidates Curated CPT candidates for this response.
 	 * @return array
 	 */
-	private static function normalize_bot_response( array $bot_data ): array {
+	private static function normalize_bot_response( array $bot_data, array $exercise_candidates = array() ): array {
 		if ( ! isset( $bot_data['card'] ) || ! is_array( $bot_data['card'] ) ) {
 			$bot_data['card'] = array( 'type' => 'none', 'data' => array() );
 		}
@@ -699,6 +741,103 @@ EOT;
 					$item['bilde_url'] = ! empty( $item['bilde_url'] ) ? $item['bilde_url'] : 'https://placehold.co/600x450/1e293b/ffffff?text=Bilde+mangler';
 				}
 			}
+		}
+
+		if ( 'exorlive' === strtolower( (string) ( $bot_data['card']['type'] ?? 'none' ) ) ) {
+			if ( ! isset( $bot_data['card']['data'] ) || ! is_array( $bot_data['card']['data'] ) ) {
+				$bot_data['card']['data'] = array();
+			}
+
+			$exercises = $bot_data['card']['data']['ovelser'] ?? array();
+			$exercises = is_array( $exercises ) ? array_slice( array_values( $exercises ), 0, self::GEAR_ENGINE_MAX_EXERCISES_PER_PROGRAM ) : array();
+
+			if ( ! empty( $exercise_candidates ) ) {
+				$candidate_map = array();
+				foreach ( $exercise_candidates as $candidate ) {
+					if ( isset( $candidate['id'] ) ) {
+						$candidate_map[ (string) absint( $candidate['id'] ) ] = $candidate;
+					}
+				}
+
+				$selected_exercises = array();
+				$selected_ids       = array();
+				foreach ( $exercises as $exercise ) {
+					if ( ! is_array( $exercise ) ) {
+						continue;
+					}
+					$library_id = $exercise['library_id'] ?? $exercise['exercise_id'] ?? '';
+					if ( ! is_scalar( $library_id ) || ! preg_match( '/^\d+$/', (string) $library_id ) ) {
+						continue;
+					}
+					$library_id = (string) absint( $library_id );
+					if ( '' === $library_id || isset( $selected_ids[ $library_id ] ) || ! isset( $candidate_map[ $library_id ] ) ) {
+						continue;
+					}
+
+					$record = $candidate_map[ $library_id ];
+					$selected_exercises[] = array(
+						'library_id'      => (int) $record['id'],
+						'navn'            => $record['title'],
+						'beskrivelse'     => $record['description'],
+						'reps'            => $record['dosage'],
+						'bilde_url'       => '',
+						'exorlive_id'     => $record['exorlive_id'],
+						'video_culture'   => $record['video_culture'],
+						'video_url'       => $record['video_url'],
+						'attribution_url' => $record['attribution_url'],
+					);
+					$selected_ids[ $library_id ] = true;
+				}
+				$bot_data['card']['data']['ovelser'] = $selected_exercises;
+				if ( empty( $selected_exercises ) ) {
+					$bot_data['card']['type'] = 'none';
+					$bot_data['card']['data'] = array();
+				}
+
+				$exercises = $selected_exercises;
+			}
+
+			foreach ( $exercises as &$exercise ) {
+				if ( ! is_array( $exercise ) ) {
+					continue;
+				}
+
+				$exercise_id = $exercise['exorlive_id'] ?? '';
+				$culture     = $exercise['video_culture'] ?? 'nb-NO';
+				$video_url   = $exercise['video_url'] ?? '';
+				$has_exorlive_source = is_scalar( $exercise_id ) && '' !== trim( (string) $exercise_id );
+
+				if ( ! $has_exorlive_source && is_scalar( $video_url ) ) {
+					$video_parts = wp_parse_url( (string) $video_url );
+					if (
+						is_array( $video_parts )
+						&& in_array( strtolower( (string) ( $video_parts['host'] ?? '' ) ), array( 'exorlive.com', 'www.exorlive.com' ), true )
+						&& '/video/' === ( $video_parts['path'] ?? '' )
+					) {
+						$query = array();
+						parse_str( (string) ( $video_parts['query'] ?? '' ), $query );
+						$exercise_id = $query['ex'] ?? '';
+						$culture     = $query['culture'] ?? 'nb-NO';
+						$has_exorlive_source = true;
+					}
+				}
+
+				if ( ! $has_exorlive_source && is_scalar( $video_url ) && false !== stripos( (string) $video_url, 'exorlive.com' ) ) {
+					$has_exorlive_source = true;
+				}
+				if ( ! $has_exorlive_source ) {
+					continue;
+				}
+
+				$canonical_url = Gear_Engine_Exercise_Service::build_exorlive_video_url( $exercise_id, $culture );
+				$exercise['exorlive_id']   = '' !== $canonical_url ? trim( (string) $exercise_id ) : '';
+				$exercise['video_culture'] = '' !== $canonical_url && is_scalar( $culture ) && preg_match( '/^[a-z]{2}-[A-Z]{2}$/', (string) $culture ) ? (string) $culture : 'nb-NO';
+				$exercise['video_url']     = $canonical_url;
+				$exercise['attribution_url'] = '' !== $canonical_url ? 'https://www.exorlive.com/no/ovelser-i-exorlive' : '';
+			}
+			unset( $exercise );
+
+			$bot_data['card']['data']['ovelser'] = $exercises;
 		}
 
 		// Clean choices.

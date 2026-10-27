@@ -20,13 +20,16 @@ $GLOBALS['wp_options']    = array();
 $GLOBALS['wp_transients'] = array();
 $GLOBALS['wp_posts']      = array();
 $GLOBALS['wp_postmeta']   = array();
+$GLOBALS['registered_post_meta'] = array();
 
 function add_action( $hook, $callback, $priority = 10, $accepted_args = 1 ) {}
 function add_filter( $hook, $callback, $priority = 10, $accepted_args = 1 ) {}
 function add_shortcode( $tag, $callback ) {}
 function register_post_type( $post_type, $args = array() ) {}
 function register_taxonomy( $taxonomy, $object_type, $args = array() ) {}
-function register_post_meta( $post_type, $meta_key, $args = array() ) {}
+function register_post_meta( $post_type, $meta_key, $args = array() ) {
+	$GLOBALS['registered_post_meta'][ $post_type ][ $meta_key ] = $args;
+}
 function register_setting( $option_group, $option_name, $args = array() ) {}
 function add_settings_section( $id, $title, $callback, $page ) {}
 function add_settings_field( $id, $title, $callback, $page, $section = 'default', $args = array() ) {}
@@ -59,7 +62,17 @@ function shortcode_atts( $pairs, $atts, $shortcode = '' ) {
 class WP_Query {
 	public array $posts = array();
 	public function __construct( $args = array() ) {
-		$this->posts = array_values( $GLOBALS['wp_posts'] );
+		$GLOBALS['last_wp_query_args'] = $args;
+		$posts = array_values( $GLOBALS['wp_posts'] );
+		if ( ! empty( $args['post_type'] ) ) {
+			$posts = array_values( array_filter( $posts, function( $post ) use ( $args ) {
+				return $post->post_type === $args['post_type'];
+			} ) );
+		}
+		if ( isset( $args['posts_per_page'] ) && (int) $args['posts_per_page'] > 0 ) {
+			$posts = array_slice( $posts, 0, (int) $args['posts_per_page'] );
+		}
+		$this->posts = $posts;
 	}
 	public function have_posts(): bool {
 		return ! empty( $this->posts );
@@ -107,8 +120,29 @@ function delete_transient( $key ) {
 function sanitize_text_field( $str ) {
 	return is_scalar( $str ) ? strip_tags( (string) $str ) : '';
 }
+function sanitize_title( $title ) {
+	return trim( preg_replace( '/[^a-z0-9-]+/i', '-', strtolower( (string) $title ) ), '-' );
+}
 function sanitize_textarea_field( $str ) {
 	return is_scalar( $str ) ? strip_tags( (string) $str ) : '';
+}
+function wp_unslash( $value ) {
+	if ( is_array( $value ) ) {
+		return array_map( 'wp_unslash', $value );
+	}
+	return is_string( $value ) ? stripslashes( $value ) : $value;
+}
+function wp_parse_url( $url, $component = -1 ) {
+	return parse_url( $url, $component );
+}
+function wp_verify_nonce( $nonce, $action ) {
+	return 'valid-exercise-nonce' === $nonce && 'gear_engine_save_exercise' === $action ? 1 : false;
+}
+function current_user_can( $capability, ...$args ) {
+	return true;
+}
+function wp_is_post_revision( $post_id ) {
+	return false;
 }
 function esc_url_raw( $url ) {
 	return filter_var( $url, FILTER_SANITIZE_URL ) ?: '';
@@ -210,6 +244,19 @@ function get_post( $id ) {
 function get_post_meta( $post_id, $key, $single = false ) {
 	return $GLOBALS['wp_postmeta'][ $post_id ][ $key ] ?? ( $single ? '' : array() );
 }
+function get_posts( $args = array() ) {
+	$results = array();
+	foreach ( $GLOBALS['wp_posts'] as $post_id => $post ) {
+		if ( isset( $args['post_type'] ) && $post->post_type !== $args['post_type'] ) {
+			continue;
+		}
+		if ( isset( $args['meta_key'] ) && get_post_meta( $post_id, $args['meta_key'], true ) !== ( $args['meta_value'] ?? '' ) ) {
+			continue;
+		}
+		$results[] = ( isset( $args['fields'] ) && 'ids' === $args['fields'] ) ? $post_id : $post;
+	}
+	return array_slice( $results, 0, (int) ( $args['posts_per_page'] ?? 5 ) );
+}
 function update_post_meta( $post_id, $key, $value ) {
 	$GLOBALS['wp_postmeta'][ $post_id ][ $key ] = $value;
 	return true;
@@ -276,6 +323,8 @@ require_once ABSPATH . 'includes/class-gae-sync-engine.php';
 require_once ABSPATH . 'includes/class-gae-gutenberg-block.php';
 require_once ABSPATH . 'includes/class-gae-ai-api.php';
 require_once ABSPATH . 'includes/class-gae-product-service.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once ABSPATH . 'modules/physio-chat/class-gae-physio-chat.php';
 
 // Test runner helper
@@ -897,6 +946,41 @@ $prompt = GAE_Chat_Agent::get_default_prompt();
 assert_test( false !== strpos( $prompt, "Du er 'Fysionett-assistenten'" ), 'chat_agent: Master prompt defines Norwegian Fysionett assistant persona' );
 assert_test( false !== strpos( $prompt, 'search_products' ) && false !== strpos( $prompt, 'find_physiotherapist' ), 'chat_agent: Master prompt declares search_products and find_physiotherapist tools' );
 assert_test( false !== strpos( $prompt, 'triage_resultat' ) && false !== strpos( $prompt, 'exorlive' ), 'chat_agent: Master prompt defines triage and exorlive schema' );
+assert_test( false !== strpos( $prompt, 'maksimalt fem øvelser' ) && false !== strpos( $prompt, 'library_id' ), 'chat_agent: Exercise prompt specifies CPT candidate IDs and five-exercise cap' );
+$normalizer = new ReflectionMethod( GAE_Chat_Agent::class, 'normalize_bot_response' );
+$normalized_program = $normalizer->invoke(
+	null,
+	array(
+		'message' => 'Program',
+		'card'    => array(
+			'type' => 'exorlive',
+			'data' => array(
+				'ovelser' => array(
+					array( 'navn' => 'A', 'video_url' => 'https://exorlive.com/video/?culture=nb-NO&ex=7282' ),
+					array( 'navn' => 'B', 'video_url' => 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' ),
+					array( 'navn' => 'C' ),
+					array( 'navn' => 'D' ),
+					array( 'navn' => 'E' ),
+					array( 'navn' => 'F' ),
+				),
+			),
+		),
+	)
+);
+assert_test( 5 === count( $normalized_program['card']['data']['ovelser'] ), 'chat_agent: Enforces maximum five exercises per program in backend normalization' );
+assert_test( '7282' === $normalized_program['card']['data']['ovelser'][0]['exorlive_id'] && 'https://exorlive.com/video/?culture=nb-NO&ex=7282' === $normalized_program['card']['data']['ovelser'][0]['video_url'], 'chat_agent: Converts official ExorLive link into validated structured player data' );
+assert_test( 'https://www.exorlive.com/no/ovelser-i-exorlive' === $normalized_program['card']['data']['ovelser'][0]['attribution_url'], 'chat_agent: Adds the official ExorLive attribution target' );
+assert_test( 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === $normalized_program['card']['data']['ovelser'][1]['video_url'], 'chat_agent: Preserves existing non-ExorLive protocol videos' );
+$malformed_program = $normalizer->invoke(
+	null,
+	array(
+		'card' => array(
+			'type' => 'exorlive',
+			'data' => array( 'ovelser' => array( array( 'navn' => 'Ugyldig', 'exorlive_id' => '7282&x=1' ) ) ),
+		),
+	)
+);
+assert_test( '' === $malformed_program['card']['data']['ovelser'][0]['video_url'], 'chat_agent: Rejects malformed ExorLive IDs before response reaches the player' );
 
 // 15.4 Verify local clinical protocol JSON files (knee, shoulder, back, foot)
 $data_dir = ABSPATH . 'modules/physio-chat/data/';
@@ -931,6 +1015,78 @@ $no_key_req = new WP_REST_Request( array( 'message' => 'Hei, jeg har vondt i kne
 $no_key_res = GAE_Chat_Agent::handle_chat_request( $no_key_req );
 assert_test( 200 === $no_key_res->status && false !== strpos( $no_key_res->data['message'], 'Google AI Studio API-nøkkel er ikke konfigurert' ), 'chat_agent: Returns helpful Norwegian setup instruction when API key is missing' );
 
+// TEST 16: Shared curated exercise library
+$exercise_cpt = new Gear_Engine_Exercises_CPT();
+$exercise_cpt->register_content_types();
+$exorlive_meta = $GLOBALS['registered_post_meta'][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE ][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID ];
+assert_test( ! empty( $exorlive_meta['show_in_rest'] ) && is_callable( $exorlive_meta['auth_callback'] ) && is_callable( $exorlive_meta['sanitize_callback'] ), 'exercise_cpt: ExorLive metadata is sanitized and permission-checked in REST' );
+$asserted_culture_meta = $GLOBALS['registered_post_meta'][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE ][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE ];
+assert_test( ! empty( $asserted_culture_meta['show_in_rest'] ) && is_callable( $asserted_culture_meta['auth_callback'] ) && is_callable( $asserted_culture_meta['sanitize_callback'] ), 'exercise_cpt: Player locale metadata is sanitized and permission-checked in REST' );
+assert_test( '' === $exercise_cpt->sanitize_exorlive_id( '7282&bad=1' ) && '' === $exercise_cpt->sanitize_exorlive_id( array( '7282' ) ), 'exercise_cpt: Rejects malformed or non-scalar ExorLive IDs' );
+assert_test( 'nb-NO' === $exercise_cpt->sanitize_video_culture( 'en-us' ) && 'nb-NO' === $exercise_cpt->sanitize_video_culture( array( 'en-US' ) ), 'exercise_cpt: Falls back for malformed or non-scalar player locales' );
+$exercise_ids = Gear_Engine_Exercises_CPT::seed_sample_exercises();
+assert_test( count( $exercise_ids ) === 2, 'exercise_cpt: Seeds two sample exercises' );
+assert_test( Gear_Engine_Exercises_CPT::seed_sample_exercises() === $exercise_ids, 'exercise_cpt: Sample seeding is idempotent' );
+
+$exercise_results = Gear_Engine_Exercise_Service::search_exercises( array( 'limit' => 5 ) );
+assert_test( count( $exercise_results ) === 2, 'exercise_service: Returns curated published exercise records' );
+assert_test( 5 === $GLOBALS['last_wp_query_args']['posts_per_page'], 'exercise_service: Applies requested result limit in WP_Query' );
+Gear_Engine_Exercise_Service::search_exercises( array( 'area' => 'kne', 'limit' => 5 ) );
+assert_test( isset( $GLOBALS['last_wp_query_args']['tax_query'][0]['terms'] ) && 'kne' === $GLOBALS['last_wp_query_args']['tax_query'][0]['terms'], 'exercise_service: Supports taxonomy-based body-area retrieval for chat' );
+assert_test( 'https://exorlive.com/video/?culture=nb-NO&ex=7282' === $exercise_results[0]['video_url'], 'exercise_service: Builds player URL from official ExorLive ID and locale' );
+assert_test( '' === Gear_Engine_Exercise_Service::build_exorlive_video_url( '7282&x=1', 'nb-NO' ), 'exercise_service: Refuses malformed player IDs' );
+assert_test( 'https://exorlive.com/video/?culture=nb-NO&ex=7282' === Gear_Engine_Exercise_Service::build_exorlive_video_url( '7282', 'en-us' ), 'exercise_service: Defaults invalid player locale to nb-NO' );
+assert_test( 'https://www.exorlive.com/no/ovelser-i-exorlive' === $exercise_results[0]['attribution_url'], 'exercise_service: Exposes the official ExorLive attribution target' );
+assert_test( '' === $exercise_results[1]['video_url'], 'exercise_service: Does not invent a video URL for an exercise without an ID' );
+assert_test( ! empty( $exercise_results[0]['description'] ) && $exercise_results[0]['description'] !== $exercise_results[1]['description'], 'exercise_cpt: Sample instructions are distinct original descriptions' );
+$cpt_program = $normalizer->invoke(
+	null,
+	array(
+		'message' => 'Program',
+		'card'    => array(
+			'type' => 'exorlive',
+			'data' => array(
+				'ovelser' => array(
+					array( 'library_id' => $exercise_results[0]['id'], 'navn' => 'AI-forslag' ),
+					array( 'library_id' => 999999, 'navn' => 'Oppdiktet øvelse', 'exorlive_id' => '12345' ),
+				),
+			),
+		),
+	),
+	$exercise_results
+);
+assert_test( 1 === count( $cpt_program['card']['data']['ovelser'] ), 'chat_agent: Keeps only candidate exercise IDs returned by the CPT service' );
+assert_test( $exercise_results[0]['title'] === $cpt_program['card']['data']['ovelser'][0]['navn'] && $exercise_results[0]['description'] === $cpt_program['card']['data']['ovelser'][0]['beskrivelse'], 'chat_agent: Builds selected exercise details from canonical CPT records' );
+assert_test( $exercise_results[0]['video_url'] === $cpt_program['card']['data']['ovelser'][0]['video_url'], 'chat_agent: Uses the CPT ExorLive metadata when composing the program' );
+$too_many_exercises = Gear_Engine_Exercise_Service::search_exercises( array( 'limit' => 500 ) );
+assert_test( 50 === $GLOBALS['last_wp_query_args']['posts_per_page'] && count( $too_many_exercises ) <= 50, 'exercise_service: Caps general queries to 50 results' );
+$invalid_exercise = new WP_Post();
+$invalid_exercise->ID = 999;
+$invalid_exercise->post_type = Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE;
+$GLOBALS['wp_postmeta'][999][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID ] = '72x2';
+$GLOBALS['wp_postmeta'][999][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE ] = 'en-US';
+$invalid_exercise_data = Gear_Engine_Exercise_Service::get_exercise_data( $invalid_exercise );
+assert_test( '' === $invalid_exercise_data['exorlive_id'] && '' === $invalid_exercise_data['video_url'], 'exercise_service: Does not create a player URL from an invalid stored ID' );
+$GLOBALS['wp_postmeta'][999][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID ] = '7282';
+$GLOBALS['wp_postmeta'][999][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE ] = array( 'en-US' );
+$invalid_culture_data = Gear_Engine_Exercise_Service::get_exercise_data( $invalid_exercise );
+assert_test( 'https://exorlive.com/video/?culture=nb-NO&ex=7282' === $invalid_culture_data['video_url'], 'exercise_service: Uses the default locale for malformed stored culture values' );
+
+$_POST = array(
+	'gear_engine_exercise_nonce'      => 'valid-exercise-nonce',
+	'gear_engine_exorlive_id'         => '7282<script>',
+	'gear_engine_video_culture'       => array( 'en-US' ),
+	'gear_engine_exercise_dosage'     => '3 x 8',
+	'gear_engine_exercise_source_url' => array( 'https://example.com/source' ),
+);
+$exercise_cpt->save_meta_box( $exercise_ids[0], null );
+assert_test( '7282' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, true ), 'exercise_cpt: Ignores save callbacks without a matching post object' );
+$saved_exercise_post = $GLOBALS['wp_posts'][ $exercise_ids[0] ];
+$exercise_cpt->save_meta_box( $exercise_ids[0], $saved_exercise_post );
+assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, true ) && 'nb-NO' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE, true ), 'exercise_cpt: Safely sanitizes invalid editor ID and locale values' );
+assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_SOURCE_URL, true ), 'exercise_cpt: Rejects non-scalar source URLs' );
+unset( $_POST );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (15/15 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (16/16 suites passed)\n";
 echo "========================================================\n";
