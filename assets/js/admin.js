@@ -297,7 +297,7 @@
 			var remaining = totalSlots - visibleSlots;
 			var $addBtn = $('#gae-add-feed-btn');
 			if (remaining > 0) {
-				$addBtn.prop('disabled', false).find('.gae-add-feed-text').text('+ Add Partner Feed (' + remaining + ' slots remaining)');
+				$addBtn.prop('disabled', false).find('.gae-add-feed-text').text('Add Partner Feed (' + remaining + ' slots remaining)');
 			} else {
 				$addBtn.prop('disabled', true).find('.gae-add-feed-text').text('All 5 Slots In Use');
 			}

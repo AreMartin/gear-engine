@@ -587,3 +587,51 @@
 	margin-top: 14px;
 	padding-top: 10px;
 }
+
+#gae-add-feed-btn {
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 6px !important;
+	height: 34px !important;
+	line-height: 1 !important;
+	padding: 0 14px !important;
+	font-size: 13px !important;
+	font-weight: 600 !important;
+	color: #1e293b !important;
+	background: #ffffff !important;
+	border: 1px solid #cbd5e1 !important;
+	border-radius: 4px !important;
+	white-space: nowrap !important;
+	vertical-align: middle !important;
+	cursor: pointer !important;
+	box-sizing: border-box !important;
+}
+
+#gae-add-feed-btn:hover {
+	background: #f8fafc !important;
+	border-color: #94a3b8 !important;
+	color: #0f172a !important;
+}
+
+#gae-add-feed-btn:disabled {
+	opacity: 0.6 !important;
+	cursor: not-allowed !important;
+}
+
+#gae-add-feed-btn .dashicons {
+	display: inline-block !important;
+	font-size: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
+	line-height: 16px !important;
+	margin: 0 !important;
+	vertical-align: middle !important;
+	color: #2563eb !important;
+}
+
+#gae-add-feed-btn .gae-add-feed-text {
+	display: inline-block !important;
+	line-height: 1 !important;
+	vertical-align: middle !important;
+}

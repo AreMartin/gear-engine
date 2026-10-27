@@ -537,12 +537,12 @@ class GAE_Settings {
 
 			<div class="gae-feeds-card-footer">
 				<button type="button" id="gae-add-feed-btn" class="button button-secondary" <?php disabled( $visible_count >= 5 ); ?>>
-					<span class="dashicons dashicons-plus-alt2" style="font-size:16px; width:16px; height:16px; vertical-align:middle; margin-right:4px;"></span>
+					<span class="dashicons dashicons-plus-alt2"></span>
 					<span class="gae-add-feed-text">
 						<?php
 						$remaining = max( 0, 5 - $visible_count );
 						if ( $remaining > 0 ) {
-							printf( esc_html__( '+ Add Partner Feed (%d slots remaining)', 'gear-engine' ), $remaining );
+							printf( esc_html__( 'Add Partner Feed (%d slots remaining)', 'gear-engine' ), $remaining );
 						} else {
 							esc_html_e( 'All 5 Slots In Use', 'gear-engine' );
 						}
