@@ -107,137 +107,22 @@ class GAE_Settings {
 			)
 		);
 
-		// 2. Pre-Filter Settings section.
+		// 2. Advanced Ingest Rules & Limits section.
 		add_settings_section(
 			'gae_section_filters',
-			__( 'Feed Pre-Filtering Rules', 'gear-engine' ),
+			__( 'Advanced Ingest Rules & Limits', 'gear-engine' ),
 			array( $this, 'render_filters_section_intro' ),
 			self::PAGE_SLUG
 		);
 
-		// Minimum Price.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_min_price',
-			array(
-				'type'              => 'number',
-				'sanitize_callback' => array( $this, 'sanitize_price' ),
-				'default'           => 0,
-			)
-		);
-
-		add_settings_field(
-			'gae_min_price',
-			__( 'Minimum Price Threshold (NOK / kr)', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_min_price',
-				'type'        => 'number',
-				'step'        => 'any',
-				'description' => __( 'Skip exercise products with price lower than this threshold (e.g. 1000). Set to 0 to disable.', 'gear-engine' ),
-			)
-		);
-
-		// Maximum Price.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_max_price',
-			array(
-				'type'              => 'number',
-				'sanitize_callback' => array( $this, 'sanitize_price' ),
-				'default'           => 0,
-			)
-		);
-
-		add_settings_field(
-			'gae_max_price',
-			__( 'Maximum Price Cap (NOK / kr)', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_max_price',
-				'type'        => 'number',
-				'step'        => 'any',
-				'description' => __( 'Skip commercial or ultra-expensive products above this price threshold (e.g. 60000). Set to 0 to disable.', 'gear-engine' ),
-			)
-		);
-
-		// Minimum Discount Percentage.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_min_discount_pct',
-			array(
-				'type'              => 'number',
-				'sanitize_callback' => array( $this, 'sanitize_price' ),
-				'default'           => 0,
-			)
-		);
-
-		add_settings_field(
-			'gae_min_discount_pct',
-			__( 'Minimum Discount Percentage (%)', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_min_discount_pct',
-				'type'        => 'number',
-				'step'        => '1',
-				'description' => __( 'Only import products currently on sale with at least this discount percentage (e.g. 15 for 15% off). Set to 0 to import all.', 'gear-engine' ),
-			)
-		);
-
-		// In-Stock Only Checkbox.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_only_in_stock',
-			array(
-				'type'              => 'boolean',
-				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => false,
-			)
-		);
-
-		add_settings_field(
-			'gae_only_in_stock',
-			__( 'Stock Availability Filter', 'gear-engine' ),
-			array( $this, 'render_field_checkbox' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_only_in_stock',
-				'label'       => __( 'Only import products that are currently in stock', 'gear-engine' ),
-				'description' => __( 'Discards out-of-stock feed items at ingest time, saving database storage and avoiding obsolete product listings.', 'gear-engine' ),
-			)
-		);
-
-		// Max Products to Import per Run.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_max_items_per_sync',
-			array(
-				'type'              => 'integer',
-				'sanitize_callback' => 'absint',
-				'default'           => 100,
-			)
-		);
-
-		add_settings_field(
-			'gae_max_items_per_sync',
-			__( 'Max Products to Import per Run', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_max_items_per_sync',
-				'type'        => 'number',
-				'step'        => '1',
-				'description' => __( 'Maximum number of products to insert/update in a single sync batch (default 100). Prevents browser memory crashes in WordPress Playground. Set to 0 for unlimited.', 'gear-engine' ),
-			)
-		);
+		// Core filter settings (registered for options persistence; UI is rendered in the interactive filter panel above).
+		register_setting( self::OPTION_GROUP, 'gae_min_price', array( 'type' => 'number', 'sanitize_callback' => array( $this, 'sanitize_price' ), 'default' => 0 ) );
+		register_setting( self::OPTION_GROUP, 'gae_max_price', array( 'type' => 'number', 'sanitize_callback' => array( $this, 'sanitize_price' ), 'default' => 0 ) );
+		register_setting( self::OPTION_GROUP, 'gae_min_discount_pct', array( 'type' => 'number', 'sanitize_callback' => array( $this, 'sanitize_price' ), 'default' => 0 ) );
+		register_setting( self::OPTION_GROUP, 'gae_only_in_stock', array( 'type' => 'boolean', 'sanitize_callback' => 'rest_sanitize_boolean', 'default' => false ) );
+		register_setting( self::OPTION_GROUP, 'gae_max_items_per_sync', array( 'type' => 'integer', 'sanitize_callback' => 'absint', 'default' => 100 ) );
+		register_setting( self::OPTION_GROUP, 'gae_allowed_categories', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field', 'default' => 'Tredemølle, Romaskin, Spinningsykkel, Vektstang, Vektvest, Treningsbenk, Crosstrainer, Styrkepakke' ) );
+		register_setting( self::OPTION_GROUP, 'gae_excluded_keywords', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field', 'default' => 'reservedel, bruksanvisning, brukermanual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat' ) );
 
 		// Total Products Limit in Catalog (Catalog Cap).
 		register_setting(
@@ -289,30 +174,6 @@ class GAE_Settings {
 			)
 		);
 
-		// Allowed Categories.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_allowed_categories',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_textarea_field',
-				'default'           => "Tredemølle, Romaskin, Spinningsykkel, Vektstang, Vektvest, Treningsbenk, Crosstrainer, Styrkepakke",
-			)
-		);
-
-		add_settings_field(
-			'gae_allowed_categories',
-			__( 'Allowed Categories / Keywords', 'gear-engine' ),
-			array( $this, 'render_field_textarea' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_allowed_categories',
-				'rows'        => 3,
-				'description' => __( 'Comma or newline separated list. Products must match at least one category to be imported. Leave empty to allow all.', 'gear-engine' ),
-			)
-		);
-
 		// Allowed Merchants Whitelist.
 		register_setting(
 			self::OPTION_GROUP,
@@ -358,30 +219,6 @@ class GAE_Settings {
 				'id'          => 'gae_excluded_merchants',
 				'rows'        => 2,
 				'description' => __( 'Comma or newline separated merchant names to discard during sync.', 'gear-engine' ),
-			)
-		);
-
-		// Excluded Keywords.
-		register_setting(
-			self::OPTION_GROUP,
-			'gae_excluded_keywords',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_textarea_field',
-				'default'           => "reservedel, bruksanvisning, brukermanual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat",
-			)
-		);
-
-		add_settings_field(
-			'gae_excluded_keywords',
-			__( 'Blacklisted Keywords', 'gear-engine' ),
-			array( $this, 'render_field_textarea' ),
-			self::PAGE_SLUG,
-			'gae_section_filters',
-			array(
-				'id'          => 'gae_excluded_keywords',
-				'rows'        => 3,
-				'description' => __( 'Comma or newline separated keywords. Any product containing these words in title, category, or description is discarded.', 'gear-engine' ),
 			)
 		);
 
@@ -643,7 +480,7 @@ class GAE_Settings {
 	 * Section intro: Filters.
 	 */
 	public function render_filters_section_intro(): void {
-		echo '<p class="description">' . esc_html__( 'Pre-filters are evaluated before database interaction. Products not meeting price criteria or containing blacklisted keywords are skipped entirely, saving database resources.', 'gear-engine' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Configure catalog limits and merchant filtering rules. Product categories, prices, stock requirements, and blocked keywords are managed in the interactive filter panel above.', 'gear-engine' ) . '</p>';
 	}
 
 	/**
@@ -1044,23 +881,23 @@ class GAE_Settings {
 					</div>
 				</div>
 
-				<div class="gae-manual-actions" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-					<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-						<button type="button" id="gae-sync-now-btn" class="button button-primary" style="height: 36px; padding: 0 16px; font-size: 13px;">
-							<span class="dashicons dashicons-update" style="vertical-align: middle; margin-right: 4px;"></span>
-							<?php esc_html_e( 'Run Streaming Sync Now', 'gear-engine' ); ?>
+				<div class="gae-manual-actions">
+					<div class="gae-action-buttons">
+						<button type="button" id="gae-sync-now-btn" class="button button-primary">
+							<span class="dashicons dashicons-update"></span>
+							<span><?php esc_html_e( 'Run Streaming Sync Now', 'gear-engine' ); ?></span>
 						</button>
-						<button type="button" id="gae-save-filters-btn" class="button button-secondary" style="height: 36px;">
-							<span class="dashicons dashicons-saved" style="vertical-align: middle; margin-right: 4px;"></span>
-							<?php esc_html_e( 'Save Filters as Defaults', 'gear-engine' ); ?>
+						<button type="button" id="gae-save-filters-btn" class="button button-secondary">
+							<span class="dashicons dashicons-saved"></span>
+							<span><?php esc_html_e( 'Save Filters as Defaults', 'gear-engine' ); ?></span>
 						</button>
 						<span id="gae-sync-spinner" class="spinner" style="float:none; margin: 0 4px;"></span>
 						<span id="gae-sync-status-msg" style="font-weight:600;"></span>
 					</div>
 					<div>
-						<button type="button" id="gae-clear-products-btn" class="button button-link-delete" style="color: #ef4444; text-decoration: none; font-size: 12px;">
-							<span class="dashicons dashicons-trash" style="vertical-align: middle; font-size: 15px;"></span>
-							<?php esc_html_e( 'Clear All Synced Products', 'gear-engine' ); ?>
+						<button type="button" id="gae-clear-products-btn" class="button button-link-delete">
+							<span class="dashicons dashicons-trash"></span>
+							<span><?php esc_html_e( 'Clear All Synced Products', 'gear-engine' ); ?></span>
 						</button>
 					</div>
 				</div>
@@ -1069,6 +906,16 @@ class GAE_Settings {
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );
+				?>
+				<!-- Synced filter values from top interactive card -->
+				<input type="hidden" id="gae_allowed_categories" name="gae_allowed_categories" value="<?php echo esc_attr( get_option( 'gae_allowed_categories', 'Tredemølle, Romaskin, Spinningsykkel, Vektstang, Vektvest, Treningsbenk, Crosstrainer, Styrkepakke' ) ); ?>" />
+				<input type="hidden" id="gae_excluded_keywords" name="gae_excluded_keywords" value="<?php echo esc_attr( get_option( 'gae_excluded_keywords', 'reservedel, bruksanvisning, brukermanual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat' ) ); ?>" />
+				<input type="hidden" id="gae_min_price" name="gae_min_price" value="<?php echo esc_attr( get_option( 'gae_min_price', 0 ) ); ?>" />
+				<input type="hidden" id="gae_max_price" name="gae_max_price" value="<?php echo esc_attr( get_option( 'gae_max_price', 0 ) ); ?>" />
+				<input type="hidden" id="gae_min_discount_pct" name="gae_min_discount_pct" value="<?php echo esc_attr( get_option( 'gae_min_discount_pct', 0 ) ); ?>" />
+				<input type="hidden" id="gae_only_in_stock" name="gae_only_in_stock" value="<?php echo get_option( 'gae_only_in_stock', false ) ? '1' : '0'; ?>" />
+				<input type="hidden" id="gae_max_items_per_sync" name="gae_max_items_per_sync" value="<?php echo esc_attr( get_option( 'gae_max_items_per_sync', 100 ) ); ?>" />
+				<?php
 				do_settings_sections( self::PAGE_SLUG );
 				submit_button( __( 'Save Gear Engine Settings', 'gear-engine' ) );
 				?>

@@ -56,24 +56,89 @@
 .gae-manual-actions {
 	display: flex;
 	align-items: center;
-	padding-top: 10px;
-	border-top: 1px solid #f1f5f9;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.gae-action-buttons {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.gae-manual-actions .button,
+.gae-manual-actions .button-primary,
+.gae-manual-actions .button-secondary,
+.gae-manual-actions .button-link-delete {
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 6px !important;
+	height: 36px !important;
+	line-height: 1 !important;
+	padding: 0 16px !important;
+	font-size: 13px !important;
+	white-space: nowrap !important;
+	vertical-align: middle !important;
+	box-sizing: border-box !important;
+}
+
+.gae-manual-actions .button .dashicons {
+	display: inline-block !important;
+	font-size: 18px !important;
+	width: 18px !important;
+	height: 18px !important;
+	line-height: 18px !important;
+	margin: 0 !important;
+	vertical-align: middle !important;
 }
 
 .gae-manual-actions .button-primary {
 	background: #16a34a !important;
 	border-color: #15803d !important;
+	color: #ffffff !important;
 	text-shadow: none !important;
-	box-shadow: none !important;
+	box-shadow: 0 1px 2px rgba(22, 163, 74, 0.2) !important;
 	font-weight: 600 !important;
-	padding: 4px 16px !important;
-	height: auto !important;
 }
 
 .gae-manual-actions .button-primary:hover,
 .gae-manual-actions .button-primary:focus {
 	background: #15803d !important;
 	border-color: #166534 !important;
+	color: #ffffff !important;
+}
+
+.gae-manual-actions .button-secondary {
+	background: #ffffff !important;
+	border-color: #cbd5e1 !important;
+	color: #1e293b !important;
+}
+
+.gae-manual-actions .button-secondary:hover {
+	background: #f8fafc !important;
+	border-color: #94a3b8 !important;
+	color: #0f172a !important;
+}
+
+.gae-manual-actions .button-link-delete {
+	background: transparent !important;
+	border: 1px solid #fecaca !important;
+	color: #ef4444 !important;
+	border-radius: 4px !important;
+	text-decoration: none !important;
+	padding: 0 12px !important;
+}
+
+.gae-manual-actions .button-link-delete:hover {
+	background: #fef2f2 !important;
+	border-color: #f87171 !important;
+	color: #b91c1c !important;
 }
 
 /* Dashboard Filter Controls */

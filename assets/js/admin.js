@@ -261,7 +261,7 @@
 		// Synchronize Quick Filters with Bottom Settings Form
 		$('#gae-quick-in-stock').on('change', function() {
 			var checked = $(this).is(':checked');
-			$('#gae_only_in_stock').prop('checked', checked);
+			$('#gae_only_in_stock').val(checked ? '1' : '0').prop('checked', checked);
 		});
 
 		$('#gae-quick-min-price').on('input change', function() {
