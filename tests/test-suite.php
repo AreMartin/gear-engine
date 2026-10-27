@@ -36,8 +36,50 @@ function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $m
 function wp_enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $in_footer = false ) {}
 function wp_register_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {}
 function wp_register_script( $handle, $src = '', $deps = array(), $ver = false, $in_footer = false ) {}
+function wp_localize_script( $handle, $object_name, $l10n ) {}
 function register_block_type( $name, $args = array() ) {}
 function register_rest_route( $namespace, $route, $args = array(), $override = false ) {}
+function rest_url( $path = '' ) { return 'http://example.com/wp-json/' . ltrim( (string) $path, '/' ); }
+function home_url( $path = '' ) { return 'http://example.com/' . ltrim( (string) $path, '/' ); }
+function plugin_dir_url( $file ) { return 'http://example.com/wp-content/plugins/gear-engine/'; }
+function shortcode_atts( $pairs, $atts, $shortcode = '' ) {
+	$atts = (array) $atts;
+	$out  = array();
+	foreach ( $pairs as $name => $default ) {
+		if ( array_key_exists( $name, $atts ) ) {
+			$out[ $name ] = $atts[ $name ];
+		} else {
+			$out[ $name ] = $default;
+		}
+	}
+	return $out;
+}
+
+class WP_Query {
+	public array $posts = array();
+	public function __construct( $args = array() ) {
+		$this->posts = array_values( $GLOBALS['wp_posts'] );
+	}
+	public function have_posts(): bool {
+		return ! empty( $this->posts );
+	}
+}
+
+class WP_REST_Request {
+	private array $params = array();
+	public function __construct( array $params = array() ) { $this->params = $params; }
+	public function get_json_params() { return $this->params; }
+	public function get_param( $key ) { return $this->params[ $key ] ?? null; }
+}
+
+class WP_REST_Response {
+	public $data;
+	public int $status;
+	public function __construct( $data = null, int $status = 200 ) {
+		$this->data   = $data;
+		$this->status = $status;
+	}
+}
 
 function get_option( $key, $default = false ) {
 	return $GLOBALS['wp_options'][ $key ] ?? $default;
@@ -232,6 +274,8 @@ require_once ABSPATH . 'includes/class-gae-cpt.php';
 require_once ABSPATH . 'includes/class-gae-sync-engine.php';
 require_once ABSPATH . 'includes/class-gae-gutenberg-block.php';
 require_once ABSPATH . 'includes/class-gae-ai-api.php';
+require_once ABSPATH . 'includes/class-gae-product-service.php';
+require_once ABSPATH . 'modules/physio-chat/class-gae-physio-chat.php';
 
 // Test runner helper
 function assert_test( $condition, string $test_name ) {
@@ -831,6 +875,61 @@ $target_sync_rules = array( 'target_feed' => 'Gymgrossisten', 'max_items_per_syn
 $sync_report = $sync_engine->run_sync( array( 'Gymgrossisten' => $tmp_multi_file ?? '' ), true, $target_sync_rules );
 assert_test( ! empty( $sync_report['date'] ), 'selective_sync: Successfully executed targeted sync for specific partner feed' );
 
+// TEST 15: Modular Physio Advisor AI Chat Interface & Product Service
+// 15.1 Verify Product Service search with keyword matching & CPT extraction
+$product_search = GAE_Product_Service::search_products( array(
+	'keywords' => 'tredemølle løpebånd',
+	'limit'    => 4,
+) );
+assert_test( is_array( $product_search ) && ! empty( $product_search ), 'product_service: Returned matching products from catalog' );
+assert_test( isset( $product_search[0]['tittel'] ) && isset( $product_search[0]['pris'] ) && isset( $product_search[0]['url'] ), 'product_service: Product card contains tittel, pris, and affiliate URL' );
+
+// 15.2 Verify Product Service price constraint enforcement
+$cheap_search = GAE_Product_Service::search_products( array(
+	'keywords'  => 'tredemølle',
+	'max_price' => 5000,
+) );
+assert_test( empty( $cheap_search ), 'product_service: Properly filters out items above maximum price limit' );
+
+// 15.3 Verify Norwegian Master Clinical Prompt
+$prompt = GAE_Chat_Agent::get_default_prompt();
+assert_test( false !== strpos( $prompt, "Du er 'Fysionett-assistenten'" ), 'chat_agent: Master prompt defines Norwegian Fysionett assistant persona' );
+assert_test( false !== strpos( $prompt, 'search_products' ) && false !== strpos( $prompt, 'find_physiotherapist' ), 'chat_agent: Master prompt declares search_products and find_physiotherapist tools' );
+assert_test( false !== strpos( $prompt, 'triage_resultat' ) && false !== strpos( $prompt, 'exorlive' ), 'chat_agent: Master prompt defines triage and exorlive schema' );
+
+// 15.4 Verify local clinical protocol JSON files (knee, shoulder, back, foot)
+$data_dir = ABSPATH . 'modules/physio-chat/data/';
+$kne_ovelser = GAE_Chat_Agent::read_safe_json( $data_dir . 'ovelser_kne.json' );
+$kne_triage  = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_kne.json' );
+assert_test( ! empty( $kne_ovelser['ovelser'] ) && count( $kne_ovelser['ovelser'] ) >= 2, 'protocols: Knee exercise protocol contains structured exercises' );
+assert_test( ! empty( $kne_triage['notat_hypotese'] ) && ! empty( $kne_triage['notat_icpc2'] ), 'protocols: Knee triage contains clinical hypothesis and ICPC-2 code' );
+
+$skulder_triage = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_skulder.json' );
+assert_test( ! empty( $skulder_triage['alvorlighetsgrad'] ) && ! empty( $skulder_triage['notat_icd10'] ), 'protocols: Shoulder triage contains severity and ICD-10 code' );
+
+$rygg_triage = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_rygg.json' );
+assert_test( ! empty( $rygg_triage['tiltak_na'] ) && ! empty( $rygg_triage['tiltak_videre'] ), 'protocols: Back triage contains immediate and long-term action plan' );
+
+// 15.5 Verify Physio Chat Module instantiation and shortcode rendering
+$physio_chat = new GAE_Physio_Chat();
+$shortcode_html = $physio_chat->render_chat_shortcode();
+assert_test( false !== strpos( $shortcode_html, 'fysio-app-container' ), 'shortcode_render: Renders main .fysio-app-container element' );
+assert_test( false !== strpos( $shortcode_html, 'fysio-message-container' ), 'shortcode_render: Contains message injection container' );
+assert_test( false !== strpos( $shortcode_html, 'fysio-modal-overlay' ), 'shortcode_render: Contains exercise protocol modal' );
+assert_test( false !== strpos( $shortcode_html, 'tpl-grid' ) && false !== strpos( $shortcode_html, 'tpl-triage-result' ), 'shortcode_render: Contains card templates for product grid and triage results' );
+assert_test( false !== strpos( $shortcode_html, 'tpl-exorlive-btn' ) && false !== strpos( $shortcode_html, 'tpl-klinikk-liste' ), 'shortcode_render: Contains templates for ExorLive button and clinic list' );
+
+// 15.6 Verify Chat Agent handles empty message gracefully
+$empty_req = new WP_REST_Request( array( 'message' => '' ) );
+$empty_res = GAE_Chat_Agent::handle_chat_request( $empty_req );
+assert_test( 400 === $empty_res->status, 'chat_agent: Returns 400 status on empty message' );
+
+// 15.7 Verify Chat Agent handles missing API key gracefully
+delete_option( 'gae_google_ai_key' );
+$no_key_req = new WP_REST_Request( array( 'message' => 'Hei, jeg har vondt i kneet' ) );
+$no_key_res = GAE_Chat_Agent::handle_chat_request( $no_key_req );
+assert_test( 200 === $no_key_res->status && false !== strpos( $no_key_res->data['message'], 'Google AI Studio API-nøkkel er ikke konfigurert' ), 'chat_agent: Returns helpful Norwegian setup instruction when API key is missing' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (14/14 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (15/15 suites passed)\n";
 echo "========================================================\n";

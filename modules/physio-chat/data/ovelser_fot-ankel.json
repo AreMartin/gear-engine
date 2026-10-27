@@ -1,0 +1,25 @@
+{
+  "hovedtittel": "Klinisk rehabiliteringsprotokoll",
+  "tittel": "Rehabilitering for fot, ankel og plantar fascie",
+  "fase_navn": "Fase 1: Vevsmobilisering og gradvis strekkbelastning",
+  "ovelser": [
+    {
+      "navn": "Eksentrisk tåhev på trinn med håndkle under tærne (Rathleff-protokoll)",
+      "beskrivelse": "Stå med fremre del av føttene på et trappetrinn med et sammenrullet håndkle under tærne for å sette plantarfascien på strekk.\nGå opp på to tær i 3 sekunder, hold 2 sekunder, og senk deg rolig ned på én fot i 3 sekunder under trinnkanten.",
+      "reps": "3 sett x 12 repetisjoner annenhver dag",
+      "bilde_url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Kontrollert eksentrisk fase med tolererbar smerte (maks 3-4 på en skala til 10)",
+      "maal": "Mekanisk strekk og kollagenstimulering av plantarfascien"
+    },
+    {
+      "navn": "Massasjerulle / massasjeball under fotsålen",
+      "beskrivelse": "Plasser en fast massasjeball eller en liten foam roller under fotsålen mens du sitter eller står.\nRull rolig med moderat trykk fra hælen og frem til tåballene i 2-3 minutter per fot.",
+      "reps": "2-3 minutter x 2 ganger daglig",
+      "bilde_url": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Behagelig trykkavlastning uten skarp stikkende smerte",
+      "maal": "Øke sirkulasjonen og redusere muskulære spenninger i fotens intrinsiske muskler"
+    }
+  ]
+}

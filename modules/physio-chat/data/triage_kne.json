@@ -1,0 +1,19 @@
+{
+  "tittel": "Patellofemoralt smertesyndrom (PFPS)",
+  "kategori": "Kne",
+  "alvorlighetsgrad": "Lav",
+  "forklaring": "Patellofemoralt smertesyndrom kjennetegnes av diffuse smerter foran i kneet, rundt eller under kneskålen. Smertene forverres typisk ved gange i trapper (særlig nedover), dype knebøy eller langvarig sitting med bøyde knær (kino-tegn). Det skyldes ofte ubalanse i styrke eller koordinasjon mellom lår, hofte og legg.",
+  "differensial": "Patellar tendinopati (hoppekne), meniskirritasjon, plica-syndrom",
+  "tiltak_na": "Avlast midlertidig fra aktiviteter som provoserer fram skarp smerte (f.eks. hopping eller dype utfall). Bruk is eller lett kompresjon ved behov etter belastning.",
+  "tiltak_videre": "Systematisk styrketrening med fokus på hofteabduktorer (gluteus medius), quadriceps og kjerne. Vurder stabilitet i fot og egnede dempede treningssko.",
+  "notat_anamnese": [
+    { "sporsmal": "Lokalisasjon av smerte", "svar": "Foran på kneet, rundt eller bak kneskålen" },
+    { "sporsmal": "Debut og forløp", "svar": "Gradvis debut i forbindelse med økt aktivitetsnivå eller løping" },
+    { "sporsmal": "Provoserende faktorer", "svar": "Trappegang, knebøy og langvarig sitting" },
+    { "sporsmal": "Leddhevelse eller låsning", "svar": "Ingen uttalt hevelse eller mekanisk låsing" }
+  ],
+  "notat_rode_flagg": "Ingen varselsymptomer eller røde flagg avdekket. Ingen akutt traume, hydrops eller mistanke om fraktur/leddbåndskade.",
+  "notat_hypotese": "Klinisk bilde forenlig med patellofemoralt smertesyndrom (retropatellær smerteproblematikk).",
+  "notat_icpc2": "L99 (Sykdom i muskel/skjelettsystem IKA)",
+  "notat_icd10": "M22.2 (Sykdom i patellofemoralleddet)"
+}

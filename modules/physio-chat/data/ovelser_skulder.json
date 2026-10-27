@@ -1,0 +1,25 @@
+{
+  "hovedtittel": "Klinisk rehabiliteringsprotokoll",
+  "tittel": "Rehabilitering for skuldersmerter og rotatorcuff",
+  "fase_navn": "Fase 1: Subakromiell avlastning og rotasjonsstyrke",
+  "ovelser": [
+    {
+      "navn": "Utadrotasjon med strikk (Rotator cuff)",
+      "beskrivelse": "Stå oppreist med albuen bøyd i 90 grader inntil kroppen (ha gjerne et lite sammenrullet håndkle under albuen).\nHold treningsstrikket og roter underarmen utover fra magen.\nHold 1-2 sekunder i ytterstilling og brems langsomt tilbake.",
+      "reps": "3 sett x 12-15 repetisjoner",
+      "bilde_url": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=80",
+      "video_url": "https://www.youtube.com/watch?v=kYIeXyV7_cM",
+      "kriterier": "Kontrollert bevegelse uten at albuen sklir ut fra kroppen",
+      "maal": "Styrke infraspinatus og teres minor for optimal glenohumeral stabilitet"
+    },
+    {
+      "navn": "Bilateral skulderabduksjon i skapulært plan (Scaption)",
+      "beskrivelse": "Stå på strikket eller hold lette manualer.\nLøft armene skrått fremover (ca. 30 grader frem for kroppen) med tomlene pekende oppover.\nStopp i skulderhøyde og senk kontrollert ned igjen.",
+      "reps": "3 sett x 10-12 repetisjoner",
+      "bilde_url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Ingen kompensatorisk heving av skuldrene mot ørene",
+      "maal": "Aktivere supraspinatus og serratus anterior med minimal avklemming"
+    }
+  ]
+}

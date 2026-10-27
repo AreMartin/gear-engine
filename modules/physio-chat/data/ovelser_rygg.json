@@ -1,0 +1,25 @@
+{
+  "hovedtittel": "Klinisk rehabiliteringsprotokoll",
+  "tittel": "Aktiv rehabilitering ved korsryggsmerter",
+  "fase_navn": "Fase 1: Bevegelighet og kjernestabilitet",
+  "ovelser": [
+    {
+      "navn": "Bekkenvipp på treningsmatte (Pelvic tilt)",
+      "beskrivelse": "Ligg på ryggen på en treningsmatte med bøyde knær.\nTrekk navlen lett inn mot ryggraden og press korsryggen flatt ned mot underlaget.\nHold i 5 sekunder, slipp deretter rolig opp til en naturlig svai.",
+      "reps": "2-3 sett x 10 repetisjoner",
+      "bilde_url": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Smertefri, jevn bevegelse uten muskelkramper",
+      "maal": "Normalisere lumbopelvin rytme og mobilisere korsryggen"
+    },
+    {
+      "navn": "Bird-Dog (Diagonalhev)",
+      "beskrivelse": "Stå på alle fire med hendene under skuldrene og knærne under hoftene.\nStram magen lett og strekk motsatt arm og ben ut i en rett linje.\nHold i 2-3 sekunder uten å svaie eller rotere i bekkenet.\nFør rolig tilbake og gjenta på motsatt side.",
+      "reps": "3 sett x 8-10 repetisjoner per side",
+      "bilde_url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Stabil kjerne og nøytral ryggrad gjennom hele bevegelsen",
+      "maal": "Aktivere multifidi og forbedre lumbal dynamisk stabilitet"
+    }
+  ]
+}

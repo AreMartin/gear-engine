@@ -37,6 +37,10 @@ require_once GAE_PLUGIN_DIR . 'includes/class-gae-cpt.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-sync-engine.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-gutenberg-block.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-ai-api.php';
+require_once GAE_PLUGIN_DIR . 'includes/class-gae-product-service.php';
+
+// Require feature modules.
+require_once GAE_PLUGIN_DIR . 'modules/physio-chat/class-gae-physio-chat.php';
 
 /**
  * Initialize the Gear Affiliate Engine plugin.
@@ -53,6 +57,9 @@ function gae_init_plugin(): void {
 	new GAE_Sync_Engine();
 	new GAE_Gutenberg_Block();
 	new GAE_AI_API();
+
+	// Instantiate feature modules.
+	new GAE_Physio_Chat();
 }
 add_action( 'plugins_loaded', 'gae_init_plugin' );
 

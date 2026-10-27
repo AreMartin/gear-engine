@@ -1,0 +1,18 @@
+{
+  "tittel": "Plantar fasciopati / Hælspore",
+  "kategori": "Fot og ankel",
+  "alvorlighetsgrad": "Lav",
+  "forklaring": "Plantar fasciopati er en overbelastningstilstand i bindevevsbåndet under foten (plantarfascien), særlig ved festet under hælbenet. Typisk for tilstanden er intense 'førstestegs-smerter' om morgenen når man setter foten i gulvet, som avtar etter litt gange, for så å forverres igjen etter lengre tids ståing.",
+  "differensial": "Tarsaltunnelsyndrom, hælputeatrifi, stressfraktur i calcaneus",
+  "tiltak_na": "Unngå å gå barbent på harde gulv. Bruk sko eller tøfler med god demping og støtte under hælen. Rull foten over en massasjeball.",
+  "tiltak_videre": "Gjennomfør Rathleffs eksentriske tåhevingsprotokoll med håndklerull under tærne. Vurder gode innleggssåler med hælskål og tilpasset demping.",
+  "notat_anamnese": [
+    { "sporsmal": "Smertens lokalisasjon", "svar": "Under hælen mot innsiden av fotsålen" },
+    { "sporsmal": "Morgensmerter", "svar": "Tydelige stikkende smerter ved de første stegene ut av sengen" },
+    { "sporsmal": "Aktivitetsforverring", "svar": "Øker etter lange dager på bena eller løping på hardt underlag" }
+  ],
+  "notat_rode_flagg": "Ingen tegn til akutt ruptur (ingen plutselig 'smell' med hematom). Ingen rødme eller mistanke om infeksjon/urinsyregikt.",
+  "notat_hypotese": "Plantar fasciopati (klassisk plantar fasciitt/hælspore).",
+  "notat_icpc2": "L99 (Sykdom i muskel/skjelettsystem IKA)",
+  "notat_icd10": "M72.2 (Plantarfasciitt)"
+}

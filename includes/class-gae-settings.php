@@ -300,6 +300,52 @@ class GAE_Settings {
 				'description' => __( 'Select or enter the Gemini model for personalized AI equipment pitches.', 'gear-engine' ),
 			)
 		);
+
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_google_places_key',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
+			)
+		);
+
+		add_settings_field(
+			'gae_google_places_key',
+			__( 'Google Places API Key', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_ai',
+			array(
+				'id'          => 'gae_google_places_key',
+				'type'        => 'password',
+				'description' => __( 'Optional API key for clinic and physiotherapist lookups. Defaults to built-in key if empty.', 'gear-engine' ),
+			)
+		);
+
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_physio_custom_prompt',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'wp_kses_post',
+				'default'           => '',
+			)
+		);
+
+		add_settings_field(
+			'gae_physio_custom_prompt',
+			__( 'Custom Physio Advisor Prompt', 'gear-engine' ),
+			array( $this, 'render_field_textarea' ),
+			self::PAGE_SLUG,
+			'gae_section_ai',
+			array(
+				'id'          => 'gae_physio_custom_prompt',
+				'rows'        => 6,
+				'description' => __( 'Optional override for the AI Physio Advisor system instructions. Leave blank to use default clinical protocol prompt.', 'gear-engine' ),
+			)
+		);
 	}
 
 	/**

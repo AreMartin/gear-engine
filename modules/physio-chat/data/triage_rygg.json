@@ -1,0 +1,18 @@
+{
+  "tittel": "Uspesifikke korsryggsmerter (Akutt lumbago)",
+  "kategori": "Rygg",
+  "alvorlighetsgrad": "Lav",
+  "forklaring": "Uspesifikke korsryggsmerter (lumbago) representerer over 90 % av alle ryggplager. Smertene oppstår gjerne akutt ved et løft eller en vridning, og skyldes samspill mellom muskelspenninger, leddbånd og fasettledd. Tilstanden er ufarlig og prognosen er svært god ved tidlig mobilisering.",
+  "differensial": "Lumbal radikulopati (isjias med nerverotaffeksjon), fasettleddsartrose, spondylolyse",
+  "tiltak_na": "Hold deg mest mulig i bevegelse innenfor smertetoleranse. Korte spaserturer på mykt underlag er ideelt. Unngå langvarig sengeleie.",
+  "tiltak_videre": "Gradvis innføring av styrke- og stabiliseringsøvelser for kjerne- og ryggstrekkere samt lett tøyning av hoftebøyere og setemuskulatur.",
+  "notat_anamnese": [
+    { "sporsmal": "Lokalisasjon", "svar": "Korsrygg, kan stråle ned mot setet, men ikke forbi kneet" },
+    { "sporsmal": "Debut", "svar": "Akutt hekseskudd etter hverdagsbelastning eller løft" },
+    { "sporsmal": "Vannlating/avføringskontroll", "svar": "Normal, ingen endret sensibilitet i ridebukseområdet" }
+  ],
+  "notat_rode_flagg": "Ingen tegn til cauda equina-syndrom, progredierende parese eller feber/vekttap.",
+  "notat_hypotese": "Akutte uspesifikke korsryggsmerter (lumbago).",
+  "notat_icpc2": "L03 (Korsryggsymptom/plage)",
+  "notat_icd10": "M54.5 (Lumbago)"
+}

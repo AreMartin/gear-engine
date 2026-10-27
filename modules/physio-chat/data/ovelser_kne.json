@@ -1,0 +1,34 @@
+{
+  "hovedtittel": "Klinisk rehabiliteringsprotokoll",
+  "tittel": "Rehabilitering for knesmerter",
+  "fase_navn": "Fase 1: Avlastning og muskelaktivering",
+  "ovelser": [
+    {
+      "navn": "Terminal Knee Extension (TKE) med strikk",
+      "beskrivelse": "Fest et treningsstrikk i knehøyde rundt en stolpe eller døranker.\nPlasser strikket i knehasen på det vonde benet.\nBøy kneet litt frem og strekk det deretter kontrollert helt ut bakover mot motstanden.\nHold spennet i 2 sekunder før du slipper rolig tilbake.",
+      "reps": "3 sett x 12-15 repetisjoner",
+      "bilde_url": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80",
+      "video_url": "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+      "kriterier": "Full smertefri ekstensjon før progresjon til dynamiske øvelser",
+      "maal": "Aktivere quadriceps og vastus medialis uten leddbelastning"
+    },
+    {
+      "navn": "Glute bridge med miniband",
+      "beskrivelse": "Ligg på ryggen med bøyde knær og føttene i gulvet i hoftebreddes avstand.\nPlasser et treningsstrikk like over knærne.\nLøft bekkenet opp mot taket til kroppen danner en rett linje fra skuldre til knær.\nKnip setemusklene godt på toppen og hold i 2-3 sekunder.",
+      "reps": "3 sett x 10-12 repetisjoner",
+      "bilde_url": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
+      "video_url": "https://www.youtube.com/watch?v=fK_xP5gq5-g",
+      "kriterier": "Evne til å gjennomføre 15 rolige repetisjoner uten kramper i bakside lår",
+      "maal": "Styrke gluteus medius og maximus for bedre bekkenkontroll og knekontroll"
+    },
+    {
+      "navn": "Statisk veggsitt (Wall sit)",
+      "beskrivelse": "Plasser ryggen mot en vegg og skli ned til ca. 60-70 graders vinkel i knærne (unngå 90 grader i akutt fase).\nPass på at knærne peker i samme retning som tærne.\nHold posisjonen jevnt mens du puster kontrollert.",
+      "reps": "3-4 repetisjoner x 30-45 sekunder",
+      "bilde_url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80",
+      "video_url": "",
+      "kriterier": "Minimum 45 sekunder holdetid uten smerteøkning",
+      "maal": "Isometrisk quadriceps-styrke og smertelindring for patellarsenen"
+    }
+  ]
+}

@@ -1,0 +1,707 @@
+/**
+ * Stylesheet: Digital Fysio Advisor Chat Module
+ * Clean, isolated styling matching prototype design with theme conflict shields.
+ */
+
+/* =========================================================
+   BASE FONTS & RESET FOR MODULE WRAPPER
+   ========================================================= */
+.fysio-app-container,
+#fysio-modal-overlay,
+#print-container {
+	font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.fysio-app-container *,
+#fysio-modal-overlay *,
+#print-container * {
+	box-sizing: border-box !important;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.fysio-app-container {
+	width: 100%;
+	height: 100dvh;
+	min-height: 500px;
+	position: relative;
+	overflow: hidden;
+	background-color: #F8FAFC;
+	color: #1f2937;
+	line-height: 1.5;
+}
+
+.fysio-app-container h1,
+.fysio-app-container h2,
+.fysio-app-container h3,
+.fysio-app-container h4,
+.fysio-app-container h5,
+.fysio-app-container h6 {
+	font-family: 'Poppins', sans-serif !important;
+	margin: 0 !important;
+	line-height: 1.25 !important;
+	display: block !important;
+	color: #1A2A3A;
+}
+
+.fysio-app-container p {
+	font-family: 'Poppins', sans-serif !important;
+	margin: 0 !important;
+	display: block !important;
+}
+
+.fysio-app-container strong,
+.fysio-app-container b {
+	font-weight: 700 !important;
+}
+
+.fysio-app-container ul,
+.fysio-app-container li {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.fysio-app-container form,
+.fysio-app-container input,
+.fysio-app-container textarea {
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+	text-decoration: none !important;
+	font-family: inherit !important;
+	border-radius: 0;
+}
+
+.fysio-app-container button {
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+	text-decoration: none !important;
+	font-family: inherit !important;
+	cursor: pointer;
+}
+
+.fysio-app-container textarea:focus {
+	outline: none !important;
+	box-shadow: none !important;
+	border: none !important;
+	background-color: transparent !important;
+}
+
+.fysio-app-container a {
+	text-decoration: none !important;
+}
+
+/* =========================================================
+   PROTECTED BUTTON STYLES (OVERRIDE WP THEMES)
+   ========================================================= */
+button.fysio-header-btn {
+	background-color: transparent !important;
+	color: #6b7280 !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 4px 8px !important;
+}
+
+button.fysio-header-btn:hover {
+	background-color: transparent !important;
+	color: #1A2A3A !important;
+}
+
+button.fysio-header-btn *,
+button.fysio-header-btn:hover * {
+	color: inherit !important;
+	transition: color 0.2s;
+}
+
+button#fysio-send-btn {
+	background-color: #1A2A3A !important;
+	border: none !important;
+	box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;
+}
+
+button#fysio-send-btn:hover {
+	background-color: #111c27 !important;
+	border: none !important;
+	transform: scale(1.05);
+}
+
+button#fysio-send-btn i,
+button#fysio-send-btn:hover i {
+	color: #ffffff !important;
+}
+
+button.fysio-quick-btn {
+	background-color: #ffffff !important;
+	border: 1px solid #e5e7eb !important;
+	color: #374151 !important;
+	border-radius: 9999px !important;
+}
+
+button.fysio-quick-btn:hover {
+	background-color: #f9fafb !important;
+	border-color: #1A2A3A !important;
+	color: #1A2A3A !important;
+}
+
+button.fysio-exorlive-btn {
+	background-color: #1A2A3A !important;
+	border: none !important;
+	color: #ffffff !important;
+}
+
+button.fysio-exorlive-btn:hover {
+	background-color: #111c27 !important;
+}
+
+button.fysio-exorlive-btn .fysio-exorlive-title,
+button.fysio-exorlive-btn:hover .fysio-exorlive-title {
+	color: #ffffff !important;
+}
+
+button.fysio-exorlive-btn .fysio-exorlive-subtitle,
+button.fysio-exorlive-btn:hover .fysio-exorlive-subtitle {
+	color: #bfdbfe !important;
+}
+
+button.fysio-exorlive-btn i,
+button.fysio-exorlive-btn:hover i {
+	color: #ffffff !important;
+}
+
+button.fysio-triage-primary {
+	background-color: #ffffff !important;
+	color: #1A2A3A !important;
+	border: 1px solid #e5e7eb !important;
+}
+
+button.fysio-triage-primary:hover {
+	background-color: #f9fafb !important;
+	color: #1A2A3A !important;
+	border-color: #d1d5db !important;
+}
+
+button.fysio-triage-primary *,
+button.fysio-triage-primary:hover * {
+	color: #1A2A3A !important;
+}
+
+button.fysio-triage-secondary {
+	background-color: #ffffff !important;
+	color: #6b7280 !important;
+	border: 1px solid #e5e7eb !important;
+}
+
+button.fysio-triage-secondary:hover {
+	background-color: #f9fafb !important;
+	color: #374151 !important;
+	border-color: #d1d5db !important;
+}
+
+button.fysio-triage-secondary *,
+button.fysio-triage-secondary:hover * {
+	color: inherit !important;
+}
+
+button.fysio-modal-tab {
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+button.fysio-modal-tab-active {
+	background-color: #1A2A3A !important;
+	color: #ffffff !important;
+}
+
+button.fysio-modal-tab-active:hover {
+	background-color: #111c27 !important;
+	color: #ffffff !important;
+}
+
+button.fysio-modal-tab-active *,
+button.fysio-modal-tab-active:hover * {
+	color: #ffffff !important;
+}
+
+button.fysio-modal-tab-inactive {
+	background-color: #f3f4f6 !important;
+	color: #4b5563 !important;
+}
+
+button.fysio-modal-tab-inactive:hover {
+	background-color: #e5e7eb !important;
+	color: #1f2937 !important;
+}
+
+button.fysio-modal-tab-inactive *,
+button.fysio-modal-tab-inactive:hover * {
+	color: inherit !important;
+}
+
+button#btn-prev {
+	background-color: #f3f4f6 !important;
+	color: #4b5563 !important;
+	border: none !important;
+}
+
+button#btn-prev:hover {
+	background-color: #e5e7eb !important;
+	color: #1f2937 !important;
+}
+
+button#btn-prev *,
+button#btn-prev:hover * {
+	color: inherit !important;
+}
+
+button#btn-next {
+	background-color: #1A2A3A !important;
+	color: #ffffff !important;
+	border: none !important;
+}
+
+button#btn-next:hover {
+	background-color: #111c27 !important;
+	color: #ffffff !important;
+}
+
+button#btn-next *,
+button#btn-next:hover * {
+	color: #ffffff !important;
+}
+
+button#btn-finish {
+	background-color: #00A878 !important;
+	color: #ffffff !important;
+	border: none !important;
+}
+
+button#btn-finish:hover {
+	background-color: #008f66 !important;
+	color: #ffffff !important;
+}
+
+button#btn-finish *,
+button#btn-finish:hover * {
+	color: #ffffff !important;
+}
+
+/* =========================================================
+   LAYOUT & GLASSMORPHISM
+   ========================================================= */
+.fysio-grid-title {
+	font-size: 16px !important;
+	font-weight: 700 !important;
+	color: #1A2A3A !important;
+	margin-bottom: 16px !important;
+	padding-left: 4px !important;
+	display: block !important;
+}
+
+.fysio-header-grid {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	width: 100%;
+}
+
+.glass-pill {
+	background: rgba(255, 255, 255, 0.88);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.safari-clip-fix {
+	-webkit-mask-image: -webkit-radial-gradient(white, black);
+	transform: translateZ(0);
+}
+
+.play-circle-fix {
+	width: 64px !important;
+	height: 64px !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	border-radius: 50% !important;
+	background: rgba(0, 0, 0, 0.25) !important;
+	border: 2px solid white !important;
+	aspect-ratio: 1/1 !important;
+	flex-shrink: 0 !important;
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+.message-enter {
+	animation: fysio-slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	opacity: 0;
+	transform: translateY(15px);
+}
+
+@keyframes fysio-slideUpFade {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.typing-dot {
+	animation: fysio-typing 1.4s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes fysio-typing {
+	0%, 80%, 100% { transform: scale(0); }
+	40% { transform: scale(1); }
+}
+
+@keyframes fysio-pop {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.05); }
+	100% { transform: scale(1); }
+}
+.fysio-pop-anim {
+	animation: fysio-pop 0.3s ease-out forwards;
+}
+
+.fysio-send-disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.fysio-send-active {
+	opacity: 1;
+	pointer-events: auto !important;
+	cursor: pointer;
+}
+
+.fysio-grid-container {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	width: 100%;
+}
+
+@media (min-width: 768px) {
+	.fysio-grid-container {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 1rem;
+	}
+}
+
+/* =========================================================
+   TAILWIND UTILITY SHIM (FOR SELF-CONTAINED OPERATION)
+   ========================================================= */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.h-10 { height: 2.5rem; }
+.w-20 { width: 5rem; }
+.h-20 { height: 5rem; }
+.w-10 { width: 2.5rem; }
+.h-10 { height: 2.5rem; }
+.w-12 { width: 3rem; }
+.h-12 { height: 3rem; }
+.w-9 { width: 2.25rem; }
+.h-9 { height: 2.25rem; }
+.w-8 { width: 2rem; }
+.h-8 { height: 2rem; }
+.w-7 { width: 1.75rem; }
+.h-7 { height: 1.75rem; }
+.w-2 { width: 0.5rem; }
+.h-2 { height: 0.5rem; }
+.w-1\.5 { width: 0.375rem; }
+.h-1\.5 { height: 0.375rem; }
+.min-w-0 { min-width: 0; }
+.shrink-0 { flex-shrink: 0; }
+.flex-grow { flex-grow: 1; }
+.flex-1 { flex: 1 1 0%; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.inset-0 { inset: 0; }
+.top-0 { top: 0; }
+.left-0 { left: 0; }
+.top-4 { top: 1rem; }
+.top-3 { top: 0.75rem; }
+.right-4 { right: 1rem; }
+.right-5 { right: 1.25rem; }
+.right-16 { right: 4rem; }
+.right-3 { right: 0.75rem; }
+.bottom-6 { bottom: 1.5rem; }
+.left-1\/2 { left: 50%; }
+.-translate-x-1\/2 { transform: translateX(-50%); }
+
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.hidden { display: none !important; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.self-start { align-self: flex-start; }
+.self-end { align-self: flex-end; }
+
+.gap-1 { gap: 0.25rem; }
+.gap-1\.5 { gap: 0.375rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-2\.5 { gap: 0.625rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-3\.5 { gap: 0.875rem; }
+.gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+.gap-6 { gap: 1.5rem; }
+
+.p-1\.5 { padding: 0.375rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+.pt-1 { padding-top: 0.25rem; }
+.pt-3 { padding-top: 0.75rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-6 { padding-top: 1.5rem; }
+.pt-32 { padding-top: 8rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.pb-4 { padding-bottom: 1rem; }
+.pb-5 { padding-bottom: 1.25rem; }
+.pb-40 { padding-bottom: 10rem; }
+
+.m-0 { margin: 0; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.25rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.mt-auto { margin-top: auto; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-5 { margin-bottom: 1.25rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-7 { margin-bottom: 1.75rem; }
+.ml-1 { margin-left: 0.25rem; }
+.mr-1 { margin-right: 0.25rem; }
+
+.rounded-md { border-radius: 0.375rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-full { border-radius: 9999px; }
+
+.bg-white { background-color: #ffffff; }
+.bg-gray-50 { background-color: #f9fafb; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-gray-200 { background-color: #e5e7eb; }
+.bg-gray-400 { background-color: #9ca3af; }
+.bg-green-50 { background-color: #f0fdf4; }
+.bg-red-50 { background-color: #fef2f2; }
+.bg-orange-50 { background-color: #fff7ed; }
+
+.text-white { color: #ffffff; }
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-700 { color: #374151; }
+.text-gray-800 { color: #1f2937; }
+.text-green-600 { color: #16a34a; }
+.text-green-700 { color: #15803d; }
+.text-red-600 { color: #dc2626; }
+.text-red-700 { color: #b91c1c; }
+.text-orange-600 { color: #ea580c; }
+
+.border { border: 1px solid #e5e7eb; }
+.border-0 { border: 0; }
+.border-b { border-bottom: 1px solid #e5e7eb; }
+.border-t { border-top: 1px solid #e5e7eb; }
+.border-gray-100 { border-color: #f3f4f6; }
+.border-gray-200 { border-color: #e5e7eb; }
+.border-gray-300 { border-color: #d1d5db; }
+.border-green-200 { border-color: #bbf7d0; }
+.border-red-200 { border-color: #fecaca; }
+
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+.object-cover { object-fit: cover; }
+.mix-blend-multiply { mix-blend-mode: multiply; }
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Responsive adjustments */
+@media (min-width: 640px) {
+	.sm\:top-6 { top: 1.5rem; }
+	.sm\:py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+	.sm\:p-2 { padding: 0.5rem; }
+	.sm\:p-6 { padding: 1.5rem; }
+	.sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+	.sm\:px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+	.sm\:w-\[350px\] { width: 350px; }
+	.sm\:w-\[360px\] { width: 360px; }
+	.sm\:w-\[380px\] { width: 380px; }
+	.sm\:w-\[480px\] { width: 480px; }
+	.sm\:w-\[500px\] { width: 500px; }
+	.sm\:max-w-md { max-width: 28rem; }
+	.sm\:h-\[85vh\] { height: 85vh; }
+	.sm\:rounded-\[2rem\] { border-radius: 2rem; }
+	.sm\:grid { display: grid; }
+	.sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.sm\:text-right { text-align: right; }
+	.sm\:flex-row { flex-direction: row; }
+}
+
+/* =========================================================
+   PRINT STYLES FOR CLINICAL NOTES AND EXERCISE SHEETS
+   ========================================================= */
+@media print {
+	body * {
+		visibility: hidden;
+	}
+	.print-hidden {
+		display: none !important;
+	}
+	#print-container,
+	#print-container * {
+		visibility: visible;
+	}
+	#print-container {
+		display: block !important;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		background: white;
+		margin: 0;
+		padding: 1cm;
+		color: #1f2937;
+		font-family: 'Poppins', sans-serif !important;
+	}
+	.print-force-bg {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+	.print-header {
+		border-bottom: 2px solid #1A2A3A !important;
+		padding-bottom: 1.5rem !important;
+		margin-bottom: 2rem !important;
+		display: flex !important;
+		justify-content: space-between !important;
+		align-items: flex-end !important;
+	}
+	.print-logo {
+		font-size: 28px !important;
+		font-weight: 800 !important;
+		color: #1A2A3A !important;
+		letter-spacing: -0.5px !important;
+	}
+	.print-logo span {
+		color: #00A878 !important;
+	}
+	.print-meta-title {
+		font-size: 11px !important;
+		color: #00A878 !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.15em !important;
+		font-weight: bold !important;
+		margin-bottom: 4px !important;
+	}
+	.print-main-title {
+		font-size: 26px !important;
+		margin: 0 !important;
+		color: #1A2A3A !important;
+		font-weight: 800 !important;
+		line-height: 1.1 !important;
+	}
+	.print-exercise {
+		margin-bottom: 2.5rem !important;
+		break-inside: avoid !important;
+		page-break-inside: avoid !important;
+		background: #f9fafb !important;
+		padding: 1.5rem !important;
+		border-radius: 12px !important;
+		border: 1px solid #e5e7eb !important;
+	}
+	.print-ex-header {
+		display: flex !important;
+		justify-content: space-between !important;
+		align-items: flex-start !important;
+		margin-bottom: 1rem !important;
+	}
+	.print-ex-title {
+		font-size: 18px !important;
+		font-weight: 700 !important;
+		color: #1A2A3A !important;
+		margin: 0 !important;
+	}
+	.print-ex-reps {
+		font-size: 13px !important;
+		font-weight: 700 !important;
+		color: #1A2A3A !important;
+		background: #eff6ff !important;
+		padding: 6px 12px !important;
+		border-radius: 8px !important;
+		border: 1px solid #bfdbfe !important;
+	}
+	.print-ex-desc {
+		font-size: 14px !important;
+		color: #4b5563 !important;
+		line-height: 1.6 !important;
+	}
+	.print-footer {
+		margin-top: 4rem !important;
+		text-align: center !important;
+		font-size: 11px !important;
+		color: #9ca3af !important;
+		border-top: 1px solid #e5e7eb !important;
+		padding-top: 1rem !important;
+	}
+	@page {
+		margin: 1cm;
+	}
+}

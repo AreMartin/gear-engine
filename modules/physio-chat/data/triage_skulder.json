@@ -1,0 +1,18 @@
+{
+  "tittel": "Subakromialt smertesyndrom (Impingement / Rotator cuff)",
+  "kategori": "Skulder",
+  "alvorlighetsgrad": "Lav",
+  "forklaring": "Subakromiale skuldersmerter oppstår når senene til rotatorcuffen (særlig supraspinatus) eller bursa subacromialis blir irritert ved bevegelse over skulderhøyde. Tilstanden kjennetegnes ofte av en 'smertebue' (painful arc) når armen løftes mellom 60 og 120 grader ut til siden.",
+  "differensial": "Adhesiv kapsulitt (frossen skulder), akromioklavikularleddsartrose, cervikobrakialgi (stråling fra nakke)",
+  "tiltak_na": "Unngå tunge løft og repetitive oppgaver over hodehøyde i 1-2 uker. Oppretthold smertefri bevegelighet.",
+  "tiltak_videre": "Målrettet styrketrening med treningsstrikk for utadrotatorer og stabiliserende muskulatur rundt skulderbladet (serratus anterior og trapezius nedre del).",
+  "notat_anamnese": [
+    { "sporsmal": "Lokalisasjon av smerte", "svar": "Utsiden av overarmen og anterolaterale skulder" },
+    { "sporsmal": "Provoserende bevegelser", "svar": "Løft over hodehøyde og soving på den affiserte siden" },
+    { "sporsmal": "Nattlige hvilesmerter", "svar": "Mild ubehag ved direkte trykk, ellers rolig" }
+  ],
+  "notat_rode_flagg": "Ingen nevrologiske utfall i overekstremitet. Ingen mistanke om akutt total seneruptur eller infeksjon.",
+  "notat_hypotese": "Subakromialt smertesyndrom med sekundær rotatorcuff-irritasjon.",
+  "notat_icpc2": "L92 (Skuldersyndrom)",
+  "notat_icd10": "M75.1 (Rotatorkuffsyndrom)"
+}
