@@ -46,6 +46,10 @@ function update_option( $key, $value, $autoload = null ) {
 	$GLOBALS['wp_options'][ $key ] = $value;
 	return true;
 }
+function delete_option( $key ) {
+	unset( $GLOBALS['wp_options'][ $key ] );
+	return true;
+}
 function get_transient( $key ) {
 	return $GLOBALS['wp_transients'][ $key ] ?? false;
 }
@@ -789,6 +793,44 @@ $dumbbell_rules = array_merge( $filter_rules, array(
 $dumbbell_reason = '';
 assert_test( $sync_engine->passes_pre_filters( $dumbbell_item, $dumbbell_rules, $dumbbell_reason ) === true, 'pre_filters: Word-boundary blacklist does not falsely reject "Manualer" (dumbbells) when "manual" is blacklisted' );
 
+// TEST 14: 5-Slot Feed Table Configuration, Migration & Selective Sync
+// 14.1 Verify legacy migration fallback to 5 slots
+delete_option( 'gae_feeds' );
+update_option( 'gae_adtraction_url', 'https://feed.adtraction.com/v2/legacy.xml' );
+update_option( 'gae_tradetracker_url', 'https://tradetracker.com/legacy.xml' );
+
+$slots = GAE_Settings::get_feed_slots();
+assert_test( count( $slots ) === 5, 'feed_slots: Always returns exactly 5 feed slots' );
+assert_test( $slots[0]['enabled'] === 1 && $slots[0]['url'] === 'https://feed.adtraction.com/v2/legacy.xml', 'feed_slots: Slot 0 migrated from legacy Adtraction URL' );
+assert_test( $slots[1]['enabled'] === 1 && $slots[1]['url'] === 'https://tradetracker.com/legacy.xml', 'feed_slots: Slot 1 migrated from legacy TradeTracker URL' );
+assert_test( $slots[2]['enabled'] === 0 && empty( $slots[2]['url'] ), 'feed_slots: Slot 2 is empty inactive placeholder' );
+
+// 14.2 Verify sanitization of 5-slot feed table
+$raw_slots_input = array(
+	array( 'name' => 'Gymgrossisten', 'network' => 'Adtraction', 'url' => 'https://feed.adtraction.com/v2/gym.xml', 'enabled' => 1 ),
+	array( 'name' => 'XXL Sport', 'network' => 'Adtraction', 'url' => 'https://feed.adtraction.com/v2/xxl.xml', 'enabled' => 1 ),
+	array( 'name' => 'Treningspartner', 'network' => 'TradeTracker', 'url' => 'https://tradetracker.com/tp.xml', 'enabled' => 0 ),
+	array( 'name' => 'Intersport', 'network' => 'Generic', 'url' => 'https://example.com/feed.xml', 'enabled' => 1 ),
+	array( 'name' => 'Spare Slot 5', 'network' => 'Adtraction', 'url' => '', 'enabled' => 0 ),
+	array( 'name' => 'Excess Slot 6', 'network' => 'Adtraction', 'url' => 'https://example.com/excess.xml', 'enabled' => 1 ),
+);
+$sanitized_slots = $settings_module->sanitize_feeds_table( $raw_slots_input );
+assert_test( count( $sanitized_slots ) === 5, 'feed_sanitize: Hard-caps configured slots to maximum 5' );
+assert_test( $sanitized_slots[0]['name'] === 'Gymgrossisten', 'feed_sanitize: Correctly sanitized partner name' );
+assert_test( $sanitized_slots[2]['enabled'] === 0, 'feed_sanitize: Preserved paused/disabled status' );
+
+// 14.3 Verify get_configured_feeds returns only active, non-empty feeds
+update_option( 'gae_feeds', $sanitized_slots );
+$active_feeds = $sync_engine->get_configured_feeds();
+assert_test( count( $active_feeds ) === 3, 'configured_feeds: Only active feeds with URLs returned (3 of 5)' );
+assert_test( isset( $active_feeds['Gymgrossisten'] ) && isset( $active_feeds['XXL Sport'] ), 'configured_feeds: Active Adtraction partner feeds keyed by name' );
+assert_test( ! isset( $active_feeds['Treningspartner'] ), 'configured_feeds: Disabled feed is excluded from sync list' );
+
+// 14.4 Verify selective single-feed targeting by partner name
+$target_sync_rules = array( 'target_feed' => 'Gymgrossisten', 'max_items_per_sync' => 10 );
+$sync_report = $sync_engine->run_sync( array( 'Gymgrossisten' => $tmp_multi_file ?? '' ), true, $target_sync_rules );
+assert_test( ! empty( $sync_report['date'] ), 'selective_sync: Successfully executed targeted sync for specific partner feed' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (13/13 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (14/14 suites passed)\n";
 echo "========================================================\n";

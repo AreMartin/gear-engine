@@ -60,34 +60,40 @@ class GAE_Settings {
 	 * @return void
 	 */
 	public function register_settings(): void {
-		// 1. Feed URLs section.
+		// 1. Feed URLs section (5-Slot Multi-Partner Table).
 		add_settings_section(
 			'gae_section_feeds',
-			__( 'Affiliate Data Feeds', 'gear-engine' ),
+			__( 'Affiliate Data Feeds (Up to 5 Partner Feeds)', 'gear-engine' ),
 			array( $this, 'render_feeds_section_intro' ),
 			self::PAGE_SLUG
 		);
 
 		register_setting(
 			self::OPTION_GROUP,
+			'gae_feeds',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( $this, 'sanitize_feeds_table' ),
+				'default'           => array(),
+			)
+		);
+
+		add_settings_field(
+			'gae_feeds_table',
+			__( 'Partner Feed Slots', 'gear-engine' ),
+			array( $this, 'render_feeds_table' ),
+			self::PAGE_SLUG,
+			'gae_section_feeds'
+		);
+
+		// Keep legacy single options registered for backward compatibility.
+		register_setting(
+			self::OPTION_GROUP,
 			'gae_adtraction_url',
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => array( $this, 'sanitize_feed_url' ),
 				'default'           => '',
-			)
-		);
-
-		add_settings_field(
-			'gae_adtraction_url',
-			__( 'Adtraction Feed URL', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_feeds',
-			array(
-				'id'          => 'gae_adtraction_url',
-				'type'        => 'url',
-				'description' => __( 'Direct XML or JSON product feed URL from Adtraction (supports XML, JSON, and NDJSON).', 'gear-engine' ),
 			)
 		);
 
@@ -98,19 +104,6 @@ class GAE_Settings {
 				'type'              => 'string',
 				'sanitize_callback' => array( $this, 'sanitize_feed_url' ),
 				'default'           => '',
-			)
-		);
-
-		add_settings_field(
-			'gae_tradetracker_url',
-			__( 'TradeTracker Feed URL', 'gear-engine' ),
-			array( $this, 'render_field_text' ),
-			self::PAGE_SLUG,
-			'gae_section_feeds',
-			array(
-				'id'          => 'gae_tradetracker_url',
-				'type'        => 'url',
-				'description' => __( 'Direct XML or JSON product feed URL from TradeTracker (supports XML, JSON, and NDJSON).', 'gear-engine' ),
 			)
 		);
 
@@ -496,10 +489,154 @@ class GAE_Settings {
 	}
 
 	/**
+	 * Retrieve the 5 feed slots (padded to 5).
+	 *
+	 * Migrates legacy single options if gae_feeds is empty.
+	 *
+	 * @return array<int, array{name: string, network: string, url: string, enabled: int}>
+	 */
+	public static function get_feed_slots(): array {
+		$saved = get_option( 'gae_feeds', array() );
+
+		if ( empty( $saved ) || ! is_array( $saved ) ) {
+			$legacy_adtraction   = (string) get_option( 'gae_adtraction_url', '' );
+			$legacy_tradetracker = (string) get_option( 'gae_tradetracker_url', '' );
+
+			$saved = array();
+			if ( ! empty( $legacy_adtraction ) ) {
+				$saved[] = array(
+					'name'    => 'Adtraction Partner 1',
+					'network' => 'Adtraction',
+					'url'     => $legacy_adtraction,
+					'enabled' => 1,
+				);
+			}
+			if ( ! empty( $legacy_tradetracker ) ) {
+				$saved[] = array(
+					'name'    => 'TradeTracker Partner 1',
+					'network' => 'TradeTracker',
+					'url'     => $legacy_tradetracker,
+					'enabled' => 1,
+				);
+			}
+		}
+
+		$slots = array();
+		for ( $i = 0; $i < 5; $i++ ) {
+			if ( isset( $saved[ $i ] ) && is_array( $saved[ $i ] ) ) {
+				$slots[ $i ] = array(
+					'name'    => (string) ( $saved[ $i ]['name'] ?? '' ),
+					'network' => (string) ( $saved[ $i ]['network'] ?? 'Adtraction' ),
+					'url'     => (string) ( $saved[ $i ]['url'] ?? '' ),
+					'enabled' => ! empty( $saved[ $i ]['enabled'] ) ? 1 : 0,
+				);
+			} else {
+				$slots[ $i ] = array(
+					'name'    => '',
+					'network' => 'Adtraction',
+					'url'     => '',
+					'enabled' => 0,
+				);
+			}
+		}
+
+		return $slots;
+	}
+
+	/**
+	 * Sanitize the 5-slot feeds table array.
+	 *
+	 * @param mixed $input Raw POST array.
+	 * @return array<int, array{name: string, network: string, url: string, enabled: int}>
+	 */
+	public function sanitize_feeds_table( $input ): array {
+		if ( ! is_array( $input ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		$count     = 0;
+
+		foreach ( $input as $slot ) {
+			if ( $count >= 5 || ! is_array( $slot ) ) {
+				break;
+			}
+
+			$url     = $this->sanitize_feed_url( (string) ( $slot['url'] ?? '' ) );
+			$name    = sanitize_text_field( (string) ( $slot['name'] ?? '' ) );
+			$network = sanitize_text_field( (string) ( $slot['network'] ?? 'Adtraction' ) );
+			$enabled = ! empty( $slot['enabled'] ) ? 1 : 0;
+
+			if ( ! in_array( $network, array( 'Adtraction', 'TradeTracker', 'Generic' ), true ) ) {
+				$network = 'Adtraction';
+			}
+
+			$sanitized[] = array(
+				'name'    => $name,
+				'network' => $network,
+				'url'     => $url,
+				'enabled' => $enabled,
+			);
+
+			$count++;
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Render the 5-slot feeds table.
+	 *
+	 * @return void
+	 */
+	public function render_feeds_table(): void {
+		$slots = self::get_feed_slots();
+		?>
+		<div class="gae-feeds-table-wrap">
+			<table class="widefat fixed striped gae-feeds-table">
+				<thead>
+					<tr>
+						<th style="width: 55px; text-align: center;"><?php esc_html_e( 'Active', 'gear-engine' ); ?></th>
+						<th style="width: 220px;"><?php esc_html_e( 'Partner / Feed Name', 'gear-engine' ); ?></th>
+						<th style="width: 140px;"><?php esc_html_e( 'Network', 'gear-engine' ); ?></th>
+						<th><?php esc_html_e( 'Feed URL (XML, JSON, GZIP)', 'gear-engine' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( $slots as $i => $slot ) : ?>
+						<tr>
+							<td style="text-align: center; vertical-align: middle;">
+								<input type="checkbox" name="gae_feeds[<?php echo (int) $i; ?>][enabled]" value="1" <?php checked( $slot['enabled'], 1 ); ?> />
+							</td>
+							<td>
+								<input type="text" name="gae_feeds[<?php echo (int) $i; ?>][name]" value="<?php echo esc_attr( $slot['name'] ); ?>" placeholder="<?php printf( esc_attr__( 'Feed #%d (e.g. Gymgrossisten)', 'gear-engine' ), (int) $i + 1 ); ?>" class="regular-text" style="width: 100%;" />
+							</td>
+							<td>
+								<select name="gae_feeds[<?php echo (int) $i; ?>][network]" style="width: 100%;">
+									<option value="Adtraction" <?php selected( $slot['network'], 'Adtraction' ); ?>>Adtraction</option>
+									<option value="TradeTracker" <?php selected( $slot['network'], 'TradeTracker' ); ?>>TradeTracker</option>
+									<option value="Generic" <?php selected( $slot['network'], 'Generic' ); ?>><?php esc_html_e( 'Generic / Other', 'gear-engine' ); ?></option>
+								</select>
+							</td>
+							<td>
+								<input type="url" name="gae_feeds[<?php echo (int) $i; ?>][url]" value="<?php echo esc_attr( $slot['url'] ); ?>" placeholder="https://..." class="large-text" style="width: 100%;" />
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<p class="description" style="margin-top: 8px;">
+				<?php esc_html_e( 'Configure up to 5 affiliate partner feeds. Feeds checked as "Active" will automatically update in background during daily cron syncs.', 'gear-engine' ); ?>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Section intro: Feeds.
 	 */
 	public function render_feeds_section_intro(): void {
-		echo '<p class="description">' . esc_html__( 'Configure the remote affiliate XML feeds from Adtraction and TradeTracker. The streaming sync engine parses these feeds incrementally to prevent memory exhaustion.', 'gear-engine' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Manage up to 5 affiliate partner feeds. Feeds checked as "Active" are automatically synced and updated during daily cron jobs.', 'gear-engine' ) . '</p>';
 	}
 
 	/**
@@ -839,10 +976,23 @@ class GAE_Settings {
 						<!-- Control 2: Feed Source Selection & In-Stock -->
 						<div class="gae-filter-box">
 							<label class="gae-filter-heading"><?php esc_html_e( '2. Source Feed & Stock Status', 'gear-engine' ); ?></label>
-							<div class="gae-feed-radios" style="margin-bottom: 8px;">
-								<label><input type="radio" name="gae_quick_feed" value="all" checked /> <?php esc_html_e( 'All Feeds', 'gear-engine' ); ?></label>
-								<label style="margin-left: 14px;"><input type="radio" name="gae_quick_feed" value="Adtraction" /> <?php esc_html_e( 'Adtraction Only', 'gear-engine' ); ?></label>
-								<label style="margin-left: 14px;"><input type="radio" name="gae_quick_feed" value="TradeTracker" /> <?php esc_html_e( 'TradeTracker Only', 'gear-engine' ); ?></label>
+							<div class="gae-feed-radios" style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 10px;">
+								<label><input type="radio" name="gae_quick_feed" value="all" checked /> <?php esc_html_e( 'All Active Feeds', 'gear-engine' ); ?></label>
+								<?php
+								$configured_slots = self::get_feed_slots();
+								$active_slots_cnt = 0;
+								foreach ( $configured_slots as $c_idx => $c_slot ) {
+									if ( ! empty( $c_slot['enabled'] ) && ! empty( $c_slot['url'] ) ) {
+										$active_slots_cnt++;
+										$feed_label = ! empty( $c_slot['name'] ) ? $c_slot['name'] : sprintf( __( 'Feed #%d', 'gear-engine' ), (int) $c_idx + 1 );
+										echo '<label><input type="radio" name="gae_quick_feed" value="' . esc_attr( $feed_label ) . '" /> ' . esc_html( $feed_label ) . '</label>';
+									}
+								}
+								if ( 0 === $active_slots_cnt ) {
+									echo '<label><input type="radio" name="gae_quick_feed" value="Adtraction" /> Adtraction</label>';
+									echo '<label><input type="radio" name="gae_quick_feed" value="TradeTracker" /> TradeTracker</label>';
+								}
+								?>
 							</div>
 							<div style="padding-top: 6px; border-top: 1px solid #e2e8f0;">
 								<label style="font-weight: 600; font-size: 13px; cursor: pointer; color: #1e293b;">

@@ -102,12 +102,12 @@ class GAE_Sync_Engine {
 		// Determine feeds to process.
 		$feeds = ! empty( $override_feeds ) ? $override_feeds : $this->get_configured_feeds();
 
-		// If a specific target feed was requested (e.g. Adtraction or TradeTracker only).
+		// If a specific target feed was requested (e.g. specific partner name or network).
 		if ( ! empty( $filter_rules['target_feed'] ) && 'all' !== strtolower( (string) $filter_rules['target_feed'] ) ) {
-			$target_key = strtolower( (string) $filter_rules['target_feed'] );
+			$target_key = strtolower( trim( (string) $filter_rules['target_feed'] ) );
 			$filtered_feeds = array();
 			foreach ( $feeds as $s_name => $s_url ) {
-				if ( strtolower( $s_name ) === $target_key ) {
+				if ( strtolower( $s_name ) === $target_key || false !== stripos( $s_name, $target_key ) ) {
 					$filtered_feeds[ $s_name ] = $s_url;
 				}
 			}
@@ -162,13 +162,47 @@ class GAE_Sync_Engine {
 	/**
 	 * Retrieve configured feed URLs.
 	 *
-	 * @return array<string, string>
+	 * Checks the 5-slot feed table (gae_feeds), falling back to legacy single options.
+	 *
+	 * @return array<string, string> Associative array of [ 'Feed Name' => 'URL' ].
 	 */
-	protected function get_configured_feeds(): array {
-		return array(
-			'Adtraction'   => (string) get_option( 'gae_adtraction_url', '' ),
-			'TradeTracker' => (string) get_option( 'gae_tradetracker_url', '' ),
-		);
+	public function get_configured_feeds(): array {
+		$feeds_option = get_option( 'gae_feeds', array() );
+		$feeds        = array();
+
+		if ( ! empty( $feeds_option ) && is_array( $feeds_option ) ) {
+			foreach ( $feeds_option as $index => $slot ) {
+				if ( ! is_array( $slot ) ) {
+					continue;
+				}
+				$enabled = ! empty( $slot['enabled'] );
+				$url     = trim( (string) ( $slot['url'] ?? '' ) );
+				$name    = trim( (string) ( $slot['name'] ?? '' ) );
+				if ( empty( $name ) ) {
+					$network = trim( (string) ( $slot['network'] ?? 'Feed' ) );
+					$name    = sprintf( '%s #%d', $network, (int) $index + 1 );
+				}
+
+				if ( $enabled && ! empty( $url ) ) {
+					$feeds[ $name ] = $url;
+				}
+			}
+		}
+
+		// Fallback to legacy single options if gae_feeds was never configured or had no active feeds.
+		if ( empty( $feeds ) ) {
+			$adtraction_url   = trim( (string) get_option( 'gae_adtraction_url', '' ) );
+			$tradetracker_url = trim( (string) get_option( 'gae_tradetracker_url', '' ) );
+
+			if ( ! empty( $adtraction_url ) ) {
+				$feeds['Adtraction'] = $adtraction_url;
+			}
+			if ( ! empty( $tradetracker_url ) ) {
+				$feeds['TradeTracker'] = $tradetracker_url;
+			}
+		}
+
+		return $feeds;
 	}
 
 	/**
