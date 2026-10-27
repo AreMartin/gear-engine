@@ -65,10 +65,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 			
 			<!-- Typing Animated Indicator -->
 			<div id="fysio-typing" class="print-hidden hidden message-enter self-start" style="display: none !important;">
-				<div class="flex bg-white border border-gray-200 shadow-sm gap-1.5 items-center" style="border-radius: 24px !important; border-top-left-radius: 8px !important; padding: 1rem 1.25rem !important;">
-					<div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
-					<div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
-					<div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
+				<div class="flex bg-white border border-gray-200 shadow-sm gap-1.5 items-center fysio-typing-box" style="border-radius: 24px !important; border-top-left-radius: 8px !important; padding: 0.875rem 1.25rem !important; display: flex !important; align-items: center !important; gap: 6px !important; background: white !important;">
+					<div class="typing-dot" style="width: 7px !important; height: 7px !important; min-width: 7px !important; min-height: 7px !important; background-color: #9ca3af !important; border-radius: 50% !important; display: inline-block !important;"></div>
+					<div class="typing-dot" style="width: 7px !important; height: 7px !important; min-width: 7px !important; min-height: 7px !important; background-color: #9ca3af !important; border-radius: 50% !important; display: inline-block !important;"></div>
+					<div class="typing-dot" style="width: 7px !important; height: 7px !important; min-width: 7px !important; min-height: 7px !important; background-color: #9ca3af !important; border-radius: 50% !important; display: inline-block !important;"></div>
 				</div>
 			</div>
 			
@@ -77,15 +77,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</main>
 
 	<!-- Input Floating Pill Bar -->
-	<footer class="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 print-hidden w-[calc(100%-2rem)] max-w-[860px]">
-		<form id="fysio-form" class="w-full m-0 p-0">
-			<div class="glass-pill rounded-[2rem] flex items-end p-1.5 sm:p-2 focus-within:ring-4 focus-within:ring-[#00A878]/20 transition-all shadow-float">
+	<footer class="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 print-hidden w-[calc(100%-2rem)] max-w-[860px]" style="position: absolute !important; bottom: 1.5rem !important; left: 50% !important; transform: translateX(-50%) !important; width: calc(100% - 2rem) !important; max-width: 860px !important; z-index: 40 !important;">
+		<form id="fysio-form" class="w-full m-0 p-0" style="margin: 0 !important; padding: 0 !important; width: 100% !important;">
+			<div class="glass-pill rounded-[2rem] flex items-end p-1.5 sm:p-2 focus-within:ring-4 focus-within:ring-[#00A878]/20 transition-all shadow-float fysio-input-bar" style="border-radius: 2rem !important; display: flex !important; align-items: flex-end !important; padding: 6px 8px !important; background: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.1) !important;">
 				<textarea id="fysio-input" rows="1" placeholder="Skriv her..." 
-					class="w-full bg-transparent border-none outline-none resize-none m-0 px-4 sm:px-5 py-2.5 text-[16px] font-medium leading-relaxed text-gray-800 placeholder-gray-400 min-h-[44px] max-h-[120px] no-scrollbar"></textarea>
+					class="w-full bg-transparent border-none outline-none resize-none m-0 px-4 sm:px-5 py-2.5 text-[16px] font-medium leading-relaxed text-gray-800 placeholder-gray-400 min-h-[44px] max-h-[120px] no-scrollbar" style="width: 100% !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; resize: none !important; margin: 0 !important; padding: 10px 18px !important; font-size: 16px !important; font-weight: 500 !important; line-height: 1.5 !important; color: #1f2937 !important; min-height: 44px !important; max-height: 120px !important; font-family: inherit !important;"></textarea>
 				
 				<button id="fysio-send-btn" type="submit"
-					class="fysio-send-disabled w-[40px] h-[40px] rounded-full flex items-center justify-center shrink-0 transition-all ml-1 cursor-pointer">
-					<i class="fa-solid fa-arrow-up text-[16px]"></i>
+					class="fysio-send-disabled w-[40px] h-[40px] rounded-full flex items-center justify-center shrink-0 transition-all ml-1 cursor-pointer" style="width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important; border-radius: 9999px !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; margin-left: 4px !important; background-color: #1A2A3A !important; border: none !important; cursor: pointer !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;">
+					<i class="fa-solid fa-arrow-up text-[16px]" style="color: #ffffff !important; font-size: 16px !important;"></i>
 				</button>
 			</div>
 		</form>

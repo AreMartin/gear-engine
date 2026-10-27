@@ -96,6 +96,23 @@ class GAE_Physio_Chat {
 			null
 		);
 
+		// Tailwind CSS 3 CDN (with preflight disabled so it does not touch WordPress theme styles).
+		wp_register_script(
+			'gae-tailwind-cdn',
+			'https://cdn.tailwindcss.com',
+			array(),
+			'3.4.1',
+			false
+		);
+
+		if ( function_exists( 'wp_add_inline_script' ) ) {
+			wp_add_inline_script(
+				'gae-tailwind-cdn',
+				'tailwind.config = { corePlugins: { preflight: false }, theme: { extend: { fontFamily: { sans: ["Poppins", "sans-serif"] }, colors: { fysioprimary: "#1A2A3A", fysiosec: "#00A878" }, boxShadow: { "float": "0 15px 35px -5px rgba(10, 37, 88, 0.1)" } } } };',
+				'after'
+			);
+		}
+
 		// Module Scoped Stylesheet.
 		wp_register_style(
 			'gae-physio-chat-css',
@@ -150,6 +167,7 @@ class GAE_Physio_Chat {
 			self::SHORTCODE_TAG
 		);
 
+		wp_enqueue_script( 'gae-tailwind-cdn' );
 		wp_enqueue_style( 'gae-physio-chat-css' );
 		wp_enqueue_script( 'gae-physio-chat-js' );
 

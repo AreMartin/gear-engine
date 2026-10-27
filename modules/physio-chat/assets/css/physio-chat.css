@@ -360,15 +360,88 @@ button#btn-finish:hover * {
 }
 
 .typing-dot {
-	animation: fysio-typing 1.4s infinite ease-in-out both;
+	width: 7px !important;
+	height: 7px !important;
+	min-width: 7px !important;
+	min-height: 7px !important;
+	border-radius: 50% !important;
+	background-color: #9ca3af !important;
+	display: inline-block !important;
+	animation: fysio-typing 1.4s infinite ease-in-out both !important;
 }
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(1) { animation-delay: -0.32s !important; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s !important; }
 
 @keyframes fysio-typing {
-	0%, 80%, 100% { transform: scale(0); }
-	40% { transform: scale(1); }
+	0%, 80%, 100% {
+		transform: scale(0.3);
+		opacity: 0.4;
+	}
+	40% {
+		transform: scale(1.1);
+		opacity: 1;
+	}
 }
+
+.fysio-user-msg-bubble {
+	border-radius: 1.5rem !important;
+	border-bottom-right-radius: 8px !important;
+	background-color: #1A2A3A !important;
+	color: #ffffff !important;
+	font-size: 15px !important;
+	padding: 0.875rem 1.25rem !important;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+	line-height: 1.6 !important;
+	width: 100% !important;
+}
+
+.fysio-bot-msg-bubble {
+	border-radius: 1.5rem !important;
+	border-top-left-radius: 8px !important;
+	background-color: #ffffff !important;
+	color: #1f2937 !important;
+	border: 1px solid #e5e7eb !important;
+	font-size: 15px !important;
+	padding: 0.875rem 1.25rem !important;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+	line-height: 1.6 !important;
+	width: 100% !important;
+}
+
+.fysio-input-bar {
+	border-radius: 2rem !important;
+	background: rgba(255, 255, 255, 0.9) !important;
+	backdrop-filter: blur(20px) !important;
+	-webkit-backdrop-filter: blur(20px) !important;
+	border: 1px solid rgba(255, 255, 255, 0.7) !important;
+	box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.1) !important;
+	display: flex !important;
+	align-items: flex-end !important;
+	padding: 6px 8px !important;
+	transition: all 0.2s ease !important;
+}
+
+.fysio-input-bar:focus-within {
+	box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.15), 0 0 0 4px rgba(0, 168, 120, 0.2) !important;
+}
+
+.rounded-\[2rem\] { border-radius: 2rem !important; }
+.rounded-\[1\.5rem\] { border-radius: 1.5rem !important; }
+.rounded-\[1\.25rem\] { border-radius: 1.25rem !important; }
+.rounded-br-\[8px\] { border-bottom-right-radius: 8px !important; }
+.rounded-tl-\[8px\] { border-top-left-radius: 8px !important; }
+.max-w-\[85\%\] { max-width: 85% !important; }
+.max-w-\[90\%\] { max-width: 90% !important; }
+.max-w-\[70\%\] { max-width: 70% !important; }
+.max-w-\[75\%\] { max-width: 75% !important; }
+.max-w-\[860px\] { max-width: 860px !important; }
+.max-w-\[900px\] { max-width: 900px !important; }
+.max-w-\[600px\] { max-width: 600px !important; }
+.w-\[40px\] { width: 40px !important; }
+.h-\[40px\] { height: 40px !important; }
+.min-h-\[44px\] { min-height: 44px !important; }
+.max-h-\[120px\] { max-height: 120px !important; }
+.shadow-float { box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.1) !important; }
 
 @keyframes fysio-pop {
 	0% { transform: scale(1); }

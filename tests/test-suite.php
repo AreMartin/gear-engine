@@ -36,6 +36,7 @@ function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $m
 function wp_enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $in_footer = false ) {}
 function wp_register_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {}
 function wp_register_script( $handle, $src = '', $deps = array(), $ver = false, $in_footer = false ) {}
+function wp_add_inline_script( $handle, $data, $position = 'after' ) {}
 function wp_localize_script( $handle, $object_name, $l10n ) {}
 function register_block_type( $name, $args = array() ) {}
 function register_rest_route( $namespace, $route, $args = array(), $override = false ) {}

@@ -49,6 +49,9 @@ Når kunden forteller om en skade/smerte, og du finner relevante produkter under
 === JSON STRUKTUR ===
 Du MÅ returnere 100% gyldig JSON. 
 Du MÅ ALLTID inkludere 'choices' (en array med 2-4 knapper/svaralternativer for brukeren for å drive samtalen videre). Dette gjelder alle responser uansett tema.
+Du MÅ ALLTID inkludere 'multiselect' (boolean):
+- Sett "multiselect": true når du stiller kartleggingsspørsmål om symptomer, smertekarakter eller provoserende aktiviteter (triage) der brukeren kan ha flere plager samtidig, slik at brukeren kan velge flere alternativer.
+- Sett "multiselect": false ved vanlige valg der brukeren velger ett enkelt svar.
 
 For øvelser bruker du systemkontekst hvis det finnes relevante øvelser der. Dersom det ikke finnes relevante øvelser kan du foreslå egnede øvelser basert på fysioterapifaglig kunnskap.
 
@@ -706,11 +709,34 @@ EOT;
 					$clean_choices[] = sanitize_text_field( trim( $c ) );
 				} elseif ( is_array( $c ) && ! empty( $c['text'] ) ) {
 					$clean_choices[] = sanitize_text_field( trim( (string) $c['text'] ) );
+				} elseif ( is_array( $c ) && ! empty( $c['label'] ) ) {
+					$clean_choices[] = sanitize_text_field( trim( (string) $c['label'] ) );
 				}
 			}
 			$bot_data['choices'] = array_values( array_unique( $clean_choices ) );
-		} else {
+		}
+
+		if ( empty( $bot_data['choices'] ) ) {
 			$bot_data['choices'] = array( 'Jeg har vondt et sted', 'Lag treningsprogram', 'Finn riktig treningsutstyr' );
+		}
+
+		// Ensure multiselect boolean.
+		$bot_data['multiselect'] = ! empty( $bot_data['multiselect'] );
+
+		// Format message markdown.
+		if ( isset( $bot_data['message'] ) && is_string( $bot_data['message'] ) ) {
+			$msg = $bot_data['message'];
+			$msg = preg_replace( '/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/', '<a href="$2" target="_blank" rel="noopener" style="color: #0A2558; text-decoration: underline; font-weight: 600;">$1</a>', $msg );
+			$msg = preg_replace( '/\*\*(.*?)\*\*/s', '<strong style="color: #1A2A3A; font-weight: 700;">$1</strong>', $msg );
+			$msg = str_replace( '*', '', $msg );
+			$msg = preg_replace( '/^[\-]\s+(.*)$/m', '<li style="margin-left: 20px; list-style-type: disc; margin-bottom: 6px;">$1</li>', $msg );
+			$msg = preg_replace( '/(<li.*?>.*?<\/li>\s*)+/s', '<ul style="margin-top: 12px; margin-bottom: 16px;">$0</ul>', $msg );
+			$msg = preg_replace( '/<\/li>\s*<li/s', '</li><li', $msg );
+			$msg = preg_replace( '/<\/ul>\s*/s', '</ul>', $msg );
+			$msg = preg_replace( '/\s*<ul>/s', '<ul>', $msg );
+			$msg = preg_replace( '/\n{2,}/', '<br><br>', $msg );
+			$msg = nl2br( $msg );
+			$bot_data['message'] = $msg;
 		}
 
 		return $bot_data;

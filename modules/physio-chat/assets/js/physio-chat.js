@@ -360,9 +360,9 @@
         const container = document.getElementById('fysio-message-container');
         if (!container) return;
         if (isUser) {
-            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[85%] sm:max-w-[70%] message-enter print-hidden" style="align-self: flex-end !important; display: flex !important;"><div class="text-white rounded-[1.5rem] rounded-br-[8px] shadow-sm leading-relaxed w-full" style="background-color: #1A2A3A !important; color: #ffffff !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important;">${text}</div></div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[85%] sm:max-w-[70%] message-enter print-hidden" style="align-self: flex-end !important; display: flex !important; max-width: 85% !important; margin-bottom: 0.5rem !important;"><div class="text-white shadow-sm leading-relaxed w-full fysio-user-msg-bubble" style="background-color: #1A2A3A !important; color: #ffffff !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-bottom-right-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${text}</div></div>`);
         } else {
-            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important;"><div class="bg-white rounded-[1.5rem] rounded-tl-[8px] border shadow-sm leading-relaxed w-full" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important;">${text}</div></div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important; max-width: 90% !important; margin-bottom: 0.5rem !important;"><div class="bg-white border shadow-sm leading-relaxed w-full fysio-bot-msg-bubble" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-top-left-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${text}</div></div>`);
         }
         scrollToSmart();
     }
@@ -566,7 +566,7 @@
         }
 
         if (msgHtml) {
-            const html = `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important;"><div class="rounded-[1.5rem] rounded-tl-[8px] border shadow-sm leading-relaxed w-full" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important;">${msgHtml}</div></div>`;
+            const html = `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important; max-width: 90% !important; margin-bottom: 0.5rem !important;"><div class="rounded-[1.5rem] rounded-tl-[8px] border shadow-sm leading-relaxed w-full fysio-bot-msg-bubble" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-top-left-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${msgHtml}</div></div>`;
             messageContainer.insertAdjacentHTML('beforeend', html);
         }
         if (extraHTML || choicesHTML) {
