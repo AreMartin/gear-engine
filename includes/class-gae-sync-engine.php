@@ -45,11 +45,12 @@ class GAE_Sync_Engine {
 	 *
 	 * Downloads and streams all configured feeds (Adtraction, TradeTracker) in batches.
 	 *
-	 * @param array<string, mixed> $override_feeds Optional feed URLs for manual/test runs.
-	 * @param bool                 $force_unlock   Whether to clear any existing lock (e.g. manual admin trigger).
+	 * @param array<string, mixed> $override_feeds        Optional feed URLs for manual/test runs.
+	 * @param bool                 $force_unlock          Whether to clear any existing lock (e.g. manual admin trigger).
+	 * @param array<string, mixed> $override_filter_rules Optional filter rules override (e.g. from dashboard).
 	 * @return array<string, mixed> Detailed execution report.
 	 */
-	public function run_sync( array $override_feeds = array(), bool $force_unlock = false ): array {
+	public function run_sync( array $override_feeds = array(), bool $force_unlock = false, array $override_filter_rules = array() ): array {
 		if ( $force_unlock ) {
 			$this->release_lock();
 		}
@@ -92,11 +93,28 @@ class GAE_Sync_Engine {
 			'errors'       => array(),
 		);
 
-		// Preload filter criteria from settings once.
+		// Preload filter criteria from settings once and merge any runtime overrides.
 		$filter_rules = $this->load_filter_rules();
+		if ( ! empty( $override_filter_rules ) ) {
+			$filter_rules = array_merge( $filter_rules, $override_filter_rules );
+		}
 
 		// Determine feeds to process.
 		$feeds = ! empty( $override_feeds ) ? $override_feeds : $this->get_configured_feeds();
+
+		// If a specific target feed was requested (e.g. Adtraction or TradeTracker only).
+		if ( ! empty( $filter_rules['target_feed'] ) && 'all' !== strtolower( (string) $filter_rules['target_feed'] ) ) {
+			$target_key = strtolower( (string) $filter_rules['target_feed'] );
+			$filtered_feeds = array();
+			foreach ( $feeds as $s_name => $s_url ) {
+				if ( strtolower( $s_name ) === $target_key ) {
+					$filtered_feeds[ $s_name ] = $s_url;
+				}
+			}
+			if ( ! empty( $filtered_feeds ) ) {
+				$feeds = $filtered_feeds;
+			}
+		}
 
 		foreach ( $feeds as $source_name => $feed_source ) {
 			if ( empty( $feed_source ) ) {
@@ -111,6 +129,11 @@ class GAE_Sync_Engine {
 					$source_name,
 					$e->getMessage()
 				);
+			}
+
+			// If total product limit or batch limit was hit, stop processing further feeds.
+			if ( ! empty( $report['batch_capped'] ) || ! empty( $report['total_capped'] ) ) {
+				break;
 			}
 		}
 
@@ -149,23 +172,39 @@ class GAE_Sync_Engine {
 	}
 
 	/**
+	 * Retrieve total count of published exercise gear products in the catalog.
+	 *
+	 * @return int Total published products.
+	 */
+	public function get_catalog_product_count(): int {
+		if ( function_exists( 'wp_count_posts' ) ) {
+			$counts = wp_count_posts( GAE_CPT::POST_TYPE );
+			return (int) ( $counts->publish ?? 0 );
+		}
+		if ( isset( $GLOBALS['wp_posts'] ) && is_array( $GLOBALS['wp_posts'] ) ) {
+			$count = 0;
+			foreach ( $GLOBALS['wp_posts'] as $post ) {
+				$pt = is_object( $post ) ? ( $post->post_type ?? '' ) : ( $post['post_type'] ?? '' );
+				$ps = is_object( $post ) ? ( $post->post_status ?? 'publish' ) : ( $post['post_status'] ?? 'publish' );
+				if ( $pt === GAE_CPT::POST_TYPE && 'publish' === $ps ) {
+					$count++;
+				}
+			}
+			return $count;
+		}
+		return 0;
+	}
+
+	/**
 	 * Load and normalize pre-filtering criteria from WordPress settings.
 	 *
-	 * @return array{
-	 *     min_price: float,
-	 *     max_price: float,
-	 *     min_discount_pct: float,
-	 *     only_in_stock: bool,
-	 *     allowed_categories: string[],
-	 *     allowed_merchants: string[],
-	 *     excluded_merchants: string[],
-	 *     excluded_keywords: string[],
-	 *     required_keywords: string[]
-	 * }
+	 * @return array<string, mixed>
 	 */
 	public function load_filter_rules(): array {
 		return array(
 			'max_items_per_sync' => (int) get_option( 'gae_max_items_per_sync', 100 ),
+			'max_total_products' => (int) get_option( 'gae_max_total_products', 100 ),
+			'max_scan_items'     => (int) get_option( 'gae_max_scan_items', 5000 ),
 			'min_price'          => (float) get_option( 'gae_min_price', 0 ),
 			'max_price'          => (float) get_option( 'gae_max_price', 0 ),
 			'min_discount_pct'   => (float) get_option( 'gae_min_discount_pct', 0 ),
@@ -258,13 +297,32 @@ class GAE_Sync_Engine {
 	}
 
 	/**
+	 * Check if file has GZIP compression header (\x1f\x8b).
+	 *
+	 * @param string $file_path Local file path.
+	 * @return bool True if gzipped.
+	 */
+	public function is_gzipped( string $file_path ): bool {
+		$handle = @fopen( $file_path, 'rb' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+		if ( ! $handle ) {
+			return false;
+		}
+		$magic = fread( $handle, 2 );
+		fclose( $handle );
+		return ( "\x1f\x8b" === $magic );
+	}
+
+	/**
 	 * Detect whether the feed file content is JSON or XML.
+	 *
+	 * Supports plain or gzip-compressed files.
 	 *
 	 * @param string $file_path Local feed file path.
 	 * @return string 'json' or 'xml'
 	 */
 	public function detect_feed_format( string $file_path ): string {
-		$handle = fopen( $file_path, 'r' );
+		$stream_uri = $this->is_gzipped( $file_path ) ? 'compress.zlib://' . $file_path : $file_path;
+		$handle     = @fopen( $stream_uri, 'r' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 		if ( ! $handle ) {
 			return 'xml';
 		}
@@ -289,6 +347,8 @@ class GAE_Sync_Engine {
 	/**
 	 * Stream remote feed directly into a temporary file on disk using download_url or wp_remote_get.
 	 *
+	 * Uses streaming to disk chunk by chunk to avoid buffering massive feeds into PHP memory.
+	 *
 	 * @param string $url Remote feed URL.
 	 * @return string|\WP_Error Path to temporary file or WP_Error on failure.
 	 */
@@ -297,13 +357,13 @@ class GAE_Sync_Engine {
 		$url = html_entity_decode( trim( $url ), ENT_QUOTES, 'UTF-8' );
 		$url = str_replace( '&amp;', '&', $url );
 
-		// For Adtraction feeds: if zip=1 or gzip=1 was provided, switch to uncompressed zip=0
-		// so XMLReader can stream it directly without memory overhead.
+		// For Adtraction feeds: prefer gzip=1 so feeds are downloaded 10-20x smaller,
+		// and stream directly via compress.zlib:// with minimal memory and zero memory blowup.
 		if ( false !== stripos( $url, 'adtraction.com' ) ) {
-			$url = preg_replace( '/([?&])zip=[^&]*/i', '${1}zip=0', $url );
-			$url = preg_replace( '/([?&])gzip=[^&]*/i', '${1}gzip=0', $url );
-			if ( ! preg_match( '/[?&]zip=/i', $url ) ) {
-				$url .= ( false !== strpos( $url, '?' ) ? '&' : '?' ) . 'zip=0';
+			if ( preg_match( '/[?&]zip=1/i', $url ) ) {
+				$url = preg_replace( '/([?&])zip=1/i', '${1}gzip=1', $url );
+			} elseif ( ! preg_match( '/[?&](?:gzip|zip)=/i', $url ) ) {
+				$url .= ( false !== strpos( $url, '?' ) ? '&' : '?' ) . 'gzip=1';
 			}
 		}
 
@@ -312,7 +372,7 @@ class GAE_Sync_Engine {
 		}
 
 		if ( function_exists( 'download_url' ) ) {
-			$tmp_file = download_url( $url, 180 );
+			$tmp_file = download_url( $url, 300 );
 			if ( ! is_wp_error( $tmp_file ) && file_exists( $tmp_file ) ) {
 				if ( filesize( $tmp_file ) > 0 ) {
 					return $tmp_file;
@@ -321,36 +381,45 @@ class GAE_Sync_Engine {
 			}
 		}
 
-		// Fallback: standard wp_remote_get into temporary file.
+		// Fallback: stream directly to temporary file on disk using wp_remote_get without buffering into RAM.
+		$tmp_file = function_exists( 'wp_tempnam' ) ? wp_tempnam( 'gae_feed_' ) : tempnam( sys_get_temp_dir(), 'gae_feed_' );
+		if ( ! $tmp_file ) {
+			return new \WP_Error( 'gae_tmp_failed', __( 'Unable to create local temporary file for feed streaming.', 'gear-engine' ) );
+		}
+
 		$response = wp_remote_get(
 			$url,
 			array(
-				'timeout'    => 120,
+				'timeout'    => 300,
+				'stream'     => true,
+				'filename'   => $tmp_file,
 				'sslverify'  => false,
 				'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 			)
 		);
 
 		if ( is_wp_error( $response ) ) {
+			if ( file_exists( $tmp_file ) ) {
+				@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			}
 			return $response;
 		}
 
 		$status_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== (int) $status_code ) {
+			if ( file_exists( $tmp_file ) ) {
+				@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			}
 			return new \WP_Error( 'gae_http_error', sprintf( 'Remote feed returned HTTP %d', $status_code ) );
 		}
 
-		$body = wp_remote_retrieve_body( $response );
-		if ( empty( $body ) ) {
+		if ( ! file_exists( $tmp_file ) || filesize( $tmp_file ) === 0 ) {
+			if ( file_exists( $tmp_file ) ) {
+				@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			}
 			return new \WP_Error( 'gae_empty_feed', __( 'Remote feed returned empty response body.', 'gear-engine' ) );
 		}
 
-		$tmp_file = tempnam( sys_get_temp_dir(), 'gae_feed_' );
-		if ( ! $tmp_file ) {
-			return new \WP_Error( 'gae_tmp_failed', __( 'Unable to create local temporary file for feed streaming.', 'gear-engine' ) );
-		}
-
-		file_put_contents( $tmp_file, $body );
 		return $tmp_file;
 	}
 
@@ -369,15 +438,19 @@ class GAE_Sync_Engine {
 		libxml_use_internal_errors( true );
 		$reader = new \XMLReader();
 
+		$open_uri = $this->is_gzipped( $file_path ) ? 'compress.zlib://' . $file_path : $file_path;
+
 		// Open XMLReader with libxml flags to ignore errors and preserve memory.
-		if ( ! $reader->open( $file_path, 'UTF-8', LIBXML_NONET | LIBXML_NOBLANKS ) ) {
+		if ( ! $reader->open( $open_uri, 'UTF-8', LIBXML_NONET | LIBXML_NOBLANKS ) ) {
 			$report['errors'][] = sprintf( '[%s] XMLReader unable to open file: %s', $source_name, $file_path );
 			libxml_clear_errors();
 			return;
 		}
 
 		$batch_counter = 0;
+		$feed_scanned  = 0;
 		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
+		$max_scan      = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
 
 		// Stream through the XML node by node.
 		while ( $reader->read() ) {
@@ -385,8 +458,15 @@ class GAE_Sync_Engine {
 				$report['batch_capped'] = true;
 				break;
 			}
+			if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
+				$report['scan_capped'] = true;
+				break;
+			}
+
 			// Look for product/item node elements.
 			if ( \XMLReader::ELEMENT === $reader->nodeType && in_array( strtolower( $reader->localName ), array( 'product', 'item', 'article' ), true ) ) {
+				$feed_scanned++;
+
 				// Extract outer XML for this node into SimpleXMLElement.
 				$raw_node_xml = $reader->readOuterXml();
 				$xml_element  = false;
@@ -436,14 +516,17 @@ class GAE_Sync_Engine {
 	 * @return void
 	 */
 	public function stream_parse_json( string $file_path, string $source_name, array $filter_rules, array &$report ): void {
-		$handle = fopen( $file_path, 'r' );
+		$open_uri = $this->is_gzipped( $file_path ) ? 'compress.zlib://' . $file_path : $file_path;
+		$handle   = @fopen( $open_uri, 'r' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 		if ( ! $handle ) {
 			$report['errors'][] = sprintf( '[%s] Unable to open JSON feed file: %s', $source_name, $file_path );
 			return;
 		}
 
 		$batch_counter = 0;
+		$feed_scanned  = 0;
 		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
+		$max_scan      = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
 		$depth         = 0;
 		$buffer        = '';
 		$in_string     = false;
@@ -470,12 +553,17 @@ class GAE_Sync_Engine {
 					$report['batch_capped'] = true;
 					break;
 				}
+				if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
+					$report['scan_capped'] = true;
+					break;
+				}
 				$line = trim( $line );
 				if ( empty( $line ) ) {
 					continue;
 				}
 				$raw = json_decode( $line, true );
 				if ( is_array( $raw ) ) {
+					$feed_scanned++;
 					$item = $this->extract_json_item_data( $raw, $source_name );
 					$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
 				}
@@ -485,6 +573,10 @@ class GAE_Sync_Engine {
 			while ( ( $chunk = fread( $handle, 8192 ) ) !== false && strlen( $chunk ) > 0 ) {
 				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
 					$report['batch_capped'] = true;
+					break;
+				}
+				if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
+					$report['scan_capped'] = true;
 					break;
 				}
 				$len = strlen( $chunk );
@@ -521,6 +613,7 @@ class GAE_Sync_Engine {
 							if ( 0 === $depth && ! empty( $buffer ) ) {
 								$raw = json_decode( $buffer, true );
 								if ( is_array( $raw ) ) {
+									$feed_scanned++;
 									$item = $this->extract_json_item_data( $raw, $source_name );
 									$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
 								}
@@ -557,15 +650,29 @@ class GAE_Sync_Engine {
 			if ( ! empty( $skip_reason ) ) {
 				$report['skip_reasons'][ $skip_reason ] = ( $report['skip_reasons'][ $skip_reason ] ?? 0 ) + 1;
 			}
+			// Clean up memory cache periodically in batches even when items are filtered/skipped.
+			if ( $batch_counter >= self::BATCH_SIZE ) {
+				$this->clear_batch_memory();
+				$batch_counter = 0;
+			}
 			return;
 		}
 
+		// Check total catalog product limit before inserting a brand new product.
+		$max_total_limit = (int) ( $filter_rules['max_total_products'] ?? 0 );
+		$catalog_count   = ( $max_total_limit > 0 ) ? $this->get_catalog_product_count() : 0;
+		$at_catalog_cap  = ( $max_total_limit > 0 && ( $catalog_count + $report['inserted'] ) >= $max_total_limit );
+
 		// Upsert product into WordPress database based on EAN deduplication key.
-		$result = $this->upsert_product( $item );
+		$result = $this->upsert_product( $item, $at_catalog_cap );
 		if ( 'inserted' === $result ) {
 			$report['inserted']++;
 		} elseif ( 'updated' === $result ) {
 			$report['updated']++;
+		} elseif ( 'catalog_capped' === $result ) {
+			$report['skipped']++;
+			$report['total_capped'] = true;
+			$report['skip_reasons']['Catalog limit reached'] = ( $report['skip_reasons']['Catalog limit reached'] ?? 0 ) + 1;
 		} else {
 			$report['skipped']++;
 		}
@@ -1148,9 +1255,13 @@ class GAE_Sync_Engine {
 		$excluded_keywords = $filter_rules['excluded_keywords'] ?? array();
 		if ( ! empty( $excluded_keywords ) ) {
 			foreach ( $excluded_keywords as $keyword ) {
-				if ( '' !== $keyword && false !== mb_strpos( $searchable, $keyword ) ) {
-					$reason = sprintf( 'Matched blacklisted keyword "%s"', $keyword );
-					return false;
+				if ( '' !== $keyword ) {
+					// Use word boundary regex so keywords like 'manual' do not match 'manualer' (dumbbells).
+					$pattern = '/(?:\b|_)' . preg_quote( $keyword, '/' ) . '(?:\b|_)/iu';
+					if ( preg_match( $pattern, $searchable ) ) {
+						$reason = sprintf( 'Matched blacklisted keyword "%s"', $keyword );
+						return false;
+					}
 				}
 			}
 		}
@@ -1177,10 +1288,11 @@ class GAE_Sync_Engine {
 	/**
 	 * Insert new post or update existing post based on EAN deduplication key.
 	 *
-	 * @param array<string, mixed> $item Product data.
-	 * @return string 'inserted', 'updated', or 'failed'
+	 * @param array<string, mixed> $item               Product data.
+	 * @param bool                 $prevent_new_insert Whether to prevent inserting if catalog is capped.
+	 * @return string 'inserted', 'updated', 'catalog_capped', or 'failed'
 	 */
-	public function upsert_product( array $item ): string {
+	public function upsert_product( array $item, bool $prevent_new_insert = false ): string {
 		global $wpdb;
 
 		$ean = (string) $item['ean'];
@@ -1226,6 +1338,11 @@ class GAE_Sync_Engine {
 			$this->assign_category( $post_id, (string) ( $item['category'] ?? '' ) );
 
 			return 'updated';
+		}
+
+		// If catalog cap is reached and this is a new product, block new insert.
+		if ( $prevent_new_insert ) {
+			return 'catalog_capped';
 		}
 
 		// Insert new post.
@@ -1305,6 +1422,10 @@ class GAE_Sync_Engine {
 	protected function clear_batch_memory(): void {
 		global $wpdb, $wp_object_cache;
 
+		if ( function_exists( 'libxml_clear_errors' ) ) {
+			libxml_clear_errors();
+		}
+
 		// Clear WP object cache.
 		if ( is_object( $wp_object_cache ) ) {
 			$wp_object_cache->group_ops      = array();
@@ -1321,7 +1442,9 @@ class GAE_Sync_Engine {
 		$wpdb->queries = array();
 
 		// Trigger PHP garbage collector.
-		gc_collect_cycles();
+		if ( function_exists( 'gc_collect_cycles' ) ) {
+			gc_collect_cycles();
+		}
 	}
 
 	/**

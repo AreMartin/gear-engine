@@ -35,6 +35,8 @@ class GAE_Settings {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'wp_ajax_gae_trigger_manual_sync', array( $this, 'ajax_manual_sync' ) );
 		add_action( 'wp_ajax_gae_refresh_gemini_models', array( $this, 'ajax_refresh_models' ) );
+		add_action( 'wp_ajax_gae_clear_all_products', array( $this, 'ajax_clear_products' ) );
+		add_action( 'wp_ajax_gae_save_dashboard_filters', array( $this, 'ajax_save_filters' ) );
 	}
 
 	/**
@@ -244,6 +246,56 @@ class GAE_Settings {
 			)
 		);
 
+		// Total Products Limit in Catalog (Catalog Cap).
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_max_total_products',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+				'default'           => 100,
+			)
+		);
+
+		add_settings_field(
+			'gae_max_total_products',
+			__( 'Total Products Limit (Catalog Cap)', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_max_total_products',
+				'type'        => 'number',
+				'step'        => '1',
+				'description' => __( 'Maximum total number of exercise gear products to store in the catalog (default 100). Once reached, no new products will be imported (existing products can still update prices). Set to 0 for unlimited.', 'gear-engine' ),
+			)
+		);
+
+		// Max Feed Items to Scan per Run.
+		register_setting(
+			self::OPTION_GROUP,
+			'gae_max_scan_items',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+				'default'           => 5000,
+			)
+		);
+
+		add_settings_field(
+			'gae_max_scan_items',
+			__( 'Max Feed Items to Scan per Run', 'gear-engine' ),
+			array( $this, 'render_field_text' ),
+			self::PAGE_SLUG,
+			'gae_section_filters',
+			array(
+				'id'          => 'gae_max_scan_items',
+				'type'        => 'number',
+				'step'        => '100',
+				'description' => __( 'Maximum number of items to scan from each feed per sync run (default 5000). Protects against server timeouts on massive merchant feeds. Set to 0 for unlimited.', 'gear-engine' ),
+			)
+		);
+
 		// Allowed Categories.
 		register_setting(
 			self::OPTION_GROUP,
@@ -323,7 +375,7 @@ class GAE_Settings {
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_textarea_field',
-				'default'           => "reservedel, manual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat",
+				'default'           => "reservedel, bruksanvisning, brukermanual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat",
 			)
 		);
 
@@ -641,13 +693,23 @@ class GAE_Settings {
 				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 				'syncNonce'          => wp_create_nonce( 'gae_manual_sync_nonce' ),
 				'refreshModelsNonce' => wp_create_nonce( 'gae_refresh_models_nonce' ),
+				'allowedCategories'  => (string) get_option( 'gae_allowed_categories', 'Tredemølle, Romaskin, Spinningsykkel, Vektstang, Vektvest, Treningsbenk, Crosstrainer, Styrkepakke' ),
+				'excludedKeywords'   => (string) get_option( 'gae_excluded_keywords', 'reservedel, bruksanvisning, brukermanual, reservedeler, kabel, skrue, mutter, smøremiddel, underlagsmatte, sokker, drikkeflaske, plakat' ),
+				'maxItemsPerSync'    => (int) get_option( 'gae_max_items_per_sync', 100 ),
+				'maxTotalProducts'   => (int) get_option( 'gae_max_total_products', 100 ),
 				'strings'            => array(
-					'syncing'         => __( 'Syncing feeds in streaming mode... Please wait.', 'gear-engine' ),
-					'syncSuccess'     => __( 'Sync completed successfully!', 'gear-engine' ),
-					'syncFailed'      => __( 'Sync encountered an error.', 'gear-engine' ),
-					'fetchingModels'  => __( 'Fetching live models from Google AI Studio...', 'gear-engine' ),
-					'fetchSuccess'    => __( 'Models updated successfully!', 'gear-engine' ),
-					'fetchFailed'     => __( 'Failed to fetch models. Verify your API key.', 'gear-engine' ),
+					'syncing'        => __( 'Syncing feeds in streaming mode... Please wait.', 'gear-engine' ),
+					'syncSuccess'    => __( 'Sync completed successfully!', 'gear-engine' ),
+					'syncFailed'     => __( 'Sync encountered an error.', 'gear-engine' ),
+					'fetchingModels' => __( 'Fetching live models from Google AI Studio...', 'gear-engine' ),
+					'fetchSuccess'   => __( 'Models updated successfully!', 'gear-engine' ),
+					'fetchFailed'    => __( 'Failed to fetch models. Verify your API key.', 'gear-engine' ),
+					'confirmClear'   => __( 'Are you sure you want to delete ALL synced exercise gear products from your database? This cannot be undone.', 'gear-engine' ),
+					'clearing'       => __( 'Clearing catalog products...', 'gear-engine' ),
+					'clearSuccess'   => __( 'Catalog cleared successfully!', 'gear-engine' ),
+					'clearFailed'    => __( 'Failed to clear catalog.', 'gear-engine' ),
+					'savingFilters'  => __( 'Saving filter defaults...', 'gear-engine' ),
+					'filtersSaved'   => __( 'Filters saved successfully!', 'gear-engine' ),
 				),
 			)
 		);
@@ -667,6 +729,12 @@ class GAE_Settings {
 		$published    = $total_gear->publish ?? 0;
 		$next_cron    = wp_next_scheduled( 'gae_daily_sync_event' );
 		$last_report  = get_option( 'gae_last_sync_report', array() );
+		$catalog_cap  = (int) get_option( 'gae_max_total_products', 100 );
+		$sync_limit   = (int) get_option( 'gae_max_items_per_sync', 100 );
+		$min_price    = (float) get_option( 'gae_min_price', 0 );
+		$max_price    = (float) get_option( 'gae_max_price', 0 );
+		$min_discount = (float) get_option( 'gae_min_discount_pct', 0 );
+		$only_stock   = (bool) get_option( 'gae_only_in_stock', false );
 		?>
 		<div class="wrap gae-settings-wrap">
 			<h1>
@@ -679,7 +747,14 @@ class GAE_Settings {
 				<div class="gae-status-grid">
 					<div class="gae-status-item">
 						<span class="gae-status-label"><?php esc_html_e( 'Total Products in PIM', 'gear-engine' ); ?></span>
-						<span class="gae-status-value"><?php echo esc_html( number_format_i18n( $published ) ); ?></span>
+						<span class="gae-status-value">
+							<?php
+							echo esc_html( number_format_i18n( $published ) );
+							if ( $catalog_cap > 0 ) {
+								echo ' <span style="font-size:13px; font-weight:normal; color:#64748b;">/ ' . esc_html( number_format_i18n( $catalog_cap ) ) . ' ' . esc_html__( 'max cap', 'gear-engine' ) . '</span>';
+							}
+							?>
+						</span>
 					</div>
 					<div class="gae-status-item">
 						<span class="gae-status-label"><?php esc_html_e( 'Next Daily WP-Cron Sync', 'gear-engine' ); ?></span>
@@ -731,13 +806,125 @@ class GAE_Settings {
 					</div>
 				<?php endif; ?>
 
-				<div class="gae-manual-actions">
-					<button type="button" id="gae-sync-now-btn" class="button button-primary">
-						<span class="dashicons dashicons-update" style="vertical-align:text-top;"></span>
-						<?php esc_html_e( 'Run Streaming Sync Now', 'gear-engine' ); ?>
-					</button>
-					<span id="gae-sync-spinner" class="spinner" style="float:none; margin: 4px 8px 0;"></span>
-					<span id="gae-sync-status-msg" style="font-weight:600; margin-left:8px;"></span>
+				<!-- User-Friendly Dashboard Controls for Ingest Limits & Filters -->
+				<div class="gae-dashboard-controls">
+					<div class="gae-controls-header">
+						<h3 style="margin: 0 0 4px 0; font-size: 15px; color: #1e293b; display: flex; align-items: center;">
+							<span class="dashicons dashicons-filter" style="margin-right: 6px; color: #16a34a; font-size: 20px; width: 20px; height: 20px;"></span>
+							<?php esc_html_e( 'Quick Sync & Filter Controls', 'gear-engine' ); ?>
+						</h3>
+						<p class="description" style="margin: 0 0 16px 0; color: #64748b;">
+							<?php esc_html_e( 'Configure product limits and filters directly in the dashboard before syncing to prevent timeouts or memory crashes on large affiliate feeds.', 'gear-engine' ); ?>
+						</p>
+					</div>
+
+					<div class="gae-filter-grid">
+						<!-- Control 1: Import Limits -->
+						<div class="gae-filter-box">
+							<label class="gae-filter-heading"><?php esc_html_e( '1. Import Limit (This Run)', 'gear-engine' ); ?></label>
+							<div class="gae-limit-selector">
+								<button type="button" class="button gae-limit-btn <?php echo ( 25 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="25">25</button>
+								<button type="button" class="button gae-limit-btn <?php echo ( 50 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="50">50</button>
+								<button type="button" class="button gae-limit-btn <?php echo ( 100 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="100">100</button>
+								<button type="button" class="button gae-limit-btn <?php echo ( 250 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="250">250</button>
+								<button type="button" class="button gae-limit-btn <?php echo ( 500 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="500">500</button>
+								<button type="button" class="button gae-limit-btn <?php echo ( 0 === $sync_limit ) ? 'is-active' : ''; ?>" data-limit="0"><?php esc_html_e( 'All', 'gear-engine' ); ?></button>
+								<input type="number" id="gae-quick-limit-input" value="<?php echo esc_attr( $sync_limit ); ?>" min="0" max="10000" class="small-text" title="<?php esc_attr_e( 'Custom product limit (0 = unlimited)', 'gear-engine' ); ?>" />
+							</div>
+							<p class="description" style="margin-top: 6px; font-size: 11px; color: #64748b;">
+								<?php printf( esc_html__( 'Total Catalog Cap: %d products maximum. Sync stops when cap is reached.', 'gear-engine' ), $catalog_cap ); ?>
+							</p>
+						</div>
+
+						<!-- Control 2: Feed Source Selection & In-Stock -->
+						<div class="gae-filter-box">
+							<label class="gae-filter-heading"><?php esc_html_e( '2. Source Feed & Stock Status', 'gear-engine' ); ?></label>
+							<div class="gae-feed-radios" style="margin-bottom: 8px;">
+								<label><input type="radio" name="gae_quick_feed" value="all" checked /> <?php esc_html_e( 'All Feeds', 'gear-engine' ); ?></label>
+								<label style="margin-left: 14px;"><input type="radio" name="gae_quick_feed" value="Adtraction" /> <?php esc_html_e( 'Adtraction Only', 'gear-engine' ); ?></label>
+								<label style="margin-left: 14px;"><input type="radio" name="gae_quick_feed" value="TradeTracker" /> <?php esc_html_e( 'TradeTracker Only', 'gear-engine' ); ?></label>
+							</div>
+							<div style="padding-top: 6px; border-top: 1px solid #e2e8f0;">
+								<label style="font-weight: 600; font-size: 13px; cursor: pointer; color: #1e293b;">
+									<input type="checkbox" id="gae-quick-in-stock" value="1" <?php checked( $only_stock ); ?> />
+									<?php esc_html_e( 'Only import in-stock products (skip out-of-stock)', 'gear-engine' ); ?>
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<!-- Control 3: Interactive Category Filter Pills -->
+					<div class="gae-filter-box-full" style="margin-top: 14px;">
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<label class="gae-filter-heading" style="margin-bottom: 0;">
+								<?php esc_html_e( '3. Category Filter (Click pills to toggle on/off)', 'gear-engine' ); ?>
+							</label>
+							<div class="gae-pill-actions">
+								<button type="button" id="gae-select-all-cats" class="button button-small"><?php esc_html_e( 'Select All', 'gear-engine' ); ?></button>
+								<button type="button" id="gae-clear-all-cats" class="button button-small"><?php esc_html_e( 'Deselect All', 'gear-engine' ); ?></button>
+							</div>
+						</div>
+						<div id="gae-category-pills" class="gae-pills-wrap">
+							<!-- Populated dynamically by admin.js from current settings -->
+						</div>
+						<div class="gae-add-pill-row" style="margin-top: 8px; display: flex; gap: 8px;">
+							<input type="text" id="gae-new-cat-input" placeholder="<?php esc_attr_e( 'Add category keyword (e.g. Vektsett, Massasjepistol)...', 'gear-engine' ); ?>" class="regular-text" style="height: 30px; font-size: 12px; max-width: 320px;" />
+							<button type="button" id="gae-add-cat-btn" class="button button-secondary"><?php esc_html_e( '+ Add Category', 'gear-engine' ); ?></button>
+						</div>
+					</div>
+
+					<!-- Control 4: Quick Price Range & Blacklist -->
+					<div class="gae-filter-grid" style="margin-top: 14px;">
+						<div class="gae-filter-box">
+							<label class="gae-filter-heading"><?php esc_html_e( '4. Price & Discount Thresholds (kr)', 'gear-engine' ); ?></label>
+							<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+								<div>
+									<span style="font-size: 11px; color: #64748b; display: block;"><?php esc_html_e( 'Min Price (kr)', 'gear-engine' ); ?></span>
+									<input type="number" id="gae-quick-min-price" value="<?php echo esc_attr( $min_price ); ?>" min="0" step="100" style="width: 105px;" />
+								</div>
+								<div>
+									<span style="font-size: 11px; color: #64748b; display: block;"><?php esc_html_e( 'Max Price (kr)', 'gear-engine' ); ?></span>
+									<input type="number" id="gae-quick-max-price" value="<?php echo esc_attr( $max_price ); ?>" min="0" step="500" style="width: 105px;" />
+								</div>
+								<div>
+									<span style="font-size: 11px; color: #64748b; display: block;"><?php esc_html_e( 'Min Discount %', 'gear-engine' ); ?></span>
+									<input type="number" id="gae-quick-min-discount" value="<?php echo esc_attr( $min_discount ); ?>" min="0" max="99" style="width: 80px;" />
+								</div>
+							</div>
+						</div>
+
+						<div class="gae-filter-box">
+							<label class="gae-filter-heading"><?php esc_html_e( '5. Blocked Junk Keywords (Removes parts/accessories)', 'gear-engine' ); ?></label>
+							<div id="gae-keyword-chips" class="gae-chips-wrap">
+								<!-- Populated dynamically by admin.js from current settings -->
+							</div>
+							<div style="margin-top: 8px; display: flex; gap: 6px;">
+								<input type="text" id="gae-new-kw-input" placeholder="<?php esc_attr_e( 'Block keyword...', 'gear-engine' ); ?>" style="height: 28px; font-size: 12px; width: 140px;" />
+								<button type="button" id="gae-add-kw-btn" class="button button-small"><?php esc_html_e( '+ Block', 'gear-engine' ); ?></button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="gae-manual-actions" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+					<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+						<button type="button" id="gae-sync-now-btn" class="button button-primary" style="height: 36px; padding: 0 16px; font-size: 13px;">
+							<span class="dashicons dashicons-update" style="vertical-align: middle; margin-right: 4px;"></span>
+							<?php esc_html_e( 'Run Streaming Sync Now', 'gear-engine' ); ?>
+						</button>
+						<button type="button" id="gae-save-filters-btn" class="button button-secondary" style="height: 36px;">
+							<span class="dashicons dashicons-saved" style="vertical-align: middle; margin-right: 4px;"></span>
+							<?php esc_html_e( 'Save Filters as Defaults', 'gear-engine' ); ?>
+						</button>
+						<span id="gae-sync-spinner" class="spinner" style="float:none; margin: 0 4px;"></span>
+						<span id="gae-sync-status-msg" style="font-weight:600;"></span>
+					</div>
+					<div>
+						<button type="button" id="gae-clear-products-btn" class="button button-link-delete" style="color: #ef4444; text-decoration: none; font-size: 12px;">
+							<span class="dashicons dashicons-trash" style="vertical-align: middle; font-size: 15px;"></span>
+							<?php esc_html_e( 'Clear All Synced Products', 'gear-engine' ); ?>
+						</button>
+					</div>
 				</div>
 			</div>
 
@@ -775,8 +962,67 @@ class GAE_Settings {
 		}
 
 		$sync_engine = new GAE_Sync_Engine();
+
+		// Collect runtime filter overrides from POST.
+		$override_rules = array();
+
+		if ( isset( $_POST['max_items'] ) ) {
+			$override_rules['max_items_per_sync'] = absint( $_POST['max_items'] );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_max_items_per_sync', $override_rules['max_items_per_sync'] );
+			}
+		}
+
+		if ( isset( $_POST['target_feed'] ) ) {
+			$override_rules['target_feed'] = sanitize_text_field( wp_unslash( $_POST['target_feed'] ) );
+		}
+
+		if ( isset( $_POST['only_in_stock'] ) ) {
+			$override_rules['only_in_stock'] = ! empty( $_POST['only_in_stock'] );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_only_in_stock', $override_rules['only_in_stock'] );
+			}
+		}
+
+		if ( isset( $_POST['min_price'] ) ) {
+			$override_rules['min_price'] = (float) sanitize_text_field( wp_unslash( $_POST['min_price'] ) );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_min_price', $override_rules['min_price'] );
+			}
+		}
+
+		if ( isset( $_POST['max_price'] ) ) {
+			$override_rules['max_price'] = (float) sanitize_text_field( wp_unslash( $_POST['max_price'] ) );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_max_price', $override_rules['max_price'] );
+			}
+		}
+
+		if ( isset( $_POST['min_discount_pct'] ) ) {
+			$override_rules['min_discount_pct'] = (float) sanitize_text_field( wp_unslash( $_POST['min_discount_pct'] ) );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_min_discount_pct', $override_rules['min_discount_pct'] );
+			}
+		}
+
+		if ( isset( $_POST['categories'] ) ) {
+			$raw_cats = sanitize_textarea_field( wp_unslash( $_POST['categories'] ) );
+			$override_rules['allowed_categories'] = $sync_engine->parse_delimited_list( $raw_cats );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_allowed_categories', $raw_cats );
+			}
+		}
+
+		if ( isset( $_POST['excluded_keywords'] ) ) {
+			$raw_kw = sanitize_textarea_field( wp_unslash( $_POST['excluded_keywords'] ) );
+			$override_rules['excluded_keywords'] = $sync_engine->parse_delimited_list( $raw_kw );
+			if ( ! empty( $_POST['save_filters'] ) ) {
+				update_option( 'gae_excluded_keywords', $raw_kw );
+			}
+		}
+
 		// Force unlock orphaned locks on manual admin click.
-		$report = $sync_engine->run_sync( array(), true );
+		$report = $sync_engine->run_sync( array(), true, $override_rules );
 
 		if ( isset( $report['status'] ) && 'locked' === $report['status'] ) {
 			wp_send_json_error( array( 'message' => $report['message'] ?? __( 'A sync process is already currently running.', 'gear-engine' ) ) );
@@ -797,10 +1043,19 @@ class GAE_Settings {
 			$reason_summary = ' — Filters: ' . implode( ', ', array_slice( $labels, 0, 3 ) );
 		}
 
-		$cap_notice = ! empty( $report['batch_capped'] ) ? ' — ' . sprintf( __( 'Batch cap of %d products reached.', 'gear-engine' ), (int) get_option( 'gae_max_items_per_sync', 100 ) ) : '';
+		$cap_notice = '';
+		if ( ! empty( $report['batch_capped'] ) ) {
+			$cap_notice .= ' — ' . sprintf( __( 'Batch run cap reached (%d products).', 'gear-engine' ), (int) ( $override_rules['max_items_per_sync'] ?? get_option( 'gae_max_items_per_sync', 100 ) ) );
+		}
+		if ( ! empty( $report['total_capped'] ) ) {
+			$cap_notice .= ' — ' . sprintf( __( 'Catalog limit reached (%d total products).', 'gear-engine' ), (int) get_option( 'gae_max_total_products', 100 ) );
+		}
+		if ( ! empty( $report['scan_capped'] ) ) {
+			$cap_notice .= ' — ' . sprintf( __( 'Feed scan cap reached (%d items).', 'gear-engine' ), (int) get_option( 'gae_max_scan_items', 5000 ) );
+		}
 		$err_notice = ! empty( $report['errors'] ) ? ' — ' . sprintf( __( 'Errors: %s', 'gear-engine' ), implode( ' | ', $report['errors'] ) ) : '';
 
-		// Guarantee clean buffer before JSON response
+		// Guarantee clean buffer before JSON response.
 		while ( ob_get_level() > 0 ) {
 			ob_end_clean();
 		}
@@ -819,6 +1074,110 @@ class GAE_Settings {
 					$err_notice
 				),
 				'report'  => $report,
+			)
+		);
+	}
+
+	/**
+	 * AJAX handler to save dashboard filters without running sync.
+	 *
+	 * @return void
+	 */
+	public function ajax_save_filters(): void {
+		check_ajax_referer( 'gae_manual_sync_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'gear-engine' ) ), 403 );
+		}
+
+		if ( isset( $_POST['max_items'] ) ) {
+			update_option( 'gae_max_items_per_sync', absint( $_POST['max_items'] ) );
+		}
+		if ( isset( $_POST['max_total_products'] ) ) {
+			update_option( 'gae_max_total_products', absint( $_POST['max_total_products'] ) );
+		}
+		if ( isset( $_POST['only_in_stock'] ) ) {
+			update_option( 'gae_only_in_stock', ! empty( $_POST['only_in_stock'] ) );
+		}
+		if ( isset( $_POST['min_price'] ) ) {
+			update_option( 'gae_min_price', (float) sanitize_text_field( wp_unslash( $_POST['min_price'] ) ) );
+		}
+		if ( isset( $_POST['max_price'] ) ) {
+			update_option( 'gae_max_price', (float) sanitize_text_field( wp_unslash( $_POST['max_price'] ) ) );
+		}
+		if ( isset( $_POST['min_discount_pct'] ) ) {
+			update_option( 'gae_min_discount_pct', (float) sanitize_text_field( wp_unslash( $_POST['min_discount_pct'] ) ) );
+		}
+		if ( isset( $_POST['categories'] ) ) {
+			update_option( 'gae_allowed_categories', sanitize_textarea_field( wp_unslash( $_POST['categories'] ) ) );
+		}
+		if ( isset( $_POST['excluded_keywords'] ) ) {
+			update_option( 'gae_excluded_keywords', sanitize_textarea_field( wp_unslash( $_POST['excluded_keywords'] ) ) );
+		}
+
+		wp_send_json_success( array( 'message' => __( 'Filter preferences saved successfully!', 'gear-engine' ) ) );
+	}
+
+	/**
+	 * AJAX handler to clear all synced exercise gear products in safe batches.
+	 *
+	 * @return void
+	 */
+	public function ajax_clear_products(): void {
+		check_ajax_referer( 'gae_manual_sync_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'gear-engine' ) ), 403 );
+		}
+
+		if ( ! ini_get( 'safe_mode' ) && function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 0 ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+		}
+
+		// Defer term and comment counting to prevent quadratic slowdown on bulk deletes.
+		if ( function_exists( 'wp_defer_term_counting' ) ) {
+			wp_defer_term_counting( true );
+		}
+		if ( function_exists( 'wp_defer_comment_counting' ) ) {
+			wp_defer_comment_counting( true );
+		}
+
+		$posts = get_posts(
+			array(
+				'post_type'      => GAE_CPT::POST_TYPE,
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			)
+		);
+
+		$deleted_count = 0;
+		if ( is_array( $posts ) ) {
+			foreach ( $posts as $i => $pid ) {
+				if ( wp_delete_post( (int) $pid, true ) ) {
+					$deleted_count++;
+				}
+				if ( 0 === ( $i % 50 ) && function_exists( 'gc_collect_cycles' ) ) {
+					gc_collect_cycles();
+				}
+			}
+		}
+
+		if ( function_exists( 'wp_defer_term_counting' ) ) {
+			wp_defer_term_counting( false );
+		}
+		if ( function_exists( 'wp_defer_comment_counting' ) ) {
+			wp_defer_comment_counting( false );
+		}
+
+		wp_send_json_success(
+			array(
+				'message' => sprintf(
+					/* translators: %d: count of deleted products */
+					__( 'Catalog cleared! %d products were removed.', 'gear-engine' ),
+					$deleted_count
+				),
+				'deleted' => $deleted_count,
 			)
 		);
 	}

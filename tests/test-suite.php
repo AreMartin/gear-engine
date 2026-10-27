@@ -662,6 +662,133 @@ $raw_url_with_entities = 'https://secure.adtraction.com/productfeed.htm?type=fee
 $clean_url = $settings_module->sanitize_feed_url( $raw_url_with_entities );
 assert_test( ! str_contains( $clean_url, '&amp;' ) && str_contains( $clean_url, '&format=XML' ), 'feed_sanitization: &amp; decoded to plain &' );
 
+// TEST 13: Total Product Limit, Per-Sync Limit, GZIP Streaming & Memory Cleanup
+// 13.1 Verify is_gzipped on plain vs gzipped files
+$plain_test_file = tempnam( sys_get_temp_dir(), 'gae_plain_' );
+file_put_contents( $plain_test_file, '<products></products>' );
+assert_test( $sync_engine->is_gzipped( $plain_test_file ) === false, 'is_gzipped: Correctly identifies plain XML file as uncompressed' );
+unlink( $plain_test_file );
+
+$gz_test_file = tempnam( sys_get_temp_dir(), 'gae_gz_' );
+file_put_contents( $gz_test_file, gzencode( '<products><product><name>GZ Treadmill</name><price>9999</price><category>Tredemølle</category></product></products>' ) );
+assert_test( $sync_engine->is_gzipped( $gz_test_file ) === true, 'is_gzipped: Correctly identifies GZIP compressed feed' );
+assert_test( $sync_engine->detect_feed_format( $gz_test_file ) === 'xml', 'detect_feed_format: Correctly detects XML format from GZIP stream' );
+unlink( $gz_test_file );
+
+// 13.2 Verify max_items_per_sync cap
+$multi_item_xml = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product>
+        <EAN>8880000000001</EAN>
+        <name>Tredemølle 1</name>
+        <price>10000</price>
+        <category>Tredemølle</category>
+    </product>
+    <product>
+        <EAN>8880000000002</EAN>
+        <name>Tredemølle 2</name>
+        <price>12000</price>
+        <category>Tredemølle</category>
+    </product>
+    <product>
+        <EAN>8880000000003</EAN>
+        <name>Tredemølle 3</name>
+        <price>14000</price>
+        <category>Tredemølle</category>
+    </product>
+</products>
+XML;
+
+$tmp_multi_file = tempnam( sys_get_temp_dir(), 'gae_multi_' );
+file_put_contents( $tmp_multi_file, $multi_item_xml );
+
+$capped_rules = array_merge( $filter_rules, array( 'max_items_per_sync' => 1 ) );
+$capped_report = array(
+	'processed' => 0,
+	'inserted'  => 0,
+	'updated'   => 0,
+	'skipped'   => 0,
+	'errors'    => array(),
+);
+
+$sync_engine->stream_parse_xml( $tmp_multi_file, 'TestCap', $capped_rules, $capped_report );
+unlink( $tmp_multi_file );
+
+assert_test( $capped_report['inserted'] === 1, 'limits: Stopped inserting after reaching max_items_per_sync limit of 1' );
+assert_test( ! empty( $capped_report['batch_capped'] ), 'limits: batch_capped flag is set when max_items_per_sync is reached' );
+
+// 13.3 Verify max_total_products cap
+$tmp_total_file = tempnam( sys_get_temp_dir(), 'gae_total_' );
+file_put_contents( $tmp_total_file, $multi_item_xml );
+
+$current_cat_count = $sync_engine->get_catalog_product_count();
+$total_capped_rules = array_merge( $filter_rules, array(
+	'max_items_per_sync' => 10,
+	'max_total_products' => $current_cat_count, // Already at total limit
+) );
+$total_report = array(
+	'processed' => 0,
+	'inserted'  => 0,
+	'updated'   => 0,
+	'skipped'   => 0,
+	'errors'    => array(),
+);
+
+$sync_engine->stream_parse_xml( $tmp_total_file, 'TestTotalCap', $total_capped_rules, $total_report );
+unlink( $tmp_total_file );
+
+assert_test( $total_report['inserted'] === 0, 'limits: Prevented inserting new products when catalog is at max_total_products' );
+assert_test( ! empty( $total_report['total_capped'] ), 'limits: total_capped flag is set when catalog product limit is reached' );
+
+// 13.4 Verify GZIP compressed feed streaming with XMLReader
+$gz_stream_file = tempnam( sys_get_temp_dir(), 'gae_gz_stream_' );
+file_put_contents( $gz_stream_file, gzencode( $multi_item_xml ) );
+
+$gz_stream_report = array(
+	'processed' => 0,
+	'inserted'  => 0,
+	'updated'   => 0,
+	'skipped'   => 0,
+	'errors'    => array(),
+);
+
+$sync_engine->stream_parse_xml( $gz_stream_file, 'AdtractionGzip', array_merge( $filter_rules, array( 'max_items_per_sync' => 5 ) ), $gz_stream_report );
+unlink( $gz_stream_file );
+
+assert_test( $gz_stream_report['processed'] === 3, 'gzip_streaming: Stream-parsed all 3 nodes directly from GZIP archive via compress.zlib://' );
+assert_test( $gz_stream_report['inserted'] > 0 || $gz_stream_report['updated'] > 0, 'gzip_streaming: Successfully ingested products from gzipped feed' );
+
+// 13.5 Verify memory cleanup for skipped items
+$skip_counter = 0;
+$mock_report = array( 'processed' => 0, 'skipped' => 0, 'skip_reasons' => array(), 'inserted' => 0, 'updated' => 0 );
+$unwanted_item = array(
+	'ean'      => '9999999999999',
+	'title'    => 'Reservedel kabel',
+	'price'    => 200,
+	'category' => 'Uønsket',
+);
+for ( $i = 0; $i < 30; $i++ ) {
+	$sync_engine->process_single_item( $unwanted_item, $filter_rules, $mock_report, $skip_counter );
+}
+assert_test( $skip_counter < 25, 'memory_cleanup: Batch counter cleared and recycled periodically even when 100% of items are skipped' );
+assert_test( $mock_report['skipped'] === 30, 'memory_cleanup: All 30 non-matching items tracked as skipped' );
+
+// 13.6 Verify word boundary keyword matching: 'Manualer' (dumbbells) not blocked by 'manual'
+$dumbbell_item = array(
+	'ean'      => '7770000000001',
+	'title'    => 'Abilica Manualer 10kg',
+	'price'    => 1500,
+	'category' => 'Manualer',
+	'in_stock' => true,
+);
+$dumbbell_rules = array_merge( $filter_rules, array(
+	'allowed_categories' => array( 'manualer' ),
+	'excluded_keywords'  => array( 'manual' ),
+) );
+$dumbbell_reason = '';
+assert_test( $sync_engine->passes_pre_filters( $dumbbell_item, $dumbbell_rules, $dumbbell_reason ) === true, 'pre_filters: Word-boundary blacklist does not falsely reject "Manualer" (dumbbells) when "manual" is blacklisted' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (12/12 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (13/13 suites passed)\n";
 echo "========================================================\n";

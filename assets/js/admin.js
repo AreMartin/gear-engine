@@ -5,6 +5,277 @@
 	'use strict';
 
 	$(function() {
+		// Category Presets
+		var defaultCatPresets = [
+			'Tredemølle',
+			'Romaskin',
+			'Spinningsykkel',
+			'Treningsbenk',
+			'Vektstang',
+			'Vektvest',
+			'Crosstrainer',
+			'Styrkepakke',
+			'Manualer',
+			'Kettlebell'
+		];
+
+		// Parse initial categories
+		var initialCats = [];
+		if (gaeAdminData && gaeAdminData.allowedCategories) {
+			initialCats = gaeAdminData.allowedCategories.split(/[\r\n,]+/).map(function(s) {
+				return $.trim(s);
+			}).filter(function(s) {
+				return s.length > 0;
+			});
+		}
+
+		// Merge presets so user can easily toggle inactive ones on
+		var allCategoryNames = [];
+		$.each(initialCats, function(i, cat) {
+			if (allCategoryNames.indexOf(cat) === -1) {
+				allCategoryNames.push(cat);
+			}
+		});
+		$.each(defaultCatPresets, function(i, preset) {
+			var exists = false;
+			$.each(allCategoryNames, function(j, existing) {
+				if (existing.toLowerCase() === preset.toLowerCase()) {
+					exists = true;
+					return false;
+				}
+			});
+			if (!exists) {
+				allCategoryNames.push(preset);
+			}
+		});
+
+		var $pillsWrap = $('#gae-category-pills');
+		var $catTextarea = $('#gae_allowed_categories');
+
+		function renderCategoryPills() {
+			if (!$pillsWrap.length) return;
+			$pillsWrap.empty();
+
+			$.each(allCategoryNames, function(i, cat) {
+				var isActive = false;
+				$.each(initialCats, function(j, act) {
+					if (act.toLowerCase() === cat.toLowerCase()) {
+						isActive = true;
+						return false;
+					}
+				});
+
+				var $pill = $('<span class="gae-pill' + (isActive ? ' is-active' : '') + '"></span>');
+				$pill.append('<span class="gae-pill-check">✓</span>');
+				$pill.append('<span class="gae-pill-label">' + $('<div>').text(cat).html() + '</span>');
+
+				// Allow custom categories to be deleted
+				var isDefault = false;
+				$.each(defaultCatPresets, function(k, def) {
+					if (def.toLowerCase() === cat.toLowerCase()) {
+						isDefault = true;
+						return false;
+					}
+				});
+
+				if (!isDefault) {
+					var $remove = $('<span class="gae-pill-remove" title="Remove category">×</span>');
+					$remove.on('click', function(e) {
+						e.stopPropagation();
+						allCategoryNames = allCategoryNames.filter(function(c) {
+							return c.toLowerCase() !== cat.toLowerCase();
+						});
+						initialCats = initialCats.filter(function(c) {
+							return c.toLowerCase() !== cat.toLowerCase();
+						});
+						renderCategoryPills();
+						syncCatTextarea();
+					});
+					$pill.append($remove);
+				}
+
+				$pill.on('click', function() {
+					$(this).toggleClass('is-active');
+					syncCatTextarea();
+				});
+
+				$pillsWrap.append($pill);
+			});
+		}
+
+		function getActiveCategories() {
+			var active = [];
+			$pillsWrap.find('.gae-pill.is-active').each(function() {
+				active.push($.trim($(this).find('.gae-pill-label').text()));
+			});
+			return active;
+		}
+
+		function syncCatTextarea() {
+			var active = getActiveCategories();
+			if ($catTextarea.length) {
+				$catTextarea.val(active.join(', '));
+			}
+		}
+
+		renderCategoryPills();
+
+		// Add Category button
+		$('#gae-add-cat-btn').on('click', function(e) {
+			e.preventDefault();
+			var val = $.trim($('#gae-new-cat-input').val());
+			if (!val) return;
+
+			var exists = false;
+			$.each(allCategoryNames, function(i, c) {
+				if (c.toLowerCase() === val.toLowerCase()) {
+					exists = true;
+					return false;
+				}
+			});
+
+			if (!exists) {
+				allCategoryNames.push(val);
+			}
+			if (initialCats.indexOf(val) === -1) {
+				initialCats.push(val);
+			}
+			$('#gae-new-cat-input').val('');
+			renderCategoryPills();
+			syncCatTextarea();
+		});
+
+		$('#gae-new-cat-input').on('keypress', function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				$('#gae-add-cat-btn').trigger('click');
+			}
+		});
+
+		// Select All / Deselect All
+		$('#gae-select-all-cats').on('click', function(e) {
+			e.preventDefault();
+			$pillsWrap.find('.gae-pill').addClass('is-active');
+			syncCatTextarea();
+		});
+
+		$('#gae-clear-all-cats').on('click', function(e) {
+			e.preventDefault();
+			$pillsWrap.find('.gae-pill').removeClass('is-active');
+			syncCatTextarea();
+		});
+
+		// Blocked Keywords Chips
+		var blockedKeywords = [];
+		if (gaeAdminData && gaeAdminData.excludedKeywords) {
+			blockedKeywords = gaeAdminData.excludedKeywords.split(/[\r\n,]+/).map(function(s) {
+				return $.trim(s);
+			}).filter(function(s) {
+				return s.length > 0;
+			});
+		}
+
+		var $chipsWrap = $('#gae-keyword-chips');
+		var $kwTextarea = $('#gae_excluded_keywords');
+
+		function renderKeywordChips() {
+			if (!$chipsWrap.length) return;
+			$chipsWrap.empty();
+
+			$.each(blockedKeywords, function(i, kw) {
+				var $chip = $('<span class="gae-chip"></span>');
+				$chip.append('<span class="gae-chip-label">' + $('<div>').text(kw).html() + '</span>');
+				var $remove = $('<span class="gae-chip-remove" title="Unblock keyword">×</span>');
+				$remove.on('click', function() {
+					blockedKeywords.splice(i, 1);
+					renderKeywordChips();
+					syncKwTextarea();
+				});
+				$chip.append($remove);
+				$chipsWrap.append($chip);
+			});
+		}
+
+		function syncKwTextarea() {
+			if ($kwTextarea.length) {
+				$kwTextarea.val(blockedKeywords.join(', '));
+			}
+		}
+
+		renderKeywordChips();
+
+		// Add Blocked Keyword button
+		$('#gae-add-kw-btn').on('click', function(e) {
+			e.preventDefault();
+			var val = $.trim($('#gae-new-kw-input').val());
+			if (!val) return;
+
+			var exists = false;
+			$.each(blockedKeywords, function(i, k) {
+				if (k.toLowerCase() === val.toLowerCase()) {
+					exists = true;
+					return false;
+				}
+			});
+
+			if (!exists) {
+				blockedKeywords.push(val);
+			}
+			$('#gae-new-kw-input').val('');
+			renderKeywordChips();
+			syncKwTextarea();
+		});
+
+		$('#gae-new-kw-input').on('keypress', function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				$('#gae-add-kw-btn').trigger('click');
+			}
+		});
+
+		// Limit Selector Buttons
+		$('.gae-limit-btn').on('click', function(e) {
+			e.preventDefault();
+			var lim = $(this).data('limit');
+			$('#gae-quick-limit-input').val(lim);
+			$('.gae-limit-btn').removeClass('is-active');
+			$(this).addClass('is-active');
+
+			var $formMaxInput = $('#gae_max_items_per_sync');
+			if ($formMaxInput.length) {
+				$formMaxInput.val(lim);
+			}
+		});
+
+		$('#gae-quick-limit-input').on('input change', function() {
+			var val = parseInt($(this).val(), 10) || 0;
+			$('.gae-limit-btn').removeClass('is-active');
+			$('.gae-limit-btn[data-limit="' + val + '"]').addClass('is-active');
+
+			var $formMaxInput = $('#gae_max_items_per_sync');
+			if ($formMaxInput.length) {
+				$formMaxInput.val(val);
+			}
+		});
+
+		// Synchronize Quick Filters with Bottom Settings Form
+		$('#gae-quick-in-stock').on('change', function() {
+			var checked = $(this).is(':checked');
+			$('#gae_only_in_stock').prop('checked', checked);
+		});
+
+		$('#gae-quick-min-price').on('input change', function() {
+			$('#gae_min_price').val($(this).val());
+		});
+
+		$('#gae-quick-max-price').on('input change', function() {
+			$('#gae_max_price').val($(this).val());
+		});
+
+		$('#gae-quick-min-discount').on('input change', function() {
+			$('#gae_min_discount_pct').val($(this).val());
+		});
+
 		// 1. Manual Sync Handler
 		var $syncBtn = $('#gae-sync-now-btn');
 		var $syncSpinner = $('#gae-sync-spinner');
@@ -22,15 +293,25 @@
 				$syncSpinner.addClass('is-active');
 				$syncStatus.css('color', '#475569').text(gaeAdminData.strings.syncing);
 
+				var postData = {
+					action: 'gae_trigger_manual_sync',
+					nonce: gaeAdminData.syncNonce,
+					max_items: $('#gae-quick-limit-input').val(),
+					target_feed: $('input[name="gae_quick_feed"]:checked').val() || 'all',
+					only_in_stock: $('#gae-quick-in-stock').is(':checked') ? 1 : 0,
+					min_price: $('#gae-quick-min-price').val(),
+					max_price: $('#gae-quick-max-price').val(),
+					min_discount_pct: $('#gae-quick-min-discount').val(),
+					categories: getActiveCategories().join(', '),
+					excluded_keywords: blockedKeywords.join(', ')
+				};
+
 				$.ajax({
 					url: gaeAdminData.ajaxUrl,
 					type: 'POST',
 					dataType: 'json',
 					timeout: 300000,
-					data: {
-						action: 'gae_trigger_manual_sync',
-						nonce: gaeAdminData.syncNonce
-					}
+					data: postData
 				})
 				.done(function(response) {
 					if (response.success) {
@@ -44,7 +325,6 @@
 					}
 				})
 				.fail(function(xhr, status, error) {
-					// Attempt to extract JSON if responseText had warnings prepended to it.
 					if (!xhr.responseJSON && xhr.responseText) {
 						var jsonMatch = xhr.responseText.match(/\{.*"success".*\}/s);
 						if (jsonMatch) {
@@ -68,7 +348,6 @@
 					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
 						errText = xhr.responseJSON.data.message;
 					} else if (xhr.status === 0 || status === 'timeout') {
-						// Network/worker timeout during large feed import - products were processed in background.
 						errText = 'Sync completed or processing in background. Refreshing dashboard...';
 						$syncStatus.css('color', '#16a34a').text(errText);
 						setTimeout(function() {
@@ -94,7 +373,100 @@
 			});
 		}
 
-		// 2. Refresh Gemini Models from Google AI Studio
+		// 2. Save Filters as Defaults Handler
+		var $saveFiltersBtn = $('#gae-save-filters-btn');
+		if ($saveFiltersBtn.length) {
+			$saveFiltersBtn.on('click', function(e) {
+				e.preventDefault();
+				if ($saveFiltersBtn.prop('disabled')) return;
+
+				$saveFiltersBtn.prop('disabled', true);
+				$syncSpinner.addClass('is-active');
+				$syncStatus.css('color', '#475569').text(gaeAdminData.strings.savingFilters);
+
+				var postData = {
+					action: 'gae_save_dashboard_filters',
+					nonce: gaeAdminData.syncNonce,
+					max_items: $('#gae-quick-limit-input').val(),
+					only_in_stock: $('#gae-quick-in-stock').is(':checked') ? 1 : 0,
+					min_price: $('#gae-quick-min-price').val(),
+					max_price: $('#gae-quick-max-price').val(),
+					min_discount_pct: $('#gae-quick-min-discount').val(),
+					categories: getActiveCategories().join(', '),
+					excluded_keywords: blockedKeywords.join(', ')
+				};
+
+				$.ajax({
+					url: gaeAdminData.ajaxUrl,
+					type: 'POST',
+					dataType: 'json',
+					data: postData
+				})
+				.done(function(response) {
+					if (response.success) {
+						$syncStatus.css('color', '#16a34a').text(response.data.message || gaeAdminData.strings.filtersSaved);
+					} else {
+						$syncStatus.css('color', '#ef4444').text(response.data.message || 'Error saving filters.');
+					}
+				})
+				.fail(function(xhr, status, error) {
+					$syncStatus.css('color', '#ef4444').text('Save failed: ' + error);
+				})
+				.always(function() {
+					$saveFiltersBtn.prop('disabled', false);
+					$syncSpinner.removeClass('is-active');
+					setTimeout(function() {
+						$syncStatus.fadeOut(400, function() {
+							$(this).text('').show();
+						});
+					}, 3500);
+				});
+			});
+		}
+
+		// 3. Clear All Synced Products Handler
+		var $clearBtn = $('#gae-clear-products-btn');
+		if ($clearBtn.length) {
+			$clearBtn.on('click', function(e) {
+				e.preventDefault();
+				if (!confirm(gaeAdminData.strings.confirmClear)) {
+					return;
+				}
+
+				$clearBtn.prop('disabled', true);
+				$syncSpinner.addClass('is-active');
+				$syncStatus.css('color', '#ef4444').text(gaeAdminData.strings.clearing);
+
+				$.ajax({
+					url: gaeAdminData.ajaxUrl,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						action: 'gae_clear_all_products',
+						nonce: gaeAdminData.syncNonce
+					}
+				})
+				.done(function(response) {
+					if (response.success) {
+						$syncStatus.css('color', '#16a34a').text(response.data.message || gaeAdminData.strings.clearSuccess);
+						setTimeout(function() {
+							window.location.reload();
+						}, 1500);
+					} else {
+						$syncStatus.css('color', '#ef4444').text(response.data.message || gaeAdminData.strings.clearFailed);
+					}
+				})
+				.fail(function(xhr, status, error) {
+					$syncStatus.css('color', '#ef4444').text('Error: ' + error);
+				})
+				.always(function() {
+					$clearBtn.prop('disabled', false);
+					$syncSpinner.removeClass('is-active');
+				});
+			});
+		}
+
+		// 4. Refresh Gemini Models from Google AI Studio
 		var $refreshModelsBtn = $('#gae-refresh-models-btn');
 		var $modelsSpinner = $('#gae-models-spinner');
 		var $modelsStatus = $('#gae-models-status');
