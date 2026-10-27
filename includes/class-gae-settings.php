@@ -759,8 +759,8 @@ class GAE_Settings {
 		echo '</select>';
 
 		echo '<button type="button" id="gae-refresh-models-btn" class="button button-secondary" title="' . esc_attr__( 'Query Google AI Studio for new and updated Gemini models', 'gear-engine' ) . '">';
-		echo '<span class="dashicons dashicons-update" style="vertical-align: text-top; font-size: 16px; width: 16px; height: 16px;"></span> ';
-		esc_html_e( 'Fetch Latest Models from Google AI', 'gear-engine' );
+		echo '<span class="dashicons dashicons-update"></span>';
+		echo '<span>' . esc_html__( 'Fetch Latest Models from Google AI', 'gear-engine' ) . '</span>';
 		echo '</button>';
 		echo '<span id="gae-models-spinner" class="spinner" style="float:none; margin: 0 4px;"></span>';
 		echo '<span id="gae-models-status" style="font-size: 13px; font-weight: 500;"></span>';
