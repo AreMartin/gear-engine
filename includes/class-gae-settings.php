@@ -37,6 +37,7 @@ class GAE_Settings {
 		add_action( 'wp_ajax_gae_refresh_gemini_models', array( $this, 'ajax_refresh_models' ) );
 		add_action( 'wp_ajax_gae_clear_all_products', array( $this, 'ajax_clear_products' ) );
 		add_action( 'wp_ajax_gae_save_dashboard_filters', array( $this, 'ajax_save_filters' ) );
+		add_action( 'wp_ajax_gae_test_feed_url', array( $this, 'ajax_test_feed_url' ) );
 	}
 
 	/**
@@ -60,11 +61,11 @@ class GAE_Settings {
 	 * @return void
 	 */
 	public function register_settings(): void {
-		// 1. Feed URLs section (5-Slot Multi-Partner Table).
+		// 1. Feed URLs section (5-Slot Multi-Partner Card).
 		add_settings_section(
 			'gae_section_feeds',
-			__( 'Affiliate Data Feeds (Up to 5 Partner Feeds)', 'gear-engine' ),
-			array( $this, 'render_feeds_section_intro' ),
+			'',
+			'__return_empty_string',
 			self::PAGE_SLUG
 		);
 
@@ -80,10 +81,11 @@ class GAE_Settings {
 
 		add_settings_field(
 			'gae_feeds_table',
-			__( 'Partner Feed Slots', 'gear-engine' ),
+			'',
 			array( $this, 'render_feeds_table' ),
 			self::PAGE_SLUG,
-			'gae_section_feeds'
+			'gae_section_feeds',
+			array( 'class' => 'gae-feeds-table-row' )
 		);
 
 		// Keep legacy single options registered for backward compatibility.
@@ -422,49 +424,135 @@ class GAE_Settings {
 	}
 
 	/**
-	 * Render the 5-slot feeds table.
+	 * Render the 5-slot feeds table as a modern full-width card.
 	 *
 	 * @return void
 	 */
 	public function render_feeds_table(): void {
-		$slots = self::get_feed_slots();
+		$slots        = self::get_feed_slots();
+		$active_count = 0;
+		$placeholders = array(
+			'e.g. Gymgrossisten (Adtraction)',
+			'e.g. XXL Sport (Adtraction)',
+			'e.g. Treningspartner (TradeTracker)',
+			'e.g. Outnorth (Adtraction)',
+			'e.g. Intersport (Generic)',
+		);
+
+		foreach ( $slots as $slot ) {
+			if ( ! empty( $slot['enabled'] ) && ! empty( $slot['url'] ) ) {
+				$active_count++;
+			}
+		}
+
+		$visible_count = 0;
+		foreach ( $slots as $i => $slot ) {
+			$has_data   = ! empty( $slot['url'] ) || ! empty( $slot['name'] );
+			$is_visible = ( 0 === $i ) || $has_data || ! empty( $slot['enabled'] );
+			if ( $is_visible ) {
+				$visible_count++;
+			}
+		}
 		?>
-		<div class="gae-feeds-table-wrap">
-			<table class="widefat fixed striped gae-feeds-table">
-				<thead>
-					<tr>
-						<th style="width: 55px; text-align: center;"><?php esc_html_e( 'Active', 'gear-engine' ); ?></th>
-						<th style="width: 220px;"><?php esc_html_e( 'Partner / Feed Name', 'gear-engine' ); ?></th>
-						<th style="width: 140px;"><?php esc_html_e( 'Network', 'gear-engine' ); ?></th>
-						<th><?php esc_html_e( 'Feed URL (XML, JSON, GZIP)', 'gear-engine' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ( $slots as $i => $slot ) : ?>
+		<div class="gae-admin-card gae-feeds-card">
+			<div class="gae-feeds-card-header">
+				<div class="gae-feeds-card-title">
+					<span class="dashicons dashicons-rss"></span>
+					<div>
+						<h3><?php esc_html_e( 'Affiliate Partner Feeds (Up to 5 Feeds)', 'gear-engine' ); ?></h3>
+						<p class="description">
+							<?php esc_html_e( 'Configure up to 5 partner product feeds. Toggle feeds active or paused, test connectivity, and auto-detect networks.', 'gear-engine' ); ?>
+						</p>
+					</div>
+				</div>
+				<div class="gae-feeds-card-badge">
+					<span class="gae-feed-active-counter" id="gae-feed-active-badge">
+						<?php printf( esc_html__( '%d / %d Active', 'gear-engine' ), $active_count, count( $slots ) ); ?>
+					</span>
+				</div>
+			</div>
+
+			<div class="gae-feeds-table-wrap">
+				<table class="widefat fixed gae-feeds-table">
+					<thead>
 						<tr>
-							<td style="text-align: center; vertical-align: middle;">
-								<input type="checkbox" name="gae_feeds[<?php echo (int) $i; ?>][enabled]" value="1" <?php checked( $slot['enabled'], 1 ); ?> />
-							</td>
-							<td>
-								<input type="text" name="gae_feeds[<?php echo (int) $i; ?>][name]" value="<?php echo esc_attr( $slot['name'] ); ?>" placeholder="<?php printf( esc_attr__( 'Feed #%d (e.g. Gymgrossisten)', 'gear-engine' ), (int) $i + 1 ); ?>" class="regular-text" style="width: 100%;" />
-							</td>
-							<td>
-								<select name="gae_feeds[<?php echo (int) $i; ?>][network]" style="width: 100%;">
-									<option value="Adtraction" <?php selected( $slot['network'], 'Adtraction' ); ?>>Adtraction</option>
-									<option value="TradeTracker" <?php selected( $slot['network'], 'TradeTracker' ); ?>>TradeTracker</option>
-									<option value="Generic" <?php selected( $slot['network'], 'Generic' ); ?>><?php esc_html_e( 'Generic / Other', 'gear-engine' ); ?></option>
-								</select>
-							</td>
-							<td>
-								<input type="url" name="gae_feeds[<?php echo (int) $i; ?>][url]" value="<?php echo esc_attr( $slot['url'] ); ?>" placeholder="https://..." class="large-text" style="width: 100%;" />
-							</td>
+							<th style="width: 120px;"><?php esc_html_e( 'Status', 'gear-engine' ); ?></th>
+							<th style="width: 220px;"><?php esc_html_e( 'Partner Name', 'gear-engine' ); ?></th>
+							<th style="width: 140px;"><?php esc_html_e( 'Network', 'gear-engine' ); ?></th>
+							<th><?php esc_html_e( 'Feed URL (XML, JSON, GZIP)', 'gear-engine' ); ?></th>
+							<th style="width: 130px; text-align: right;"><?php esc_html_e( 'Actions', 'gear-engine' ); ?></th>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
-			<p class="description" style="margin-top: 8px;">
-				<?php esc_html_e( 'Configure up to 5 affiliate partner feeds. Feeds checked as "Active" will automatically update in background during daily cron syncs.', 'gear-engine' ); ?>
-			</p>
+					</thead>
+					<tbody id="gae-feeds-tbody">
+						<?php
+						foreach ( $slots as $i => $slot ) :
+							$has_data   = ! empty( $slot['url'] ) || ! empty( $slot['name'] );
+							$is_visible = ( 0 === $i ) || $has_data || ! empty( $slot['enabled'] );
+							$row_class  = 'gae-feed-row' . ( ! $is_visible ? ' gae-slot-hidden' : '' ) . ( empty( $slot['enabled'] ) ? ' is-paused' : '' );
+							?>
+							<tr class="<?php echo esc_attr( $row_class ); ?>" data-slot="<?php echo (int) $i; ?>">
+								<td style="vertical-align: middle;">
+									<div class="gae-switch-wrap">
+										<label class="gae-switch" title="<?php esc_attr_e( 'Toggle Feed Active/Paused', 'gear-engine' ); ?>">
+											<input type="checkbox" name="gae_feeds[<?php echo (int) $i; ?>][enabled]" class="gae-feed-enabled-toggle" value="1" <?php checked( $slot['enabled'], 1 ); ?> />
+											<span class="gae-slider"></span>
+										</label>
+										<span class="gae-status-pill <?php echo ! empty( $slot['enabled'] ) ? 'is-active' : 'is-paused'; ?>">
+											<?php echo ! empty( $slot['enabled'] ) ? esc_html__( 'Active', 'gear-engine' ) : esc_html__( 'Paused', 'gear-engine' ); ?>
+										</span>
+									</div>
+								</td>
+								<td>
+									<input type="text" name="gae_feeds[<?php echo (int) $i; ?>][name]" value="<?php echo esc_attr( $slot['name'] ); ?>" placeholder="<?php echo esc_attr( $placeholders[ $i ] ?? sprintf( 'Feed #%d', $i + 1 ) ); ?>" class="regular-text gae-feed-name-input" style="width: 100%;" />
+								</td>
+								<td>
+									<select name="gae_feeds[<?php echo (int) $i; ?>][network]" class="gae-network-select" style="width: 100%;">
+										<option value="Adtraction" <?php selected( $slot['network'], 'Adtraction' ); ?>>Adtraction</option>
+										<option value="TradeTracker" <?php selected( $slot['network'], 'TradeTracker' ); ?>>TradeTracker</option>
+										<option value="Generic" <?php selected( $slot['network'], 'Generic' ); ?>><?php esc_html_e( 'Generic / Other', 'gear-engine' ); ?></option>
+									</select>
+								</td>
+								<td>
+									<div class="gae-url-col">
+										<input type="url" name="gae_feeds[<?php echo (int) $i; ?>][url]" value="<?php echo esc_attr( $slot['url'] ); ?>" placeholder="https://..." class="large-text gae-feed-url-input" style="width: 100%;" />
+										<div class="gae-feed-test-result"></div>
+									</div>
+								</td>
+								<td style="text-align: right; vertical-align: middle;">
+									<div class="gae-row-actions">
+										<button type="button" class="button button-small gae-test-feed-btn" title="<?php esc_attr_e( 'Test connection to this feed URL', 'gear-engine' ); ?>">
+											<span class="dashicons dashicons-rest-api" style="font-size:14px; width:14px; height:14px; vertical-align:middle;"></span>
+											<?php esc_html_e( 'Test', 'gear-engine' ); ?>
+										</button>
+										<button type="button" class="button button-small button-link-delete gae-remove-feed-btn" title="<?php esc_attr_e( 'Clear / remove this feed slot', 'gear-engine' ); ?>">
+											<span class="dashicons dashicons-trash" style="font-size:14px; width:14px; height:14px; vertical-align:middle;"></span>
+										</button>
+									</div>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="gae-feeds-card-footer">
+				<button type="button" id="gae-add-feed-btn" class="button button-secondary" <?php disabled( $visible_count >= 5 ); ?>>
+					<span class="dashicons dashicons-plus-alt2" style="font-size:16px; width:16px; height:16px; vertical-align:middle; margin-right:4px;"></span>
+					<span class="gae-add-feed-text">
+						<?php
+						$remaining = max( 0, 5 - $visible_count );
+						if ( $remaining > 0 ) {
+							printf( esc_html__( '+ Add Partner Feed (%d slots remaining)', 'gear-engine' ), $remaining );
+						} else {
+							esc_html_e( 'All 5 Slots In Use', 'gear-engine' );
+						}
+						?>
+					</span>
+				</button>
+				<p class="description" style="margin: 0; font-size: 12px; color: #64748b;">
+					<?php esc_html_e( 'Paste an Adtraction or TradeTracker URL to auto-detect its network. Feeds marked "Active" are automatically refreshed during scheduled daily cron syncs.', 'gear-engine' ); ?>
+				</p>
+			</div>
 		</div>
 		<?php
 	}
@@ -473,7 +561,80 @@ class GAE_Settings {
 	 * Section intro: Feeds.
 	 */
 	public function render_feeds_section_intro(): void {
-		echo '<p class="description">' . esc_html__( 'Manage up to 5 affiliate partner feeds. Feeds checked as "Active" are automatically synced and updated during daily cron jobs.', 'gear-engine' ) . '</p>';
+		// Handled directly inside render_feeds_table card header.
+	}
+
+	/**
+	 * AJAX handler to test connection and probe format of a feed URL.
+	 *
+	 * @return void
+	 */
+	public function ajax_test_feed_url(): void {
+		check_ajax_referer( 'gae_manual_sync_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'gear-engine' ) ), 403 );
+		}
+
+		$url = sanitize_text_field( wp_unslash( $_POST['url'] ?? '' ) );
+		$url = html_entity_decode( trim( $url ), ENT_QUOTES, 'UTF-8' );
+		$url = str_replace( '&amp;', '&', $url );
+
+		if ( empty( $url ) || ! preg_match( '#^https?://#i', $url ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid HTTP or HTTPS feed URL.', 'gear-engine' ) ) );
+			return;
+		}
+
+		// Adtraction check
+		if ( false !== stripos( $url, 'adtraction.com' ) ) {
+			if ( preg_match( '/[?&]zip=1/i', $url ) ) {
+				$url = preg_replace( '/([?&])zip=1/i', '${1}gzip=1', $url );
+			} elseif ( ! preg_match( '/[?&](?:gzip|zip)=/i', $url ) ) {
+				$url .= ( false !== strpos( $url, '?' ) ? '&' : '?' ) . 'gzip=1';
+			}
+		}
+
+		// Perform a lightweight probe request (first 8KB) using range header
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'    => 15,
+				'sslverify'  => false,
+				'headers'    => array( 'Range' => 'bytes=0-8191' ),
+				'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( array( 'message' => sprintf( __( 'Connection failed: %s', 'gear-engine' ), $response->get_error_message() ) ) );
+			return;
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== (int) $code && 206 !== (int) $code ) {
+			wp_send_json_error( array( 'message' => sprintf( __( 'HTTP Error %d returned by feed server.', 'gear-engine' ), $code ) ) );
+			return;
+		}
+
+		$body   = wp_remote_retrieve_body( $response );
+		$is_gz  = ( strlen( $body ) >= 2 && "\x1f\x8b" === substr( $body, 0, 2 ) );
+		$format = 'XML';
+		$sample = $body;
+
+		if ( $is_gz && function_exists( 'gzdecode' ) ) {
+			$uncompressed = @gzdecode( $body );
+			if ( false !== $uncompressed && '' !== trim( $uncompressed ) ) {
+				$sample = $uncompressed;
+			}
+		}
+
+		$sample_trimmed = ltrim( $sample );
+		if ( ! empty( $sample_trimmed ) && in_array( $sample_trimmed[0], array( '{', '[' ), true ) ) {
+			$format = 'JSON';
+		}
+
+		$info = sprintf( 'HTTP %d · %s%s (Connected)', $code, $format, $is_gz ? ' GZIP' : '' );
+		wp_send_json_success( array( 'message' => $info, 'format' => $format, 'is_gzip' => $is_gz ) );
 	}
 
 	/**

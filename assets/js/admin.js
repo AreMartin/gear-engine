@@ -276,6 +276,134 @@
 			$('#gae_min_discount_pct').val($(this).val());
 		});
 
+		// ==========================================
+		// Partner Feeds Card Interactive Management
+		// ==========================================
+		function updateFeedCounters() {
+			var totalSlots = 5;
+			var visibleSlots = $('.gae-feed-row:not(.gae-slot-hidden)').length;
+			var activeSlots = 0;
+
+			$('.gae-feed-row').each(function() {
+				var isChecked = $(this).find('.gae-feed-enabled-toggle').is(':checked');
+				var hasUrl = $.trim($(this).find('.gae-feed-url-input').val()).length > 0;
+				if (isChecked && hasUrl) {
+					activeSlots++;
+				}
+			});
+
+			$('#gae-feed-active-badge').text(activeSlots + ' / ' + totalSlots + ' Active');
+
+			var remaining = totalSlots - visibleSlots;
+			var $addBtn = $('#gae-add-feed-btn');
+			if (remaining > 0) {
+				$addBtn.prop('disabled', false).find('.gae-add-feed-text').text('+ Add Partner Feed (' + remaining + ' slots remaining)');
+			} else {
+				$addBtn.prop('disabled', true).find('.gae-add-feed-text').text('All 5 Slots In Use');
+			}
+		}
+
+		// Toggle switch active/paused
+		$(document).on('change', '.gae-feed-enabled-toggle', function() {
+			var isChecked = $(this).is(':checked');
+			var $row = $(this).closest('.gae-feed-row');
+			var $pill = $row.find('.gae-status-pill');
+
+			if (isChecked) {
+				$row.removeClass('is-paused');
+				$pill.removeClass('is-paused').addClass('is-active').text('Active');
+			} else {
+				$row.addClass('is-paused');
+				$pill.removeClass('is-active').addClass('is-paused').text('Paused');
+			}
+			updateFeedCounters();
+		});
+
+		// Auto-detect network when typing/pasting URL
+		$(document).on('input paste change', '.gae-feed-url-input', function() {
+			var val = $(this).val();
+			var $row = $(this).closest('.gae-feed-row');
+			var $select = $row.find('.gae-network-select');
+
+			if (val.indexOf('adtraction.com') !== -1) {
+				$select.val('Adtraction');
+			} else if (val.indexOf('tradetracker.') !== -1) {
+				$select.val('TradeTracker');
+			}
+			updateFeedCounters();
+		});
+
+		// Add Feed Button
+		$('#gae-add-feed-btn').on('click', function(e) {
+			e.preventDefault();
+			var $hiddenRow = $('.gae-feed-row.gae-slot-hidden').first();
+			if ($hiddenRow.length) {
+				$hiddenRow.removeClass('gae-slot-hidden');
+				$hiddenRow.find('.gae-feed-name-input').focus();
+				updateFeedCounters();
+			}
+		});
+
+		// Remove Feed Button
+		$(document).on('click', '.gae-remove-feed-btn', function(e) {
+			e.preventDefault();
+			var $row = $(this).closest('.gae-feed-row');
+			$row.find('.gae-feed-name-input').val('');
+			$row.find('.gae-feed-url-input').val('');
+			$row.find('.gae-network-select').val('Adtraction');
+			$row.find('.gae-feed-test-result').empty();
+			$row.find('.gae-feed-enabled-toggle').prop('checked', false).trigger('change');
+
+			var visibleRows = $('.gae-feed-row:not(.gae-slot-hidden)').length;
+			if (visibleRows > 1) {
+				$row.addClass('gae-slot-hidden');
+				$('#gae-feeds-tbody').append($row);
+			}
+			updateFeedCounters();
+		});
+
+		// Test Feed Connection Probe Button
+		$(document).on('click', '.gae-test-feed-btn', function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var $row = $btn.closest('.gae-feed-row');
+			var url = $.trim($row.find('.gae-feed-url-input').val());
+			var $result = $row.find('.gae-feed-test-result');
+
+			if (!url) {
+				$result.html('<span class="gae-badge-error">⚠ Enter URL first</span>');
+				return;
+			}
+
+			$btn.prop('disabled', true);
+			$result.html('<span class="spinner is-active" style="float:none; margin:0 4px 0 0; vertical-align:middle;"></span> <span style="color:#64748b;">Testing...</span>');
+
+			$.ajax({
+				url: gaeAdminData.ajaxUrl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'gae_test_feed_url',
+					nonce: gaeAdminData.syncNonce,
+					url: url
+				}
+			})
+			.done(function(response) {
+				if (response.success) {
+					$result.html('<span class="gae-badge-success">✓ ' + $('<div>').text(response.data.message).html() + '</span>');
+				} else {
+					var err = (response.data && response.data.message) ? response.data.message : 'Connection failed';
+					$result.html('<span class="gae-badge-error">⚠ ' + $('<div>').text(err).html() + '</span>');
+				}
+			})
+			.fail(function(xhr, status, error) {
+				$result.html('<span class="gae-badge-error">⚠ Request failed (' + error + ')</span>');
+			})
+			.always(function() {
+				$btn.prop('disabled', false);
+			});
+		});
+
 		// 1. Manual Sync Handler
 		var $syncBtn = $('#gae-sync-now-btn');
 		var $syncSpinner = $('#gae-sync-spinner');

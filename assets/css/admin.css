@@ -327,31 +327,101 @@
 	margin-top: -2px;
 }
 
-/* Feeds Table (5 Slots) */
-.gae-feeds-table-wrap {
-	margin: 10px 0 16px 0;
+/* Feeds Card (Full Width) */
+.form-table tr.gae-feeds-table-row th,
+.gae-feeds-table-row th {
+	display: none !important;
+}
+
+.form-table tr.gae-feeds-table-row td,
+.gae-feeds-table-row td {
+	display: block !important;
+	width: 100% !important;
+	padding: 0 !important;
+}
+
+.gae-feeds-card {
 	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 20px 22px;
+	margin: 16px 0 24px 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.gae-feeds-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.gae-feeds-card-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.gae-feeds-card-title .dashicons {
+	font-size: 26px;
+	width: 26px;
+	height: 26px;
+	color: #16a34a;
+}
+
+.gae-feeds-card-title h3 {
+	margin: 0 0 2px 0;
+	font-size: 16px;
+	color: #1e293b;
+	font-weight: 700;
+}
+
+.gae-feeds-card-title .description {
+	margin: 0;
+	color: #64748b;
+	font-size: 12px;
+}
+
+.gae-feed-active-counter {
+	background: #dcfce7;
+	color: #15803d;
+	font-weight: 700;
+	font-size: 12px;
+	padding: 4px 12px;
+	border-radius: 12px;
+	border: 1px solid #86efac;
+}
+
+.gae-feeds-table-wrap {
 	border: 1px solid #cbd5e1;
 	border-radius: 6px;
 	overflow: hidden;
+	background: #ffffff;
 }
 
 .gae-feeds-table {
 	border: none !important;
 	box-shadow: none !important;
+	margin: 0 !important;
 }
 
 .gae-feeds-table th {
 	background: #f8fafc;
-	color: #334155;
-	font-weight: 600;
-	font-size: 13px;
-	padding: 10px 12px;
+	color: #475569;
+	font-weight: 700;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+	padding: 10px 14px;
 	border-bottom: 1px solid #e2e8f0;
 }
 
 .gae-feeds-table td {
-	padding: 8px 12px;
+	padding: 10px 14px;
 	vertical-align: middle;
 	border-bottom: 1px solid #f1f5f9;
 }
@@ -360,6 +430,96 @@
 	border-bottom: none;
 }
 
+.gae-feed-row.gae-slot-hidden {
+	display: none !important;
+}
+
+.gae-feed-row.is-paused td:not(:first-child) {
+	opacity: 0.65;
+	transition: opacity 0.2s ease;
+}
+
+.gae-feed-row.is-paused:hover td:not(:first-child) {
+	opacity: 0.95;
+}
+
+/* iOS Toggle Switch */
+.gae-switch-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.gae-switch {
+	position: relative;
+	display: inline-block;
+	width: 36px;
+	height: 20px;
+	margin: 0 !important;
+}
+
+.gae-switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+	position: absolute;
+}
+
+.gae-slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #cbd5e1;
+	transition: .2s;
+	border-radius: 20px;
+}
+
+.gae-slider:before {
+	position: absolute;
+	content: "";
+	height: 14px;
+	width: 14px;
+	left: 3px;
+	bottom: 3px;
+	background-color: #ffffff;
+	transition: .2s;
+	border-radius: 50%;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.gae-switch input:checked + .gae-slider {
+	background-color: #16a34a;
+}
+
+.gae-switch input:checked + .gae-slider:before {
+	transform: translateX(16px);
+}
+
+.gae-status-pill {
+	font-size: 11px;
+	font-weight: 700;
+	padding: 2px 8px;
+	border-radius: 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.gae-status-pill.is-active {
+	background: #dcfce7;
+	color: #15803d;
+	border: 1px solid #bbf7d0;
+}
+
+.gae-status-pill.is-paused {
+	background: #f1f5f9;
+	color: #64748b;
+	border: 1px solid #e2e8f0;
+}
+
+/* Table Inputs */
 .gae-feeds-table input[type="text"],
 .gae-feeds-table input[type="url"],
 .gae-feeds-table select {
@@ -369,7 +529,61 @@
 	border-color: #cbd5e1;
 }
 
-.gae-feeds-table input[type="checkbox"] {
-	transform: scale(1.15);
-	cursor: pointer;
+.gae-url-col {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.gae-feed-test-result {
+	font-size: 11px;
+	line-height: 1.3;
+}
+
+.gae-badge-success {
+	color: #16a34a;
+	font-weight: 600;
+}
+
+.gae-badge-error {
+	color: #dc2626;
+	font-weight: 600;
+}
+
+.gae-row-actions {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+}
+
+.gae-test-feed-btn {
+	display: inline-flex !important;
+	align-items: center !important;
+	gap: 4px !important;
+	height: 28px !important;
+	font-size: 11px !important;
+	padding: 0 8px !important;
+}
+
+.gae-remove-feed-btn {
+	color: #94a3b8 !important;
+	padding: 0 4px !important;
+	height: 28px !important;
+	border-radius: 4px !important;
+}
+
+.gae-remove-feed-btn:hover {
+	color: #dc2626 !important;
+	background: #fee2e2 !important;
+}
+
+.gae-feeds-card-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 14px;
+	padding-top: 10px;
 }
