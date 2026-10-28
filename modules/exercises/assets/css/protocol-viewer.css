@@ -64,3 +64,8 @@
 	.gear-engine-program__noprint { display: none !important; }
 	.gear-engine-program { max-width: none; padding: 0; }
 }
+
+.gear-engine-program__questions { display: grid; gap: 16px; }
+.gear-engine-program__question { border: 1px solid var(--ge-border, #e2e8f0); border-radius: 8px; padding: 12px 16px; margin: 0; }
+.gear-engine-program__question legend { font-weight: 600; color: var(--ge-navy, #1a2a3a); padding: 0 6px; }
+.gear-engine-program__question label { display: block; padding: 6px 0; cursor: pointer; }

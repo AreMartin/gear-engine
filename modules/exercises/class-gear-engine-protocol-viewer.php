@@ -23,6 +23,7 @@ class Gear_Engine_Protocol_Viewer {
 	public const DEFAULT_PAGE_PATH  = 'treningsprogram';
 	public const QUERY_VAR          = 'program';
 	private const EXERCISE_LIMIT    = 50;
+	private const AUTO_LIMIT        = 8;
 
 	/**
 	 * Constructor.
@@ -69,6 +70,194 @@ class Gear_Engine_Protocol_Viewer {
 		 * @param string $slug Protocol slug.
 		 */
 		return (string) apply_filters( 'gear_engine_program_url', $url, $slug );
+	}
+
+	/**
+	 * URL of an automatically assembled program for a triage diagnosis.
+	 *
+	 * @param string $region    Triage region slug.
+	 * @param string $diagnosis Diagnosis id within the region config.
+	 * @return string
+	 */
+	public static function get_auto_program_url( string $region, string $diagnosis ): string {
+		return trailingslashit( home_url( self::get_page_path() ) ) . '?region=' . rawurlencode( sanitize_key( $region ) ) . '&dx=' . rawurlencode( sanitize_key( $diagnosis ) );
+	}
+
+	/**
+	 * Exercise area slug used for a triage region (a config may override it with "area").
+	 *
+	 * @param string               $region Region slug.
+	 * @param array<string, mixed> $config Region config.
+	 * @return string
+	 */
+	public static function get_region_area( string $region, array $config = array() ): string {
+		return sanitize_title( (string) ( ! empty( $config['area'] ) ? $config['area'] : $region ) );
+	}
+
+	/**
+	 * Order exercises so those whose "good for" tags occur in the text come first (stable otherwise).
+	 *
+	 * @param array<int, array<string, mixed>> $exercises Exercises.
+	 * @param string                           $text      Text to match tags against.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function rank_exercises( array $exercises, string $text ): array {
+		$text   = mb_strtolower( $text, 'UTF-8' );
+		$scored = array();
+		foreach ( $exercises as $index => $exercise ) {
+			$score = 0;
+			foreach ( preg_split( '/[;,]/', (string) ( $exercise['good_for'] ?? '' ) ) as $tag ) {
+				$tag = mb_strtolower( trim( $tag ), 'UTF-8' );
+				if ( mb_strlen( $tag, 'UTF-8' ) >= 3 && false !== mb_strpos( $text, $tag ) ) {
+					++$score;
+				}
+			}
+			$scored[] = array( $score, $index, $exercise );
+		}
+		usort(
+			$scored,
+			static function ( array $a, array $b ): int {
+				return $b[0] <=> $a[0] ?: $a[1] <=> $b[1];
+			}
+		);
+		return array_column( $scored, 2 );
+	}
+
+	/**
+	 * Whether a region has any exercises that can be used for automatic programs.
+	 *
+	 * @param string $area Exercise area slug.
+	 * @return bool
+	 */
+	public static function area_has_auto_exercises( string $area ): bool {
+		return '' !== $area && (bool) Gear_Engine_Exercise_Service::search_exercises(
+			array(
+				'area'     => $area,
+				'max_risk' => 'moderate',
+				'limit'    => 1,
+			)
+		);
+	}
+
+	/**
+	 * Allowed answers of the phase questions, in order from most to least limited.
+	 *
+	 * @return array<string, array<int, string>>
+	 */
+	public static function get_phase_answers(): array {
+		return array(
+			'pain'  => array( 'severe', 'moderate', 'mild' ),
+			'func'  => array( 'limited', 'partial', 'normal' ),
+			'since' => array( 'acute', 'subacute', 'chronic' ),
+		);
+	}
+
+	/**
+	 * Rehab phase (1 calm, 2 build, 3 return to activity) from the phase answers.
+	 *
+	 * The most limited of pain and daily function decides; a problem younger than two weeks never goes past phase 2.
+	 *
+	 * @param array<string, string> $answers Keys pain, func, since.
+	 * @return int 0 when an answer is missing or invalid.
+	 */
+	public static function compute_phase( array $answers ): int {
+		$levels = array();
+		foreach ( self::get_phase_answers() as $key => $allowed ) {
+			$index = isset( $answers[ $key ] ) ? array_search( $answers[ $key ], $allowed, true ) : false;
+			if ( false === $index ) {
+				return 0;
+			}
+			$levels[ $key ] = (int) $index;
+		}
+
+		$phase = min( $levels['pain'], $levels['func'] ) + 1;
+		return 0 === $levels['since'] ? min( $phase, 2 ) : $phase;
+	}
+
+	/**
+	 * Short guidance text for a phase.
+	 *
+	 * @param int $phase Phase 0-3.
+	 * @return string
+	 */
+	public static function get_phase_summary( int $phase ): string {
+		if ( 1 === $phase ) {
+			return __( 'Fase 1 – Roe ned: milde, smertelindrende øvelser. Hold deg innenfor det som er komfortabelt.', 'gear-engine' );
+		}
+		if ( 2 === $phase ) {
+			return __( 'Fase 2 – Bygg opp: gradvis økende belastning og bevegelighet. Litt ubehag er greit, men smertene skal ikke øke.', 'gear-engine' );
+		}
+		if ( 3 === $phase ) {
+			return __( 'Fase 3 – Tilbake til aktivitet: mer krevende øvelser for styrke og kontroll. Øk gradvis.', 'gear-engine' );
+		}
+		return __( 'Et utvalg rolige øvelser for området. Start forsiktig og slutt hvis det gjør vondt verre.', 'gear-engine' );
+	}
+
+	/**
+	 * Assemble a program from the region's low/moderate risk exercises, ranked by the diagnosis.
+	 *
+	 * Never produced for high or critical severity diagnoses.
+	 *
+	 * @param string $region    Triage region slug.
+	 * @param string $diagnosis Diagnosis id.
+	 * @param int    $phase     Rehab phase 1-3 (0 = not specified): 1 uses low risk exercises only, 3 puts moderate risk first.
+	 * @return array{protocol: array<string, mixed>, groups: array<int, array<string, mixed>>}|null
+	 */
+	public static function get_auto_program( string $region, string $diagnosis, int $phase = 0 ): ?array {
+		$region    = sanitize_key( $region );
+		$diagnosis = sanitize_key( $diagnosis );
+		if ( '' === $region || '' === $diagnosis || ! class_exists( 'Gear_Engine_Triage' ) ) {
+			return null;
+		}
+
+		$config = Gear_Engine_Triage::get_config( $region );
+		if ( is_wp_error( $config ) || empty( $config['diagnoses'][ $diagnosis ] ) ) {
+			return null;
+		}
+
+		$dx = $config['diagnoses'][ $diagnosis ];
+		if ( in_array( $dx['severity'] ?? '', array( 'Kritisk', 'Høy' ), true ) ) {
+			return null;
+		}
+
+		$exercises = Gear_Engine_Exercise_Service::search_exercises(
+			array(
+				'area'     => self::get_region_area( $region, $config ),
+				'max_risk' => 1 === $phase ? 'low' : 'moderate',
+				'limit'    => self::EXERCISE_LIMIT,
+			)
+		);
+		$title     = (string) ( $dx['title'] ?? '' );
+		$exercises = self::rank_exercises( $exercises, $title . ' ' . (string) ( $dx['description'] ?? '' ) );
+		if ( 3 === $phase ) {
+			usort(
+				$exercises,
+				static function ( array $a, array $b ): int {
+					return ( 'moderate' === ( $b['risk'] ?? '' ) ) <=> ( 'moderate' === ( $a['risk'] ?? '' ) );
+				}
+			);
+		}
+		$exercises = array_slice( $exercises, 0, 1 === $phase ? self::AUTO_LIMIT - 3 : self::AUTO_LIMIT );
+		if ( ! $exercises ) {
+			return null;
+		}
+
+		return array(
+			'protocol' => array(
+				'slug'      => '',
+				'name'      => $title,
+				'summary'   => self::get_phase_summary( $phase ),
+				'dosage'    => '',
+				'red_flags' => __( 'Smertene øker, du får nummenhet, kraftsvikt eller nye symptomer.', 'gear-engine' ),
+			),
+			'groups'   => array(
+				array(
+					'name'        => '',
+					'description' => '',
+					'exercises'   => $exercises,
+				),
+			),
+		);
 	}
 
 	/**
@@ -256,8 +445,35 @@ class Gear_Engine_Protocol_Viewer {
 		wp_enqueue_style( 'gear-engine-protocol-viewer' );
 		wp_enqueue_script( 'gear-engine-protocol-viewer' );
 
+		$region = '';
+		$dx     = '';
+		if ( '' === $slug && isset( $_GET['region'], $_GET['dx'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display of public content.
+			$region = sanitize_key( wp_unslash( $_GET['region'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$dx     = sanitize_key( wp_unslash( $_GET['dx'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		}
+
 		ob_start();
-		if ( '' === $slug ) {
+		if ( '' !== $region && '' !== $dx ) {
+			$answers = array();
+			foreach ( array_keys( self::get_phase_answers() ) as $key ) {
+				$answers[ $key ] = isset( $_GET[ $key ] ) ? sanitize_key( wp_unslash( $_GET[ $key ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			}
+			$phase       = self::compute_phase( $answers );
+			$warning_yes = isset( $_GET['warn'] ) && 'yes' === sanitize_key( wp_unslash( $_GET['warn'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$auto        = self::get_auto_program( $region, $dx, 0 === $phase ? 0 : $phase );
+			if ( $auto && $warning_yes ) {
+				echo '<div class="gear-engine-program"><div class="gear-engine-program__warning" role="alert"><strong>' . esc_html__( 'Ikke start øvelser nå.', 'gear-engine' ) . '</strong><p>' . esc_html__( 'Nummenhet, kraftsvikt eller raskt økende smerter bør vurderes av lege eller fysioterapeut før du trener.', 'gear-engine' ) . '</p></div></div>';
+			} elseif ( $auto && 0 === $phase ) {
+				$question_title = $auto['protocol']['name'];
+				include GEAR_ENGINE_PATH . 'modules/exercises/templates/protocol-phase-questions.php';
+			} elseif ( $auto ) {
+				$protocol = $auto['protocol'];
+				$groups   = $auto['groups'];
+				include GEAR_ENGINE_PATH . 'modules/exercises/templates/protocol-view.php';
+			} else {
+				echo '<div class="gear-engine-program"><p class="gear-engine-program__empty">' . esc_html__( 'Dette treningsprogrammet er ikke tilgjengelig.', 'gear-engine' ) . '</p></div>';
+			}
+		} elseif ( '' === $slug ) {
 			$protocols = self::get_listed_protocols();
 			include GEAR_ENGINE_PATH . 'modules/exercises/templates/protocol-index.php';
 		} else {

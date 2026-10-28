@@ -80,6 +80,13 @@ class Gear_Engine_Protocols {
 }
 class Gear_Engine_Exercise_Service {
 	public static function search_exercises( array $args = array() ): array {
+		if ( ! empty( $args['area'] ) ) {
+			$list = $GLOBALS['area_exercises'][ $args['area'] ] ?? array();
+			if ( 'low' === ( $args['max_risk'] ?? '' ) ) {
+				$list = array_values( array_filter( $list, static function ( $e ) { return 'low' === ( $e['risk'] ?? '' ); } ) );
+			}
+			return array_slice( $list, 0, $args['limit'] ?? 50 );
+		}
 		return $GLOBALS['exercises'][ $args['protocol'] ?? '' ] ?? array();
 	}
 }
@@ -115,6 +122,7 @@ $GLOBALS['exercises'] = array(
 	'referral-prog' => array( ex( 3, 'Noe' ) ),
 	'neck-program'  => array( ex( 4, 'Hake inn' ) ),
 );
+$GLOBALS['area_exercises'] = array();
 
 // Page path and URL.
 t( 'page path default', Gear_Engine_Protocol_Viewer::get_page_path() === 'treningsprogram' );
@@ -165,5 +173,53 @@ unset( $_GET['program'] );
 $index = $viewer->render();
 t( 'index lists only approved programs with exercises', false !== strpos( $index, 'SAPS-program' ) && false === strpos( $index, 'Utkast' ) && false === strpos( $index, 'Tomt' ) );
 t( 'index links to program url', false !== strpos( $index, 'treningsprogram/?program=saps-program' ) );
+
+// Automatic programs (no protocol needed).
+$none = Gear_Engine_Triage::attach_programs( Gear_Engine_Triage::get_config( 'skulder' ), 'skulder' );
+t( 'no area exercises: no automatic link', empty( $none['diagnoses']['frozen_shoulder']['trainingProgram'] ) );
+
+$GLOBALS['area_exercises']['skulder'] = array(
+	ex( 10, 'Generell øvelse', array( 'good_for' => '', 'risk' => 'moderate' ) ),
+	ex( 11, 'Frossen skulder øvelse', array( 'good_for' => 'frozen shoulder; kapsulitt', 'risk' => 'low' ) ),
+);
+$auto = Gear_Engine_Triage::attach_programs( Gear_Engine_Triage::get_config( 'skulder' ), 'skulder' );
+$fs   = Gear_Engine_Triage::get_config( 'skulder' )['diagnoses']['frozen_shoulder'];
+t( 'diagnosis without protocol gets automatic link', ( $auto['diagnoses']['frozen_shoulder']['trainingProgram']['url'] ?? '' ) === 'http://example.com/treningsprogram/?region=skulder&dx=frozen_shoulder' );
+t( 'protocol still wins over automatic', ( $auto['diagnoses']['saps']['trainingProgram']['url'] ?? '' ) === 'http://example.com/treningsprogram/?program=saps-program' );
+t( 'high severity gets no automatic link', empty( $auto['diagnoses']['medical_referral']['trainingProgram'] ) && empty( $auto['diagnoses']['acute_cuff_tear']['trainingProgram'] ) );
+t( 'other region without exercises gets none', empty( Gear_Engine_Triage::attach_programs( Gear_Engine_Triage::get_config( 'kne' ), 'kne' )['diagnoses']['acl']['trainingProgram'] ?? null ) );
+
+$_GET['region'] = 'skulder';
+$_GET['dx']     = 'frozen_shoulder';
+$page = $viewer->render();
+t( 'automatic link first asks the phase questions', false !== strpos( $page, '<form' ) && false !== strpos( $page, 'name="pain"' ) && false === strpos( $page, 'Generell øvelse' ) );
+t( 'questions escape and carry region and dx', false !== strpos( $page, 'name="region" value="skulder"' ) && false !== strpos( $page, 'name="dx" value="frozen_shoulder"' ) );
+
+$p = 'Gear_Engine_Protocol_Viewer::compute_phase';
+t( 'phase 1 for severe pain', 1 === $p( array( 'pain' => 'severe', 'func' => 'normal', 'since' => 'chronic' ) ) );
+t( 'phase 1 for limited function', 1 === $p( array( 'pain' => 'mild', 'func' => 'limited', 'since' => 'chronic' ) ) );
+t( 'phase 2 for moderate', 2 === $p( array( 'pain' => 'moderate', 'func' => 'normal', 'since' => 'subacute' ) ) );
+t( 'phase 3 when little pain and normal function', 3 === $p( array( 'pain' => 'mild', 'func' => 'normal', 'since' => 'chronic' ) ) );
+t( 'acute onset caps at phase 2', 2 === $p( array( 'pain' => 'mild', 'func' => 'normal', 'since' => 'acute' ) ) );
+t( 'invalid or missing answers give phase 0', 0 === $p( array( 'pain' => 'mild' ) ) && 0 === $p( array( 'pain' => 'x', 'func' => 'normal', 'since' => 'acute' ) ) );
+
+$_GET += array( 'pain' => 'severe', 'func' => 'partial', 'since' => 'chronic', 'warn' => 'no' );
+$page = $viewer->render();
+t( 'phase 1 shows only low risk exercises', false !== strpos( $page, 'Frossen skulder øvelse' ) && false === strpos( $page, 'Generell øvelse' ) && false !== strpos( $page, 'Fase 1' ) );
+
+$_GET = array_merge( $_GET, array( 'pain' => 'mild', 'func' => 'normal' ) );
+$page = $viewer->render();
+t( 'phase 3 lists moderate risk first', false !== strpos( $page, 'Fase 3' ) && strpos( $page, 'Generell øvelse' ) < strpos( $page, 'Frossen skulder øvelse' ) );
+t( 'automatic program page escapes title', false !== strpos( $page, esc_html( $fs['title'] ) ) );
+
+$_GET['warn'] = 'yes';
+$page = $viewer->render();
+t( 'warning answer blocks exercises', false !== strpos( $page, 'Ikke start øvelser' ) && false === strpos( $page, 'Generell øvelse' ) );
+$_GET['warn'] = 'no';
+$_GET['dx'] = 'medical_referral';
+t( 'automatic program refused for high severity', false !== strpos( $viewer->render(), 'ikke tilgjengelig' ) );
+$_GET['dx'] = 'nope';
+t( 'automatic program refused for unknown diagnosis', false !== strpos( $viewer->render(), 'ikke tilgjengelig' ) );
+unset( $_GET['region'], $_GET['dx'], $_GET['pain'], $_GET['func'], $_GET['since'], $_GET['warn'] );
 
 exit( $failures ? 1 : 0 );

@@ -440,7 +440,7 @@ class Gear_Engine_Triage {
 				: '';
 		}
 
-		$config = self::attach_programs( $config );
+		$config = self::attach_programs( $config, $region );
 
 		wp_enqueue_style( 'gear-engine-triage' );
 		wp_enqueue_script( 'gear-engine-triage' );
@@ -456,12 +456,13 @@ class Gear_Engine_Triage {
 	 *
 	 * A diagnosis gets a program when an approved, in-date protocol with exercises matches its
 	 * ICD-10/ICPC-2 codes, or the protocol named in its optional "protocol" field. High and
-	 * critical severity diagnoses never get a program. An existing manual trainingProgram.url is kept.
+	 * critical severity diagnoses never get a program. Without a protocol, and with a region, the link
+	 * points to an automatic program built from the region's exercises. An existing manual trainingProgram.url is kept.
 	 *
 	 * @param array<string, mixed> $config Validated region config.
 	 * @return array<string, mixed>
 	 */
-	public static function attach_programs( array $config ): array {
+	public static function attach_programs( array $config, string $region = '' ): array {
 		if ( ! class_exists( 'Gear_Engine_Protocol_Viewer' ) || ! class_exists( 'Gear_Engine_Protocols' ) ) {
 			return $config;
 		}
@@ -479,13 +480,17 @@ class Gear_Engine_Triage {
 			}
 
 			$slug = self::find_program_slug( $diagnosis );
-			if ( '' === $slug ) {
+			if ( '' !== $slug ) {
+				$url = Gear_Engine_Protocol_Viewer::get_program_url( $slug );
+			} elseif ( '' !== $region && Gear_Engine_Protocol_Viewer::area_has_auto_exercises( Gear_Engine_Protocol_Viewer::get_region_area( $region, $config ) ) ) {
+				$url = Gear_Engine_Protocol_Viewer::get_auto_program_url( $region, (string) $id );
+			} else {
 				continue;
 			}
 
 			$config['diagnoses'][ $id ]['trainingProgram'] = array(
 				'title' => isset( $program['title'] ) && '' !== $program['title'] ? (string) $program['title'] : __( 'Åpne treningsprogrammet', 'gear-engine' ),
-				'url'   => Gear_Engine_Protocol_Viewer::get_program_url( $slug ),
+				'url'   => $url,
 			);
 		}
 
