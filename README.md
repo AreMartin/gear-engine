@@ -49,6 +49,10 @@ CSV also accepts optional `risk` and `protocol` columns. Protocols must already 
 
 The Exercise Library dashboard has an **Import Exercises** submenu with a CSV template and a preview-first importer. Required columns are `title`, `description` (step-by-step instructions), and either `exorlive_id` or `external_key`; optional columns are `summary`, `area`, `equipment`, `dosage`, `video_culture`, `video_url`, and `source_url`. The optional `video_url` accepts HTTPS ExorLive, YouTube, or Vimeo links and takes precedence over `exorlive_id`; for an ExorLive link the ID is read from `ex=` when `exorlive_id` is empty, so the URL alone is enough. Separate multiple area/equipment values with semicolons and quote CSV fields that contain commas. The importer validates rows, flags duplicates within a file, and updates existing records by ExorLive ID or external key. New records are drafts by default; publishing requires checking the explicit publish option before preview confirmation. CSV files are limited to 5 MB and 500 rows.
 
+## Shortcodes & Pages (admin overview)
+
+**Settings → Gear Engine: Shortcodes** lists every shortcode with a copy button, and a page map showing which page should hold which shortcode, how the pages link to each other (front page card → picker → region quiz → program page), and a live status per page (OK, page missing, not published, shortcode missing). Missing pages have a "Create page" link that prefills the title and shortcode; set the slug to match the shown path. Paths follow the settings under **Settings → Smertesjekk**. The chat page has no fixed path, so it is found by searching pages and posts for `[gae_physio_chat]`. Test with `php tests/admin/shortcode-guide.test.php`.
+
 ## Triage module
 
 `modules/triage/` is a rule-based triage quiz (separate from the AI chat) that ends in a conclusion and a printable clinical note. Embed it with `[gear_engine_triage region="rygg"]` or the **Triage Quiz** block.
