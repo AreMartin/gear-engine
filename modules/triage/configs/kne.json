@@ -1,0 +1,322 @@
+{
+  "label": "Kne",
+  "summary": "Kneskader, smerter foran i kneet og slitasje",
+  "order": 30,
+  "icon": "knee",
+  "version": "0.1.0",
+  "reviewStatus": "draft-unreviewed",
+  "title": "Knesjekk",
+  "description": "Svar på noen spørsmål om kneet ditt, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
+  "defaultAnswers": {
+    "age": null,
+    "onset": null,
+    "location": [],
+    "symptoms": [],
+    "weight_bearing": null,
+    "red_flags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "age",
+      "title": "Hvor gammel er du?",
+      "type": "single",
+      "options": [
+        { "id": "under25", "icon": "User", "title": "Under 25 år" },
+        { "id": "25-50", "icon": "Activity", "title": "25 til 50 år" },
+        { "id": "over50", "icon": "Clock", "title": "Over 50 år" }
+      ]
+    },
+    {
+      "id": "onset",
+      "title": "Hvordan startet plagene?",
+      "type": "single",
+      "options": [
+        { "id": "acute_twist", "icon": "RotateCcw", "title": "Vridning eller stopp i fart", "subtitle": "For eksempel i fotball, håndball eller ski" },
+        { "id": "acute_impact", "icon": "Zap", "title": "Slag, fall eller støt mot kneet" },
+        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+      ]
+    },
+    {
+      "id": "location",
+      "title": "Hvor sitter smerten?",
+      "description": "Velg alle steder som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "front", "icon": "MapPin", "title": "Foran, rundt eller under kneskålen" },
+        { "id": "inner", "icon": "MapPin", "title": "På innsiden av kneet" },
+        { "id": "outer", "icon": "MapPin", "title": "På utsiden av kneet" },
+        { "id": "back", "icon": "MapPin", "title": "I knehasen (baksiden)" },
+        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+      ]
+    },
+    {
+      "id": "symptoms",
+      "title": "Hva stemmer for deg?",
+      "description": "Velg alle som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "pop", "icon": "Zap", "title": "Jeg hørte eller kjente et smell da det skjedde" },
+        { "id": "swelling_fast", "icon": "Flame", "title": "Kneet svulmet kraftig opp i løpet av noen timer" },
+        { "id": "giving_way", "icon": "RotateCcw", "title": "Kneet svikter eller glipper under meg" },
+        { "id": "locking", "icon": "Lock", "title": "Kneet låser seg, eller jeg får ikke strukket det helt ut" },
+        { "id": "stairs", "icon": "ArrowDown", "title": "Verst i trapper, knebøy eller etter lang tid med bøyd kne" },
+        { "id": "jumping", "icon": "ArrowUp", "title": "Verst ved hopping eller løping, med ømt punkt rett under kneskålen" },
+        { "id": "morning_stiff", "icon": "Clock", "title": "Stivt og støl når jeg starter opp, bedre når kneet blir varmt" },
+        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+      ]
+    },
+    {
+      "id": "weight_bearing",
+      "title": "Klarer du å legge vekt på kneet?",
+      "type": "single",
+      "options": [
+        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
+        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
+        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å gå fire skritt" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Smerteintensitet",
+      "type": "slider"
+    },
+    {
+      "id": "red_flags",
+      "title": "Sikkerhetssjekk (Viktig!)",
+      "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
+      "type": "multiple",
+      "options": [
+        { "id": "hot_swollen", "icon": "AlertTriangle", "title": "Kneet er varmt, rødt og hovent, og jeg har feber eller føler meg syk" },
+        { "id": "calf_swelling", "icon": "AlertTriangle", "title": "Jeg har smerte og hevelse i leggen, for eksempel etter lang reise eller sengeleie" },
+        { "id": "numb_foot", "icon": "ShieldAlert", "title": "Foten er kald, blek eller nummen" },
+        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "medical_referral",
+      "when": { "all": [
+        { "field": "red_flags", "op": "notEmpty" },
+        { "field": "red_flags", "op": "notIncludes", "value": "none" }
+      ] }
+    },
+    {
+      "diagnosis": "fracture_suspected",
+      "when": { "all": [
+        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
+        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
+      ] }
+    },
+    {
+      "diagnosis": "acl_injury",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute_twist" },
+        { "field": "symptoms", "op": "includes", "value": "swelling_fast" },
+        { "any": [
+          { "field": "symptoms", "op": "includes", "value": "pop" },
+          { "field": "symptoms", "op": "includes", "value": "giving_way" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "meniscus_injury",
+      "when": { "field": "symptoms", "op": "includes", "value": "locking" }
+    },
+    {
+      "diagnosis": "knee_sprain",
+      "when": { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] }
+    },
+    {
+      "diagnosis": "osteoarthritis",
+      "when": { "all": [
+        { "field": "age", "op": "eq", "value": "over50" },
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "symptoms", "op": "includes", "value": "morning_stiff" }
+      ] }
+    },
+    {
+      "diagnosis": "patellar_tendinopathy",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "symptoms", "op": "includes", "value": "jumping" }
+      ] }
+    },
+    {
+      "diagnosis": "itbs",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "location", "op": "includes", "value": "outer" },
+        { "field": "location", "op": "notIncludes", "value": "front" }
+      ] }
+    },
+    {
+      "diagnosis": "pfps",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "any": [
+          { "field": "symptoms", "op": "includes", "value": "stairs" },
+          { "field": "location", "op": "includes", "value": "front" }
+        ] }
+      ] }
+    }
+  ],
+  "defaultDiagnosis": "non_specific",
+  "diagnoses": {
+    "medical_referral": {
+      "title": "Vurdering hos lege anbefales",
+      "category": "Medisinsk sjekk",
+      "severity": "Høy",
+      "actionLabel": "Kontakt lege i dag",
+      "patientDesc": "Svarene dine tyder på at kneet eller beinet trenger en medisinsk vurdering. Et varmt, rødt og hovent kne med feber kan være en infeksjon i leddet, og smerte og hevelse i leggen kan være en blodpropp. Begge deler må sjekkes raskt.",
+      "patientDiff": "Leddinfeksjon, blodpropp i legg (DVT), urinsyregikt eller betennelse i leddet.",
+      "phase1": "Kontakt fastlegen eller legevakt (116 117) i dag. Ved kald, blek eller nummen fot, eller pustevansker, ring 113. Ikke masser leggen og ikke tren før du er undersøkt.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg: mistanke om septisk artritt, dyp venetrombose eller karskade. Hastevurdering.",
+      "icpc2": "A99",
+      "icd10": "R52.9"
+    },
+    "fracture_suspected": {
+      "title": "Mulig brudd eller alvorlig skade",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Få kneet undersøkt",
+      "patientDesc": "Når du ikke klarer å belaste kneet etter en skade, kan det være et brudd eller en større skade. Det bør undersøkes og eventuelt røntgenbilde tas.",
+      "patientDiff": "Kneskålsbrudd, leddbåndsskade, kraftig forslåing.",
+      "phase1": "Avlast kneet, bruk krykker hvis du har det, og legg på is i 15 minutter av gangen. Kontakt legevakt eller fastlege samme dag for vurdering.",
+      "exercises": [],
+      "clinicalHypothesis": "Mulig fraktur etter traume, manglende evne til å belaste (positivt Ottawa knee rule). Bildediagnostikk indisert.",
+      "icpc2": "L16",
+      "icd10": "S82.9"
+    },
+    "acl_injury": {
+      "title": "Mistenkt korsbåndsskade",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Bli undersøkt av fysioterapeut eller lege",
+      "patientDesc": "Vridning i fart med smell, rask hevelse og følelse av at kneet svikter er et klassisk bilde på skade på fremre korsbånd. Det er viktig å få en klinisk undersøkelse for å avgjøre om du trenger operasjon eller kan trene deg til stabilitet.",
+      "patientDiff": "Menisk- eller leddbåndsskade, kneskålen som har gått ut av stilling.",
+      "phase1": "Avlast og bruk is og kompresjon de første dagene. Unngå vridninger og sport til du er undersøkt. Beveg kneet forsiktig innenfor smertegrensen for å holde det mykt.",
+      "exercises": [
+        "Bøy og strekk kneet rolig mens du ligger, innenfor smertegrensen.",
+        "Stram lårmuskelen (quadriceps) 10 sekunder om gangen, flere ganger om dagen."
+      ],
+      "clinicalHypothesis": "Mistenkt ruptur av fremre korsbånd (ACL): vridningstraume, smell, hemartrose, instabilitet.",
+      "icpc2": "L96",
+      "icd10": "S83.5"
+    },
+    "meniscus_injury": {
+      "title": "Mulig meniskskade",
+      "category": "Bruskskive",
+      "severity": "Moderat",
+      "actionLabel": "Bli undersøkt av fysioterapeut",
+      "patientDesc": "Når kneet låser seg eller du ikke får strukket det helt ut, kan en bit av menisken (bruskskiven i kneet) ha kilt seg fast. Det kan skje ved akutte vridninger, men også gradvis hos voksne.",
+      "patientDiff": "Løst bruskfragment, leddbåndsskade, slitasjegikt.",
+      "phase1": "Unngå dype knebøy og vridninger i belastet kne. Gå og beveg deg normalt innenfor smertegrensen. Hvis kneet er låst og ikke løsner, bør du kontakte lege raskt.",
+      "exercises": [
+        "Sykling på lett motstand, hvis det er smertefritt.",
+        "Styrk lår og hofte med rette ben-løft og balanseøvelser."
+      ],
+      "clinicalHypothesis": "Mistenkt meniskskade med mekaniske symptomer (låsning/ekstensjonsdefekt).",
+      "icpc2": "L96",
+      "icd10": "S83.2"
+    },
+    "knee_sprain": {
+      "title": "Forstuing eller overbelastning etter skade",
+      "category": "Akutt skade",
+      "severity": "Moderat",
+      "patientDesc": "Etter en vridning eller et slag er det vanlig at leddbånd, slimposer og bløtvev rundt kneet blir irritert eller overstrukket. De fleste slike skader blir bra med riktig belastning, uten operasjon.",
+      "patientDiff": "Begynnende meniskskade, kneskålsproblematikk eller forslått bein.",
+      "phase1": "De første dagene: Beveg kneet rolig, bruk is ved behov og unngå aktiviteter som gir skarp smerte. Etter hvert kan du øke belastningen gradvis. Hvis kneet ikke blir merkbart bedre i løpet av to uker, bør du få det undersøkt.",
+      "exercises": [
+        "Gå korte turer på flatt underlag så lenge det er smertefritt.",
+        "Stram lårmuskelen og løft strakt ben fra underlaget 10 ganger.",
+        "Hold hevelsen nede med høyleie og kompresjon ved behov."
+      ],
+      "clinicalHypothesis": "Distorsjon/kontusjon i kneet uten tegn til fraktur eller instabilitet i anamnesen.",
+      "icpc2": "L96",
+      "icd10": "S83.6"
+    },
+    "osteoarthritis": {
+      "title": "Slitasjegikt i kneet (artrose)",
+      "category": "Ledd og brusk",
+      "severity": "Lav",
+      "patientDesc": "Stivhet ved oppstart som blir bedre når kneet blir varmt, hos voksne over 50 år, er typisk for slitasjegikt. Det er veldig vanlig og betyr ikke at kneet er «utslitt». Trening er den beste behandlingen.",
+      "patientDiff": "Meniskproblemer, leddbetennelse, kneskålssmerte.",
+      "phase1": "Hold deg i bevegelse. Styrketrening og gange demper smerte og bedrer funksjon. Det er greit at det er litt vondt (opp mot 4 av 10) mens du trener, så lenge det roer seg innen et døgn.",
+      "exercises": [
+        "Reis deg opp fra en stol 10 ganger, 2-3 runder.",
+        "Gå raske turer eller sykle i et tempo der du kan snakke.",
+        "Tåhev og lett knebøy mot en benk for å styrke legg og lår."
+      ],
+      "clinicalHypothesis": "Gonartrose: alder over 50, gradvis debut, morgenstivhet under 30 min, belastningsrelatert smerte.",
+      "icpc2": "L90",
+      "icd10": "M17.9"
+    },
+    "patellar_tendinopathy": {
+      "title": "Seneplager under kneskålen (hoppekne)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Smerte rett under kneskålen, særlig ved hopping, løping og spurting, er typisk for patellar tendinopati. Senen har blitt overbelastet over tid og trenger gradvis, målrettet styrketrening.",
+      "patientDiff": "Kneskålssmerte (PFPS), Hoffas fettpute, Sinding-Larsen.",
+      "phase1": "Reduser aktiviteter som gir mest smerte (hopp og sprint) i noen uker, men ikke hvil helt. Senen trenger belastning for å bli sterk igjen.",
+      "exercises": [
+        "Isometrisk kneekstensjon eller sittende veggstøtte, 5 x 30–45 sekunder.",
+        "Sakte tungt knebøy på skråbrett, hvis det er smertefritt nok.",
+        "Gradvis opptrapping til hopp når styrketreningen går bra."
+      ],
+      "clinicalHypothesis": "Patellar tendinopati (jumper's knee): lokalisert smerte på distale patellapol, belastningsrelatert.",
+      "icpc2": "L96",
+      "icd10": "M76.5"
+    },
+    "itbs": {
+      "title": "Smerte på utsiden av kneet (løperkne)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Smerte på utsiden av kneet som kommer gradvis, ofte under løping og nedoverbakke, skyldes ofte irritasjon i den lange senestrengen på utsiden av låret (iliotibialbåndet).",
+      "patientDiff": "Utvendig meniskskade, leddbåndsirritasjon, hoftesvakhet.",
+      "phase1": "Reduser løpedistansen og unngå nedoverbakke i en periode. Fortsett med aktivitet som ikke gir smerte, som sykling eller svømming, og start styrketrening for hofte.",
+      "exercises": [
+        "Sideliggende benløft for å styrke setemuskelen (gluteus medius).",
+        "Ettbens knebøy mot en vegg, med kontroll på kneet over foten.",
+        "Rolig tøyning av låret på utsiden."
+      ],
+      "clinicalHypothesis": "Iliotibialt båndsyndrom (ITBS) med lateral kneplage ved repetitiv belastning.",
+      "icpc2": "L96",
+      "icd10": "M76.3"
+    },
+    "pfps": {
+      "title": "Smerte foran i kneet (PFPS)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Diffuse smerter rundt eller bak kneskålen, som kommer i trapper, knebøy eller etter lang tids sitting, er svært vanlig. Det kalles patellofemoralt smertesyndrom, og skyldes ofte at belastningen har blitt større enn det kneet er trent for.",
+      "patientDiff": "Hoppekne, meniskirritasjon, begynnende slitasje.",
+      "phase1": "Du trenger ikke hvile helt. Juster aktiviteten slik at smerten holder seg under 4 av 10, og start styrketrening for lår og hofte.",
+      "exercises": [
+        "Sittende kneekstensjon med strikk, 3 x 12.",
+        "Sideliggende benløft og «clam» for hoftemuskulaturen.",
+        "Trappetrening: gå rolig opp og ned i trapp med kontroll."
+      ],
+      "clinicalHypothesis": "Patellofemoralt smertesyndrom (PFPS): fremre kneplager ved belastning i bøyd kne.",
+      "icpc2": "L96",
+      "icd10": "M22.2"
+    },
+    "non_specific": {
+      "title": "Uspesifikke knesmerter",
+      "category": "Muskel og sene",
+      "severity": "Lav",
+      "patientDesc": "Svarene dine peker ikke på noen bestemt skade eller sykdom. Knesmerter uten tydelig årsak skyldes ofte belastning som har økt litt for raskt, eller at kneet har vært lite brukt.",
+      "patientDiff": "Tidlig PFPS, seneplager, slitasje.",
+      "phase1": "Hold deg i aktivitet innenfor smertegrensen, med variert bevegelse som gange og sykling. Øk belastningen gradvis. Hvis plagene vedvarer i mer enn 3–4 uker, bør du få det vurdert.",
+      "exercises": [
+        "Gå en tur hver dag i et komfortabelt tempo.",
+        "Reis deg fra en stol 10 ganger.",
+        "Rette ben-løft liggende, 10 x 2."
+      ],
+      "clinicalHypothesis": "Uspesifikke kneplager uten tegn til strukturell skade eller røde flagg.",
+      "icpc2": "L15",
+      "icd10": "M25.56"
+    }
+  }
+}

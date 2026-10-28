@@ -1,0 +1,305 @@
+{
+  "label": "Fot og ankel",
+  "summary": "Ankelskader, hælsmerter og akillessene",
+  "order": 40,
+  "icon": "foot",
+  "version": "0.1.0",
+  "reviewStatus": "draft-unreviewed",
+  "title": "Fot- og anklesjekk",
+  "description": "Svar på noen spørsmål om foten eller ankelen din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
+  "defaultAnswers": {
+    "onset": null,
+    "location": [],
+    "symptoms": [],
+    "weight_bearing": null,
+    "red_flags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "onset",
+      "title": "Hvordan startet plagene?",
+      "type": "single",
+      "options": [
+        { "id": "acute_twist", "icon": "RotateCcw", "title": "Vrikking eller feiltrinn", "subtitle": "Foten vred seg under deg" },
+        { "id": "acute_impact", "icon": "Zap", "title": "Slag, fall eller noe tungt over foten" },
+        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+      ]
+    },
+    {
+      "id": "location",
+      "title": "Hvor sitter smerten?",
+      "description": "Velg alle steder som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "ankle_outer", "icon": "MapPin", "title": "Utsiden av ankelen" },
+        { "id": "ankle_inner", "icon": "MapPin", "title": "Innsiden av ankelen" },
+        { "id": "achilles", "icon": "MapPin", "title": "Akillessenen (baksiden av ankelen, over hælen)" },
+        { "id": "heel", "icon": "MapPin", "title": "Under hælen eller i fotbuen" },
+        { "id": "forefoot", "icon": "MapPin", "title": "Fremre del av foten eller tærne" },
+        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+      ]
+    },
+    {
+      "id": "symptoms",
+      "title": "Hva stemmer for deg?",
+      "description": "Velg alle som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "pop", "icon": "Zap", "title": "Jeg hørte eller kjente et smell, som et spark mot akillessenen" },
+        { "id": "swelling_bruise", "icon": "Flame", "title": "Rask hevelse og blåmerke etter skaden" },
+        { "id": "first_steps", "icon": "ArrowDown", "title": "Verst de første skrittene om morgenen eller etter hvile" },
+        { "id": "tendon_morning", "icon": "Clock", "title": "Stiv og øm akillessene ved oppstart, bedre når jeg blir varm" },
+        { "id": "tingling", "icon": "Zap", "title": "Isende, brennende eller «småstein under foten»-følelse i fremfoten" },
+        { "id": "big_toe_attack", "icon": "AlertTriangle", "title": "Plutselig, intens smerte, rødhet og hevelse i stortåleddet" },
+        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+      ]
+    },
+    {
+      "id": "weight_bearing",
+      "title": "Klarer du å legge vekt på foten?",
+      "type": "single",
+      "options": [
+        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
+        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
+        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å gå fire skritt" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Smerteintensitet",
+      "type": "slider"
+    },
+    {
+      "id": "red_flags",
+      "title": "Sikkerhetssjekk (Viktig!)",
+      "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
+      "type": "multiple",
+      "options": [
+        { "id": "hot_swollen", "icon": "AlertTriangle", "title": "Foten eller ankelen er varm, rød og hoven, og jeg har feber eller føler meg syk" },
+        { "id": "calf_swelling", "icon": "AlertTriangle", "title": "Jeg har smerte og hevelse i leggen" },
+        { "id": "cold_numb", "icon": "ShieldAlert", "title": "Foten er kald, blek eller nummen" },
+        { "id": "wound", "icon": "AlertTriangle", "title": "Jeg har et sår på foten som ikke gror, og har diabetes eller dårlig sirkulasjon" },
+        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "medical_referral",
+      "when": { "all": [
+        { "field": "red_flags", "op": "notEmpty" },
+        { "field": "red_flags", "op": "notIncludes", "value": "none" }
+      ] }
+    },
+    {
+      "diagnosis": "achilles_rupture",
+      "when": { "all": [
+        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
+        { "field": "symptoms", "op": "includes", "value": "pop" },
+        { "field": "location", "op": "includes", "value": "achilles" }
+      ] }
+    },
+    {
+      "diagnosis": "fracture_suspected",
+      "when": { "all": [
+        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
+        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
+      ] }
+    },
+    {
+      "diagnosis": "ankle_sprain",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute_twist" },
+        { "any": [
+          { "field": "location", "op": "includes", "value": "ankle_outer" },
+          { "field": "location", "op": "includes", "value": "ankle_inner" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "foot_injury",
+      "when": { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] }
+    },
+    {
+      "diagnosis": "gout_suspected",
+      "when": { "all": [
+        { "field": "symptoms", "op": "includes", "value": "big_toe_attack" },
+        { "field": "location", "op": "includes", "value": "forefoot" }
+      ] }
+    },
+    {
+      "diagnosis": "achilles_tendinopathy",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "location", "op": "includes", "value": "achilles" }
+      ] }
+    },
+    {
+      "diagnosis": "plantar_fasciitis",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "any": [
+          { "field": "location", "op": "includes", "value": "heel" },
+          { "field": "symptoms", "op": "includes", "value": "first_steps" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "mortons_neuroma",
+      "when": { "all": [
+        { "field": "location", "op": "includes", "value": "forefoot" },
+        { "field": "symptoms", "op": "includes", "value": "tingling" }
+      ] }
+    }
+  ],
+  "defaultDiagnosis": "non_specific",
+  "diagnoses": {
+    "medical_referral": {
+      "title": "Vurdering hos lege anbefales",
+      "category": "Medisinsk sjekk",
+      "severity": "Høy",
+      "actionLabel": "Kontakt lege i dag",
+      "patientDesc": "Svarene dine tyder på at foten eller beinet trenger en medisinsk vurdering. Varm, rød og hoven fot med feber kan være en infeksjon, smerte og hevelse i leggen kan være en blodpropp, og en kald, blek fot eller et sår som ikke gror kan skyldes dårlig blodsirkulasjon.",
+      "patientDiff": "Infeksjon, blodpropp i legg (DVT), nedsatt blodsirkulasjon, diabetessår, urinsyregikt.",
+      "phase1": "Kontakt fastlegen eller legevakt (116 117) i dag. Ved kald, blek eller nummen fot, eller pustevansker, ring 113. Ikke masser leggen og ikke tren før du er undersøkt.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg: mistanke om infeksjon, dyp venetrombose, kritisk iskemi eller diabetisk fotsår. Hastevurdering.",
+      "icpc2": "A99",
+      "icd10": "R52.9"
+    },
+    "achilles_rupture": {
+      "title": "Mistenkt akillessenerift",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Få det sjekket i dag",
+      "patientDesc": "Et smell eller «spark» bak på ankelen etter en brå belastning er et klassisk tegn på at akillessenen har revet seg. Dette må undersøkes raskt, fordi behandlingen er mest effektiv når den starter tidlig.",
+      "patientDiff": "Forstuing, delvis senerift, leggmuskelskade.",
+      "phase1": "Avlast foten og unngå å gå uten støtte. Kontakt legevakt eller fastlege i dag. Du klarer ofte ikke å stå på tåspissene på den skadde foten.",
+      "exercises": [],
+      "clinicalHypothesis": "Mistenkt akutt akillesseneruptur: smell, plutselig smerte, sviktende plantarfleksjon.",
+      "icpc2": "L92",
+      "icd10": "S86.0"
+    },
+    "fracture_suspected": {
+      "title": "Mulig brudd eller alvorlig skade",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Få foten undersøkt",
+      "patientDesc": "Når du ikke klarer å belaste foten etter en skade, kan det være et brudd eller en leddbåndsskade som bør undersøkes. Røntgenbilde kan være nødvendig.",
+      "patientDiff": "Ankelbrudd, brudd i mellomfot, kraftig leddbåndsskade.",
+      "phase1": "Avlast og høyleie foten, bruk is i 15 minutter av gangen og kontakt legevakt eller fastlege samme dag.",
+      "exercises": [],
+      "clinicalHypothesis": "Mulig fraktur i ankel/fot etter traume: manglende evne til å belaste (Ottawa ankle rules). Bildediagnostikk indisert.",
+      "icpc2": "L16",
+      "icd10": "S82.8"
+    },
+    "ankle_sprain": {
+      "title": "Ankelforstuing",
+      "category": "Akutt skade",
+      "severity": "Lav",
+      "patientDesc": "Når foten vrir seg, kan leddbåndene på utsiden eller innsiden av ankelen bli overstrukket. Det er den vanligste idrettsskaden, og de fleste blir bra med aktiv oppfølging.",
+      "patientDiff": "Brudd, skade på syndesmosen (leddbåndet over ankelen), peroneussene-skade.",
+      "phase1": "De første dagene: høyleie, is og kompresjon ved behov. Belast foten så mye du tåler, og gå gjerne med støtte. Start tidlig med bevegelse for å unngå stivhet.",
+      "exercises": [
+        "Skriv alfabetet med foten, sittende, for å få i gang bevegelsen.",
+        "Tåhev på to bein, så gradvis på ett bein.",
+        "Balansetrening: stå på ett bein, med økt vanskelighetsgrad over tid."
+      ],
+      "clinicalHypothesis": "Lateral/medial ankelligamentskade grad I–II etter inversjons- eller eversjonstraume, uten tegn til fraktur.",
+      "icpc2": "L77",
+      "icd10": "S93.4"
+    },
+    "foot_injury": {
+      "title": "Forslåing eller overbelastning etter skade",
+      "category": "Akutt skade",
+      "severity": "Moderat",
+      "patientDesc": "Slag eller fall mot foten kan gi forslåing av bløtvev eller bein. Det er vanlig å ha smerter og blåmerker i noen uker. Hvis du blir verre eller ikke blir bedre, bør det undersøkes.",
+      "patientDiff": "Tåbrudd, stressfraktur, senerift.",
+      "phase1": "Høyleie og is de første dagene. Belast etter smertegrensen, med fotsåle som gir støtte. Hvis du ikke blir merkbart bedre i løpet av en uke, bør du få foten sjekket.",
+      "exercises": [
+        "Beveg tærne og ankelen forsiktig flere ganger daglig.",
+        "Gå korte turer på flatt underlag så lenge det er smertefritt."
+      ],
+      "clinicalHypothesis": "Kontusjon eller bløtdelsskade i fot/ankel uten tydelig instabilitet eller tegn til fraktur i anamnesen.",
+      "icpc2": "L77",
+      "icd10": "S90.3"
+    },
+    "gout_suspected": {
+      "title": "Mulig urinsyregikt (stortåleddet)",
+      "category": "Leddbetennelse",
+      "severity": "Moderat",
+      "actionLabel": "Kontakt fastlege",
+      "patientDesc": "Plutselig, intens smerte, rødhet og hevelse i stortåleddet, ofte om natten, er et typisk bilde på urinsyregikt. Det bør bekreftes av lege, og kan behandles effektivt.",
+      "patientDiff": "Leddinfeksjon, forstuing, brudd, slitasje i stortåleddet.",
+      "phase1": "Kontakt fastlegen for vurdering. Hold tåen i ro og avlast med kjølepose. Drikk rikelig med vann og unngå alkohol til du har fått time hos lege.",
+      "exercises": [],
+      "clinicalHypothesis": "Akutt monoartritt i MTP-1 med mistanke om urinsyregikt.",
+      "icpc2": "T92",
+      "icd10": "M10.9"
+    },
+    "achilles_tendinopathy": {
+      "title": "Seneplager i akillessenen",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Gradvis smerte og stivhet i akillessenen, særlig ved oppstart, skyldes ofte at senen har fått mer belastning enn den er trent for. Senen blir best av gradvis, tung belastning, ikke av hvile.",
+      "patientDiff": "Slimposebetennelse bak hælen, delvis senerift, Haglunds deformitet.",
+      "phase1": "Reduser løping og hopping til et nivå som gir lite smerte, men fortsett å belaste senen i kontrollerte øvelser.",
+      "exercises": [
+        "Tåhev på to bein, 3 x 15, med rolig tempo.",
+        "Gradvis til ettbens tåhev og tåhev fra en trappetrinn.",
+        "Gå raske turer uten å øke smerten over 4 av 10."
+      ],
+      "clinicalHypothesis": "Akillesseneforandringer (midportion tendinopati): gradvis debut, belastningsrelatert smerte, morgenstivhet.",
+      "icpc2": "L87",
+      "icd10": "M76.6"
+    },
+    "plantar_fasciitis": {
+      "title": "Smerter under hælen (plantar fasciitt)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Smerter under hælen eller i fotbuen, verst de første skrittene om morgenen, skyldes ofte irritasjon i senepaten under foten. Det er vanlig og går som regel over i løpet av noen måneder.",
+      "patientDiff": "Hælspore, stressfraktur i hælen, nerveinnklemming.",
+      "phase1": "Bruk gode sko med støtte og demping, og unngå å gå barbeint på hardt underlag. Behold normal aktivitet innenfor smertegrensen, og start tøyning og styrketrening.",
+      "exercises": [
+        "Tøy leggen mot en vegg, 3 x 30 sekunder.",
+        "Tåhev med en rullet håndkle under tærne, 3 x 10.",
+        "Rull fotbuen over en tennisball i 2 minutter."
+      ],
+      "clinicalHypothesis": "Plantar fasciopati: hælsmerte med startsmerte (first-step pain) og belastningsrelatert forverring.",
+      "icpc2": "L87",
+      "icd10": "M72.2"
+    },
+    "mortons_neuroma": {
+      "title": "Nerveirritasjon i fremfoten (Mortons nevrom)",
+      "category": "Nerve",
+      "severity": "Lav",
+      "patientDesc": "Brennende, isende eller «småstein under foten»-følelse i fremfoten, ofte mellom tærne, kan skyldes at en nerve er klemt. Det er vanlig ved trange sko og høy belastning på fremfoten.",
+      "patientDiff": "Leddirritasjon i tåleddene, stressfraktur, nerveskade i ryggen.",
+      "phase1": "Bruk romslige sko med bred tåboks og demping. Unngå høye hæler og sko som klemmer. Avlast fremfoten når det er mulig.",
+      "exercises": [
+        "Spre og bøy tærne forsiktig flere ganger daglig.",
+        "Rull fotsålen over en ball i 2 minutter."
+      ],
+      "clinicalHypothesis": "Interdigital nevralgi/Mortons nevrom: brennende og isende smerte i fremfot, belastningsrelatert.",
+      "icpc2": "N99",
+      "icd10": "G57.6"
+    },
+    "non_specific": {
+      "title": "Uspesifikke fot- eller ankelsmerter",
+      "category": "Muskel og sene",
+      "severity": "Lav",
+      "patientDesc": "Svarene dine peker ikke på noen bestemt skade eller sykdom. Plager i foten skyldes ofte økt belastning, nye sko eller at foten har vært lite brukt.",
+      "patientDiff": "Tidlig seneplager, leddirritasjon, nerveirritasjon.",
+      "phase1": "Hold deg i aktivitet innenfor smertegrensen og øk belastningen gradvis. Vurder om skoene dine passer. Hvis plagene varer i mer enn 3–4 uker, bør du få dem vurdert.",
+      "exercises": [
+        "Gå en tur hver dag i et komfortabelt tempo.",
+        "Tåhev 3 x 15 for å styrke legg og fot.",
+        "Balansetrening på ett bein, 3 x 30 sekunder."
+      ],
+      "clinicalHypothesis": "Uspesifikke fot-/ankelplager uten tegn til strukturell skade eller røde flagg.",
+      "icpc2": "L17",
+      "icd10": "M79.67"
+    }
+  }
+}

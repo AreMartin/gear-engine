@@ -1,0 +1,207 @@
+/**
+ * Gear Engine Triage: scoped styles (no CDN dependencies).
+ * All rules are namespaced under .gear-engine-triage.
+ */
+.gear-engine-triage {
+	--get-navy: #1a2a3a;
+	--get-green: #10b981;
+	--get-green-dark: #059669;
+	--get-border: #e2e8f0;
+	--get-bg: #f8fafc;
+	--get-text: #475569;
+	--get-muted: #64748b;
+	box-sizing: border-box;
+	max-width: 760px;
+	margin: 0 auto;
+	padding: 0 12px 40px;
+	color: var(--get-text);
+	font-family: inherit;
+	line-height: 1.5;
+}
+.gear-engine-triage *,
+.gear-engine-triage *::before,
+.gear-engine-triage *::after { box-sizing: border-box; }
+.gear-engine-triage button { font-family: inherit; cursor: pointer; }
+.gear-engine-triage button:disabled { opacity: 0.45; cursor: not-allowed; }
+.gear-engine-triage :focus-visible { outline: 3px solid var(--get-green); outline-offset: 2px; }
+.gear-engine-triage .get-stage:focus { outline: none; }
+.gear-engine-triage svg { flex-shrink: 0; }
+
+/* Animations */
+.gear-engine-triage .get-anim-forward { animation: get-in-right 0.35s ease-out both; }
+.gear-engine-triage .get-anim-backward { animation: get-in-left 0.35s ease-out both; }
+@keyframes get-in-right { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes get-in-left { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+@keyframes get-pulse { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) {
+	.gear-engine-triage * { animation: none !important; transition: none !important; }
+}
+
+/* Typography */
+.gear-engine-triage .get-title { margin: 0 0 12px; color: var(--get-navy); font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 800; line-height: 1.15; }
+.gear-engine-triage .get-question { margin: 8px 0 12px; color: var(--get-navy); font-size: clamp(1.5rem, 4.5vw, 2.1rem); font-weight: 800; line-height: 1.2; }
+.gear-engine-triage .get-lead { margin: 0 0 20px; color: var(--get-muted); font-size: 1.05rem; }
+.gear-engine-triage .get-muted { color: var(--get-muted); font-size: 0.9rem; }
+.gear-engine-triage h3 { margin: 0 0 10px; color: var(--get-navy); font-size: 1.25rem; font-weight: 700; }
+.gear-engine-triage .get-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; }
+.gear-engine-triage .get-hint { display: inline-block; margin-bottom: 16px; padding: 4px 12px; border-radius: 8px; background: #ecfdf5; color: var(--get-green-dark); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Cards */
+.gear-engine-triage .get-card { margin-bottom: 20px; padding: 24px; border: 1px solid #f1f5f9; border-radius: 24px; background: #fff; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04); }
+.gear-engine-triage .get-card p { margin: 0; }
+.gear-engine-triage .get-card--center { text-align: center; padding: 40px 24px; }
+.gear-engine-triage .get-card--cta { border: 2px solid rgba(16, 185, 129, 0.25); text-align: center; }
+.gear-engine-triage .get-card--cta p { margin-bottom: 20px; }
+.gear-engine-triage .get-hero-icon { display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: #ecfdf5; color: var(--get-green); }
+.gear-engine-triage .get-hero-icon--solid { background: var(--get-green); color: #fff; }
+.gear-engine-triage .get-pulse { animation: get-pulse 1.2s ease-in-out infinite; }
+.gear-engine-triage .get-dim { opacity: 0.4; filter: blur(2px); }
+
+/* Buttons */
+.gear-engine-triage .get-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 28px; border: 1px solid transparent; border-radius: 999px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: transform 0.15s, background 0.15s; }
+.gear-engine-triage .get-btn:active:not(:disabled) { transform: scale(0.98); }
+.gear-engine-triage .get-btn--block { display: flex; width: 100%; }
+.gear-engine-triage .get-btn--navy { background: var(--get-navy); color: #fff; }
+.gear-engine-triage .get-btn--navy:hover:not(:disabled) { background: #0f1b27; }
+.gear-engine-triage .get-btn--primary { background: var(--get-green); color: #fff; }
+.gear-engine-triage .get-btn--primary:hover:not(:disabled) { background: var(--get-green-dark); color: #fff; }
+.gear-engine-triage .get-btn--ghost { flex: 1; background: #fff; border-color: var(--get-border); color: var(--get-navy); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.gear-engine-triage .get-btn--ghost:hover { background: var(--get-bg); }
+.gear-engine-triage .get-link { display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; margin-left: -8px; border: 0; border-radius: 8px; background: none; color: var(--get-muted); font-size: 0.9rem; font-weight: 600; }
+.gear-engine-triage .get-link:hover { color: var(--get-navy); background: rgba(0, 0, 0, 0.05); }
+
+/* Progress */
+.gear-engine-triage .get-progress { position: sticky; top: 0; z-index: 5; padding: 12px 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(6px); }
+.gear-engine-triage .get-progress__row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.gear-engine-triage .get-progress__count { color: var(--get-muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.gear-engine-triage .get-progress__bar { height: 6px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
+.gear-engine-triage .get-progress__fill { height: 100%; border-radius: 999px; background: var(--get-green); transition: width 0.4s ease-out; }
+
+/* Options */
+.gear-engine-triage .get-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.gear-engine-triage .get-option { display: flex; align-items: center; gap: 16px; width: 100%; padding: 18px; border: 2px solid #f1f5f9; border-radius: 20px; background: #fff; color: var(--get-text); text-align: left; transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+.gear-engine-triage .get-option:hover { border-color: var(--get-border); transform: translateY(-1px); }
+.gear-engine-triage .get-option.is-active { border-color: var(--get-green); background: rgba(16, 185, 129, 0.06); }
+.gear-engine-triage .get-option__icon { color: #94a3b8; }
+.gear-engine-triage .get-option.is-active .get-option__icon { color: var(--get-green); }
+.gear-engine-triage .get-option__text { flex: 1; }
+.gear-engine-triage .get-option__title { display: block; color: var(--get-navy); font-size: 1.05rem; font-weight: 700; line-height: 1.25; }
+.gear-engine-triage .get-option__sub { display: block; margin-top: 4px; color: var(--get-muted); font-size: 0.85rem; }
+.gear-engine-triage .get-option__mark { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 2px solid var(--get-border); color: #fff; }
+.gear-engine-triage .get-option__mark--box { border-radius: 6px; }
+.gear-engine-triage .get-option__mark--radio { border-radius: 50%; }
+.gear-engine-triage .get-option.is-active .get-option__mark { border-color: var(--get-green); background: var(--get-green); }
+.gear-engine-triage .get-help { display: flex; gap: 12px; margin-bottom: 20px; padding: 16px; border-radius: 16px; background: #eff6ff; color: var(--get-navy); }
+.gear-engine-triage .get-help p { margin: 0; }
+
+/* Slider */
+.gear-engine-triage input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; margin: 12px 0 28px; border-radius: 4px; background: linear-gradient(to right, var(--get-green) var(--get-fill, 50%), #e2e8f0 var(--get-fill, 50%)); }
+.gear-engine-triage input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 34px; height: 34px; border: 3px solid var(--get-navy); border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer; }
+.gear-engine-triage input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; border: 3px solid var(--get-navy); border-radius: 50%; background: #fff; cursor: pointer; }
+.gear-engine-triage .get-slider__scale { display: flex; align-items: center; justify-content: space-between; color: #94a3b8; font-size: 1.25rem; font-weight: 700; }
+.gear-engine-triage .get-slider__value { display: flex; align-items: center; justify-content: center; width: 84px; height: 84px; border: 4px solid #f1f5f9; border-radius: 50%; color: var(--get-navy); font-size: 2.5rem; font-weight: 800; }
+
+/* Resume banner */
+.gear-engine-triage .get-resume { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 20px; padding: 20px; border: 1px solid #bbf7d0; border-radius: 20px; background: #f0fdf4; color: var(--get-green); }
+.gear-engine-triage .get-resume div { flex: 1; min-width: 160px; }
+.gear-engine-triage .get-resume strong { color: var(--get-navy); }
+.gear-engine-triage .get-resume p { margin: 0; color: var(--get-text); }
+
+/* Disclaimer sheet */
+.gear-engine-triage .get-sheet { position: fixed; right: 0; bottom: 0; left: 0; z-index: 50; max-width: 680px; margin: 0 auto; padding: 28px 24px; border-radius: 28px 28px 0 0; background: #fff; box-shadow: 0 -10px 50px rgba(0, 0, 0, 0.2); animation: get-sheet 0.35s ease-out both; }
+@keyframes get-sheet { from { transform: translateY(100%); } to { transform: none; } }
+.gear-engine-triage .get-sheet__head { display: flex; gap: 16px; margin-bottom: 20px; color: #ca8a04; }
+.gear-engine-triage .get-sheet__head h3 { font-size: 1.5rem; }
+.gear-engine-triage .get-sheet__head p { margin: 0; color: var(--get-text); }
+.gear-engine-triage .get-check { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding: 14px; border-radius: 16px; background: var(--get-bg); color: var(--get-navy); font-weight: 700; cursor: pointer; }
+.gear-engine-triage .get-check input { width: 22px; height: 22px; accent-color: var(--get-navy); }
+
+/* Result */
+.gear-engine-triage .get-result__head { margin-bottom: 28px; text-align: center; }
+.gear-engine-triage .get-badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 6px 16px; border-radius: 999px; background: var(--get-navy); color: #fff; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.gear-engine-triage .get-badge svg { color: var(--get-green); }
+.gear-engine-triage .get-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.gear-engine-triage .get-tag { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid #f1f5f9; border-radius: 999px; background: #fff; font-size: 0.85rem; font-weight: 700; }
+.gear-engine-triage .get-tag--severity i { width: 10px; height: 10px; border-radius: 50%; background: var(--get-green); }
+.gear-engine-triage .get-tag--severity.is-moderate { background: #fefce8; border-color: #fef08a; color: #854d0e; }
+.gear-engine-triage .get-tag--severity.is-moderate i { background: #eab308; }
+.gear-engine-triage .get-tag--severity.is-high { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.gear-engine-triage .get-tag--severity.is-high i { background: #ef4444; }
+.gear-engine-triage .get-tag--severity.is-low { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
+.gear-engine-triage .get-plan { margin-bottom: 20px; padding: 28px 24px; border-radius: 24px; background: var(--get-navy); color: #cbd5e1; }
+.gear-engine-triage .get-plan h3 { margin-bottom: 20px; color: #fff; font-size: 1.5rem; }
+.gear-engine-triage .get-plan__step + .get-plan__step { margin-top: 24px; }
+.gear-engine-triage .get-plan__head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.gear-engine-triage .get-plan__head h4 { margin: 0; color: #fff; font-size: 1.05rem; }
+.gear-engine-triage .get-plan__num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--get-green); color: #fff; font-weight: 800; }
+.gear-engine-triage .get-plan p { margin: 0; }
+.gear-engine-triage .get-plan ul { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.gear-engine-triage .get-plan li { display: flex; gap: 12px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: #f1f5f9; }
+.gear-engine-triage .get-plan li svg { color: var(--get-green); margin-top: 3px; }
+
+.gear-engine-triage .get-note-toggle { display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px; border: 1px solid var(--get-border); border-radius: 20px; background: #fff; color: var(--get-navy); font-size: 1rem; font-weight: 700; text-align: left; }
+.gear-engine-triage .get-note-toggle > span:first-of-type { flex: 1; }
+.gear-engine-triage .get-note-toggle svg { color: #94a3b8; }
+.gear-engine-triage .get-note-toggle .get-chevron { transition: transform 0.3s; }
+.gear-engine-triage .get-note-toggle[aria-expanded="true"] .get-chevron { transform: rotate(180deg); }
+.gear-engine-triage .get-pill { padding: 3px 12px; border-radius: 999px; background: var(--get-navy); color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Clinical note */
+.gear-engine-triage .get-note { display: none; margin-top: 16px; }
+.gear-engine-triage .get-note.is-open { display: block; }
+.gear-engine-triage .get-note__inner { padding: 28px 24px; border: 1px solid var(--get-border); border-radius: 24px; background: #fafafa; color: var(--get-navy); }
+.gear-engine-triage .get-note__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid var(--get-navy); }
+.gear-engine-triage .get-note__head h4 { margin: 0 0 6px; font-size: 1.4rem; text-transform: uppercase; }
+.gear-engine-triage .get-note__date { display: flex; flex-direction: column; }
+.gear-engine-triage .get-note__date span { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.gear-engine-triage .get-note h5 { margin: 24px 0 10px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.gear-engine-triage .get-table { width: 100%; border-collapse: collapse; border: 1px solid var(--get-border); border-radius: 12px; background: #fff; font-size: 0.9rem; }
+.gear-engine-triage .get-table th,
+.gear-engine-triage .get-table td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; text-align: left; vertical-align: top; }
+.gear-engine-triage .get-table th { width: 40%; color: var(--get-muted); font-weight: 500; }
+.gear-engine-triage .get-table td { color: var(--get-navy); font-weight: 700; }
+.gear-engine-triage .get-flag { display: flex; align-items: center; gap: 10px; margin: 0; padding: 14px; border: 1px solid; border-radius: 12px; font-weight: 700; }
+.gear-engine-triage .get-flag.is-ok { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+.gear-engine-triage .get-flag.is-alert { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.gear-engine-triage .get-hypothesis { padding: 16px; border: 1px solid var(--get-border); border-radius: 12px; background: #fff; }
+.gear-engine-triage .get-hypothesis p { margin: 0 0 14px; font-weight: 700; }
+.gear-engine-triage .get-codes { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 14px; border-top: 1px solid #f1f5f9; }
+.gear-engine-triage .get-codes span { padding: 6px 12px; border: 1px solid var(--get-border); border-radius: 6px; background: var(--get-bg); color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; }
+.gear-engine-triage .get-codes b { margin-left: 8px; color: var(--get-navy); font-size: 0.85rem; }
+
+.gear-engine-triage .get-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.gear-engine-triage .get-error { padding: 16px; border-radius: 12px; background: #fef2f2; color: #991b1b; }
+
+/* Print: only the clinical note is printed, always expanded. */
+@media print {
+	body * { visibility: hidden !important; }
+	.gear-engine-triage .get-note,
+	.gear-engine-triage .get-note * { visibility: visible !important; }
+	.gear-engine-triage .get-note { display: block !important; position: absolute; top: 0; left: 0; width: 100%; margin: 0; }
+	.gear-engine-triage .get-note__inner { border: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+	.gear-engine-triage .get-noprint { display: none !important; }
+}
+
+@media (min-width: 640px) {
+	.gear-engine-triage .get-card { padding: 36px; }
+	.gear-engine-triage .get-card--center { padding: 56px 48px; }
+	.gear-engine-triage .get-option { padding: 22px; }
+	.gear-engine-triage .get-actions .get-btn--ghost { flex: 1 1 0; }
+}
+
+/* Back link and region picker */
+.gear-engine-triage .gear-engine-triage__back { display: inline-block; margin: 8px 0; color: var(--get-muted); font-size: 0.9rem; font-weight: 600; text-decoration: none; }
+.gear-engine-triage .gear-engine-triage__back:hover { color: var(--get-navy); }
+
+.gear-engine-triage-picker { max-width: 960px; margin: 0 auto; }
+.gear-engine-triage-picker__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.gear-engine-triage-picker__card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 24px; border: 1px solid #f1f5f9; border-radius: 16px; background: #fff; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04); color: #1a2a3a; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; }
+.gear-engine-triage-picker__card:hover,
+.gear-engine-triage-picker__card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08); }
+.gear-engine-triage-picker__card:focus-visible { outline: 3px solid #10b981; outline-offset: 2px; }
+.gear-engine-triage-picker__label { font-size: 1.15rem; font-weight: 700; }
+.gear-engine-triage-picker__summary { color: #64748b; font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .gear-engine-triage-picker__card { transition: none; } }
+.gear-engine-triage-picker__icon { color: #10b981; margin-bottom: 6px; }
+.gear-engine-triage-picker__card { align-items: flex-start; }

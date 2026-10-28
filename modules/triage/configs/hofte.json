@@ -1,0 +1,293 @@
+{
+  "label": "Hofte",
+  "summary": "Smerter i lyske, utsiden av hoften og sete",
+  "order": 50,
+  "icon": "hip",
+  "version": "0.1.0",
+  "reviewStatus": "draft-unreviewed",
+  "title": "Hoftesjekk",
+  "description": "Svar på noen spørsmål om hoften din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
+  "defaultAnswers": {
+    "age": null,
+    "onset": null,
+    "location": [],
+    "symptoms": [],
+    "weight_bearing": null,
+    "red_flags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "age",
+      "title": "Hvor gammel er du?",
+      "type": "single",
+      "options": [
+        { "id": "under40", "icon": "User", "title": "Under 40 år" },
+        { "id": "40-60", "icon": "Activity", "title": "40 til 60 år" },
+        { "id": "over60", "icon": "Clock", "title": "Over 60 år" }
+      ]
+    },
+    {
+      "id": "onset",
+      "title": "Hvordan startet plagene?",
+      "type": "single",
+      "options": [
+        { "id": "acute_fall", "icon": "ArrowDown", "title": "Fall eller slag mot hoften" },
+        { "id": "acute_sport", "icon": "Zap", "title": "Brå bevegelse eller strekk", "subtitle": "For eksempel spark, sprint eller spagat" },
+        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+      ]
+    },
+    {
+      "id": "location",
+      "title": "Hvor kjenner du smerten?",
+      "description": "Velg alle steder som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "groin", "icon": "MapPin", "title": "I lysken eller foran i hoften" },
+        { "id": "lateral", "icon": "MapPin", "title": "På utsiden av hoften (det benete punktet)" },
+        { "id": "buttock", "icon": "MapPin", "title": "Bak i setet eller bekkenet" },
+        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+      ]
+    },
+    {
+      "id": "symptoms",
+      "title": "Hva stemmer for deg?",
+      "description": "Velg alle som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "lateral_lying", "icon": "Clock", "title": "Det gjør vondt å ligge på den siden om natten" },
+        { "id": "stairs_walk", "icon": "ArrowUp", "title": "Verst ved gange, trapper eller når jeg står på ett bein" },
+        { "id": "stiff", "icon": "Lock", "title": "Stiv hofte, vanskelig å ta på sokker og sko" },
+        { "id": "clicking", "icon": "Zap", "title": "Hakking, klikking eller låsning i lysken ved dyp bøy" },
+        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+      ]
+    },
+    {
+      "id": "weight_bearing",
+      "title": "Klarer du å legge vekt på beinet?",
+      "type": "single",
+      "options": [
+        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
+        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
+        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å belaste beinet" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Smerteintensitet",
+      "type": "slider"
+    },
+    {
+      "id": "red_flags",
+      "title": "Sikkerhetssjekk (Viktig!)",
+      "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
+      "type": "multiple",
+      "options": [
+        { "id": "fever", "icon": "AlertTriangle", "title": "Feber, frysninger eller en generell sykdomsfølelse" },
+        { "id": "cancer", "icon": "AlertTriangle", "title": "Tidligere kreft, uforklarlig vekttap, eller konstante smerter som også plager meg i hvile og om natten" },
+        { "id": "saddle", "icon": "ShieldAlert", "title": "Nummenhet i skrittet eller tap av kontroll over blære eller tarm" },
+        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "medical_referral",
+      "when": { "all": [
+        { "field": "red_flags", "op": "notEmpty" },
+        { "field": "red_flags", "op": "notIncludes", "value": "none" }
+      ] }
+    },
+    {
+      "diagnosis": "fracture_suspected",
+      "when": { "all": [
+        { "field": "onset", "op": "in", "value": ["acute_fall", "acute_sport"] },
+        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
+      ] }
+    },
+    {
+      "diagnosis": "muscle_strain",
+      "when": { "field": "onset", "op": "eq", "value": "acute_sport" }
+    },
+    {
+      "diagnosis": "hip_contusion",
+      "when": { "field": "onset", "op": "eq", "value": "acute_fall" }
+    },
+    {
+      "diagnosis": "hip_osteoarthritis",
+      "when": { "all": [
+        { "field": "age", "op": "in", "value": ["40-60", "over60"] },
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "location", "op": "includes", "value": "groin" },
+        { "field": "symptoms", "op": "includes", "value": "stiff" }
+      ] }
+    },
+    {
+      "diagnosis": "fai",
+      "when": { "all": [
+        { "field": "age", "op": "in", "value": ["under40", "40-60"] },
+        { "field": "location", "op": "includes", "value": "groin" },
+        { "field": "symptoms", "op": "includes", "value": "clicking" }
+      ] }
+    },
+    {
+      "diagnosis": "gtps",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "location", "op": "includes", "value": "lateral" },
+        { "any": [
+          { "field": "symptoms", "op": "includes", "value": "lateral_lying" },
+          { "field": "symptoms", "op": "includes", "value": "stairs_walk" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "buttock_referred",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "location", "op": "includes", "value": "buttock" }
+      ] }
+    }
+  ],
+  "defaultDiagnosis": "non_specific",
+  "diagnoses": {
+    "medical_referral": {
+      "title": "Vurdering hos lege anbefales",
+      "category": "Medisinsk sjekk",
+      "severity": "Høy",
+      "actionLabel": "Kontakt lege",
+      "patientDesc": "Svarene dine viser symptomer som bør undersøkes av lege, for eksempel feber, vedvarende hvilesmerter eller nummenhet i skrittet. Selv om hofteplager oftest er ufarlige, må vi være sikre på at det ikke ligger noe annet bak.",
+      "patientDiff": "Infeksjon, leddbetennelse, sykdom i ryggen, sjelden: svulst.",
+      "phase1": "Kontakt fastlegen eller legevakt (116 117) i dag. Ved nummenhet i skrittet eller tap av blære-/tarmkontroll må du kontakte legevakt umiddelbart. Unngå tung trening til du er undersøkt.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg avdekket: differensialdiagnostikk mot infeksjon, malignitet eller cauda equina påkrevet.",
+      "icpc2": "A99",
+      "icd10": "R52.9"
+    },
+    "fracture_suspected": {
+      "title": "Mulig brudd eller alvorlig skade",
+      "category": "Akutt skade",
+      "severity": "Kritisk",
+      "actionLabel": "Ring 113 / legevakt",
+      "patientDesc": "Når du ikke klarer å belaste beinet etter et fall eller en skade, kan det være et brudd i hoften eller bekkenet. Dette må vurderes raskt, spesielt hvis du er over 60 år.",
+      "patientDiff": "Lårhalsbrudd, bekkenbrudd, kraftig forslåing.",
+      "phase1": "Ikke prøv å belaste beinet. Ring 113 hvis du ligger på gulvet eller har sterke smerter. Ellers kontakt legevakt umiddelbart.",
+      "exercises": [],
+      "clinicalHypothesis": "Mulig hoftenært brudd (lårhals/bekken) etter traume: manglende evne til å belaste. Hastevurdering.",
+      "icpc2": "L75",
+      "icd10": "S72.0"
+    },
+    "muscle_strain": {
+      "title": "Muskelstrekk rundt hoften eller i lysken",
+      "category": "Akutt skade",
+      "severity": "Lav",
+      "patientDesc": "Etter en brå bevegelse kan en muskel rundt hoften eller i lysken ha blitt overstrukket. Det gir smerte ved aktivering og tøyning, og blir som regel bra i løpet av noen uker med gradvis belastning.",
+      "patientDiff": "Senefestebetennelse, stressreaksjon i bekkenet, lyskebrokk.",
+      "phase1": "De første dagene: unngå aktiviteter som gir skarp smerte, men gå normalt. Når det er mulig, start rolig bevegelse og isometrisk spenning. Øk belastningen gradvis.",
+      "exercises": [
+        "Isometrisk spenning: klem en ball mellom knærne, 5 x 20 sekunder.",
+        "Rolig tøyning innenfor smertegrensen, 3 x 20 sekunder.",
+        "Gå korte turer, og øk gradvis distansen."
+      ],
+      "clinicalHypothesis": "Akutt muskelstrekk (adduktorer, hoftebøyer eller hamstrings) uten tegn til avulsjon eller fraktur i anamnesen.",
+      "icpc2": "L81",
+      "icd10": "S76.1"
+    },
+    "hip_contusion": {
+      "title": "Forslåing etter fall",
+      "category": "Akutt skade",
+      "severity": "Moderat",
+      "patientDesc": "Et fall mot hoften gir ofte forslåing av muskler og bløtvev, med blåmerker og ømhet i flere uker. Siden du klarer å belaste beinet, er et brudd mindre sannsynlig, men ikke utelukket.",
+      "patientDiff": "Lårhalsbrudd uten forskyvning, slimposebetennelse, bekkenskade.",
+      "phase1": "Hold deg i bevegelse innenfor smertegrensen, og bruk is ved behov. Hvis du blir verre eller ikke klarer å belaste beinet, må du kontakte lege samme dag.",
+      "exercises": [
+        "Gå korte turer flere ganger daglig.",
+        "Rolig bevegelse av hoften liggende på ryggen: bøy og strekk beinet.",
+        "Unngå å ligge på den ømme siden så lenge det gjør vondt."
+      ],
+      "clinicalHypothesis": "Kontusjon av hofte/trochanterregion etter fall uten manglende belastningsevne.",
+      "icpc2": "L81",
+      "icd10": "S70.0"
+    },
+    "hip_osteoarthritis": {
+      "title": "Slitasjegikt i hoften (artrose)",
+      "category": "Ledd og brusk",
+      "severity": "Lav",
+      "patientDesc": "Smerte i lysken og stivhet i hoften hos voksne over 40 år, som har kommet gradvis, er et typisk bilde for slitasjegikt. Det er vanlig og betyr ikke at hoften er «utslitt». Trening og gange er den viktigste behandlingen.",
+      "patientDiff": "Smerter fra ryggen, femoroacetabulært impingement, senesmerte utenpå hoften.",
+      "phase1": "Hold deg i bevegelse. Styrketrening og gange demper smerte og bedrer funksjon. Det er greit at det er litt vondt (opp mot 4 av 10) så lenge det roer seg innen et døgn.",
+      "exercises": [
+        "Reis deg opp fra en stol 10 ganger, 2–3 runder.",
+        "Sidelengs benløft for å styrke hofta.",
+        "Gå raske turer eller sykle i et tempo der du kan snakke."
+      ],
+      "clinicalHypothesis": "Koksartrose: alder over 40, gradvis debut, lyskesmerte og nedsatt bevegelighet/stivhet.",
+      "icpc2": "L89",
+      "icd10": "M16.9"
+    },
+    "fai": {
+      "title": "Mulig innklemming i hofteleddet (FAI)",
+      "category": "Ledd",
+      "severity": "Moderat",
+      "patientDesc": "Smerte i lysken med hakking eller låsning ved dyp bøy hos aktive personer kan tyde på at hoften har litt for lite plass ved enkelte bevegelser (femoroacetabulært impingement), noen ganger med skade på bruskleppen.",
+      "patientDiff": "Muskelstrekk, lyskebrokk, senefestebetennelse.",
+      "phase1": "Unngå dype bøy og stillinger som utløser smerte, og hold deg i bevegelse. Fysioterapeut kan undersøke og veilede treningen.",
+      "exercises": [
+        "Styrk setemuskulatur: bekkenløft liggende, 3 x 12.",
+        "Kjernemuskulatur: planke, 3 x 20 sekunder.",
+        "Kontrollert bevegelse av hoften innenfor smertefritt område."
+      ],
+      "clinicalHypothesis": "Mistenkt femoroacetabulært impingement (FAI) / labrumaffeksjon: lyskesmerte, mekaniske symptomer ved fleksjon.",
+      "icpc2": "L13",
+      "icd10": "M24.85"
+    },
+    "gtps": {
+      "title": "Smerte på utsiden av hoften (GTPS)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Smerte over det benete punktet på utsiden av hoften, ofte vondt å ligge på og vondt ved gange, skyldes oftest irritasjon i senene til setemusklene (gluteal tendinopati). Det er svært vanlig, spesielt hos kvinner over 40.",
+      "patientDiff": "Slimposebetennelse, utstrålende smerte fra ryggen, artrose i hofta.",
+      "phase1": "Unngå å ligge på den vonde siden og å stå med vekten på ett bein. Bruk en pute mellom knærne når du sover. Start gradvis styrketrening av hoftemusklene.",
+      "exercises": [
+        "Isometrisk hoftespark ut til siden, 5 x 30 sekunder.",
+        "Sidelengs benløft, 3 x 10.",
+        "Gradvis styrke setemuskulaturen med knebøy mot en vegg."
+      ],
+      "clinicalHypothesis": "Større trokanter-smertesyndrom (GTPS) / gluteal tendinopati: lateral hoftesmerte, ømhet ved palpasjon, vondt å ligge på.",
+      "icpc2": "L13",
+      "icd10": "M70.6"
+    },
+    "buttock_referred": {
+      "title": "Smerter bak i sete eller bekken",
+      "category": "Bekken og rygg",
+      "severity": "Lav",
+      "patientDesc": "Smerte bak i setet og bekkenet skyldes ofte irritasjon i bekkenleddet, setemuskulaturen eller utstråling fra korsryggen, og sjeldnere selve hofteleddet.",
+      "patientDiff": "Isjias, piriformis-syndrom, lumbal utstråling, SI-leddsirritasjon.",
+      "phase1": "Hold deg i bevegelse, og varier stillinger i løpet av dagen. Unngå å sitte lenge i samme stilling.",
+      "exercises": [
+        "Bekkenløft liggende, 3 x 12.",
+        "Rolig tøyning av setemuskelen liggende, 3 x 30 sekunder.",
+        "Gå en tur hver dag i et komfortabelt tempo."
+      ],
+      "clinicalHypothesis": "Gluteal/bekkensmerter uten røde flagg: referert smerte fra lumbalcolumna eller SI-ledd, eller myofascial smerte.",
+      "icpc2": "L03",
+      "icd10": "M53.3"
+    },
+    "non_specific": {
+      "title": "Uspesifikke hoftesmerter",
+      "category": "Muskel og sene",
+      "severity": "Lav",
+      "patientDesc": "Svarene dine peker ikke på noen bestemt skade eller sykdom. Hofteplager uten tydelig årsak skyldes ofte økt belastning, lite bevegelse eller stramme muskler.",
+      "patientDiff": "Tidlig slitasje, seneplager, utstråling fra ryggen.",
+      "phase1": "Hold deg i aktivitet innenfor smertegrensen. Hvis plagene varer i mer enn 3–4 uker, bør du få dem vurdert.",
+      "exercises": [
+        "Gå en tur hver dag i et komfortabelt tempo.",
+        "Reis deg fra en stol 10 ganger.",
+        "Sidelengs benløft, 3 x 10."
+      ],
+      "clinicalHypothesis": "Uspesifikke hofteplager uten tegn til strukturell skade eller røde flagg.",
+      "icpc2": "L13",
+      "icd10": "M25.55"
+    }
+  }
+}

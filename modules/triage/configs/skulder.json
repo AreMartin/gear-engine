@@ -1,0 +1,357 @@
+{
+  "label": "Skulder",
+  "summary": "Skuldersmerter, stivhet og ustabilitet",
+  "order": 20,
+  "icon": "shoulder",
+  "version": "1.0.0",
+  "title": "Skuldersjekk",
+  "description": "Svar på noen raske spørsmål under for å få et skreddersydd opplegg for din skulder, basert på anerkjent forskning.",
+  "defaultAnswers": {
+    "age": null,
+    "onset": null,
+    "trauma_details": [],
+    "duration": null,
+    "location": [],
+    "pain_pattern": [],
+    "functional_loss": [],
+    "red_flags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "age",
+      "title": "Hvilken aldersgruppe tilhører du?",
+      "description": "Skuldre forandrer seg naturlig gjennom livet. Alderen din gir oss viktige hint om hva som er den mest sannsynlige årsaken til plagene dine.",
+      "type": "single",
+      "options": [
+        { "id": "under30", "icon": "User", "title": "Under 30 år", "subtitle": "Høyere sjanse for idrettsskader og ustabilitet" },
+        { "id": "30-55", "icon": "Activity", "title": "30 til 55 år", "subtitle": "Høyere sjanse for seneirritasjon og stivhet" },
+        { "id": "over55", "icon": "Clock", "title": "Over 55 år", "subtitle": "Høyere sjanse for naturlig slitasje i sener og ledd" }
+      ]
+    },
+    {
+      "id": "onset",
+      "title": "Hvordan og når startet plagene?",
+      "description": "Startet smerten brått ved et uhell, eller har den kommet snikende over tid? Dette er viktig for å forstå hva som har skjedd inne i skulderen.",
+      "type": "single",
+      "helpText": "Akutt betyr at det skjedde på et helt bestemt tidspunkt (for eksempel et fall eller et rykk). Gradvis betyr at du ikke kan peke på nøyaktig når det begynte.",
+      "options": [
+        { "id": "acute", "icon": "Zap", "title": "Akutt skade (Traume)", "subtitle": "Smerter fra et bestemt uhell, fall eller vridning" },
+        { "id": "gradual", "icon": "Activity", "title": "Kom snikende over tid", "subtitle": "Startet gradvis, gjerne etter perioder med mye bruk" }
+      ]
+    },
+    {
+      "id": "trauma_details",
+      "title": "Hva skjedde da du skadet deg?",
+      "description": "Måten du skadet deg på hjelper oss å finne ut nøyaktig hvilke deler av skulderen som kan ha fått seg en trøkk.",
+      "visibleIf": { "field": "onset", "op": "eq", "value": "acute" },
+      "type": "multiple",
+      "options": [
+        { "id": "fall_arm", "icon": "ArrowDown", "title": "Falt og tok imot med strak arm" },
+        { "id": "out_of_socket", "icon": "RotateCcw", "title": "Skulderen var ute av ledd" },
+        { "id": "heavy_jerk", "icon": "Zap", "title": "Fikk et kraftig rykk eller strekk i armen" },
+        { "id": "direct_blow", "icon": "Target", "title": "Fikk et direkte slag mot utsiden av skulderen" },
+        { "id": "none", "icon": "Check", "title": "Ingen av disse / Husker ikke helt" }
+      ]
+    },
+    {
+      "id": "duration",
+      "title": "Hvor lenge har du hatt vondt?",
+      "description": "Hvor lenge det har vart bestemmer om vi bør fokusere mest på å dempe akutte smerter nå, eller begynne å bygge opp styrken din igjen.",
+      "type": "single",
+      "options": [
+        { "id": "ultra_acute", "icon": "Clock", "title": "Under 1 uke (Nylig)", "subtitle": "Fokus på å lindre smerte og holde i gang blodsirkulasjon" },
+        { "id": "sub_acute", "icon": "Clock", "title": "2 til 6 uker (En liten stund)", "subtitle": "Fokus på gradvis og trygg oppbygging" },
+        { "id": "chronic", "icon": "Clock", "title": "Over 3 måneder (Langvarig)", "subtitle": "Krever ofte litt mer tålmodig styrketrening" }
+      ]
+    },
+    {
+      "id": "location",
+      "title": "Hvor kjenner du smerten best?",
+      "description": "Akkurat hvor det gjør vondt er et av de beste hintene vi har for å finne ut hvilken sene eller del av skulderen som trøbler.",
+      "type": "multiple",
+      "helpText": "Trøbbel med sener kjennes ofte ut som verk som trekker nedover utsiden av overarmen. Trøbbel med selve leddet kjennes oftere ut som stikking dypt inni eller på toppen.",
+      "options": [
+        { "id": "lateral", "icon": "MapPin", "title": "Utsiden av overarmen (nedover mot albuen)" },
+        { "id": "superior", "icon": "MapPin", "title": "Helt på toppen av skulderen (ved kragebeinet)" },
+        { "id": "deep_front", "icon": "MapPin", "title": "Dypt inni fronten av skulderen" },
+        { "id": "radiating", "icon": "Zap", "title": "Stikkende smerte som skyter forbi albuen og helt ut i fingrene" },
+        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett spesifikt sted" }
+      ]
+    },
+    {
+      "id": "pain_pattern",
+      "title": "Hvilke bevegelser gjør mest vondt?",
+      "description": "De forskjellige musklene i skulderen har ulike oppgaver. Ved å vite hvilke bevegelser som er vonde, kan vi snevre inn akkurat hvor problemet sitter.",
+      "type": "multiple",
+      "options": [
+        { "id": "arc", "icon": "ArrowUp", "title": "Å løfte armen ut til siden (særlig midtveis i løftet)" },
+        { "id": "behind_back", "icon": "RotateCcw", "title": "Å ta armen bak på ryggen (f.eks. for å ta på en jakke)" },
+        { "id": "cross_body", "icon": "ArrowRight", "title": "Å føre armen tvers over brystet mot motsatt skulder" },
+        { "id": "overhead", "icon": "ArrowUp", "title": "Å jobbe med armene over hodehøyde (f.eks. vaske vinduer)" },
+        { "id": "none", "icon": "Check", "title": "Smerten endrer seg lite uansett hva jeg gjør" }
+      ]
+    },
+    {
+      "id": "functional_loss",
+      "title": "Klarer du å bruke armen?",
+      "description": "Gjør det \"bare\" vondt, eller er armen faktisk for stiv eller svak til å flyttes på? Dette hjelper oss å sjekke om det har gått utover funksjonen i leddet.",
+      "type": "multiple",
+      "helpText": "Viktig: Skulderen føles gjerne svak når det gjør vondt. Men velg 'helt kraftløs' KUN hvis du faktisk ikke har muskelkraft til å løfte armen, selv når du prøver å ignorere smerten.",
+      "options": [
+        { "id": "weakness", "icon": "ArrowDown", "title": "Kraftløs: Jeg klarer rett og slett ikke å løfte armen" },
+        { "id": "stiffness", "icon": "Lock", "title": "Helt stiv: Armen er helt låst og umulig å bevege særlig på" },
+        { "id": "instability", "icon": "RotateCcw", "title": "Ustabil: Jeg føler at skulderen glipper eller vil hoppe ut av ledd" },
+        { "id": "none", "icon": "Check", "title": "Jeg klarer å bruke den fint, det gjør bare vondt" }
+      ]
+    },
+    {
+      "id": "red_flags",
+      "title": "Sikkerhetsspørsmål",
+      "description": "Dette er standard spørsmål vi alltid stiller for å være på den sikre siden, og sjekke at smertene ikke skyldes andre sykdommer.",
+      "type": "multiple",
+      "helpText": "Disse symptomene hjelper oss å utelukke feber, infeksjoner eller andre mer uvanlige årsaker til skuldersmerter.",
+      "options": [
+        { "id": "fever", "icon": "AlertTriangle", "title": "Generell sykdomsfølelse, feber eller frysninger" },
+        { "id": "weight_loss", "icon": "AlertTriangle", "title": "Uforklarlig vekttap i det siste" },
+        { "id": "constant_pain", "icon": "AlertTriangle", "title": "Konstant, uutholdelig smerte som ikke blir bedre av å hvile" },
+        { "id": "deformity", "icon": "AlertTriangle", "title": "Skulderen min har en veldig tydelig, unaturlig feilstilling" },
+        { "id": "none", "icon": "Check", "title": "Nei, ingen av disse gjelder for meg" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Hvor vondt har du det?",
+      "helpText": "Skalaen går fra 0 til 10. 0 betyr at du er helt smertefri. 10 betyr den verste smerten du kan forestille deg (som krever at du drar på sykehuset).",
+      "type": "slider"
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "medical_referral",
+      "when": { "all": [
+        { "field": "red_flags", "op": "notEmpty" },
+        { "field": "red_flags", "op": "notIncludes", "value": "none" }
+      ] }
+    },
+    {
+      "diagnosis": "instability",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute" },
+        { "any": [
+          { "field": "trauma_details", "op": "includes", "value": "out_of_socket" },
+          { "field": "functional_loss", "op": "includes", "value": "instability" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "acute_cuff_tear",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute" },
+        { "field": "functional_loss", "op": "includes", "value": "weakness" }
+      ] }
+    },
+    {
+      "diagnosis": "ac_joint_trauma",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute" },
+        { "field": "trauma_details", "op": "includes", "value": "direct_blow" },
+        { "field": "location", "op": "includes", "value": "superior" }
+      ] }
+    },
+    {
+      "diagnosis": "osteoarthritis",
+      "when": { "all": [
+        { "field": "functional_loss", "op": "includes", "value": "stiffness" },
+        { "field": "age", "op": "eq", "value": "over55" },
+        { "field": "onset", "op": "eq", "value": "gradual" }
+      ] }
+    },
+    {
+      "diagnosis": "frozen_shoulder",
+      "when": { "field": "functional_loss", "op": "includes", "value": "stiffness" }
+    },
+    {
+      "diagnosis": "cervical_referred",
+      "when": { "field": "location", "op": "includes", "value": "radiating" }
+    },
+    {
+      "diagnosis": "ac_joint_degeneration",
+      "when": { "all": [
+        { "field": "location", "op": "includes", "value": "superior" },
+        { "field": "pain_pattern", "op": "includes", "value": "cross_body" },
+        { "field": "onset", "op": "eq", "value": "gradual" }
+      ] }
+    },
+    {
+      "diagnosis": "saps",
+      "when": { "any": [
+        { "field": "location", "op": "includes", "value": "lateral" },
+        { "field": "pain_pattern", "op": "includes", "value": "arc" },
+        { "field": "pain_pattern", "op": "includes", "value": "overhead" }
+      ] }
+    }
+  ],
+  "defaultDiagnosis": "non_specific",
+  "diagnoses": {
+    "medical_referral": {
+      "title": "Vurdering hos lege anbefales",
+      "category": "Medisinsk sjekk",
+      "severity": "Høy",
+      "actionLabel": "Kontakt lege",
+      "patientDesc": "Svarene dine viser at du opplever noen symptomer (som for eksempel sykdomsfølelse eller nattesvette) i tillegg til smertene. Derfor bør fastlegen din undersøke deg for å være på den sikre siden, slik at vi kan utelukke andre årsaker til plagene dine.",
+      "patientDiff": "Kroppslig infeksjon eller revmatisk sykdom.",
+      "phase1": "Kontakt fastlegen din eller legevakt for en vanlig sjekk. Det er viktig at du ikke provoserer skulderen med tung trening før legen har gitt deg grønt lys.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg avdekket i anamnese. Differensialdiagnostikk mot systemisk årsak, infeksjon eller malignitet påkrevet.",
+      "icpc2": "A99",
+      "icd10": "R52.9"
+    },
+    "acute_cuff_tear": {
+      "title": "Mistenkt seneskade i skulderen",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Få det sjekket",
+      "patientDesc": "Siden du har skadet deg nylig og opplever at armen er fysisk kraftløs, kan det hende at en av senene i skulderen har fått seg en rift. Dette er veldig vanlig etter fall eller rykk, men det bør sjekkes opp av en fagperson.",
+      "patientDiff": "Forstuing av leddbånd eller brist.",
+      "phase1": "Bruk armen rolig foran kroppen, men unngå tunge løft og å ha armen over hodehøyde. Ta gjerne kontakt med fastlegen eller en fysioterapeut for å vurdere om du bør ta et bilde (MR eller ultralyd).",
+      "exercises": [
+        "La armen få hvile de første dagene hvis det er intenst vondt.",
+        "Lene deg fremover og la armen dingle som en tung pendel. Dette smører leddet uten å belaste senene."
+      ],
+      "clinicalHypothesis": "Traumatisk rotator cuff ruptur med pseudoparalyse.",
+      "icpc2": "L92",
+      "icd10": "S46.0"
+    },
+    "instability": {
+      "title": "Ustabilitet i skulderen",
+      "category": "Leddbånd og muskler",
+      "severity": "Moderat",
+      "patientDesc": "Skulderen din viser tegn på å være ustabil. Dette skjer gjerne hvis skulderen har vært helt eller delvis ut av ledd, slik at leddbåndene som skal holde den på plass har blitt strukket ut.",
+      "patientDiff": "Skade på bruskringen inni leddet.",
+      "phase1": "Det aller viktigste for deg nå er å unngå stillinger der du føler at skulderen kan glippe (særlig å ha armen ut til siden og rotert bakover, som når du kaster en ball). For å gjøre skulderen trygg igjen, trenger du stabilitetstrening.",
+      "exercises": [
+        "Spenne musklene i skulderen uten at selve armen beveger seg.",
+        "Rolig oppbygging av støttemuskulaturen rundt skulderbladet."
+      ],
+      "trainingProgram": { "title": "Program for skulderustabilitet" },
+      "clinicalHypothesis": "Glenohumeral instabilitet / tilstand etter luksasjon.",
+      "icpc2": "L92",
+      "icd10": "S43.4"
+    },
+    "frozen_shoulder": {
+      "title": "Frossen Skulder (Kapsulitt)",
+      "category": "Leddkapsel",
+      "severity": "Moderat",
+      "patientDesc": "En frossen skulder betyr rett og slett at 'posen' rundt selve skulderleddet strammer seg til og blir tykkere. Det gir ofte dyp og plagsom smerte i starten (særlig om natten), før skulderen gradvis blir veldig stiv og fastlåst.",
+      "patientDiff": "Kalkskulder eller slitasjegikt (artrose).",
+      "phase1": "Her er tålmodighet nøkkelen! En frossen skulder brenner nemlig ut og går over av seg selv med tiden. I den vonde, første fasen gjelder det bare å lindre smerten og holde armen litt i bevegelse – uten å tvinge den inn i dyp smerte.",
+      "exercises": [
+        "Bruk gjerne en varmepute på skulderen før du legger deg.",
+        "Sving armen rolig i sirkler (som en pendel) for å holde blodsirkulasjonen i gang.",
+        "Legg puter under armen for å finne en god og støttende sovestilling."
+      ],
+      "trainingProgram": { "title": "Gode råd for frossen skulder" },
+      "clinicalHypothesis": "Adhesiv kapsulitt (Frozen Shoulder) i fryse- eller stivhetsfase.",
+      "icpc2": "L92",
+      "icd10": "M75.0"
+    },
+    "saps": {
+      "title": "Seneirritasjon (SAPS)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Dette er den aller vanligste årsaken til skuldersmerter (tidligere kalt 'impingement'). Det betyr rett og slett at en sene eller en slimpose i skulderen har blitt overbelastet og irritert. Smertene treffer deg gjerne midtveis når du løfter armen ut til siden.",
+      "patientDiff": "Begynnende frossen skulder, eller stivhet fra nakken.",
+      "phase1": "Prøv å finne ut hvilke bevegelser i hverdagen som irriterer skulderen mest, og reduser disse i 1-2 uker (f.eks. å vaske over hodehøyde eller sove på armen). Deretter starter vi med smarte øvelser for å gjøre senen sterk og robust igjen.",
+      "exercises": [
+        "Rolig styrketrening med en lett treningsstrikk.",
+        "Øvelser for å styrke opp ryggen og musklene rundt skulderbladene.",
+        "Unngå total hvile – beveg armen i de retningene som ikke gjør vondt."
+      ],
+      "trainingProgram": { "title": "Start opptrening for SAPS" },
+      "clinicalHypothesis": "Subakromialt smertesyndrom (SAPS) / Rotatorcuff tendinopati.",
+      "icpc2": "L92",
+      "icd10": "M75.4"
+    },
+    "ac_joint_trauma": {
+      "title": "Akutt skade på kragebeinsleddet",
+      "category": "Akutt skade",
+      "severity": "Moderat",
+      "patientDesc": "Smertene dine tyder på at det lille leddet helt på toppen av skulderen (mellom kragebeinet og skulderbladet) har fått seg en trøkk. Dette skjer veldig ofte hvis man faller på isen eller blir taklet på skulderen.",
+      "patientDiff": "Kragebeinsbrudd eller leddbåndsskade.",
+      "phase1": "Legg gjerne på litt is i 15 minutter om gangen hvis det dunker og gjør vondt. Unngå å føre armen tvers over brystet og å løfte tungt over hodet de første ukene. Ellers kan du bruke armen normalt under smertegrensen din.",
+      "exercises": [
+        "Hold gjerne armen under brysthøyde den første tiden.",
+        "Rull litt på skuldrene og beveg nakken for at ikke musklene skal stivne til mens leddet gror."
+      ],
+      "clinicalHypothesis": "Akutt distorsjon i Akromioklavikularleddet (AC-leddet).",
+      "icpc2": "L92",
+      "icd10": "S43.5"
+    },
+    "ac_joint_degeneration": {
+      "title": "Irritasjon i kragebeinsleddet",
+      "category": "Ledd og brusk",
+      "severity": "Lav",
+      "patientDesc": "Smerter akkurat på toppen av skulderen, spesielt når du fører armen over brystet (som å ta på et sikkerhetsbelte), kommer ofte av lett irritasjon eller naturlig slitasje i leddet mellom kragebeinet og skulderbladet.",
+      "patientDiff": "Vanlig seneirritasjon (SAPS).",
+      "phase1": "Prøv å bytte ut øvelser og gjøremål som presser skuldrene sammen (f.eks. tunge armhevinger eller å bære vesker på bare én skulder). Om du trener, ha heller fokus på øvelser der du trekker ting mot deg for en periode.",
+      "exercises": [
+        "Bytt ut tunge press-øvelser med ro-øvelser hvis du trener styrke.",
+        "Myk opp brystryggen og skuldrene med lette bevegelser i hverdagen."
+      ],
+      "trainingProgram": { "title": "Tilpasset trening for AC-leddet" },
+      "clinicalHypothesis": "Symptomatisk AC-leddsartrose eller mekanisk irritasjon.",
+      "icpc2": "L92",
+      "icd10": "M19.9"
+    },
+    "cervical_referred": {
+      "title": "Smerter som stråler fra nakken",
+      "category": "Nerver og stram muskulatur",
+      "severity": "Moderat",
+      "patientDesc": "Når smertene er stikkende, nummne, eller stråler forbi albuen og helt ut i fingrene, kommer de sjelden fra selve skulderen. Da er det oftere en nerve i nakken din som er litt irritert og sender smertesignaler ned i armen.",
+      "patientDiff": "Karpaltunnelsyndrom, eller dyp smerte fra muskelknuter.",
+      "phase1": "Her må vi flytte fokuset fra selve skulderen, og heller se på hvordan nakken og ryggen din har det! Forsøk å variere sittestillingen din ofte gjennom dagen. Hvis du i tillegg mister følelse eller kraft i fingrene, bør du kontakte lege for en sjekk.",
+      "exercises": [
+        "Myke og rolige bevegelsesøvelser for nakken.",
+        "Øvelser for å styrke brystryggen for å gi nakken din en bedre plattform."
+      ],
+      "trainingProgram": { "title": "Kom i gang med nakkeprogram" },
+      "clinicalHypothesis": "Cervikal radikulopati / cervikobrakialgi med referert smerte til skulder/arm.",
+      "icpc2": "L83",
+      "icd10": "M53.1"
+    },
+    "osteoarthritis": {
+      "title": "Slitasjegikt i skulderen (Artrose)",
+      "category": "Naturlig aldersslitasje",
+      "severity": "Lav",
+      "patientDesc": "En gradvis stivhet og dyp verk hos voksne kan tyde på vanlig, aldersbetinget slitasje (artrose) på brusken inne i skulderleddet. Du kan også oppleve en 'skurrende' følelse eller lyd når du beveger armen.",
+      "patientDiff": "Kronisk frossen skulder.",
+      "phase1": "Gode nyheter: For ledd med slitasje er bevegelse og trening den aller beste medisinen! Fysisk aktivitet fungerer som smøring for leddet ditt. Det er faktisk helt greit at det gjør litt vondt (opp mot 5 av 10) mens du trener, så lenge smerten roer seg etterpå.",
+      "exercises": [
+        "Generell og variert styrketrening for overkroppen er supert for deg.",
+        "Spesifikk trening for de små musklene i skulderen (rotatorcuffen) for å stabilisere leddet."
+      ],
+      "trainingProgram": { "title": "Styrketrening for skulderartrose" },
+      "clinicalHypothesis": "Symptomatisk glenohumeral artrose.",
+      "icpc2": "L90",
+      "icd10": "M19.0"
+    },
+    "non_specific": {
+      "title": "Uspesifikke skuldersmerter",
+      "category": "Muskelspenninger",
+      "severity": "Lav",
+      "patientDesc": "Symptomene dine peker ikke på noen farlig skade, betennelse eller leddsykdom. Smerter som flytter litt på seg og er vanskelige å peke ut, skyldes oftest helt ufarlige muskelspenninger, hverdagsstress eller ugunstige arbeidsstillinger.",
+      "patientDiff": "Stramhet som stråler ut fra øvre del av nakken.",
+      "phase1": "Bruk armen som normalt! Senk skuldrene og pust med magen. Variert bevegelse, turgåing og å få opp pulsen er det desidert beste du kan gjøre for å få stram muskulatur til å slappe av igjen.",
+      "exercises": [
+        "Rull skuldrene bakover noen ganger mens du sitter på jobb.",
+        "Gå turer i skog og mark der du svinger naturlig på armene.",
+        "Varm opp brystryggen og nakken for å gi skuldrene bedre plass."
+      ],
+      "trainingProgram": { "title": "Mobilitetsprogram for overkropp" },
+      "clinicalHypothesis": "Uspesifikk myalgi i skulderbue/nakke-overgang.",
+      "icpc2": "L08",
+      "icd10": "M25.5"
+    }
+  }
+}

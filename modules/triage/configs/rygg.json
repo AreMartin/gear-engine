@@ -1,0 +1,230 @@
+{
+  "label": "Rygg",
+  "summary": "Korsryggsmerter, isjias og hekseskudd",
+  "order": 10,
+  "icon": "back",
+  "version": "1.0.0",
+  "title": "RyggSjekk",
+  "description": "Korsryggsmerter er svært vanlig. Svar på spørsmålene under for å kartlegge om det er snakk om klassisk kink, isjias, eller noe som krever videre sjekk.",
+  "defaultAnswers": {
+    "age": null,
+    "onset": null,
+    "radiation": null,
+    "pain_behavior": [],
+    "redFlags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "age",
+      "title": "Hvor gammel er du?",
+      "type": "single",
+      "options": [
+        { "id": "under20", "icon": "User", "title": "Under 20 år" },
+        { "id": "20-55", "icon": "Flame", "title": "20 til 55 år" },
+        { "id": "over55", "icon": "Clock", "title": "Over 55 år" }
+      ]
+    },
+    {
+      "id": "onset",
+      "title": "Hvordan startet plagene?",
+      "type": "single",
+      "options": [
+        { "id": "akutt_loft", "icon": "Zap", "title": "Akutt ved et løft/vridning", "subtitle": "Kjent som hekseskudd eller kink" },
+        { "id": "akutt_traume", "icon": "AlertTriangle", "title": "Etter en ulykke eller et hardt fall" },
+        { "id": "gradvis", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Snikende debut over tid" }
+      ]
+    },
+    {
+      "id": "radiation",
+      "title": "Stråler smerten ned i beina?",
+      "description": "Er smerten kun i ryggen, eller går den nedover lår/legger?",
+      "type": "single",
+      "options": [
+        { "id": "ingen", "icon": "Check", "title": "Nei, kun i korsryggen", "subtitle": "Evt. litt ut i setemuskulaturen" },
+        { "id": "til_kneet", "icon": "MapPin", "title": "Ja, men stopper over kneet", "subtitle": "Stråler bak i låret" },
+        { "id": "forbi_kneet", "icon": "Zap", "title": "Ja, helt ned i leggen eller foten", "subtitle": "Føles som et skarpt strømstøt eller iling" }
+      ]
+    },
+    {
+      "id": "pain_behavior",
+      "title": "Når er smerten verst?",
+      "description": "Velg de som passer best.",
+      "type": "multiple",
+      "options": [
+        { "id": "sitte_boye", "icon": "ChevronDown", "title": "Verst når jeg sitter eller bøyer meg fremover (f.eks. tar på sokker)" },
+        { "id": "staa_gaa", "icon": "Activity", "title": "Verst når jeg står oppreist eller går lenge" },
+        { "id": "morgen", "icon": "Clock", "title": "Ekstremt stiv om morgenen (varer i over 1 time)" },
+        { "id": "ingen", "icon": "Check", "title": "Ingen spesifikke mønstre" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Smerteintensitet",
+      "type": "slider"
+    },
+    {
+      "id": "redFlags",
+      "title": "Sikkerhetssjekk (Viktig!)",
+      "description": "Ryggsmerter er sjelden farlig, men vi må utelukke \"røde flagg\". Har du noen av disse symptomene?",
+      "type": "multiple",
+      "options": [
+        { "id": "cauda", "icon": "AlertTriangle", "title": "Jeg har mistet kontroll på blære/tarm (tisser på meg) eller er nummen i skrittet" },
+        { "id": "drop_foot", "icon": "ShieldAlert", "title": "Foten svikter fullstendig når jeg går (droppfot)" },
+        { "id": "fever_cancer", "icon": "Activity", "title": "Jeg har uforklarlig feber, vekttap eller tidligere kreftdiagnose" },
+        { "id": "ingen", "icon": "Check", "title": "Nei, ingen av delene" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "cauda_equina",
+      "when": { "all": [
+        { "field": "redFlags", "op": "includes", "value": "cauda" },
+        { "field": "redFlags", "op": "notIncludes", "value": "ingen" }
+      ] }
+    },
+    {
+      "diagnosis": "red_flag_medical",
+      "when": { "all": [
+        { "field": "redFlags", "op": "notEmpty" },
+        { "field": "redFlags", "op": "notIncludes", "value": "ingen" }
+      ] }
+    },
+    {
+      "diagnosis": "trauma_fracture",
+      "when": { "field": "onset", "op": "eq", "value": "akutt_traume" }
+    },
+    {
+      "diagnosis": "sciatica",
+      "when": { "field": "radiation", "op": "eq", "value": "forbi_kneet" }
+    },
+    {
+      "diagnosis": "spinal_stenosis",
+      "when": { "all": [
+        { "field": "age", "op": "eq", "value": "over55" },
+        { "field": "pain_behavior", "op": "includes", "value": "staa_gaa" },
+        { "field": "radiation", "op": "neq", "value": "ingen" }
+      ] }
+    },
+    {
+      "diagnosis": "inflammatory_back_pain",
+      "when": { "all": [
+        { "field": "age", "op": "in", "value": ["under20", "20-55"] },
+        { "field": "onset", "op": "eq", "value": "gradvis" },
+        { "field": "pain_behavior", "op": "includes", "value": "morgen" }
+      ] }
+    },
+    {
+      "diagnosis": "acute_lumbago",
+      "when": { "field": "onset", "op": "eq", "value": "akutt_loft" }
+    }
+  ],
+  "defaultDiagnosis": "unspecific_lbp",
+  "diagnoses": {
+    "cauda_equina": {
+      "title": "Øyeblikkelig Hjelp",
+      "category": "Kritisk / Nevrologi",
+      "severity": "Kritisk",
+      "actionLabel": "Ring 113 / Legevakt",
+      "patientDesc": "At du mister kontroll på urin/avføring eller mister følelsen i skrittet er et tegn på at nervene nederst i ryggmargen er i kraftig klem. Dette kalles Cauda Equina-syndrom.",
+      "patientDiff": "Ingen andre – dette skal sjekkes akutt.",
+      "phase1": "Ring medisinsk nødtelefon (113) eller dra rett til akuttmottaket. Dette kan kreve akutt operasjon for å redde nervefunksjonen.",
+      "exercises": [],
+      "clinicalHypothesis": "Mistenkt Cauda Equina Syndrom.",
+      "icpc2": "N94",
+      "icd10": "G83.4"
+    },
+    "red_flag_medical": {
+      "title": "Bør vurderes av lege",
+      "category": "Medisinsk Screening",
+      "severity": "Høy",
+      "actionLabel": "Legetime raskt",
+      "patientDesc": "Når ryggsmerter opptrer sammen med droppfot (lammelse i foten), feber eller tidligere kreftsykdom, krever det alltid en grundig medisinsk sjekk (ofte med MR).",
+      "patientDiff": "Isjias med muskel-lammelse, infeksjon.",
+      "phase1": "Bestill time hos fastlegen din så raskt som mulig, eller kontakt legevakt ved store lammelser.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg tilstede. Obs lammelse / malignitet / infeksjon.",
+      "icpc2": "L84",
+      "icd10": "M54.9"
+    },
+    "trauma_fracture": {
+      "title": "Akutt Traume / Mulig Brudd",
+      "category": "Traume",
+      "severity": "Høy",
+      "actionLabel": "Legevakt / Røntgen",
+      "patientDesc": "Når ryggsmertene oppsto etter et direkte fall eller en ulykke, må man utelukke et brudd eller brist i en ryggvirvel.",
+      "patientDiff": "Kraftig forstuing av ryggmuskulaturen.",
+      "phase1": "Hold ryggen mest mulig i ro og oppsøk legevakt for røntgenvurdering.",
+      "exercises": [],
+      "clinicalHypothesis": "Mistenkt vertebralfraktur etter traume.",
+      "icpc2": "L76",
+      "icd10": "S32.0"
+    },
+    "sciatica": {
+      "title": "Isjias / Skiveprolaps",
+      "category": "Nevrologi / Skive",
+      "severity": "Moderat",
+      "actionLabel": "Konservativ / Fysio",
+      "patientDesc": "Smerter som stråler som et 'strømstøt' helt ned i foten, betyr at en nerverot i korsryggen er irritert eller i klem. Den vanligste årsaken er en skiveutbukning (prolaps).",
+      "patientDiff": "Piriformis-syndrom (klem i setemuskelen).",
+      "phase1": "Selv om det er ekstremt vondt, er det ufarlig og går oftest over av seg selv over uker/måneder. Finn stillinger som avlaster nerven.",
+      "exercises": ["Ligg på ryggen med leggene oppå en stol (90 grader i hofter og knær)."],
+      "clinicalHypothesis": "Lumbal radikulopati (Isjias) antatt sekundært til skiveprolaps.",
+      "icpc2": "N86",
+      "icd10": "M51.1"
+    },
+    "spinal_stenosis": {
+      "title": "Spinal Stenose",
+      "category": "Degenerativt",
+      "severity": "Lav",
+      "actionLabel": "Tilpasset trening",
+      "patientDesc": "Med alderen kan plassforholdene for nervene i ryggmargskanalen bli trange (stenose). Det typiske er at beina verker og 'visner' når du står og går, men det hjelper å sette seg ned.",
+      "patientDiff": "Dårlig blodsirkulasjon i beina (røykebein).",
+      "phase1": "Bruk gjerne rullator, handlevogn eller sykkel for å holde deg i aktivitet – det åpner opp kanalen i ryggen fordi du lener deg fremover.",
+      "exercises": ["Sykling på ergometersykkel (fremoverlent)."],
+      "clinicalHypothesis": "Lumbal spinal stenose (Nevrogen claudicatio).",
+      "icpc2": "L84",
+      "icd10": "M48.0"
+    },
+    "inflammatory_back_pain": {
+      "title": "Inflammatorisk Ryggsmerte",
+      "category": "Revmatologi",
+      "severity": "Moderat",
+      "actionLabel": "Legevurdering",
+      "patientDesc": "Ryggsmerter hos yngre voksne som blir verre av hvile og bedre av bevegelse, kombinert med sterk stivhet om morgenen, kan tyde på en revmatisk irritasjon (som Bekhterevs).",
+      "patientDiff": "Vanlig mekanisk stivhet.",
+      "phase1": "Nevn den lange morgenstivheten for fastlegen din. Bevegelse og lett trening vil smøre leddene og redusere smerten i hverdagen.",
+      "exercises": ["Varm dusj og lett tøying av ryggen om morgenen."],
+      "clinicalHypothesis": "Obs inflammatorisk rygglidelse (eks. Ankyloserende spondylitt).",
+      "icpc2": "L84",
+      "icd10": "M45"
+    },
+    "acute_lumbago": {
+      "title": "Akutt Lumbago (Kink i ryggen)",
+      "category": "Mekanisk",
+      "severity": "Lav",
+      "actionLabel": "Bevegelse / Avvente",
+      "patientDesc": "Ryggen har gått i 'krampelås'. Et hekseskudd er ekstremt smertefullt og skremmende, men det er helt ufarlig! Det er ryggens forsvarsmekanisme, ingen skive er 'ute av ledd'.",
+      "patientDiff": "Mindre skivebukning.",
+      "phase1": "Hvil litt, men ikke legg deg i sengen i dagesvis! Prøv å gå korte, hyppige turer i ulendt terreng (skogbunn) for å løse opp krampene.",
+      "exercises": ["Ligg på ryggen og vipp knærne rolig fra side til side som vindusviskere."],
+      "clinicalHypothesis": "Akutt lumbago (mekanisk ryggsmerte).",
+      "icpc2": "L84",
+      "icd10": "M54.5"
+    },
+    "unspecific_lbp": {
+      "title": "Uspesifikke Korsryggsmerter",
+      "category": "Mekanisk / Uspesifikk",
+      "severity": "Lav",
+      "actionLabel": "Styrketrening",
+      "patientDesc": "Gode nyheter! Symptomene dine peker ikke mot noen farlig sykdom eller nerveskade. Gradvis murring i ryggen skyldes oftest litt for lite variert bevegelse over tid.",
+      "patientDiff": "Stress-relaterte muskelspenninger.",
+      "phase1": "Ikke vær redd for å bruke ryggen. Å løfte og trene ryggen gjør den sterkere, selv om det murrer litt.",
+      "exercises": ["Gå turer hver dag.", "Lett styrketrening for kjernemuskulatur og setemuskler."],
+      "clinicalHypothesis": "Uspesifikk korsryggsmerte (LBP).",
+      "icpc2": "L84",
+      "icd10": "M54.5"
+    }
+  }
+}

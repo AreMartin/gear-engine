@@ -48,3 +48,15 @@ The safety gate runs on every message. Without candidates, the legacy JSON fallb
 CSV also accepts optional `risk` and `protocol` columns. Protocols must already exist (names or slugs, semicolon-separated); unknown ones are reported, not created, and omitting the column leaves existing protocol tags unchanged.
 
 The Exercise Library dashboard has an **Import Exercises** submenu with a CSV template and a preview-first importer. Required columns are `title`, `description` (step-by-step instructions), and either `exorlive_id` or `external_key`; optional columns are `summary`, `area`, `equipment`, `dosage`, `video_culture`, `video_url`, and `source_url`. The optional `video_url` accepts HTTPS ExorLive, YouTube, or Vimeo links and takes precedence over `exorlive_id`; for an ExorLive link the ID is read from `ex=` when `exorlive_id` is empty, so the URL alone is enough. Separate multiple area/equipment values with semicolons and quote CSV fields that contain commas. The importer validates rows, flags duplicates within a file, and updates existing records by ExorLive ID or external key. New records are drafts by default; publishing requires checking the explicit publish option before preview confirmation. CSV files are limited to 5 MB and 500 rows.
+
+## Triage module
+
+`modules/triage/` is a rule-based triage quiz (separate from the AI chat) that ends in a conclusion and a printable clinical note. Embed it with `[gear_engine_triage region="rygg"]` or the **Triage Quiz** block.
+
+Each region is one JSON file in `modules/triage/configs/{region}.json` containing the quiz `steps`, ordered declarative `rules` (first match wins, otherwise `defaultDiagnosis`) and the `diagnoses` shown in the result and clinical note. Rule conditions use `{ field, op, value }` with `eq`, `neq`, `in`, `notIn`, `includes`, `notIncludes`, `empty`, `notEmpty`, combined with `all`, `any` and `not`. Validate configs and rules with `node tests/triage/triage-configs.test.js` (it also checks that every diagnosis is reachable).
+
+Available regions: `rygg`, `skulder`, `kne`, `fot-ankel`, `hofte`, `nakke`. `rygg` and `skulder` are ports of the original prototype (verified against the legacy functions). The others carry `"reviewStatus": "draft-unreviewed"`: their clinical content was drafted without a clinician and must be reviewed before publishing.
+
+### Smertesjekk section (region picker)
+
+The triage quizzes are a separate section from the AI chat ("Digital fysio"). Create one WordPress page containing `[gear_engine_triage_picker]` and one page per region containing `[gear_engine_triage region="<slug>"]`, with the region pages' URLs at `/<section path>/<slug>/`. The section path defaults to `smertesjekk` and can be changed under **Settings → Smertesjekk**. Cards come from each config's `label`, `summary` and `order`; each quiz page shows an "Alle tester" link back to the section page (disable with `back_link="false"`). Run PHP checks with `php tests/triage/triage-php.test.php`.

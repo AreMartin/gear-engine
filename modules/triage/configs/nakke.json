@@ -1,0 +1,298 @@
+{
+  "label": "Nakke",
+  "summary": "Nakkesmerter, nakkelås og utstråling til armen",
+  "order": 60,
+  "icon": "neck",
+  "version": "0.1.0",
+  "reviewStatus": "draft-unreviewed",
+  "title": "Nakkesjekk",
+  "description": "Svar på noen spørsmål om nakken din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
+  "defaultAnswers": {
+    "age": null,
+    "onset": null,
+    "radiation": null,
+    "symptoms": [],
+    "red_flags": [],
+    "pain_level": 5
+  },
+  "steps": [
+    {
+      "id": "age",
+      "title": "Hvor gammel er du?",
+      "type": "single",
+      "options": [
+        { "id": "under30", "icon": "User", "title": "Under 30 år" },
+        { "id": "30-50", "icon": "Activity", "title": "30 til 50 år" },
+        { "id": "over50", "icon": "Clock", "title": "Over 50 år" }
+      ]
+    },
+    {
+      "id": "onset",
+      "title": "Hvordan startet plagene?",
+      "type": "single",
+      "options": [
+        { "id": "acute_trauma", "icon": "Zap", "title": "Etter en ulykke, et fall eller et kraftig rykk i nakken", "subtitle": "For eksempel en bilulykke eller en tackling" },
+        { "id": "acute_wakeup", "icon": "Clock", "title": "Brått, uten ulykke", "subtitle": "For eksempel at jeg våknet med nakkelås" },
+        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Snikende over dager eller uker" }
+      ]
+    },
+    {
+      "id": "radiation",
+      "title": "Stråler smerten ut fra nakken?",
+      "type": "single",
+      "options": [
+        { "id": "none", "icon": "Check", "title": "Nei, kun i nakken", "subtitle": "Evt. litt opp mot bakhodet eller mot skulderen" },
+        { "id": "arm", "icon": "MapPin", "title": "Ja, ned i armen", "subtitle": "Som regel ikke lenger enn til albuen" },
+        { "id": "hand", "icon": "Zap", "title": "Ja, helt ut i hånden eller fingrene", "subtitle": "Gjerne med iling eller nummenhet" }
+      ]
+    },
+    {
+      "id": "symptoms",
+      "title": "Hva stemmer for deg?",
+      "description": "Velg alle som passer.",
+      "type": "multiple",
+      "options": [
+        { "id": "stiffness", "icon": "Lock", "title": "Jeg klarer ikke å vri eller bøye hodet normalt" },
+        { "id": "headache", "icon": "Zap", "title": "Jeg har hodepine som starter i nakken eller bak i hodet" },
+        { "id": "arm_weakness", "icon": "ArrowDown", "title": "Jeg har merkbart nedsatt kraft i armen eller hånden" },
+        { "id": "screen", "icon": "Clock", "title": "Verst etter lange dager ved skjerm eller i stillesittende arbeid" },
+        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+      ]
+    },
+    {
+      "id": "pain_level",
+      "title": "Smerteintensitet",
+      "type": "slider"
+    },
+    {
+      "id": "red_flags",
+      "title": "Sikkerhetssjekk (Viktig!)",
+      "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
+      "type": "multiple",
+      "options": [
+        { "id": "thunderclap", "icon": "AlertTriangle", "title": "Plutselig, voldsom hodepine, som den verste jeg har hatt" },
+        { "id": "meningitis", "icon": "AlertTriangle", "title": "Feber sammen med stiv nakke, lysskyhet eller sykdomsfølelse" },
+        { "id": "neuro", "icon": "ShieldAlert", "title": "Svekket balanse, tale- eller synsforstyrrelser, nummenhet i begge armer eller bein, eller tap av blære-/tarmkontroll" },
+        { "id": "cancer", "icon": "AlertTriangle", "title": "Tidligere kreft, uforklarlig vekttap eller konstante nattesmerter" },
+        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "diagnosis": "medical_referral",
+      "when": { "all": [
+        { "field": "red_flags", "op": "notEmpty" },
+        { "field": "red_flags", "op": "notIncludes", "value": "none" }
+      ] }
+    },
+    {
+      "diagnosis": "neck_trauma_referral",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "acute_trauma" },
+        { "any": [
+          { "field": "symptoms", "op": "includes", "value": "arm_weakness" },
+          { "field": "radiation", "op": "eq", "value": "hand" }
+        ] }
+      ] }
+    },
+    {
+      "diagnosis": "whiplash",
+      "when": { "field": "onset", "op": "eq", "value": "acute_trauma" }
+    },
+    {
+      "diagnosis": "radiculopathy_deficit",
+      "when": { "all": [
+        { "field": "radiation", "op": "in", "value": ["arm", "hand"] },
+        { "field": "symptoms", "op": "includes", "value": "arm_weakness" }
+      ] }
+    },
+    {
+      "diagnosis": "radiculopathy",
+      "when": { "field": "radiation", "op": "in", "value": ["arm", "hand"] }
+    },
+    {
+      "diagnosis": "torticollis",
+      "when": { "field": "onset", "op": "eq", "value": "acute_wakeup" }
+    },
+    {
+      "diagnosis": "cervical_osteoarthritis",
+      "when": { "all": [
+        { "field": "age", "op": "eq", "value": "over50" },
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "symptoms", "op": "includes", "value": "stiffness" }
+      ] }
+    },
+    {
+      "diagnosis": "cervicogenic_headache",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "symptoms", "op": "includes", "value": "headache" }
+      ] }
+    },
+    {
+      "diagnosis": "postural_neck",
+      "when": { "all": [
+        { "field": "onset", "op": "eq", "value": "gradual" },
+        { "field": "symptoms", "op": "includes", "value": "screen" }
+      ] }
+    }
+  ],
+  "defaultDiagnosis": "non_specific",
+  "diagnoses": {
+    "medical_referral": {
+      "title": "Øyeblikkelig vurdering anbefales",
+      "category": "Medisinsk sjekk",
+      "severity": "Kritisk",
+      "actionLabel": "Ring 113 / legevakt",
+      "patientDesc": "Svarene dine inneholder symptomer som kan skyldes alvorlige tilstander, for eksempel hjernehinnebetennelse, blødning i hodet eller påvirkning av ryggmargen. Selv om nakkesmerter oftest er ufarlige, må dette sjekkes raskt.",
+      "patientDiff": "Hjernehinnebetennelse, hjerneblødning, ryggmargspåvirkning, sykdom med feber eller malignitet.",
+      "phase1": "Ring 113 ved plutselig voldsom hodepine, tale- eller synsforstyrrelser, nedsatt balanse eller feber med stiv nakke. Ellers kontakt legevakt (116 117) i dag.",
+      "exercises": [],
+      "clinicalHypothesis": "Røde flagg: differensialdiagnostikk mot SAH, meningitt, cervikal myelopati og malignitet. Hastevurdering.",
+      "icpc2": "A99",
+      "icd10": "R52.9"
+    },
+    "neck_trauma_referral": {
+      "title": "Nakkeskade som bør vurderes av lege",
+      "category": "Akutt skade",
+      "severity": "Høy",
+      "actionLabel": "Kontakt legevakt",
+      "patientDesc": "Etter en ulykke med nedsatt kraft eller utstråling til hånden bør nakken undersøkes for skade på ryggvirvler eller nerver, og eventuelt bildediagnostikk.",
+      "patientDiff": "Nakkebrudd, skive-/nerverotskade, kraftig strekkskade.",
+      "phase1": "Beveg nakken forsiktig, og ikke press den inn i smerte. Kontakt legevakt (116 117) i dag. Ved økende kraftsvikt eller nummenhet, ring 113.",
+      "exercises": [],
+      "clinicalHypothesis": "Nakketraume med nevrologiske symptomer: utelukk cervikal fraktur eller nerverotskade.",
+      "icpc2": "L83",
+      "icd10": "S14.1"
+    },
+    "whiplash": {
+      "title": "Nakkesleng (whiplash)",
+      "category": "Akutt skade",
+      "severity": "Moderat",
+      "patientDesc": "Etter en ulykke eller et kraftig rykk i nakken er det vanlig å få smerter og stivhet i nakken, ofte med hodepine. De fleste blir bra i løpet av uker til måneder, og aktiv oppfølging er viktigere enn hvile.",
+      "patientDiff": "Skade på skiver eller ledd, kraftig muskelskade.",
+      "phase1": "Hold deg i bevegelse og unngå halskrage. Rolige nakkebevegelser og gange er bra. Hvis du får nye symptomer, som nummenhet eller kraftsvikt, bør du kontakte lege.",
+      "exercises": [
+        "Roter hodet rolig til hver side, 10 ganger, innenfor smertegrensen.",
+        "Sett haken inn, og hold i 5 sekunder, 10 ganger.",
+        "Rull skuldrene baklengs, 10 ganger, flere ganger daglig."
+      ],
+      "clinicalHypothesis": "Akutt nakketraume (WAD grad I–II) uten nevrologiske utfall.",
+      "icpc2": "L83",
+      "icd10": "S13.4"
+    },
+    "radiculopathy_deficit": {
+      "title": "Nerverotpåvirkning med nedsatt kraft",
+      "category": "Nerver",
+      "severity": "Høy",
+      "actionLabel": "Kontakt lege eller fysioterapeut snart",
+      "patientDesc": "Smerte som stråler ut i armen, kombinert med merkbart nedsatt kraft, kan tyde på at en nerve ved nakken er kraftig påvirket. Nedsatt kraft bør alltid undersøkes, slik at du kan få riktig behandling raskt.",
+      "patientDiff": "Skade på perifer nerve, karpaltunnelsyndrom, påvirkning av skulderen.",
+      "phase1": "Kontakt fastlege eller fysioterapeut i løpet av få dager. Hvis kraften blir raskt verre, eller du får nummenhet i begge armer eller bein, bør du kontakte legevakt umiddelbart.",
+      "exercises": [
+        "Rolige bevegelser i nakken innenfor smertegrensen.",
+        "Unngå stillinger som gir mer utstråling."
+      ],
+      "clinicalHypothesis": "Cervikal radikulopati med motorisk utfall: krever klinisk undersøkelse og ev. bildediagnostikk.",
+      "icpc2": "L83",
+      "icd10": "M54.1"
+    },
+    "radiculopathy": {
+      "title": "Nerveirritasjon fra nakken (utstråling til armen)",
+      "category": "Nerver",
+      "severity": "Moderat",
+      "patientDesc": "Smerte som stråler fra nakken ned i armen, ofte med iling eller nummenhet, skyldes vanligvis at en nerverot ved nakken er irritert. De aller fleste blir bedre i løpet av noen uker til måneder uten operasjon.",
+      "patientDiff": "Karpaltunnelsyndrom, skuldersmerter, muskelsmerter med utstråling.",
+      "phase1": "Finn stillinger som demper utstrålingen, og hold deg i bevegelse. Unngå lange perioder i samme stilling. Kontakt lege hvis du får nedsatt kraft eller nummenhet som blir verre.",
+      "exercises": [
+        "Roter hodet rolig fra side til side, 10 ganger.",
+        "Sett haken inn, 10 ganger, flere ganger daglig.",
+        "Nerveglidning: bøy og strekk armen rolig, uten å framprovosere sterk smerte."
+      ],
+      "clinicalHypothesis": "Cervikobrakialgi / cervikal radikulopati uten motoriske utfall.",
+      "icpc2": "L83",
+      "icd10": "M54.12"
+    },
+    "torticollis": {
+      "title": "Akutt nakkelås",
+      "category": "Muskel og ledd",
+      "severity": "Lav",
+      "patientDesc": "Å våkne med en stiv, smertefull nakke uten tydelig skade er veldig vanlig. Det skyldes ofte irritasjon i ledd og muskler i nakken, og går som regel over i løpet av noen dager.",
+      "patientDiff": "Nervepåvirkning, skiveproblematikk, infeksjon.",
+      "phase1": "Hold deg i aktivitet, og beveg nakken rolig i den bevegelsen som er minst vond. Varme kan lindre. Unngå halskrage.",
+      "exercises": [
+        "Roter hodet rolig fra side til side innenfor smertegrensen.",
+        "Rull skuldrene baklengs, 10 ganger.",
+        "Bruk en varmepute på nakken i 15 minutter om gangen."
+      ],
+      "clinicalHypothesis": "Akutt cervikal dysfunksjon (torticollis/nakkelås) uten røde flagg eller nevrologiske utfall.",
+      "icpc2": "L01",
+      "icd10": "M54.2"
+    },
+    "cervical_osteoarthritis": {
+      "title": "Slitasje i nakken",
+      "category": "Ledd og skiver",
+      "severity": "Lav",
+      "patientDesc": "Stivhet og gradvis nedsatt bevegelighet i nakken hos voksne over 50 år skyldes ofte aldersbetinget slitasje. Det er svært vanlig og betyr ikke at noe er farlig. Bevegelse og trening er den beste behandlingen.",
+      "patientDiff": "Muskelspenninger, nerverotpåvirkning, nakkehodepine.",
+      "phase1": "Hold nakken i bevegelse og tren rolig hver dag. Det er greit at det er litt vondt (opp mot 4 av 10) så lenge det roer seg etterpå.",
+      "exercises": [
+        "Roter hodet fra side til side, 10 ganger.",
+        "Hake inn, 10 ganger, med 5 sekunders hold.",
+        "Gå raske turer og svøm hvis du har mulighet."
+      ],
+      "clinicalHypothesis": "Cervikal spondylose: gradvis debut, redusert bevegelighet, alder over 50.",
+      "icpc2": "L83",
+      "icd10": "M47.8"
+    },
+    "cervicogenic_headache": {
+      "title": "Hodepine fra nakken",
+      "category": "Muskel og ledd",
+      "severity": "Lav",
+      "patientDesc": "Hodepine som starter i nakken eller bak i hodet, og som kommer sammen med nakkesmerter, kalles nakkehodepine. Den skyldes ofte stramme muskler og stive ledd øverst i nakken.",
+      "patientDiff": "Spenningshodepine, migrene.",
+      "phase1": "Varier stillingene i løpet av dagen, og ta mikropauser med nakkebevegelser. Pass på at du får god søvn og drikker nok.",
+      "exercises": [
+        "Hake inn, 10 ganger, flere ganger daglig.",
+        "Rolige nakkerotasjoner, 10 ganger til hver side.",
+        "Styrk muskler mellom skulderbladene med strikk, 3 x 12."
+      ],
+      "clinicalHypothesis": "Cervikogen hodepine uten røde flagg: nakke-/bakhodesmerte med bevegelsesutløsning.",
+      "icpc2": "N01",
+      "icd10": "G44.841"
+    },
+    "postural_neck": {
+      "title": "Belastningsplager i nakken (skjermarbeid)",
+      "category": "Overbelastning",
+      "severity": "Lav",
+      "patientDesc": "Smerte i nakke og skuldre som kommer etter lange dager ved skjerm skyldes oftest at muskler får lite variasjon i belastningen. Det er ufarlig og kan som regel dempes med små justeringer i hverdagen.",
+      "patientDiff": "Nakkeslitasje, nerveirritasjon, spenningshodepine.",
+      "phase1": "Ta små pauser hvert 30.–40. minutt, og varier mellom å sitte og stå. Juster skjermhøyden slik at du ser rett fram.",
+      "exercises": [
+        "Rull skuldrene baklengs og strekk deg opp, 10 ganger hvert 30. minutt.",
+        "Hake inn og tilbake, 10 ganger.",
+        "Gå en tur i lunsjen, med armene i naturlig sving."
+      ],
+      "clinicalHypothesis": "Uspesifikke nakkesmerter, assosiert med statisk arbeidsbelastning; ingen røde flagg.",
+      "icpc2": "L01",
+      "icd10": "M54.2"
+    },
+    "non_specific": {
+      "title": "Uspesifikke nakkesmerter",
+      "category": "Muskel og ledd",
+      "severity": "Lav",
+      "patientDesc": "Svarene dine peker ikke på noen bestemt skade eller sykdom. Nakkesmerter uten tydelig årsak skyldes ofte muskelspenninger, stress eller lite variasjon i bevegelse. De fleste blir bedre uten spesifikk behandling.",
+      "patientDiff": "Tidlig slitasje, nervepåvirkning, hodepine fra nakken.",
+      "phase1": "Hold deg i aktivitet og beveg nakken rolig flere ganger daglig. Varme og mosjon kan hjelpe. Hvis plagene varer i mer enn 3–4 uker, bør du få dem vurdert.",
+      "exercises": [
+        "Roter hodet rolig fra side til side, 10 ganger.",
+        "Rull skuldrene baklengs, 10 ganger.",
+        "Gå en tur hver dag i et komfortabelt tempo."
+      ],
+      "clinicalHypothesis": "Uspesifikke nakkesmerter uten røde flagg eller nevrologiske utfall.",
+      "icpc2": "L01",
+      "icd10": "M54.2"
+    }
+  }
+}
