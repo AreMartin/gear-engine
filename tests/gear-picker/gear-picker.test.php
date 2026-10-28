@@ -12,6 +12,9 @@ function add_action() {}
 function apply_filters( $tag, $value ) { return $value; }
 function sanitize_key( $k ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $k ) ); }
 function wp_strip_all_tags( $s ) { return strip_tags( (string) $s ); }
+function __( $s ) { return $s; }
+function _n( $a, $b, $n ) { return 1 === $n ? $a : $b; }
+function number_format_i18n( $n ) { return (string) $n; }
 class WP_Error {}
 class WP_Post {}
 class GAE_CPT {
@@ -19,6 +22,7 @@ class GAE_CPT {
 }
 
 require_once ABSPATH . 'modules/gear-picker/class-gear-engine-gear-picker.php';
+require_once ABSPATH . 'modules/gear-picker/class-gear-engine-picker-diagnostics.php';
 
 $failures = 0;
 function t( $name, $ok ) {
@@ -95,5 +99,34 @@ foreach ( $types as $type ) {
 	t( "$type: pills use defined specs", ! array_diff( $used, $fields ) );
 	t( "$type: has base scoring", isset( $c['scoring']['base'], $c['scoring']['fallback_score'] ) );
 }
+
+// Diagnostics helpers.
+$D     = 'Gear_Engine_Picker_Diagnostics';
+$match = array( 'include' => array( 'tredemølle' ), 'exclude' => array( 'reservedel' ), 'exclude_title' => array( 'matte' ) );
+t( 'reason: matches', '' === Gear_Engine_Gear_Picker::match_reason( 'Tredemølle X', array(), $match ) );
+t( 'reason: other type', 'other_type' === Gear_Engine_Gear_Picker::match_reason( 'Romaskin', array(), $match ) );
+t( 'reason: excluded', 'excluded' === Gear_Engine_Gear_Picker::match_reason( 'Tredemølle matte', array(), $match ) );
+t( 'reason: scope skips include', '' === Gear_Engine_Gear_Picker::match_reason( 'Romaskin', array(), $match, true ) );
+
+t( 'types: default treadmill', array( 'treadmill' ) === $D::shortcode_types_in( '[gear_engine_gear_picker]' ) );
+t( 'types: explicit + unique', array( 'romaskin', 'treadmill' ) === $D::shortcode_types_in( '[gear_engine_gear_picker type="romaskin"] [gear_engine_gear_picker type=treadmill] [gear_engine_gear_picker type="romaskin" category="x"]' ) );
+t( 'types: none', array() === $D::shortcode_types_in( 'hello [gallery]' ) );
+
+$terms = array( array( 'name' => 'Tredemøller', 'slug' => 'tredemoller', 'count' => 3 ), array( 'name' => 'Yoga', 'slug' => 'yoga', 'count' => 1 ) );
+t( 'categories: suggests match', 'tredemoller' === ( $D::suggest_categories( $terms, array( 'tredemøll' ) )[0]['slug'] ?? '' ) );
+t( 'categories: none', array() === $D::suggest_categories( $terms, array( 'romaskin' ) ) );
+
+$base = array( 'total' => 20, 'qualified' => 10, 'reasons' => array(), 'samples' => array(), 'specs' => array( 'speed' => array( 'type' => 'number', 'found' => 8, 'guessed' => 2, 'missing' => 0 ) ) );
+t( 'advice: healthy is ready', 'ready' === $D::status( $D::advise( $base, array(), 1 ) ) );
+t( 'advice: no gear is broken', 'broken' === $D::status( $D::advise( array( 'total' => 0, 'qualified' => 0, 'reasons' => array(), 'specs' => array() ) ) ) );
+$none = array_merge( $base, array( 'qualified' => 0, 'reasons' => array( 'other_type' => 20 ) ) );
+t( 'advice: zero qualified is broken', 'broken' === $D::status( $D::advise( $none, array(), 1 ) ) );
+$adv = $D::advise( $none, array( array( 'name' => 'T', 'slug' => 'tredemoller', 'count' => 3 ) ), 1 );
+t( 'advice: suggests category slug', false !== strpos( json_encode( $adv ), 'category=\"tredemoller\"' ) );
+t( 'advice: few products needs attention', 'attention' === $D::status( $D::advise( array_merge( $base, array( 'qualified' => 3 ) ), array(), 1 ) ) );
+$weak = $base;
+$weak['specs']['speed']['found'] = 2;
+t( 'advice: weak spec coverage needs attention', 'attention' === $D::status( $D::advise( $weak, array(), 1 ) ) );
+t( 'advice: unused is only a tip', 'ready' === $D::status( $D::advise( $base, array(), 0 ) ) );
 
 exit( $failures ? 1 : 0 );

@@ -177,18 +177,31 @@ class Gear_Engine_Gear_Picker {
 	 * @return bool
 	 */
 	public static function is_match( string $title, array $terms, array $match, bool $has_scope = false ): bool {
+		return '' === self::match_reason( $title, $terms, $match, $has_scope );
+	}
+
+	/**
+	 * Why a product does not belong to the picker type.
+	 *
+	 * @param string               $title     Product title.
+	 * @param string[]             $terms     Category names.
+	 * @param array<string, mixed> $match     Config "match" block.
+	 * @param bool                 $has_scope Whether a category scope already restricted the query.
+	 * @return string "" when it matches, "other_type" when it lacks every include word, "excluded" for accessories and spare parts.
+	 */
+	public static function match_reason( string $title, array $terms, array $match, bool $has_scope = false ): string {
 		$title_lower = self::lower( $title );
 		$haystack    = self::lower( $title . ' ' . implode( ' ', $terms ) );
 
+		if ( ! $has_scope && ! self::contains_any( $haystack, (array) ( $match['include'] ?? array() ) ) ) {
+			return 'other_type';
+		}
 		if ( self::contains_any( $haystack, (array) ( $match['exclude'] ?? array() ) )
 			|| self::contains_any( $title_lower, (array) ( $match['exclude_title'] ?? array() ) )
 			|| self::matches_any_pattern( $title_lower, (array) ( $match['exclude_patterns'] ?? array() ) ) ) {
-			return false;
+			return 'excluded';
 		}
-		if ( $has_scope ) {
-			return true;
-		}
-		return self::contains_any( $haystack, (array) ( $match['include'] ?? array() ) );
+		return '';
 	}
 
 	/**
@@ -253,26 +266,50 @@ class Gear_Engine_Gear_Picker {
 	/**
 	 * Build the client payload for one product, or null when it does not qualify.
 	 *
-	 * @param WP_Post              $post   Gear post.
-	 * @param array<string, mixed> $config Picker config.
+	 * @param WP_Post              $post      Gear post.
+	 * @param array<string, mixed> $config    Picker config.
 	 * @param bool                 $has_scope Whether a category scope restricted the query.
 	 * @return array<string, mixed>|null
 	 */
 	public static function build_item( WP_Post $post, array $config, bool $has_scope = false ): ?array {
-		$in_stock = get_post_meta( $post->ID, GAE_CPT::META_IN_STOCK, true );
-		$price    = (float) get_post_meta( $post->ID, GAE_CPT::META_PRICE, true );
-		$url      = (string) get_post_meta( $post->ID, GAE_CPT::META_AFFILIATE_URL, true );
+		return self::evaluate_post( $post, $config, $has_scope )['item'];
+	}
 
-		if ( '0' === (string) $in_stock || $price <= 0 || '' === $url || $price < (float) ( $config['match']['min_price'] ?? 0 ) ) {
-			return null;
-		}
-
+	/**
+	 * Decide whether a product qualifies and, if not, why.
+	 *
+	 * Reasons: other_type, excluded, out_of_stock, no_price, below_min_price, no_link.
+	 *
+	 * @param WP_Post              $post      Gear post.
+	 * @param array<string, mixed> $config    Picker config.
+	 * @param bool                 $has_scope Whether a category scope restricted the query.
+	 * @return array{item: array<string, mixed>|null, reason: string}
+	 */
+	public static function evaluate_post( WP_Post $post, array $config, bool $has_scope = false ): array {
 		$terms = wp_get_post_terms( $post->ID, GAE_CPT::TAXONOMY, array( 'fields' => 'names' ) );
 		$terms = is_wp_error( $terms ) ? array() : $terms;
 		$title = get_the_title( $post );
 
-		if ( ! self::is_match( $title, $terms, (array) $config['match'], $has_scope ) ) {
-			return null;
+		$reason = self::match_reason( $title, $terms, (array) $config['match'], $has_scope );
+		if ( '' !== $reason ) {
+			return array( 'item' => null, 'reason' => $reason );
+		}
+
+		$in_stock = get_post_meta( $post->ID, GAE_CPT::META_IN_STOCK, true );
+		$price    = (float) get_post_meta( $post->ID, GAE_CPT::META_PRICE, true );
+		$url      = (string) get_post_meta( $post->ID, GAE_CPT::META_AFFILIATE_URL, true );
+
+		if ( '0' === (string) $in_stock ) {
+			return array( 'item' => null, 'reason' => 'out_of_stock' );
+		}
+		if ( $price <= 0 ) {
+			return array( 'item' => null, 'reason' => 'no_price' );
+		}
+		if ( $price < (float) ( $config['match']['min_price'] ?? 0 ) ) {
+			return array( 'item' => null, 'reason' => 'below_min_price' );
+		}
+		if ( '' === $url ) {
+			return array( 'item' => null, 'reason' => 'no_link' );
 		}
 
 		$image = (string) get_post_meta( $post->ID, GAE_CPT::META_IMAGE_URL, true );
@@ -281,21 +318,39 @@ class Gear_Engine_Gear_Picker {
 			$image = ! empty( $thumb[0] ) ? $thumb[0] : $image;
 		}
 
-		$old = (float) get_post_meta( $post->ID, GAE_CPT::META_REGULAR_PRICE, true );
-
+		$old  = (float) get_post_meta( $post->ID, GAE_CPT::META_REGULAR_PRICE, true );
 		$read = self::extract_specs( $title . ' ' . $post->post_excerpt . ' ' . $post->post_content, (array) $config['specs'], $price );
 
 		return array(
-			'id'    => $post->ID,
-			'name'  => $title,
-			'shop'  => (string) get_post_meta( $post->ID, GAE_CPT::META_MERCHANT, true ),
-			'price' => $price,
-			'old'   => $old > $price ? $old : 0,
-			'cur'   => (string) get_post_meta( $post->ID, GAE_CPT::META_CURRENCY, true ) ?: 'kr',
-			'img'   => esc_url_raw( $image ),
-			'url'   => esc_url_raw( $url ),
-			'specs' => $read['specs'],
-			'est'   => $read['est'],
+			'item'   => array(
+				'id'    => $post->ID,
+				'name'  => $title,
+				'shop'  => (string) get_post_meta( $post->ID, GAE_CPT::META_MERCHANT, true ),
+				'price' => $price,
+				'old'   => $old > $price ? $old : 0,
+				'cur'   => (string) get_post_meta( $post->ID, GAE_CPT::META_CURRENCY, true ) ?: 'kr',
+				'img'   => esc_url_raw( $image ),
+				'url'   => esc_url_raw( $url ),
+				'specs' => $read['specs'],
+				'est'   => $read['est'],
+			),
+			'reason' => '',
+		);
+	}
+
+	/**
+	 * Base query arguments for loading gear posts.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function get_query_args(): array {
+		return array(
+			'post_type'              => GAE_CPT::POST_TYPE,
+			'post_status'            => 'publish',
+			'posts_per_page'         => (int) apply_filters( 'gear_engine_gear_picker_max_products', 1000 ),
+			'no_found_rows'          => true,
+			'update_post_term_cache' => true,
+			'update_post_meta_cache' => true,
 		);
 	}
 
@@ -314,14 +369,7 @@ class Gear_Engine_Gear_Picker {
 			return $cached;
 		}
 
-		$args = array(
-			'post_type'              => GAE_CPT::POST_TYPE,
-			'post_status'            => 'publish',
-			'posts_per_page'         => (int) apply_filters( 'gear_engine_gear_picker_max_products', 1000 ),
-			'no_found_rows'          => true,
-			'update_post_term_cache' => true,
-			'update_post_meta_cache' => true,
-		);
+		$args = self::get_query_args();
 		if ( $category ) {
 			$args['tax_query'] = array(
 				array(

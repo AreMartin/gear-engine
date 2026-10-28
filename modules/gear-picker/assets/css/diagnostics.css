@@ -1,0 +1,24 @@
+.gear-engine-diag__intro { max-width: 760px; font-size: 14px; }
+.gear-engine-diag__summary { font-size: 15px; font-weight: 600; }
+.gear-engine-diag__card { max-width: 860px; margin: 20px 0; padding: 4px 20px 16px; border: 1px solid #c3c4c7; border-left-width: 6px; border-radius: 4px; background: #fff; }
+.gear-engine-diag__card--ready { border-left-color: #00a32a; }
+.gear-engine-diag__card--attention { border-left-color: #dba617; }
+.gear-engine-diag__card--broken { border-left-color: #d63638; }
+.gear-engine-diag__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gear-engine-diag__head h2 { margin: 12px 0; }
+.gear-engine-diag__badge { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+.gear-engine-diag__badge--ready { background: #edfaef; color: #00700f; }
+.gear-engine-diag__badge--attention { background: #fcf9e8; color: #7d5a00; }
+.gear-engine-diag__badge--broken { background: #fcf0f1; color: #b32d2e; }
+.gear-engine-diag__code { width: 100%; max-width: 380px; font-family: monospace; }
+.gear-engine-diag__count strong { font-size: 22px; }
+.gear-engine-diag__error { padding: 8px 12px; background: #fcf0f1; color: #b32d2e; font-family: monospace; }
+.gear-engine-diag__advice { margin: 0 0 12px; padding: 0; list-style: none; }
+.gear-engine-diag__advice-item { margin: 0 0 8px; padding: 10px 12px; border-radius: 4px; background: #f6f7f7; }
+.gear-engine-diag__advice-item--ok { background: #edfaef; }
+.gear-engine-diag__advice-item--warn { background: #fcf9e8; }
+.gear-engine-diag__advice-item--bad { background: #fcf0f1; }
+.gear-engine-diag__level { display: inline-block; min-width: 64px; margin-right: 8px; font-weight: 700; }
+.gear-engine-diag__details { margin-top: 10px; }
+.gear-engine-diag__details summary { cursor: pointer; font-weight: 600; }
+.gear-engine-diag__details table { margin-top: 10px; }

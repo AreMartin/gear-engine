@@ -81,4 +81,6 @@ Each type is one JSON file in `modules/gear-picker/configs/`: which products qua
 
 Specs that the feed text does not state can get a price-based `estimate`. Estimates take part in filtering but are never shown as pills. `feature_shop` makes sure one product from that shop appears when available, and `scoring.shop_bias` nudges ranking per shop; remove either to disable it. Product lists are cached for an hour and cleared when gear is saved or deleted.
 
+**Gear Pickers Health** (Exercise Gear → Gear Pickers Health, admins only) checks every picker against the real products. Each picker gets a Ready / Needs attention / Not working badge, its shortcode, the pages using it, a plain-language "What to do" list and expandable tables showing why products were skipped and how well specs are read from descriptions. It uses the same `Gear_Engine_Gear_Picker::evaluate_post()` as the picker, so results always agree.
+
 To add a type (e.g. rowing machines), copy `treadmill.json` and adjust it. Tests: `php tests/gear-picker/gear-picker.test.php` and `node tests/gear-picker/scoring.test.js`.
