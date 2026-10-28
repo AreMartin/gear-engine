@@ -170,6 +170,7 @@ class Gear_Engine_Exercise_Service {
 			'area'             => $area,
 			'equipment'        => $equipment,
 			'risk'             => Gear_Engine_Exercises_CPT::sanitize_risk( get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ) ),
+			'good_for'         => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ),
 			'video_culture'    => $culture,
 			'exorlive_id'      => $video_url ? $exorlive_id : '',
 			'video_url'        => $video_url,

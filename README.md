@@ -19,7 +19,13 @@ $exercises = Gear_Engine_Exercise_Service::search_exercises(
 
 The service caps any request at 50 records; the chat retrieves at most five relevant CPT candidates when exercise intent is detected, and the backend separately enforces a maximum of five exercises per training program. The AI selects candidate IDs, while the chat builds the returned program from canonical CPT records. Existing local JSON exercise protocols remain a fallback when no matching CPT entries exist. ExorLive player URLs are constructed from the stored numeric exercise ID and locale unless a manual supported video URL is provided. The chat builds embeds from approved provider URLs and shows ExorLive attribution for ExorLive videos. Raw iframe HTML is never stored. Exercise descriptions should be original, and any source material should be recorded in the source/reference field.
 
-### Protocols and risk levels
+### Simple setup: risk and "Good for"
+
+The default setup needs no protocols. Rate each exercise's **Risk level** and, optionally, fill in **Good for** (comma-separated conditions such as `meniscus, kneartrose, tennisalbue`). **Exercise Library → Rate Exercises** lets you edit risk and Good for for many exercises at once, with a "Needs attention" list of what is still missing. In general mode the chat takes up to 50 low/moderate-risk exercises for the body area, ranks those whose Good for tags match the triage title/category or recent user messages first, gives the AI the top 12, and the AI picks at most five. Both columns can also be filled through the CSV (`risk`, `good_for`).
+
+### Protocols and risk levels (advanced, optional)
+
+Protocols are off by default. Enable them under **Settings → AI → Clinical protocols (advanced)**; this shows the Protocols screen and turns the Rate Exercises page into the full Protocol Manager.
 
 Protocols are managed in the WP dashboard under **Exercise Library → Protocols** (no JSON files). A top-level term is a condition; child terms are phases. Each term has editorial fields: clinical summary, red flags, matching ICD-10/ICPC-2 codes, dosage/progression guidance, sources, an optional review reminder date, and a Draft/Approved status. A protocol can only be saved as Approved when codes, red flags and at least one published exercise are present; the reviewer and date are filled in automatically from the approving user. If a reminder date is set, the protocol is no longer used after that date until approved again; with no date it never expires. An exercise can belong to several protocols. Sources are never exposed to the chat.
 

@@ -1188,6 +1188,7 @@ assert_test( 1 === $publish_summary['updated'] && 'publish' === get_post_status(
 
 // Suite 17: protocols and risk levels.
 echo "\nRunning Suite 17: Protocols and risk levels...\n";
+update_option( 'gear_engine_enable_protocols', true );
 assert_test( 'moderate' === Gear_Engine_Exercises_CPT::sanitize_risk( ' Moderate ' ) && '' === Gear_Engine_Exercises_CPT::sanitize_risk( 'extreme' ) && '' === Gear_Engine_Exercises_CPT::sanitize_risk( array( 'low' ) ), 'protocols: Risk sanitizer accepts only known levels' );
 assert_test( 'M23.2, L96' === Gear_Engine_Protocols::sanitize_codes( 'm23.2; l96, junk, 12' ), 'protocols: Normalizes ICD-10/ICPC-2 codes and drops invalid entries' );
 assert_test( '2026-02-30' !== Gear_Engine_Protocols::sanitize_date( '2026-02-30' ) && '2026-03-01' === Gear_Engine_Protocols::sanitize_date( '2026-03-01' ), 'protocols: Rejects invalid dates' );
@@ -1254,10 +1255,20 @@ assert_test( 5 === $GLOBALS['last_wp_query_args']['posts_per_page'] && 'meniscus
 $no_code = $triage;
 $no_code['codes'] = array( 'X99' );
 $sel = Gear_Engine_Exercise_Selection::select( $no_code, 'kne', 'øvelser', true );
-assert_test( 'general' === $sel['mode'] && 12 === $GLOBALS['last_wp_query_args']['posts_per_page'], 'selection: Falls back to general mode without a protocol' );
+assert_test( 'general' === $sel['mode'] && 50 === $GLOBALS['last_wp_query_args']['posts_per_page'], 'selection: Falls back to general mode without a protocol' );
 assert_test( array( 'low', 'moderate' ) === $GLOBALS['last_wp_query_args']['meta_query'][0]['value'], 'selection: General mode only draws from rated low and moderate risk exercises' );
 assert_test( 'none' === Gear_Engine_Exercise_Selection::select( $no_code, 'kne', 'øvelser', false )['mode'], 'selection: General mode can be disabled' );
 assert_test( 'none' === Gear_Engine_Exercise_Selection::select( $no_code, '', 'øvelser', true )['mode'], 'selection: General mode requires a known body area' );
+$GLOBALS['last_wp_query_args'] = null;
+$ranked = Gear_Engine_Exercise_Selection::rank_by_good_for( array( array( 'id' => 1, 'good_for' => 'albue' ), array( 'id' => 2, 'good_for' => 'Meniscus; kneartrose' ), array( 'id' => 3, 'good_for' => '' ), array( 'id' => 4, 'good_for' => 'meniscus' ) ), 'Jeg har meniskskade? meniscus operert' );
+assert_test( array( 2, 4, 1, 3 ) === array_column( $ranked, 'id' ), 'selection: Exercises with matching good_for tags are ranked first, others keep order' );
+assert_test( 'Meniscus, kneartrose' === Gear_Engine_Exercises_CPT::sanitize_good_for( 'Meniscus; kneartrose,, MENISCUS' ), 'exercise_cpt: Normalizes and de-duplicates good_for tags' );
+update_option( 'gear_engine_enable_protocols', false );
+assert_test( array() === Gear_Engine_Protocols::find_approved_by_codes( array( 'L96' ) ) && 'general' === Gear_Engine_Exercise_Selection::select( $triage, 'kne', 'øvelser', true )['mode'], 'selection: With protocols switched off the chat uses general mode with good_for ranking' );
+$GLOBALS['wp_set_terms_calls'] = array();
+Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id ), array(), array(), array( $imported_exercise_id => 'meniscus; kne' ), false );
+assert_test( array() === $GLOBALS['wp_set_terms_calls'] && 'meniscus, kne' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ), 'protocol_manager: Rating screen saves good_for without touching protocol tags' );
+update_option( 'gear_engine_enable_protocols', true );
 $GLOBALS['last_wp_query_args'] = null;
 $sel_blocked = Gear_Engine_Exercise_Selection::select( array( 'severity' => 'Høy', 'codes' => array( 'M23.2' ) ), 'kne', 'øvelser', true );
 assert_test( 'blocked' === $sel_blocked['mode'] && null === $GLOBALS['last_wp_query_args'] && array() === $sel_blocked['candidates'], 'selection: Blocked mode never queries or returns exercises' );

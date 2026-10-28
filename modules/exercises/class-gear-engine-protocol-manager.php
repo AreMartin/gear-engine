@@ -40,8 +40,8 @@ class Gear_Engine_Protocol_Manager {
 	public function register_admin_page(): void {
 		add_submenu_page(
 			'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE,
-			__( 'Protocol Manager', 'gear-engine' ),
-			__( 'Protocol Manager', 'gear-engine' ),
+			Gear_Engine_Protocols::is_enabled() ? __( 'Protocol Manager', 'gear-engine' ) : __( 'Rate Exercises', 'gear-engine' ),
+			Gear_Engine_Protocols::is_enabled() ? __( 'Protocol Manager', 'gear-engine' ) : __( 'Rate Exercises', 'gear-engine' ),
 			'edit_posts',
 			self::GEAR_ENGINE_PAGE_SLUG,
 			array( $this, 'render_admin_page' )
@@ -90,9 +90,11 @@ class Gear_Engine_Protocol_Manager {
 	 * @param array<int, int>               $post_ids Exercise IDs that were displayed.
 	 * @param array<int|string, mixed>      $assign   Map of exercise ID to checked term IDs.
 	 * @param array<int|string, mixed>      $risk     Map of exercise ID to risk level.
+	 * @param array<int|string, mixed>|null $good_for Map of exercise ID to "good for" tags; null leaves them unchanged.
+	 * @param bool                          $sync_protocols Whether to replace protocol assignments.
 	 * @return int Number of exercises updated.
 	 */
-	public static function apply_matrix_changes( array $post_ids, array $assign, array $risk ): int {
+	public static function apply_matrix_changes( array $post_ids, array $assign, array $risk, ?array $good_for = null, bool $sync_protocols = true ): int {
 		$valid_terms = array();
 		foreach ( self::get_protocol_tree() as $row ) {
 			$valid_terms[] = (int) $row['term']->term_id;
@@ -108,8 +110,13 @@ class Gear_Engine_Protocol_Manager {
 				continue;
 			}
 
-			$checked = isset( $assign[ $post_id ] ) && is_array( $assign[ $post_id ] ) ? array_map( 'absint', $assign[ $post_id ] ) : array();
-			wp_set_object_terms( $post_id, array_values( array_intersect( $checked, $valid_terms ) ), Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY );
+			if ( $sync_protocols ) {
+				$checked = isset( $assign[ $post_id ] ) && is_array( $assign[ $post_id ] ) ? array_map( 'absint', $assign[ $post_id ] ) : array();
+				wp_set_object_terms( $post_id, array_values( array_intersect( $checked, $valid_terms ) ), Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY );
+			}
+			if ( null !== $good_for && isset( $good_for[ $post_id ] ) ) {
+				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, Gear_Engine_Exercises_CPT::sanitize_good_for( $good_for[ $post_id ] ) );
+			}
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, Gear_Engine_Exercises_CPT::sanitize_risk( $risk[ $post_id ] ?? '' ) );
 			++$updated;
 		}
@@ -131,7 +138,8 @@ class Gear_Engine_Protocol_Manager {
 		$post_ids = isset( $_POST['gear_engine_post_ids'] ) && is_array( $_POST['gear_engine_post_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['gear_engine_post_ids'] ) ) : array();
 		$assign   = isset( $_POST['gear_engine_assign'] ) && is_array( $_POST['gear_engine_assign'] ) ? wp_unslash( $_POST['gear_engine_assign'] ) : array();
 		$risk     = isset( $_POST['gear_engine_risk'] ) && is_array( $_POST['gear_engine_risk'] ) ? wp_unslash( $_POST['gear_engine_risk'] ) : array();
-		$count    = self::apply_matrix_changes( $post_ids, $assign, $risk );
+		$good_for = isset( $_POST['gear_engine_good_for'] ) && is_array( $_POST['gear_engine_good_for'] ) ? wp_unslash( $_POST['gear_engine_good_for'] ) : null;
+		$count    = self::apply_matrix_changes( $post_ids, $assign, $risk, $good_for, Gear_Engine_Protocols::is_enabled() );
 
 		$return = isset( $_POST['gear_engine_return'] ) ? esc_url_raw( wp_unslash( $_POST['gear_engine_return'] ) ) : '';
 		$return = $return ? wp_validate_redirect( $return, admin_url( 'edit.php' ) ) : admin_url( 'edit.php' );
@@ -168,16 +176,21 @@ class Gear_Engine_Protocol_Manager {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'gear-engine' ), '', array( 'response' => 403 ) );
 		}
+		$enabled  = Gear_Engine_Protocols::is_enabled();
 		$tab      = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'overview';
-		$tab      = 'matrix' === $tab ? 'matrix' : 'overview';
+		$tab      = 'matrix' === $tab || ! $enabled ? 'matrix' : 'overview';
 		$base_url = admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE . '&page=' . self::GEAR_ENGINE_PAGE_SLUG );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Protocol Manager', 'gear-engine' ); ?></h1>
+			<h1><?php echo $enabled ? esc_html__( 'Protocol Manager', 'gear-engine' ) : esc_html__( 'Rate Exercises', 'gear-engine' ); ?></h1>
+			<?php if ( ! $enabled ) : ?>
+				<?php $this->render_attention_box(); ?>
+			<?php else : ?>
 			<h2 class="nav-tab-wrapper">
 				<a class="nav-tab <?php echo 'overview' === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $base_url ); ?>"><?php esc_html_e( 'Overview', 'gear-engine' ); ?></a>
 				<a class="nav-tab <?php echo 'matrix' === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'tab', 'matrix', $base_url ) ); ?>"><?php esc_html_e( 'Exercise matrix', 'gear-engine' ); ?></a>
 			</h2>
+			<?php endif; ?>
 			<?php
 			if ( 'matrix' === $tab ) {
 				$this->render_matrix( $base_url );
@@ -226,7 +239,7 @@ class Gear_Engine_Protocol_Manager {
 				),
 			)
 		);
-		$untagged = self::count_published_exercises(
+		$untagged = ! Gear_Engine_Protocols::is_enabled() ? 0 : self::count_published_exercises(
 			array(
 				'tax_query' => array(
 					array(
@@ -236,8 +249,18 @@ class Gear_Engine_Protocol_Manager {
 				),
 			)
 		);
+		$no_tags  = self::count_published_exercises(
+			array(
+				'meta_query' => array(
+					'relation' => 'OR',
+					array( 'key' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, 'compare' => 'NOT EXISTS' ),
+					array( 'key' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, 'value' => '' ),
+				),
+			)
+		);
+		$enabled  = Gear_Engine_Protocols::is_enabled();
 		$drafts   = 0;
-		foreach ( self::get_protocol_tree() as $row ) {
+		foreach ( $enabled ? self::get_protocol_tree() : array() as $row ) {
 			if ( 0 === (int) $row['term']->parent && Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED !== Gear_Engine_Protocols::get_status( (int) $row['term']->term_id ) ) {
 				++$drafts;
 			}
@@ -245,6 +268,7 @@ class Gear_Engine_Protocol_Manager {
 
 		$items = array(
 			array( $unrated, __( 'published exercises have no risk level (the chat cannot suggest them without a protocol)', 'gear-engine' ), add_query_arg( 'tab', 'matrix', admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE . '&page=' . self::GEAR_ENGINE_PAGE_SLUG ) ) ),
+			array( $no_tags, __( 'published exercises have no "Good for" conditions (optional, helps the chat pick the right ones)', 'gear-engine' ), add_query_arg( 'tab', 'matrix', admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE . '&page=' . self::GEAR_ENGINE_PAGE_SLUG ) ) ),
 			array( $untagged, __( 'published exercises are in no protocol', 'gear-engine' ), add_query_arg( 'gear_engine_protocol_filter', 'none', $list_url ) ),
 			array( $drafts, __( 'protocols are not approved or have expired', 'gear-engine' ), '' ),
 		);
@@ -326,11 +350,7 @@ class Gear_Engine_Protocol_Manager {
 	 * @return void
 	 */
 	private function render_matrix( string $base_url ): void {
-		$tree = self::get_protocol_tree();
-		if ( ! $tree ) {
-			echo '<p>' . esc_html__( 'Create at least one protocol first, then assign exercises here.', 'gear-engine' ) . '</p>';
-			return;
-		}
+		$tree = Gear_Engine_Protocols::is_enabled() ? self::get_protocol_tree() : array();
 
 		$area     = isset( $_GET['area'] ) ? sanitize_title( wp_unslash( $_GET['area'] ) ) : '';
 		$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
@@ -379,7 +399,7 @@ class Gear_Engine_Protocol_Manager {
 		echo '<input type="hidden" name="gear_engine_return" value="' . esc_url( $return ) . '" />';
 		wp_nonce_field( self::GEAR_ENGINE_SAVE_ACTION, 'gear_engine_matrix_nonce' );
 
-		echo '<div style="overflow-x:auto"><table class="widefat striped"><thead><tr><th>' . esc_html__( 'Exercise', 'gear-engine' ) . '</th><th>' . esc_html__( 'Risk', 'gear-engine' ) . '</th>';
+		echo '<div style="overflow-x:auto"><table class="widefat striped"><thead><tr><th>' . esc_html__( 'Exercise', 'gear-engine' ) . '</th><th>' . esc_html__( 'Risk', 'gear-engine' ) . '</th><th>' . esc_html__( 'Good for (comma-separated)', 'gear-engine' ) . '</th>';
 		foreach ( $tree as $row ) {
 			echo '<th style="text-align:center;font-weight:' . ( $row['depth'] ? 'normal' : '700' ) . '">' . ( $row['depth'] ? '&mdash; ' : '' ) . esc_html( $row['term']->name ) . '</th>';
 		}
@@ -399,7 +419,7 @@ class Gear_Engine_Protocol_Manager {
 			foreach ( array( '' => __( 'Not rated', 'gear-engine' ), 'low' => __( 'Low', 'gear-engine' ), 'moderate' => __( 'Moderate', 'gear-engine' ), 'high' => __( 'High', 'gear-engine' ) ) as $value => $label ) {
 				echo '<option value="' . esc_attr( $value ) . '"' . selected( $risk, $value, false ) . '>' . esc_html( $label ) . '</option>';
 			}
-			echo '</select></td>';
+			echo '</select></td><td><input type="text" class="regular-text" name="gear_engine_good_for[' . esc_attr( (string) $post_id ) . ']" value="' . esc_attr( (string) get_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ) ) . '"' . ( $can_edit ? '' : ' disabled' ) . ' /></td>';
 			foreach ( $tree as $row ) {
 				$term_id = (int) $row['term']->term_id;
 				echo '<td style="text-align:center"><input type="checkbox" name="gear_engine_assign[' . esc_attr( (string) $post_id ) . '][]" value="' . esc_attr( (string) $term_id ) . '"' . checked( in_array( $term_id, $assigned, true ), true, false ) . ( $can_edit ? '' : ' disabled' ) . ' /></td>';
@@ -464,12 +484,14 @@ class Gear_Engine_Protocol_Manager {
 		$protocol = isset( $_GET['gear_engine_protocol_filter'] ) ? sanitize_text_field( wp_unslash( $_GET['gear_engine_protocol_filter'] ) ) : '';
 		$risk     = isset( $_GET['gear_engine_risk_filter'] ) ? sanitize_text_field( wp_unslash( $_GET['gear_engine_risk_filter'] ) ) : '';
 
-		echo '<select name="gear_engine_protocol_filter"><option value="">' . esc_html__( 'All protocols', 'gear-engine' ) . '</option>';
-		echo '<option value="none"' . selected( $protocol, 'none', false ) . '>' . esc_html__( 'No protocol', 'gear-engine' ) . '</option>';
-		foreach ( self::get_protocol_tree() as $row ) {
-			echo '<option value="' . esc_attr( (string) $row['term']->term_id ) . '"' . selected( $protocol, (string) $row['term']->term_id, false ) . '>' . esc_html( str_repeat( '— ', (int) $row['depth'] ) . $row['term']->name ) . '</option>';
+		if ( Gear_Engine_Protocols::is_enabled() ) {
+			echo '<select name="gear_engine_protocol_filter"><option value="">' . esc_html__( 'All protocols', 'gear-engine' ) . '</option>';
+			echo '<option value="none"' . selected( $protocol, 'none', false ) . '>' . esc_html__( 'No protocol', 'gear-engine' ) . '</option>';
+			foreach ( self::get_protocol_tree() as $row ) {
+				echo '<option value="' . esc_attr( (string) $row['term']->term_id ) . '"' . selected( $protocol, (string) $row['term']->term_id, false ) . '>' . esc_html( str_repeat( '— ', (int) $row['depth'] ) . $row['term']->name ) . '</option>';
+			}
+			echo '</select>';
 		}
-		echo '</select>';
 
 		echo '<select name="gear_engine_risk_filter"><option value="">' . esc_html__( 'All risk levels', 'gear-engine' ) . '</option>';
 		foreach ( array( 'unrated' => __( 'Not rated', 'gear-engine' ), 'low' => __( 'Low', 'gear-engine' ), 'moderate' => __( 'Moderate', 'gear-engine' ), 'high' => __( 'High', 'gear-engine' ) ) as $value => $label ) {

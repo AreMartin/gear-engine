@@ -149,6 +149,35 @@ class Gear_Engine_Exercise_Selection {
 	}
 
 	/**
+	 * Put exercises whose "good for" tags appear in the conversation first (stable order otherwise).
+	 *
+	 * @param array<int, array<string, mixed>> $candidates Exercises.
+	 * @param string                           $haystack   Triage title/category and recent user text.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function rank_by_good_for( array $candidates, string $haystack ): array {
+		$haystack = mb_strtolower( $haystack, 'UTF-8' );
+		$scored   = array();
+		foreach ( $candidates as $index => $exercise ) {
+			$score = 0;
+			foreach ( preg_split( '/[;,]/', (string) ( $exercise['good_for'] ?? '' ) ) as $tag ) {
+				$tag = mb_strtolower( trim( $tag ), 'UTF-8' );
+				if ( mb_strlen( $tag, 'UTF-8' ) >= 3 && false !== mb_strpos( $haystack, $tag ) ) {
+					++$score;
+				}
+			}
+			$scored[] = array( $score, $index, $exercise );
+		}
+		usort(
+			$scored,
+			static function ( array $a, array $b ): int {
+				return $b[0] <=> $a[0] ?: $a[1] <=> $b[1];
+			}
+		);
+		return array_column( $scored, 2 );
+	}
+
+	/**
 	 * Return a reason string when exercises must not be offered, otherwise an empty string.
 	 *
 	 * @param array<string, mixed> $triage    Triage summary from extract_triage().
@@ -228,9 +257,11 @@ class Gear_Engine_Exercise_Selection {
 				array(
 					'area'     => $area_slug,
 					'max_risk' => 'moderate',
-					'limit'    => self::GEAR_ENGINE_GENERAL_LIMIT,
+					'limit'    => 50,
 				)
 			);
+			$candidates = self::rank_by_good_for( $candidates, ( $triage['title'] ?? '' ) . ' ' . ( $triage['category'] ?? '' ) . ' ' . $user_text );
+			$candidates = array_slice( $candidates, 0, self::GEAR_ENGINE_GENERAL_LIMIT );
 			if ( $candidates ) {
 				$selection['mode']       = 'general';
 				$selection['candidates'] = $candidates;
@@ -265,6 +296,7 @@ class Gear_Engine_Exercise_Selection {
 					'area'       => $exercise['area'],
 					'equipment'  => $exercise['equipment'],
 					'dosage'     => $exercise['dosage'],
+					'god_for'    => $exercise['good_for'] ?? '',
 				);
 			},
 			$selection['candidates']
@@ -285,6 +317,7 @@ class Gear_Engine_Exercise_Selection {
 			$text  = "\nMODUS: GENERELLE ØVELSESFORSLAG (ingen klinisk gjennomgått protokoll for denne tilstanden).\n";
 			$text .= "STRENGE REGLER FOR VALG:\n";
 			$text .= "1. Velg KUN fra CPT_EXERCISE_LIBRARY, maks 5. Aldri andre øvelser.\n";
+			$text .= "1b. Øvelser med treff i feltet god_for er markert som egnet for tilstanden brukeren beskriver; foretrekk dem, men bruk egen vurdering.\n";
 			$text .= "2. Foretrekk skånsomme øvelser som passer brukerens oppgitte smerte, funksjon og kapasitet.\n";
 			$text .= "3. Utelat øvelser som strider mot det brukeren har fortalt (akutt skade, operasjon, forverring ved belastning).\n";
 			$text .= "4. Er du usikker, velg færre øvelser eller ingen, og forklar hvorfor.\n";

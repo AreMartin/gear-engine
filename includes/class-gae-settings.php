@@ -357,6 +357,29 @@ class GAE_Settings {
 			)
 		);
 
+		register_setting(
+			self::OPTION_GROUP,
+			'gear_engine_enable_protocols',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+
+		add_settings_field(
+			'gear_engine_enable_protocols',
+			__( 'Clinical protocols (advanced)', 'gear-engine' ),
+			array( $this, 'render_field_checkbox' ),
+			self::PAGE_SLUG,
+			'gae_section_ai',
+			array(
+				'id'          => 'gear_engine_enable_protocols',
+				'label'       => __( 'Enable hand-picked protocols', 'gear-engine' ),
+				'description' => __( 'Optional. Adds a Protocols screen where you can define fixed exercise sets per condition. Leave off to let the chat choose from rated exercises by body area and "Good for" conditions.', 'gear-engine' ),
+			)
+		);
+
 		add_settings_field(
 			'gear_engine_disable_general_exercises',
 			__( 'Exercise suggestions without a protocol', 'gear-engine' ),

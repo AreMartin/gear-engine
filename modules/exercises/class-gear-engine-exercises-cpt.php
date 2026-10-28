@@ -23,6 +23,7 @@ class Gear_Engine_Exercises_CPT {
 	public const GEAR_ENGINE_META_DOSAGE        = '_gear_engine_exercise_dosage';
 	public const GEAR_ENGINE_META_SOURCE_URL    = '_gear_engine_exercise_source_url';
 	public const GEAR_ENGINE_META_RISK          = '_gear_engine_exercise_risk';
+	public const GEAR_ENGINE_META_GOOD_FOR      = '_gear_engine_exercise_good_for';
 	public const GEAR_ENGINE_META_SAMPLE_KEY    = '_gear_engine_exercise_sample_key';
 	public const GEAR_ENGINE_SAMPLE_OPTION      = 'gear_engine_exercise_samples_seeded';
 	private const GEAR_ENGINE_META_BOX_NONCE    = 'gear_engine_exercise_nonce';
@@ -127,8 +128,13 @@ class Gear_Engine_Exercises_CPT {
 			),
 			self::GEAR_ENGINE_META_RISK => array(
 				'type'              => 'string',
-				'description'       => __( 'Clinician-assigned risk level: low, moderate or high. Unrated exercises are never used without an approved protocol.', 'gear-engine' ),
+				'description'       => __( 'Clinician-assigned risk level: low, moderate or high. Unrated exercises are only used through an approved protocol.', 'gear-engine' ),
 				'sanitize_callback' => array( __CLASS__, 'sanitize_risk' ),
+			),
+			self::GEAR_ENGINE_META_GOOD_FOR => array(
+				'type'              => 'string',
+				'description'       => __( 'Optional comma-separated conditions this exercise suits, used to rank suggestions in the chat.', 'gear-engine' ),
+				'sanitize_callback' => array( __CLASS__, 'sanitize_good_for' ),
 			),
 		);
 
@@ -157,6 +163,26 @@ class Gear_Engine_Exercises_CPT {
 	public static function sanitize_risk( $value ): string {
 		$value = is_scalar( $value ) ? strtolower( trim( (string) $value ) ) : '';
 		return in_array( $value, array( 'low', 'moderate', 'high' ), true ) ? $value : '';
+	}
+
+	/**
+	 * Normalize the "good for" tags to a short comma-separated list.
+	 *
+	 * @param mixed $value Raw value; semicolons and commas separate tags.
+	 * @return string
+	 */
+	public static function sanitize_good_for( $value ): string {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$tags = array();
+		foreach ( preg_split( '/[;,]/', sanitize_text_field( (string) $value ) ) as $tag ) {
+			$tag = trim( $tag );
+			if ( '' !== $tag && ! isset( $tags[ strtolower( $tag ) ] ) ) {
+				$tags[ strtolower( $tag ) ] = $tag;
+			}
+		}
+		return implode( ', ', array_slice( array_values( $tags ), 0, 12 ) );
 	}
 
 	/**
@@ -339,6 +365,7 @@ class Gear_Engine_Exercises_CPT {
 		$dosage      = get_post_meta( $post->ID, self::GEAR_ENGINE_META_DOSAGE, true );
 		$source_url  = get_post_meta( $post->ID, self::GEAR_ENGINE_META_SOURCE_URL, true );
 		$risk        = self::sanitize_risk( get_post_meta( $post->ID, self::GEAR_ENGINE_META_RISK, true ) );
+		$good_for    = get_post_meta( $post->ID, self::GEAR_ENGINE_META_GOOD_FOR, true );
 		?>
 		<p>
 			<label for="gear-engine-exercise-risk"><?php esc_html_e( 'Risk level', 'gear-engine' ); ?></label>
@@ -349,6 +376,11 @@ class Gear_Engine_Exercises_CPT {
 				<option value="high" <?php selected( $risk, 'high' ); ?>><?php esc_html_e( 'High (clinician guided)', 'gear-engine' ); ?></option>
 			</select>
 			<span class="description"><?php esc_html_e( 'Without an approved protocol the chat only uses Low and Moderate exercises.', 'gear-engine' ); ?></span>
+		</p>
+		<p>
+			<label for="gear-engine-exercise-good-for"><?php esc_html_e( 'Good for (optional)', 'gear-engine' ); ?></label>
+			<input class="widefat" id="gear-engine-exercise-good-for" name="gear_engine_exercise_good_for" type="text" value="<?php echo esc_attr( (string) $good_for ); ?>" placeholder="<?php esc_attr_e( 'For example: meniscus, kneartrose, tennisalbue', 'gear-engine' ); ?>" />
+			<span class="description"><?php esc_html_e( 'Conditions this exercise suits. The chat lists matching exercises first.', 'gear-engine' ); ?></span>
 		</p>
 		<p>
 			<label for="gear-engine-exorlive-id"><?php esc_html_e( 'ExorLive exercise ID', 'gear-engine' ); ?></label>
@@ -409,6 +441,7 @@ class Gear_Engine_Exercises_CPT {
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_DOSAGE, sanitize_text_field( wp_unslash( $_POST['gear_engine_exercise_dosage'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_SOURCE_URL, $this->sanitize_source_url( wp_unslash( $_POST['gear_engine_exercise_source_url'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_RISK, self::sanitize_risk( wp_unslash( $_POST['gear_engine_exercise_risk'] ?? '' ) ) );
+		update_post_meta( $post_id, self::GEAR_ENGINE_META_GOOD_FOR, self::sanitize_good_for( wp_unslash( $_POST['gear_engine_exercise_good_for'] ?? '' ) ) );
 	}
 
 	/**

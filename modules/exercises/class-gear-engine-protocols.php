@@ -60,7 +60,8 @@ class Gear_Engine_Protocols {
 					'parent_item'   => __( 'Parent protocol', 'gear-engine' ),
 				),
 				'hierarchical'      => true,
-				'show_admin_column' => true,
+				'show_ui'           => self::is_enabled(),
+				'show_admin_column' => self::is_enabled(),
 				'show_in_rest'      => true, // Required for the block editor tag panel; term meta is not exposed.
 				'rewrite'           => false,
 			)
@@ -425,6 +426,15 @@ class Gear_Engine_Protocols {
 	}
 
 	/**
+	 * Whether the optional clinical protocols feature is switched on in settings.
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled(): bool {
+		return (bool) get_option( 'gear_engine_enable_protocols', false );
+	}
+
+	/**
 	 * Effective status: approved, expired (approved but past an optional reminder date) or draft.
 	 *
 	 * @param int $term_id Term ID.
@@ -450,6 +460,9 @@ class Gear_Engine_Protocols {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function find_approved_by_codes( array $codes ): array {
+		if ( ! self::is_enabled() ) {
+			return array();
+		}
 		$needles = array();
 		foreach ( $codes as $code ) {
 			$code = is_scalar( $code ) ? preg_replace( '/[^A-Z0-9]/', '', strtoupper( (string) $code ) ) : '';

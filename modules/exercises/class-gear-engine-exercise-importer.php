@@ -66,7 +66,7 @@ class Gear_Engine_Exercise_Importer {
 			<h1><?php esc_html_e( 'Import Exercises from CSV', 'gear-engine' ); ?></h1>
 			<p><?php esc_html_e( 'Upload a UTF-8 CSV file to preview and validate exercise records before importing them. New records are drafts unless you explicitly choose to publish them.', 'gear-engine' ); ?></p>
 			<p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=' . self::GEAR_ENGINE_TEMPLATE_ACTION ), self::GEAR_ENGINE_TEMPLATE_ACTION ) ); ?>"><?php esc_html_e( 'Download CSV template', 'gear-engine' ); ?></a></p>
-			<p><?php esc_html_e( 'Required columns: title, description (step-by-step instructions), and either exorlive_id or external_key. Add an optional HTTPS video_url from ExorLive, YouTube, or Vimeo; it takes precedence over exorlive_id, and for an ExorLive link (ex=...) the ID is filled in automatically if exorlive_id is empty. Optional risk (low, moderate, high) and protocol (existing protocol names or slugs) columns are supported; an absent protocol column leaves existing tags unchanged. Separate multiple area/equipment/protocol terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
+			<p><?php esc_html_e( 'Required columns: title, description (step-by-step instructions), and either exorlive_id or external_key. Add an optional HTTPS video_url from ExorLive, YouTube, or Vimeo; it takes precedence over exorlive_id, and for an ExorLive link (ex=...) the ID is filled in automatically if exorlive_id is empty. Optional risk (low, moderate, high), good_for (comma- or semicolon-separated conditions such as meniscus; tennisalbue, used to rank chat suggestions) and protocol (existing protocol names or slugs) columns are supported; an absent protocol column leaves existing tags unchanged. Separate multiple area/equipment/protocol terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
 
 			<?php $this->render_import_notice(); ?>
 
@@ -164,7 +164,7 @@ class Gear_Engine_Exercise_Importer {
 			},
 			$headers
 		);
-		$allowed_headers = array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'protocol' );
+		$allowed_headers = array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'good_for', 'protocol' );
 		if ( count( array_unique( $headers ) ) !== count( $headers ) || array_diff( $headers, $allowed_headers ) ) {
 			fclose( $handle );
 			return new WP_Error( 'gear_engine_exercise_csv_headers_invalid', __( 'The CSV contains duplicate or unsupported column names. Download the template for the supported columns.', 'gear-engine' ) );
@@ -268,7 +268,7 @@ class Gear_Engine_Exercise_Importer {
 		if ( false === $output ) {
 			wp_die( esc_html__( 'The CSV template could not be generated.', 'gear-engine' ) );
 		}
-		fputcsv( $output, array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'protocol' ) );
+		fputcsv( $output, array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'good_for', 'protocol' ) );
 		fclose( $output );
 		exit;
 	}
@@ -299,6 +299,7 @@ class Gear_Engine_Exercise_Importer {
 			'video_url'    => $get_text( 'video_url' ),
 			'source_url'   => $get_text( 'source_url' ),
 			'risk'         => $get_text( 'risk' ),
+			'good_for'     => Gear_Engine_Exercises_CPT::sanitize_good_for( $get_text( 'good_for' ) ),
 			// Null means the column is absent, so existing protocol tags are left untouched.
 			'protocol'     => array_key_exists( 'protocol', $raw ) ? self::parse_terms( $get_text( 'protocol' ) ) : null,
 		);
@@ -461,6 +462,9 @@ class Gear_Engine_Exercise_Importer {
 			update_post_meta( $post_id, self::GEAR_ENGINE_META_IMPORT_KEY, $data['external_key'] );
 			if ( '' !== $data['risk'] ) {
 				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, $data['risk'] );
+			}
+			if ( '' !== $data['good_for'] ) {
+				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, $data['good_for'] );
 			}
 
 			// Only existing protocols are assigned; unknown names are reported instead of silently created.
