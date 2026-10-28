@@ -15,12 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<ul class="gear-engine-triage-picker__grid">
 		<?php foreach ( $cards as $card ) : ?>
 			<li>
-				<a class="gear-engine-triage-picker__card" href="<?php echo esc_url( $card['url'] ); ?>">
+				<a class="gear-engine-triage-picker__card" href="<?php echo esc_url( $card['url'] ); ?>"<?php echo '' !== $card['summary'] ? ' title="' . esc_attr( $card['summary'] ) . '"' : ''; ?>>
 					<?php echo Gear_Engine_Triage::get_icon_svg( $card['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static plugin-defined SVG. ?>
 					<span class="gear-engine-triage-picker__label"><?php echo esc_html( $card['label'] ); ?></span>
-					<?php if ( '' !== $card['summary'] ) : ?>
-						<span class="gear-engine-triage-picker__summary"><?php echo esc_html( $card['summary'] ); ?></span>
-					<?php endif; ?>
 				</a>
 			</li>
 		<?php endforeach; ?>
