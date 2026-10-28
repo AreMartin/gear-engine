@@ -72,6 +72,9 @@ class WP_Query {
 		if ( isset( $args['posts_per_page'] ) && (int) $args['posts_per_page'] > 0 ) {
 			$posts = array_slice( $posts, 0, (int) $args['posts_per_page'] );
 		}
+		if ( isset( $args['fields'] ) && 'ids' === $args['fields'] ) {
+			$posts = array_map( static function ( $post ) { return $post->ID; }, $posts );
+		}
 		$this->posts = $posts;
 	}
 	public function have_posts(): bool {
@@ -142,8 +145,28 @@ function wp_parse_url( $url, $component = -1 ) {
 	return parse_url( $url, $component );
 }
 function wp_verify_nonce( $nonce, $action ) {
-	return 'valid-exercise-nonce' === $nonce && 'gear_engine_save_exercise' === $action ? 1 : false;
+	return 'valid-exercise-nonce' === $nonce && in_array( $action, array( 'gear_engine_save_exercise', 'gear_engine_save_protocol' ), true ) ? 1 : false;
 }
+$GLOBALS['wp_terms']     = array();
+$GLOBALS['wp_termmeta']  = array();
+function register_term_meta( $taxonomy, $meta_key, $args = array() ) {}
+function get_term_meta( $term_id, $key, $single = false ) { return $GLOBALS['wp_termmeta'][ $term_id ][ $key ] ?? ''; }
+function update_term_meta( $term_id, $key, $value ) { $GLOBALS['wp_termmeta'][ $term_id ][ $key ] = $value; return true; }
+function get_term( $term_id, $taxonomy = '' ) { return $GLOBALS['wp_terms'][ $term_id ] ?? null; }
+function get_terms( $args = array() ) {
+	return array_values( array_filter( $GLOBALS['wp_terms'], function ( $t ) use ( $args ) {
+		return ! isset( $args['parent'] ) || (int) $t->parent === (int) $args['parent'];
+	} ) );
+}
+function get_term_by( $field, $value, $taxonomy = '' ) {
+	foreach ( $GLOBALS['wp_terms'] as $t ) {
+		if ( ( 'slug' === $field && $t->slug === $value ) || ( 'name' === $field && $t->name === $value ) ) {
+			return $t;
+		}
+	}
+	return false;
+}
+function get_current_user_id() { return 1; }
 function current_user_can( $capability, ...$args ) {
 	return true;
 }
@@ -234,7 +257,9 @@ function term_exists( $term, $taxonomy = '', $parent = null ) {
 function wp_insert_term( $term, $taxonomy = '', $args = array() ) {
 	return array( 'term_id' => 1 );
 }
-function wp_set_object_terms( $object_id, $terms, $taxonomy, $append = false ) {}
+function wp_set_object_terms( $object_id, $terms, $taxonomy, $append = false ) {
+	$GLOBALS['wp_set_terms_calls'][] = array( $object_id, $terms, $taxonomy );
+}
 
 class WP_Post {
 	public int $ID = 0;
@@ -337,6 +362,8 @@ require_once ABSPATH . 'includes/class-gae-gutenberg-block.php';
 require_once ABSPATH . 'includes/class-gae-ai-api.php';
 require_once ABSPATH . 'includes/class-gae-product-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-protocols.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-manager.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-importer.php';
 require_once ABSPATH . 'modules/physio-chat/class-gae-physio-chat.php';
@@ -1036,8 +1063,14 @@ $exorlive_meta = $GLOBALS['registered_post_meta'][ Gear_Engine_Exercises_CPT::GE
 assert_test( ! empty( $exorlive_meta['show_in_rest'] ) && is_callable( $exorlive_meta['auth_callback'] ) && is_callable( $exorlive_meta['sanitize_callback'] ), 'exercise_cpt: ExorLive metadata is sanitized and permission-checked in REST' );
 $asserted_culture_meta = $GLOBALS['registered_post_meta'][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE ][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE ];
 assert_test( ! empty( $asserted_culture_meta['show_in_rest'] ) && is_callable( $asserted_culture_meta['auth_callback'] ) && is_callable( $asserted_culture_meta['sanitize_callback'] ), 'exercise_cpt: Player locale metadata is sanitized and permission-checked in REST' );
+$video_url_meta = $GLOBALS['registered_post_meta'][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE ][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL ];
+assert_test( ! empty( $video_url_meta['show_in_rest'] ) && is_callable( $video_url_meta['auth_callback'] ) && is_callable( $video_url_meta['sanitize_callback'] ), 'exercise_cpt: Video URL metadata is sanitized and permission-checked in REST' );
 assert_test( '' === $exercise_cpt->sanitize_exorlive_id( '7282&bad=1' ) && '' === $exercise_cpt->sanitize_exorlive_id( array( '7282' ) ), 'exercise_cpt: Rejects malformed or non-scalar ExorLive IDs' );
 assert_test( 'nb-NO' === $exercise_cpt->sanitize_video_culture( 'en-us' ) && 'nb-NO' === $exercise_cpt->sanitize_video_culture( array( 'en-US' ) ), 'exercise_cpt: Falls back for malformed or non-scalar player locales' );
+assert_test( 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === Gear_Engine_Exercises_CPT::sanitize_video_url_static( 'https://youtu.be/kJQP7kiw5Fk' ), 'exercise_cpt: Canonicalizes supported YouTube links' );
+assert_test( 'https://player.vimeo.com/video/123456?h=abc123' === Gear_Engine_Exercises_CPT::sanitize_video_url_static( 'https://vimeo.com/123456/abc123' ), 'exercise_cpt: Canonicalizes supported Vimeo links' );
+assert_test( 'https://exorlive.com/video/?culture=en-US&ex=7282' === Gear_Engine_Exercises_CPT::sanitize_video_url_static( 'https://www.exorlive.com/video/?culture=en-US&ex=7282' ), 'exercise_cpt: Canonicalizes supported ExorLive links' );
+assert_test( '' === Gear_Engine_Exercises_CPT::sanitize_video_url_static( 'https://example.com/video' ) && '' === Gear_Engine_Exercises_CPT::sanitize_video_url_static( 'http://youtu.be/kJQP7kiw5Fk' ), 'exercise_cpt: Rejects untrusted and non-HTTPS video links' );
 $exercise_ids = Gear_Engine_Exercises_CPT::seed_sample_exercises();
 assert_test( count( $exercise_ids ) === 2, 'exercise_cpt: Seeds two sample exercises' );
 assert_test( Gear_Engine_Exercises_CPT::seed_sample_exercises() === $exercise_ids, 'exercise_cpt: Sample seeding is idempotent' );
@@ -1052,6 +1085,10 @@ assert_test( '' === Gear_Engine_Exercise_Service::build_exorlive_video_url( '728
 assert_test( 'https://exorlive.com/video/?culture=nb-NO&ex=7282' === Gear_Engine_Exercise_Service::build_exorlive_video_url( '7282', 'en-us' ), 'exercise_service: Defaults invalid player locale to nb-NO' );
 assert_test( 'https://www.exorlive.com/no/ovelser-i-exorlive' === $exercise_results[0]['attribution_url'], 'exercise_service: Exposes the official ExorLive attribution target' );
 assert_test( '' === $exercise_results[1]['video_url'], 'exercise_service: Does not invent a video URL for an exercise without an ID' );
+update_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, 'https://youtu.be/kJQP7kiw5Fk' );
+$manual_video_data = Gear_Engine_Exercise_Service::get_exercise_data( $exercise_ids[0] );
+assert_test( 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === $manual_video_data['video_url'] && '' === $manual_video_data['exorlive_id'] && '' === $manual_video_data['attribution_url'], 'exercise_service: Uses a manual supported video URL in preference to the ExorLive ID' );
+update_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, '' );
 assert_test( ! empty( $exercise_results[0]['description'] ) && $exercise_results[0]['description'] !== $exercise_results[1]['description'], 'exercise_cpt: Sample instructions are distinct original descriptions' );
 $cpt_program = $normalizer->invoke(
 	null,
@@ -1091,6 +1128,7 @@ $_POST = array(
 	'gear_engine_exorlive_id'         => '7282<script>',
 	'gear_engine_video_culture'       => array( 'en-US' ),
 	'gear_engine_exercise_dosage'     => '3 x 8',
+	'gear_engine_exercise_video_url'  => array( 'https://youtu.be/kJQP7kiw5Fk' ),
 	'gear_engine_exercise_source_url' => array( 'https://example.com/source' ),
 );
 $exercise_cpt->save_meta_box( $exercise_ids[0], null );
@@ -1099,23 +1137,37 @@ $saved_exercise_post = $GLOBALS['wp_posts'][ $exercise_ids[0] ];
 $exercise_cpt->save_meta_box( $exercise_ids[0], $saved_exercise_post );
 assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, true ) && 'nb-NO' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE, true ), 'exercise_cpt: Safely sanitizes invalid editor ID and locale values' );
 assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_SOURCE_URL, true ), 'exercise_cpt: Rejects non-scalar source URLs' );
+assert_test( '' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, true ), 'exercise_cpt: Rejects non-scalar video URLs' );
+unset( $_POST );
+
+$_POST = array(
+	'gear_engine_exercise_nonce'      => 'valid-exercise-nonce',
+	'gear_engine_exorlive_id'         => '',
+	'gear_engine_video_culture'       => 'nb-NO',
+	'gear_engine_exercise_dosage'     => '',
+	'gear_engine_exercise_video_url'  => 'https://youtu.be/kJQP7kiw5Fk',
+	'gear_engine_exercise_source_url' => '',
+);
+$exercise_cpt->save_meta_box( $exercise_ids[0], $saved_exercise_post );
+assert_test( 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === get_post_meta( $exercise_ids[0], Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, true ), 'exercise_cpt: Saves and canonicalizes manually entered video links' );
 unset( $_POST );
 
 $csv_path = tempnam( sys_get_temp_dir(), 'gear-engine-exercises-' );
 file_put_contents(
 	$csv_path,
-	"\xEF\xBB\xBFexternal_key,title,description,summary,area,equipment,dosage,exorlive_id,video_culture,source_url\n"
-	. "csv-new-1,CSV curl,\"Instructions, with comma\",Short,kne;skulder,strikk,3 x 10,,nb-NO,https://example.com/reference\n"
-	. "csv-new-1,Duplicate curl,Instructions,Short,kne,strikk,3 x 10,,nb-NO,\n"
-	. "bad-id,Bad ID,Instructions,Short,kne,strikk,3 x 10,72x2,nb-NO,\n"
+	"\xEF\xBB\xBFexternal_key,title,description,summary,area,equipment,dosage,exorlive_id,video_culture,video_url,source_url\n"
+	. "csv-new-1,CSV curl,\"Instructions, with comma\",Short,kne;skulder,strikk,3 x 10,,nb-NO,https://youtu.be/kJQP7kiw5Fk,https://example.com/reference\n"
+	. "csv-new-1,Duplicate curl,Instructions,Short,kne,strikk,3 x 10,,nb-NO,,\n"
+	. "bad-id,Bad ID,Instructions,Short,kne,strikk,3 x 10,72x2,nb-NO,,\n"
+	. "bad-url,Bad URL,Instructions,Short,kne,strikk,3 x 10,,nb-NO,https://example.com/video,\n"
 );
 $csv_preview = Gear_Engine_Exercise_Importer::validate_csv_file( $csv_path );
 unlink( $csv_path );
-assert_test( is_array( $csv_preview ) && 3 === count( $csv_preview ), 'exercise_importer: Parses UTF-8 CSV and preserves quoted comma fields' );
-assert_test( empty( $csv_preview[0]['errors'] ) && 'Instructions, with comma' === $csv_preview[0]['data']['description'], 'exercise_importer: Validates and normalizes a valid row' );
-assert_test( ! empty( $csv_preview[1]['errors'] ) && ! empty( $csv_preview[2]['errors'] ), 'exercise_importer: Flags duplicate keys and invalid ExorLive IDs during preview' );
+assert_test( is_array( $csv_preview ) && 4 === count( $csv_preview ), 'exercise_importer: Parses UTF-8 CSV and preserves quoted comma fields' );
+assert_test( empty( $csv_preview[0]['errors'] ) && 'Instructions, with comma' === $csv_preview[0]['data']['description'] && 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === $csv_preview[0]['data']['video_url'], 'exercise_importer: Validates instructions and canonicalizes a video URL' );
+assert_test( ! empty( $csv_preview[1]['errors'] ) && ! empty( $csv_preview[2]['errors'] ) && ! empty( $csv_preview[3]['errors'] ), 'exercise_importer: Flags duplicate keys, invalid IDs, and unsupported video URLs during preview' );
 $import_summary = Gear_Engine_Exercise_Importer::import_rows( $csv_preview );
-assert_test( 1 === $import_summary['imported'] && 2 === $import_summary['skipped'] && 0 === $import_summary['failed'], 'exercise_importer: Imports valid rows and skips invalid preview rows' );
+assert_test( 1 === $import_summary['imported'] && 3 === $import_summary['skipped'] && 0 === $import_summary['failed'], 'exercise_importer: Imports valid rows and skips invalid preview rows' );
 $imported_exercise_id = 0;
 foreach ( $GLOBALS['wp_posts'] as $candidate_post ) {
 	if ( 'CSV curl' === $candidate_post->post_title ) {
@@ -1124,12 +1176,64 @@ foreach ( $GLOBALS['wp_posts'] as $candidate_post ) {
 	}
 }
 assert_test( $imported_exercise_id > 0 && 'draft' === get_post_status( $imported_exercise_id ), 'exercise_importer: Creates new exercises as drafts by default' );
+assert_test( 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, true ), 'exercise_importer: Saves supported video URLs from CSV' );
 $csv_preview[0]['data']['title'] = 'Updated CSV curl';
 $update_summary = Gear_Engine_Exercise_Importer::import_rows( array( $csv_preview[0] ) );
 assert_test( 1 === $update_summary['updated'] && 'Updated CSV curl' === $GLOBALS['wp_posts'][ $imported_exercise_id ]->post_title, 'exercise_importer: Re-import upserts by external_key without creating duplicates' );
 $publish_summary = Gear_Engine_Exercise_Importer::import_rows( array( $csv_preview[0] ), true );
 assert_test( 1 === $publish_summary['updated'] && 'publish' === get_post_status( $imported_exercise_id ), 'exercise_importer: Publishing requires the explicit publish option' );
 
+// Suite 17: protocols and risk levels.
+echo "\nRunning Suite 17: Protocols and risk levels...\n";
+assert_test( 'moderate' === Gear_Engine_Exercises_CPT::sanitize_risk( ' Moderate ' ) && '' === Gear_Engine_Exercises_CPT::sanitize_risk( 'extreme' ) && '' === Gear_Engine_Exercises_CPT::sanitize_risk( array( 'low' ) ), 'protocols: Risk sanitizer accepts only known levels' );
+assert_test( 'M23.2, L96' === Gear_Engine_Protocols::sanitize_codes( 'm23.2; l96, junk, 12' ), 'protocols: Normalizes ICD-10/ICPC-2 codes and drops invalid entries' );
+assert_test( '2026-02-30' !== Gear_Engine_Protocols::sanitize_date( '2026-02-30' ) && '2026-03-01' === Gear_Engine_Protocols::sanitize_date( '2026-03-01' ), 'protocols: Rejects invalid dates' );
+$GLOBALS['wp_terms'][11] = (object) array( 'term_id' => 11, 'slug' => 'meniscus', 'name' => 'Meniscus', 'parent' => 0 );
+$GLOBALS['wp_terms'][12] = (object) array( 'term_id' => 12, 'slug' => 'meniscus-phase-1', 'name' => 'Phase 1', 'parent' => 11 );
+$GLOBALS['wp_terms'][13] = (object) array( 'term_id' => 13, 'slug' => 'shoulder', 'name' => 'Shoulder subluxation', 'parent' => 0 );
+$set_protocol_meta = static function ( int $id, array $meta ): void {
+	foreach ( $meta as $key => $value ) {
+		update_term_meta( $id, $key, $value );
+	}
+};
+$future = gmdate( 'Y-m-d', strtotime( '+30 days' ) );
+$past   = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
+$set_protocol_meta( 11, array(
+	Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS => 'approved', Gear_Engine_Protocols::GEAR_ENGINE_META_CODES => 'L96, M23',
+	Gear_Engine_Protocols::GEAR_ENGINE_META_REVIEW_DUE => $future, Gear_Engine_Protocols::GEAR_ENGINE_META_SUMMARY => 'Summary', Gear_Engine_Protocols::GEAR_ENGINE_META_SOURCES => 'secret source',
+) );
+$set_protocol_meta( 13, array( Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS => 'approved', Gear_Engine_Protocols::GEAR_ENGINE_META_CODES => 'L80', Gear_Engine_Protocols::GEAR_ENGINE_META_REVIEW_DUE => $past ) );
+$found = Gear_Engine_Protocols::find_approved_by_codes( array( 'm23.2' ) );
+assert_test( 1 === count( $found ) && 'meniscus' === $found[0]['slug'], 'protocols: Matches an approved protocol by code prefix' );
+assert_test( ! array_key_exists( 'sources', $found[0] ) && 'Summary' === $found[0]['summary'], 'protocols: Chat data excludes guideline sources' );
+assert_test( array() === Gear_Engine_Protocols::find_approved_by_codes( array( 'L80' ) ) && 'expired' === Gear_Engine_Protocols::get_status( 13 ), 'protocols: Overdue review disables an approved protocol' );
+assert_test( array() === Gear_Engine_Protocols::find_approved_by_codes( array( 'X99' ) ) && array() === Gear_Engine_Protocols::find_approved_by_codes( array() ), 'protocols: Unmatched or empty codes return no protocol' );
+$GLOBALS['wp_postmeta'][5001][ Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK ] = 'high';
+$risk_post = new WP_Post();
+$risk_post->ID = 5001;
+$risk_post->post_type = Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE;
+$risk_post->post_title = 'Risk test';
+$risk_post->post_content = '';
+$risk_post->post_excerpt = '';
+assert_test( 'high' === Gear_Engine_Exercise_Service::get_exercise_data( $risk_post )['risk'], 'protocols: Exercise data exposes the risk level' );
+Gear_Engine_Exercise_Service::search_exercises( array( 'max_risk' => 'moderate', 'protocol' => 'meniscus' ) );
+$last_args = $GLOBALS['last_wp_query_args'];
+assert_test( array( 'low', 'moderate' ) === $last_args['meta_query'][0]['value'] && 'IN' === $last_args['meta_query'][0]['compare'], 'protocols: max_risk limits results to rated lower-risk exercises' );
+assert_test( 'meniscus' === $last_args['tax_query'][0]['terms'] && true === $last_args['tax_query'][0]['include_children'], 'protocols: Protocol filter includes phase terms' );
+$csv_rows = array( array( 'line' => 2, 'errors' => array(), 'data' => array( 'external_key' => 'proto-row', 'title' => 'Proto', 'description' => 'Steps', 'summary' => '', 'area' => array(), 'equipment' => array(), 'dosage' => '', 'exorlive_id' => '', 'video_culture' => 'nb-NO', 'video_url' => '', 'source_url' => '', 'risk' => 'low', 'protocol' => array( 'Meniscus', 'typo-protocol' ) ) ) );
+$proto_summary = Gear_Engine_Exercise_Importer::import_rows( $csv_rows );
+assert_test( 1 === $proto_summary['imported'] && 1 === count( $proto_summary['errors'] ), 'protocols: Importer reports unknown protocols instead of creating them' );
+
+$tree = Gear_Engine_Protocol_Manager::get_protocol_tree();
+assert_test( array( 11, 12, 13 ) === array_map( static function ( $r ) { return (int) $r['term']->term_id; }, $tree ) && 1 === $tree[1]['depth'], 'protocol_manager: Builds a parent-first protocol tree with depth' );
+$GLOBALS['wp_set_terms_calls'] = array();
+$updated = Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id, 999999 ), array( $imported_exercise_id => array( '11', '12', '777' ) ), array( $imported_exercise_id => 'moderate' ) );
+assert_test( 1 === $updated && array( 11, 12 ) === $GLOBALS['wp_set_terms_calls'][0][1], 'protocol_manager: Matrix save assigns only valid protocol terms' );
+assert_test( 'moderate' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ), 'protocol_manager: Matrix save stores the risk level' );
+Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id ), array(), array( $imported_exercise_id => 'bogus' ) );
+assert_test( array() === $GLOBALS['wp_set_terms_calls'][1][1] && '' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ), 'protocol_manager: Unchecked boxes remove protocols and invalid risk is cleared' );
+assert_test( in_array( 'reviewer', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ) && ! in_array( 'matching codes', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ), 'protocols: Reports missing approval requirements' );
+
 echo "========================================================\n";
-echo "ALL TESTS PASSED SUCCESSFULLY! (16/16 suites passed)\n";
+echo "ALL TESTS PASSED SUCCESSFULLY! (17/17 suites passed)\n";
 echo "========================================================\n";

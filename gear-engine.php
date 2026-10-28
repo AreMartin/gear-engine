@@ -39,6 +39,8 @@ require_once GAE_PLUGIN_DIR . 'includes/class-gae-gutenberg-block.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-ai-api.php';
 require_once GAE_PLUGIN_DIR . 'includes/class-gae-product-service.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercises-cpt.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-protocols.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-protocol-manager.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-importer.php';
 
@@ -61,6 +63,8 @@ function gae_init_plugin(): void {
 	new GAE_Gutenberg_Block();
 	new GAE_AI_API();
 	new Gear_Engine_Exercises_CPT();
+	new Gear_Engine_Protocols();
+	new Gear_Engine_Protocol_Manager();
 	new Gear_Engine_Exercise_Importer();
 
 	// Instantiate feature modules.
@@ -80,6 +84,8 @@ function gae_activate_plugin(): void {
 	$cpt->register_post_type();
 	$exercise_cpt = new Gear_Engine_Exercises_CPT();
 	$exercise_cpt->register_content_types();
+	$protocols = new Gear_Engine_Protocols();
+	$protocols->register_taxonomy();
 	Gear_Engine_Exercises_CPT::seed_sample_exercises();
 	flush_rewrite_rules();
 

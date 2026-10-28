@@ -66,7 +66,7 @@ class Gear_Engine_Exercise_Importer {
 			<h1><?php esc_html_e( 'Import Exercises from CSV', 'gear-engine' ); ?></h1>
 			<p><?php esc_html_e( 'Upload a UTF-8 CSV file to preview and validate exercise records before importing them. New records are drafts unless you explicitly choose to publish them.', 'gear-engine' ); ?></p>
 			<p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=' . self::GEAR_ENGINE_TEMPLATE_ACTION ), self::GEAR_ENGINE_TEMPLATE_ACTION ) ); ?>"><?php esc_html_e( 'Download CSV template', 'gear-engine' ); ?></a></p>
-			<p><?php esc_html_e( 'Required columns: title, description, and either exorlive_id or external_key. Separate multiple area/equipment terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
+			<p><?php esc_html_e( 'Required columns: title, description (step-by-step instructions), and either exorlive_id or external_key. Add an optional HTTPS video_url from ExorLive, YouTube, or Vimeo; it takes precedence over exorlive_id. Optional risk (low, moderate, high) and protocol (existing protocol names or slugs) columns are supported; an absent protocol column leaves existing tags unchanged. Separate multiple area/equipment/protocol terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
 
 			<?php $this->render_import_notice(); ?>
 
@@ -164,7 +164,7 @@ class Gear_Engine_Exercise_Importer {
 			},
 			$headers
 		);
-		$allowed_headers = array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'source_url' );
+		$allowed_headers = array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'protocol' );
 		if ( count( array_unique( $headers ) ) !== count( $headers ) || array_diff( $headers, $allowed_headers ) ) {
 			fclose( $handle );
 			return new WP_Error( 'gear_engine_exercise_csv_headers_invalid', __( 'The CSV contains duplicate or unsupported column names. Download the template for the supported columns.', 'gear-engine' ) );
@@ -268,7 +268,7 @@ class Gear_Engine_Exercise_Importer {
 		if ( false === $output ) {
 			wp_die( esc_html__( 'The CSV template could not be generated.', 'gear-engine' ) );
 		}
-		fputcsv( $output, array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'source_url' ) );
+		fputcsv( $output, array( 'external_key', 'title', 'description', 'summary', 'area', 'equipment', 'dosage', 'exorlive_id', 'video_culture', 'video_url', 'source_url', 'risk', 'protocol' ) );
 		fclose( $output );
 		exit;
 	}
@@ -296,7 +296,11 @@ class Gear_Engine_Exercise_Importer {
 			'dosage'       => sanitize_text_field( $get_text( 'dosage' ) ),
 			'exorlive_id'  => $get_text( 'exorlive_id' ),
 			'video_culture'=> $get_text( 'video_culture' ),
+			'video_url'    => $get_text( 'video_url' ),
 			'source_url'   => $get_text( 'source_url' ),
+			'risk'         => $get_text( 'risk' ),
+			// Null means the column is absent, so existing protocol tags are left untouched.
+			'protocol'     => array_key_exists( 'protocol', $raw ) ? self::parse_terms( $get_text( 'protocol' ) ) : null,
 		);
 		$errors = array();
 
@@ -322,6 +326,18 @@ class Gear_Engine_Exercise_Importer {
 			}
 		} else {
 			$data['video_culture'] = 'nb-NO';
+		}
+		if ( '' !== $data['video_url'] ) {
+			$data['video_url'] = Gear_Engine_Exercises_CPT::sanitize_video_url_static( $data['video_url'] );
+			if ( '' === $data['video_url'] ) {
+				$errors[] = __( 'Video URL must be a valid HTTPS link from ExorLive, YouTube, or Vimeo.', 'gear-engine' );
+			}
+		}
+		if ( '' !== $data['risk'] ) {
+			$data['risk'] = Gear_Engine_Exercises_CPT::sanitize_risk( $data['risk'] );
+			if ( '' === $data['risk'] ) {
+				$errors[] = __( 'Risk must be low, moderate, or high.', 'gear-engine' );
+			}
 		}
 		if ( '' !== $data['source_url'] ) {
 			$data['source_url'] = esc_url_raw( $data['source_url'] );
@@ -428,9 +444,33 @@ class Gear_Engine_Exercise_Importer {
 
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, $data['exorlive_id'] );
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE, $data['video_culture'] );
+			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, $data['video_url'] );
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_DOSAGE, $data['dosage'] );
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_SOURCE_URL, $data['source_url'] );
 			update_post_meta( $post_id, self::GEAR_ENGINE_META_IMPORT_KEY, $data['external_key'] );
+			if ( '' !== $data['risk'] ) {
+				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, $data['risk'] );
+			}
+
+			// Only existing protocols are assigned; unknown names are reported instead of silently created.
+			if ( is_array( $data['protocol'] ) ) {
+				$protocol_ids = array();
+				foreach ( $data['protocol'] as $protocol_name ) {
+					$term = get_term_by( 'slug', sanitize_title( $protocol_name ), Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY );
+					$term = $term ? $term : get_term_by( 'name', $protocol_name, Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY );
+					if ( $term ) {
+						$protocol_ids[] = (int) $term->term_id;
+					} else {
+						$results['errors'][] = sprintf(
+							/* translators: 1: CSV row number, 2: protocol name */
+							__( 'Row %1$d: protocol "%2$s" does not exist and was not assigned. Create it under Exercise Library > Protocols first.', 'gear-engine' ),
+							(int) ( $row['line'] ?? 0 ),
+							$protocol_name
+						);
+					}
+				}
+				wp_set_object_terms( $post_id, $protocol_ids, Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY );
+			}
 
 			$area_result      = wp_set_object_terms( $post_id, $data['area'], Gear_Engine_Exercises_CPT::GEAR_ENGINE_AREA_TAXONOMY );
 			$equipment_result = wp_set_object_terms( $post_id, $data['equipment'], Gear_Engine_Exercises_CPT::GEAR_ENGINE_EQUIPMENT_TAXONOMY );

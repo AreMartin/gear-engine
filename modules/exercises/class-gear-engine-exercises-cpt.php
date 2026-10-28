@@ -19,8 +19,10 @@ class Gear_Engine_Exercises_CPT {
 	public const GEAR_ENGINE_EQUIPMENT_TAXONOMY = 'gear_engine_exercise_equipment';
 	public const GEAR_ENGINE_META_EXORLIVE_ID   = '_gear_engine_exorlive_id';
 	public const GEAR_ENGINE_META_VIDEO_CULTURE = '_gear_engine_video_culture';
+	public const GEAR_ENGINE_META_VIDEO_URL     = '_gear_engine_exercise_video_url';
 	public const GEAR_ENGINE_META_DOSAGE        = '_gear_engine_exercise_dosage';
 	public const GEAR_ENGINE_META_SOURCE_URL    = '_gear_engine_exercise_source_url';
+	public const GEAR_ENGINE_META_RISK          = '_gear_engine_exercise_risk';
 	public const GEAR_ENGINE_META_SAMPLE_KEY    = '_gear_engine_exercise_sample_key';
 	public const GEAR_ENGINE_SAMPLE_OPTION      = 'gear_engine_exercise_samples_seeded';
 	private const GEAR_ENGINE_META_BOX_NONCE    = 'gear_engine_exercise_nonce';
@@ -108,6 +110,11 @@ class Gear_Engine_Exercises_CPT {
 				'description'       => __( 'Locale used by the ExorLive video player, for example nb-NO.', 'gear-engine' ),
 				'sanitize_callback' => array( $this, 'sanitize_video_culture' ),
 			),
+			self::GEAR_ENGINE_META_VIDEO_URL => array(
+				'type'              => 'string',
+				'description'       => __( 'Optional HTTPS video link from ExorLive, YouTube, or Vimeo.', 'gear-engine' ),
+				'sanitize_callback' => array( $this, 'sanitize_video_url' ),
+			),
 			self::GEAR_ENGINE_META_DOSAGE => array(
 				'type'              => 'string',
 				'description'       => __( 'Suggested sets, repetitions, or duration for this exercise.', 'gear-engine' ),
@@ -117,6 +124,11 @@ class Gear_Engine_Exercises_CPT {
 				'type'              => 'string',
 				'description'       => __( 'Optional source PDF or reference URL for editorial traceability.', 'gear-engine' ),
 				'sanitize_callback' => array( $this, 'sanitize_source_url' ),
+			),
+			self::GEAR_ENGINE_META_RISK => array(
+				'type'              => 'string',
+				'description'       => __( 'Clinician-assigned risk level: low, moderate or high. Unrated exercises are never used without an approved protocol.', 'gear-engine' ),
+				'sanitize_callback' => array( __CLASS__, 'sanitize_risk' ),
 			),
 		);
 
@@ -134,6 +146,17 @@ class Gear_Engine_Exercises_CPT {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Accept only a known risk level; empty means unrated.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_risk( $value ): string {
+		$value = is_scalar( $value ) ? strtolower( trim( (string) $value ) ) : '';
+		return in_array( $value, array( 'low', 'moderate', 'high' ), true ) ? $value : '';
 	}
 
 	/**
@@ -198,6 +221,85 @@ class Gear_Engine_Exercises_CPT {
 	}
 
 	/**
+	 * Sanitize a supported video link into a canonical player URL.
+	 *
+	 * @param mixed $value Raw video URL.
+	 * @return string
+	 */
+	public function sanitize_video_url( $value ): string {
+		return self::sanitize_video_url_static( $value );
+	}
+
+	/**
+	 * Allow only HTTPS player URLs for the supported video providers.
+	 *
+	 * @param mixed $value Raw video URL.
+	 * @return string
+	 */
+	public static function sanitize_video_url_static( $value ): string {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		$url   = esc_url_raw( trim( (string) $value ) );
+		$parts = wp_parse_url( $url );
+		if (
+			! is_array( $parts )
+			|| 'https' !== strtolower( (string) ( $parts['scheme'] ?? '' ) )
+			|| empty( $parts['host'] )
+			|| isset( $parts['user'] )
+			|| isset( $parts['pass'] )
+			|| isset( $parts['port'] )
+			|| ! wp_http_validate_url( $url )
+		) {
+			return '';
+		}
+
+		$host = strtolower( (string) $parts['host'] );
+		$path = (string) ( $parts['path'] ?? '' );
+		$query = array();
+		parse_str( (string) ( $parts['query'] ?? '' ), $query );
+
+		if ( in_array( $host, array( 'exorlive.com', 'www.exorlive.com' ), true ) && '/video' === rtrim( $path, '/' ) ) {
+			$exercise_id = Gear_Engine_Exercises_CPT::sanitize_exorlive_id_static( $query['ex'] ?? '' );
+			$culture     = self::sanitize_video_culture_static( $query['culture'] ?? 'nb-NO' );
+			return Gear_Engine_Exercise_Service::build_exorlive_video_url( $exercise_id, $culture );
+		}
+
+		$youtube_hosts = array( 'youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be' );
+		if ( in_array( $host, $youtube_hosts, true ) ) {
+			$video_id = '';
+			if ( 'youtu.be' === $host ) {
+				$video_id = trim( $path, '/' );
+			} elseif ( '/watch' === $path ) {
+				$video_id = is_scalar( $query['v'] ?? null ) ? (string) $query['v'] : '';
+			} elseif ( preg_match( '#^/(?:embed|shorts|live|v)/([A-Za-z0-9_-]+)/*$#', $path, $matches ) ) {
+				$video_id = $matches[1];
+			}
+
+			return preg_match( '/^[A-Za-z0-9_-]{11}$/', $video_id )
+				? 'https://www.youtube.com/watch?v=' . rawurlencode( $video_id )
+				: '';
+		}
+
+		if ( in_array( $host, array( 'vimeo.com', 'www.vimeo.com', 'player.vimeo.com' ), true ) ) {
+			if ( ! preg_match( '#^/(?:video/)?([0-9]+)(?:/([A-Za-z0-9]+))?/*$#', $path, $matches ) ) {
+				return '';
+			}
+
+			$video_id = $matches[1];
+			$hash     = $matches[2] ?? ( is_scalar( $query['h'] ?? null ) ? (string) $query['h'] : '' );
+			if ( '' !== $hash && ! preg_match( '/^[A-Za-z0-9]+$/', $hash ) ) {
+				return '';
+			}
+
+			return 'https://player.vimeo.com/video/' . rawurlencode( $video_id ) . ( '' !== $hash ? '?h=' . rawurlencode( $hash ) : '' );
+		}
+
+		return '';
+	}
+
+	/**
 	 * Sanitize an optional source/reference URL.
 	 *
 	 * @param mixed $value Raw URL.
@@ -233,13 +335,30 @@ class Gear_Engine_Exercises_CPT {
 		wp_nonce_field( self::GEAR_ENGINE_META_BOX_ACTION, self::GEAR_ENGINE_META_BOX_NONCE );
 		$exorlive_id = get_post_meta( $post->ID, self::GEAR_ENGINE_META_EXORLIVE_ID, true );
 		$culture     = get_post_meta( $post->ID, self::GEAR_ENGINE_META_VIDEO_CULTURE, true );
+		$video_url   = get_post_meta( $post->ID, self::GEAR_ENGINE_META_VIDEO_URL, true );
 		$dosage      = get_post_meta( $post->ID, self::GEAR_ENGINE_META_DOSAGE, true );
 		$source_url  = get_post_meta( $post->ID, self::GEAR_ENGINE_META_SOURCE_URL, true );
+		$risk        = self::sanitize_risk( get_post_meta( $post->ID, self::GEAR_ENGINE_META_RISK, true ) );
 		?>
+		<p>
+			<label for="gear-engine-exercise-risk"><?php esc_html_e( 'Risk level', 'gear-engine' ); ?></label>
+			<select class="widefat" id="gear-engine-exercise-risk" name="gear_engine_exercise_risk">
+				<option value=""><?php esc_html_e( 'Not rated (protocol use only)', 'gear-engine' ); ?></option>
+				<option value="low" <?php selected( $risk, 'low' ); ?>><?php esc_html_e( 'Low', 'gear-engine' ); ?></option>
+				<option value="moderate" <?php selected( $risk, 'moderate' ); ?>><?php esc_html_e( 'Moderate', 'gear-engine' ); ?></option>
+				<option value="high" <?php selected( $risk, 'high' ); ?>><?php esc_html_e( 'High (clinician guided)', 'gear-engine' ); ?></option>
+			</select>
+			<span class="description"><?php esc_html_e( 'Without an approved protocol the chat only uses Low and Moderate exercises.', 'gear-engine' ); ?></span>
+		</p>
 		<p>
 			<label for="gear-engine-exorlive-id"><?php esc_html_e( 'ExorLive exercise ID', 'gear-engine' ); ?></label>
 			<input class="widefat" id="gear-engine-exorlive-id" name="gear_engine_exorlive_id" type="text" inputmode="numeric" value="<?php echo esc_attr( (string) $exorlive_id ); ?>" />
 			<span class="description"><?php esc_html_e( 'Use the ID from the official shared video link, for example ex=7282. Do not paste iframe code.', 'gear-engine' ); ?></span>
+		</p>
+		<p>
+			<label for="gear-engine-exercise-video-url"><?php esc_html_e( 'Video URL (optional)', 'gear-engine' ); ?></label>
+			<input class="widefat" id="gear-engine-exercise-video-url" name="gear_engine_exercise_video_url" type="url" value="<?php echo esc_attr( (string) $video_url ); ?>" placeholder="https://..." />
+			<span class="description"><?php esc_html_e( 'Paste an HTTPS ExorLive, YouTube, or Vimeo link. When provided, this link is used instead of the ExorLive exercise ID.', 'gear-engine' ); ?></span>
 		</p>
 		<p>
 			<label for="gear-engine-video-culture"><?php esc_html_e( 'Video language', 'gear-engine' ); ?></label>
@@ -283,8 +402,10 @@ class Gear_Engine_Exercises_CPT {
 
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_EXORLIVE_ID, $this->sanitize_exorlive_id( wp_unslash( $_POST['gear_engine_exorlive_id'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_VIDEO_CULTURE, $this->sanitize_video_culture( wp_unslash( $_POST['gear_engine_video_culture'] ?? 'nb-NO' ) ) );
+		update_post_meta( $post_id, self::GEAR_ENGINE_META_VIDEO_URL, $this->sanitize_video_url( wp_unslash( $_POST['gear_engine_exercise_video_url'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_DOSAGE, sanitize_text_field( wp_unslash( $_POST['gear_engine_exercise_dosage'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_SOURCE_URL, $this->sanitize_source_url( wp_unslash( $_POST['gear_engine_exercise_source_url'] ?? '' ) ) );
+		update_post_meta( $post_id, self::GEAR_ENGINE_META_RISK, self::sanitize_risk( wp_unslash( $_POST['gear_engine_exercise_risk'] ?? '' ) ) );
 	}
 
 	/**

@@ -244,7 +244,9 @@
                 videoContainer.style.setProperty('display', 'flex', 'important');
                 
                 let vidUrl = ovelse.video_url || '';
-                let isYouTube = vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be');
+                const youtubeMatch = /^https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})$/.exec(vidUrl);
+                const vimeoMatch = /^https:\/\/player\.vimeo\.com\/video\/([0-9]+)(?:\?h=([A-Za-z0-9]+))?$/.exec(vidUrl);
+                let isYouTube = !!youtubeMatch;
                 let isExorLive = hasExorLiveVideo;
 
                 if (isExorLive && videoPlayer) {
@@ -269,15 +271,15 @@
                         hintOverlay.style.opacity = '1';
                         hintTimeoutId = setTimeout(() => { hintOverlay.style.opacity = '0'; }, 4000);
                     }
-                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    const match = vidUrl.match(regExp);
-                    const videoId = (match && match[2].length === 11) ? match[2] : null;
-                    if (videoId) {
-                        videoPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0" class="w-full h-full absolute top-0 left-0 border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-                    } else {
-                        let sep = vidUrl.includes('?') ? '&' : '?';
-                        videoPlayer.innerHTML = `<iframe src="${vidUrl}${sep}rel=0" class="w-full h-full absolute top-0 left-0 border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                    }
+                    const videoId = youtubeMatch[1];
+                    videoPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0" class="w-full h-full absolute top-0 left-0 border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+                } else if (vimeoMatch && videoPlayer) {
+                    if (videoThumb) videoThumb.style.display = 'none';
+                    if (playOverlay) playOverlay.style.setProperty('display', 'none', 'important');
+                    videoPlayer.classList.remove('hidden');
+                    const vimeoUrl = new URL(vidUrl);
+                    vimeoUrl.searchParams.set('autoplay', 'false');
+                    videoPlayer.innerHTML = `<iframe src="${vimeoUrl.href}" class="w-full h-full absolute top-0 left-0 border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     if (videoThumb) {
                         videoThumb.src = ovelse.bilde_url || '';
@@ -289,12 +291,7 @@
                             playOverlay.style.setProperty('display', 'none', 'important');
                             if (videoThumb) videoThumb.style.display = 'none';
                             videoPlayer.classList.remove('hidden');
-                            if (vidUrl.includes('vimeo.com')) {
-                                let sep = vidUrl.includes('?') ? '&' : '?';
-                                videoPlayer.innerHTML = `<iframe src="${vidUrl}${sep}autoplay=1" class="w-full h-full absolute top-0 left-0 border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                            } else {
-                                videoPlayer.innerHTML = `<video src="${vidUrl}" class="w-full h-full object-cover" controls autoplay playsinline></video>`;
-                            }
+                            videoPlayer.innerHTML = `<video src="${vidUrl}" class="w-full h-full object-cover" controls autoplay playsinline></video>`;
                         };
                     } else if (playOverlay) {
                         playOverlay.style.setProperty('display', 'none', 'important');

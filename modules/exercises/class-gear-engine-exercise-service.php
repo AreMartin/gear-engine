@@ -43,7 +43,7 @@ class Gear_Engine_Exercise_Service {
 	 * Callers may request larger result sets for non-program features. A plan
 	 * builder should explicitly request no more than five exercises.
 	 *
-	 * @param array<string, mixed> $args Search options: keywords, area, equipment, limit.
+	 * @param array<string, mixed> $args Search options: keywords, area, equipment, protocol (slug), max_risk (low|moderate|high), limit.
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function search_exercises( array $args = array() ): array {
@@ -79,8 +79,30 @@ class Gear_Engine_Exercise_Service {
 				'terms'    => sanitize_title( (string) $args['equipment'] ),
 			);
 		}
+		if ( isset( $args['protocol'] ) && is_scalar( $args['protocol'] ) && '' !== (string) $args['protocol'] ) {
+			$tax_query[] = array(
+				'taxonomy'         => Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY,
+				'field'            => 'slug',
+				'terms'            => sanitize_title( (string) $args['protocol'] ),
+				'include_children' => true,
+			);
+		}
 		if ( count( $tax_query ) > 1 ) {
 			$query_args['tax_query'] = $tax_query;
+		}
+
+		// Unrated exercises are excluded whenever a maximum risk level is requested.
+		if ( isset( $args['max_risk'] ) && is_scalar( $args['max_risk'] ) && '' !== (string) $args['max_risk'] ) {
+			$levels  = array( 'low', 'moderate', 'high' );
+			$max_idx = array_search( strtolower( (string) $args['max_risk'] ), $levels, true );
+			$allowed = false === $max_idx ? array( 'low' ) : array_slice( $levels, 0, $max_idx + 1 );
+			$query_args['meta_query'] = array(
+				array(
+					'key'     => Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK,
+					'value'   => $allowed,
+					'compare' => 'IN',
+				),
+			);
 		}
 
 		$query = new WP_Query( $query_args );
@@ -116,10 +138,25 @@ class Gear_Engine_Exercise_Service {
 
 		$raw_exorlive_id = get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_EXORLIVE_ID, true );
 		$raw_culture     = get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_CULTURE, true );
+		$raw_video_url   = get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, true );
 		$exorlive_id     = is_scalar( $raw_exorlive_id ) ? trim( (string) $raw_exorlive_id ) : '';
 		$culture         = is_scalar( $raw_culture ) ? trim( (string) $raw_culture ) : '';
 		$culture     = preg_match( '/^[a-z]{2}-[A-Z]{2}$/', $culture ) ? $culture : 'nb-NO';
-		$video_url = self::build_exorlive_video_url( $exorlive_id, $culture );
+		$video_url      = Gear_Engine_Exercises_CPT::sanitize_video_url_static( $raw_video_url );
+
+		if ( '' !== $video_url ) {
+			$video_parts = wp_parse_url( $video_url );
+			if ( is_array( $video_parts ) && in_array( strtolower( (string) ( $video_parts['host'] ?? '' ) ), array( 'exorlive.com', 'www.exorlive.com' ), true ) ) {
+				$query = array();
+				parse_str( (string) ( $video_parts['query'] ?? '' ), $query );
+				$exorlive_id = Gear_Engine_Exercises_CPT::sanitize_exorlive_id_static( $query['ex'] ?? '' );
+				$culture     = Gear_Engine_Exercises_CPT::sanitize_video_culture_static( $query['culture'] ?? $culture );
+			} else {
+				$exorlive_id = '';
+			}
+		} else {
+			$video_url = self::build_exorlive_video_url( $exorlive_id, $culture );
+		}
 
 		$area      = self::get_term_names( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_AREA_TAXONOMY );
 		$equipment = self::get_term_names( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_EQUIPMENT_TAXONOMY );
@@ -132,11 +169,12 @@ class Gear_Engine_Exercise_Service {
 			'dosage'           => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_DOSAGE, true ),
 			'area'             => $area,
 			'equipment'        => $equipment,
+			'risk'             => Gear_Engine_Exercises_CPT::sanitize_risk( get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ) ),
 			'video_culture'    => $culture,
 			'exorlive_id'      => $video_url ? $exorlive_id : '',
 			'video_url'        => $video_url,
-			'attribution_text' => $video_url ? sprintf( '%s - ExorLive', $post->post_title ) : '',
-			'attribution_url'  => $video_url ? 'https://www.exorlive.com/no/ovelser-i-exorlive' : '',
+			'attribution_text' => $exorlive_id && $video_url ? sprintf( '%s - ExorLive', $post->post_title ) : '',
+			'attribution_url'  => $exorlive_id && $video_url ? 'https://www.exorlive.com/no/ovelser-i-exorlive' : '',
 			'source_url'       => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_SOURCE_URL, true ),
 		);
 	}
