@@ -57,6 +57,12 @@ Each region is one JSON file in `modules/triage/configs/{region}.json` containin
 
 Available regions: `rygg`, `skulder`, `kne`, `fot-ankel`, `hofte`, `nakke`. `rygg` and `skulder` are ports of the original prototype (verified against the legacy functions). The others carry `"reviewStatus": "draft-unreviewed"`: their clinical content was drafted without a clinician and must be reviewed before publishing.
 
+### Training programs on the result page
+
+A quiz result links to a training program when an approved, in-date protocol that has exercises matches the diagnosis's `icd10`/`icpc2` codes (most specific code match first). Set it up in the existing exercise admin: create a protocol, put the diagnosis code (for example `M75.4`) in its codes, assign exercises and approve it. A diagnosis can name a protocol explicitly with `"protocol": "<slug>"`, which overrides code matching. Diagnoses with severity `Høy` or `Kritisk` never get a program, and a manual `trainingProgram.url` in a config is kept as is.
+
+The button opens a program page: create a page at the path under **Settings → Smertesjekk → Program page path** (default `/treningsprogram/`) containing `[gear_engine_protocol]`. With `?program=<slug>` it shows that protocol (phases, exercises, lazy-loaded video, print); without it, it lists the approved programs. The viewer lives in `modules/exercises/` and shares nothing with the AI chat. Colours shared by the quiz and program page are in `assets/css/gear-engine-tokens.css`. Test with `php tests/triage/program-link.test.php`.
+
 ### Smertesjekk section (region picker)
 
 The triage quizzes are a separate section from the AI chat ("Digital fysio"). Create one WordPress page containing `[gear_engine_triage_picker]` and one page per region containing `[gear_engine_triage region="<slug>"]`, with the region pages' URLs at `/<section path>/<slug>/`. The section path defaults to `smertesjekk` and can be changed under **Settings → Smertesjekk**. Cards come from each config's `label`, `summary` and `order`; each quiz page shows an "Alle tester" link back to the section page (disable with `back_link="false"`). Run PHP checks with `php tests/triage/triage-php.test.php`.

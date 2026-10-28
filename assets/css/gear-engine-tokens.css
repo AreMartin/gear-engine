@@ -1,0 +1,15 @@
+/**
+ * Gear Engine shared design tokens.
+ *
+ * Single source for the colours used by the quiz and program pages. Modules reference
+ * these with a fallback, e.g. var(--ge-navy, #1a2a3a), so they still render without this file.
+ */
+:root {
+	--ge-navy: #1a2a3a;
+	--ge-green: #10b981;
+	--ge-green-dark: #059669;
+	--ge-border: #e2e8f0;
+	--ge-bg: #f8fafc;
+	--ge-text: #475569;
+	--ge-muted: #64748b;
+}

@@ -3,13 +3,13 @@
  * All rules are namespaced under .gear-engine-triage.
  */
 .gear-engine-triage {
-	--get-navy: #1a2a3a;
-	--get-green: #10b981;
-	--get-green-dark: #059669;
-	--get-border: #e2e8f0;
-	--get-bg: #f8fafc;
-	--get-text: #475569;
-	--get-muted: #64748b;
+	--get-navy: var(--ge-navy, #1a2a3a);
+	--get-green: var(--ge-green, #10b981);
+	--get-green-dark: var(--ge-green-dark, #059669);
+	--get-border: var(--ge-border, #e2e8f0);
+	--get-bg: var(--ge-bg, #f8fafc);
+	--get-text: var(--ge-text, #475569);
+	--get-muted: var(--ge-muted, #64748b);
 	box-sizing: border-box;
 	max-width: 760px;
 	margin: 0 auto;

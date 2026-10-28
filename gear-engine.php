@@ -43,10 +43,20 @@ require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-protocols.php
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-protocol-manager.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-exercise-importer.php';
+require_once GAE_PLUGIN_DIR . 'modules/exercises/class-gear-engine-protocol-viewer.php';
 
 // Require feature modules.
 require_once GAE_PLUGIN_DIR . 'modules/physio-chat/class-gae-physio-chat.php';
 require_once GAE_PLUGIN_DIR . 'modules/triage/class-gear-engine-triage.php';
+
+/**
+ * Register stylesheets shared by several modules.
+ *
+ * @return void
+ */
+function gear_engine_register_shared_assets(): void {
+	wp_register_style( 'gear-engine-tokens', GEAR_ENGINE_URL . 'assets/css/gear-engine-tokens.css', array(), GEAR_ENGINE_VERSION );
+}
 
 /**
  * Initialize the Gear Affiliate Engine plugin.
@@ -67,6 +77,8 @@ function gae_init_plugin(): void {
 	new Gear_Engine_Protocols();
 	new Gear_Engine_Protocol_Manager();
 	new Gear_Engine_Exercise_Importer();
+	new Gear_Engine_Protocol_Viewer();
+	add_action( 'wp_enqueue_scripts', 'gear_engine_register_shared_assets', 1 );
 
 	// Instantiate feature modules.
 	new GAE_Physio_Chat();

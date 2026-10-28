@@ -231,6 +231,14 @@ class Gear_Engine_Triage {
 							<p class="description"><?php esc_html_e( 'The page holding [gear_engine_triage_picker]. Each region card links to this path plus the region slug (for example /smertesjekk/rygg/), so create a page for each region with that slug.', 'gear-engine' ); ?></p>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row"><label for="gear-engine-program-page-path"><?php esc_html_e( 'Program page path', 'gear-engine' ); ?></label></th>
+						<td>
+							<code><?php echo esc_html( trailingslashit( home_url() ) ); ?></code>
+							<input type="text" id="gear-engine-program-page-path" name="<?php echo esc_attr( Gear_Engine_Protocol_Viewer::OPTION_PAGE_PATH ); ?>" value="<?php echo esc_attr( Gear_Engine_Protocol_Viewer::get_page_path() ); ?>" class="regular-text">
+							<p class="description"><?php esc_html_e( 'The page holding [gear_engine_protocol]. Quiz results link to it as /path/?program=protocol-slug when an approved protocol with exercises matches the diagnosis codes.', 'gear-engine' ); ?></p>
+						</td>
+					</tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
@@ -332,7 +340,7 @@ class Gear_Engine_Triage {
 	public function register_assets(): void {
 		$base = GEAR_ENGINE_URL . 'modules/triage/assets/';
 
-		wp_register_style( 'gear-engine-triage', $base . 'css/triage.css', array(), GEAR_ENGINE_VERSION );
+		wp_register_style( 'gear-engine-triage', $base . 'css/triage.css', array( 'gear-engine-tokens' ), GEAR_ENGINE_VERSION );
 		wp_register_script( 'gear-engine-triage-rules', $base . 'js/triage-rules.js', array(), GEAR_ENGINE_VERSION, true );
 		wp_register_script( 'gear-engine-triage-icons', $base . 'js/triage-icons.js', array(), GEAR_ENGINE_VERSION, true );
 		wp_register_script(
@@ -432,6 +440,8 @@ class Gear_Engine_Triage {
 				: '';
 		}
 
+		$config = self::attach_programs( $config );
+
 		wp_enqueue_style( 'gear-engine-triage' );
 		wp_enqueue_script( 'gear-engine-triage' );
 
@@ -439,5 +449,71 @@ class Gear_Engine_Triage {
 		$template = GEAR_ENGINE_PATH . 'modules/triage/templates/triage-container.php';
 		include $template;
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Link diagnoses to approved training programs (protocols).
+	 *
+	 * A diagnosis gets a program when an approved, in-date protocol with exercises matches its
+	 * ICD-10/ICPC-2 codes, or the protocol named in its optional "protocol" field. High and
+	 * critical severity diagnoses never get a program. An existing manual trainingProgram.url is kept.
+	 *
+	 * @param array<string, mixed> $config Validated region config.
+	 * @return array<string, mixed>
+	 */
+	public static function attach_programs( array $config ): array {
+		if ( ! class_exists( 'Gear_Engine_Protocol_Viewer' ) || ! class_exists( 'Gear_Engine_Protocols' ) ) {
+			return $config;
+		}
+
+		foreach ( $config['diagnoses'] as $id => $diagnosis ) {
+			$program = isset( $diagnosis['trainingProgram'] ) && is_array( $diagnosis['trainingProgram'] ) ? $diagnosis['trainingProgram'] : array();
+			unset( $config['diagnoses'][ $id ]['trainingProgram'] );
+
+			if ( ! empty( $program['url'] ) ) {
+				$config['diagnoses'][ $id ]['trainingProgram'] = $program;
+				continue;
+			}
+			if ( in_array( $diagnosis['severity'] ?? '', array( 'Kritisk', 'Høy' ), true ) ) {
+				continue;
+			}
+
+			$slug = self::find_program_slug( $diagnosis );
+			if ( '' === $slug ) {
+				continue;
+			}
+
+			$config['diagnoses'][ $id ]['trainingProgram'] = array(
+				'title' => isset( $program['title'] ) && '' !== $program['title'] ? (string) $program['title'] : __( 'Åpne treningsprogrammet', 'gear-engine' ),
+				'url'   => Gear_Engine_Protocol_Viewer::get_program_url( $slug ),
+			);
+		}
+
+		return $config;
+	}
+
+	/**
+	 * Slug of the approved protocol (with exercises) that fits a diagnosis, or an empty string.
+	 *
+	 * @param array<string, mixed> $diagnosis Diagnosis definition.
+	 * @return string
+	 */
+	private static function find_program_slug( array $diagnosis ): string {
+		$has_exercises = static function ( string $slug ): bool {
+			return (bool) Gear_Engine_Exercise_Service::search_exercises( array( 'protocol' => $slug, 'limit' => 1 ) );
+		};
+
+		if ( ! empty( $diagnosis['protocol'] ) ) {
+			$slug = sanitize_title( (string) $diagnosis['protocol'] );
+			return Gear_Engine_Protocol_Viewer::get_approved_protocol( $slug ) && $has_exercises( $slug ) ? $slug : '';
+		}
+
+		$codes = array_filter( array( $diagnosis['icd10'] ?? '', $diagnosis['icpc2'] ?? '' ) );
+		foreach ( Gear_Engine_Protocols::find_approved_by_codes( $codes ) as $protocol ) {
+			if ( $has_exercises( (string) $protocol['slug'] ) ) {
+				return (string) $protocol['slug'];
+			}
+		}
+		return '';
 	}
 }
