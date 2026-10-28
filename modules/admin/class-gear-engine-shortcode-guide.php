@@ -90,6 +90,13 @@ class Gear_Engine_Shortcode_Guide {
 			),
 			array(
 				'group'       => __( 'Produkter', 'gear-engine' ),
+				'tag'         => Gear_Engine_Gear_Picker::SHORTCODE_TAG,
+				'example'     => '[' . Gear_Engine_Gear_Picker::SHORTCODE_TAG . ' type="treadmill"]',
+				'description' => __( 'Guided gear picker built from the imported exercise gear. Options: type (config in modules/gear-picker/configs), category (gear_category slugs, comma separated).', 'gear-engine' ),
+				'note'        => __( 'Use anywhere. Needs imported products with a price and affiliate link.', 'gear-engine' ),
+			),
+			array(
+				'group'       => __( 'Produkter', 'gear-engine' ),
 				'tag'         => 'gear_product',
 				'example'     => '[gear_product id="123"]',
 				'description' => __( 'Affiliate product card. Options: id or ean, show_ai, pitch, button_text.', 'gear-engine' ),

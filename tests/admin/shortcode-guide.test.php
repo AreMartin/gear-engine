@@ -44,6 +44,7 @@ class Gear_Engine_Exercise_Service {}
 
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-viewer.php';
 require_once ABSPATH . 'modules/triage/class-gear-engine-triage.php';
+require_once ABSPATH . 'modules/gear-picker/class-gear-engine-gear-picker.php';
 require_once ABSPATH . 'modules/admin/class-gear-engine-shortcode-guide.php';
 
 $failures = 0;
@@ -61,7 +62,7 @@ function page( $id, $content, $status = 'publish' ) {
 // Shortcode list.
 $list = Gear_Engine_Shortcode_Guide::get_shortcodes();
 $tags = array_column( $list, 'tag' );
-foreach ( array( 'gae_physio_chat', 'gear_engine_triage_picker', 'gear_engine_triage', 'gear_engine_protocol', 'gear_product' ) as $tag ) {
+foreach ( array( 'gae_physio_chat', 'gear_engine_triage_picker', 'gear_engine_triage', 'gear_engine_protocol', 'gear_engine_gear_picker', 'gear_product' ) as $tag ) {
 	t( "lists $tag", in_array( $tag, $tags, true ) );
 }
 t( 'every example starts with its own tag', ! array_filter( $list, function ( $r ) { return 0 !== strpos( $r['example'], '[' . $r['tag'] ); } ) );

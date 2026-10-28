@@ -72,3 +72,13 @@ The button opens a program page: create a page at the path under **Settings → 
 ### Smertesjekk section (region picker)
 
 The triage quizzes are a separate section from the AI chat ("Digital fysio"). Create one WordPress page containing `[gear_engine_triage_picker]` and one page per region containing `[gear_engine_triage region="<slug>"]`, with the region pages' URLs at `/<section path>/<slug>/`. The section path defaults to `smertesjekk` and can be changed under **Settings → Smertesjekk**. Cards show only each config's one-word `label` (the `summary` becomes the hover tooltip) in `order`, in 2, 3 or 6 columns depending on the width of the column or page they sit in; each quiz page shows an "Alle tester" link back to the section page (disable with `back_link="false"`). Run PHP checks with `php tests/triage/triage-php.test.php`.
+
+## Gear picker module
+
+`modules/gear-picker/` is a guided quiz that recommends products from the `exercise_gear` posts imported by the affiliate sync. Embed it with `[gear_engine_gear_picker type="treadmill"]` (optional `category="slug1,slug2"` limits it to `gear_category` terms).
+
+Each type is one JSON file in `modules/gear-picker/configs/`: which products qualify (`match`), how specs are read from title/description (`specs`), the quiz `steps`, `fallback` filters, `scoring`, result `pills` and expert `notes`. Each choice option can `require` conditions (hard filters) and give a score `bonus`; sliders carry `rules`. Conditions are small JSON objects (`field`/`op`/`value` or `ref` to another answer, plus `any`/`all`/`if`), documented at the top of `assets/js/gear-picker-scoring.js`. If nothing passes, the `fallback` filters apply and results show a notice.
+
+Specs that the feed text does not state can get a price-based `estimate`. Estimates take part in filtering but are never shown as pills. `feature_shop` makes sure one product from that shop appears when available, and `scoring.shop_bias` nudges ranking per shop; remove either to disable it. Product lists are cached for an hour and cleared when gear is saved or deleted.
+
+To add a type (e.g. rowing machines), copy `treadmill.json` and adjust it. Tests: `php tests/gear-picker/gear-picker.test.php` and `node tests/gear-picker/scoring.test.js`.

@@ -1,0 +1,153 @@
+{
+	"id": "treadmill",
+	"label": "Tredemøller",
+	"match": {
+		"include": ["tredemølle", "treadmill", "løpebånd", "walkingpad"],
+		"exclude": ["reservedel", "vedlikehold", "tilbehør"],
+		"exclude_title": ["sykkel", "vektskive", "underlag", "matte", "beskyttelse", "spray", "smøre", "silikon", "håndkle", "romaskin", "drivreim", "kretskort", "kontrollboks", "sikkerhetsnøkkel"],
+		"exclude_patterns": ["/(motor|løpebånd|vifte|display|skjerm|reim)\\s+(til|for)\\b/iu"],
+		"min_price": 2500
+	},
+	"specs": {
+		"speed": {
+			"type": "number", "min": 3, "max": 30,
+			"patterns": ["/(\\d{1,2}(?:[.,]\\d+)?)\\s*km\\/t/iu", "/hastighet\\s+(?:opptil|til)\\s+(\\d{1,2})/iu"],
+			"estimate": [{ "gt": 16000, "value": 20 }, { "value": 16 }]
+		},
+		"weight": {
+			"type": "number", "min": 51, "max": 250,
+			"patterns": ["/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt)[^0-9]{0,25}?(\\d{2,3})/iu"],
+			"estimate": [{ "gt": 18000, "value": 150 }, { "value": 120 }]
+		},
+		"incline": {
+			"type": "number", "min": 1, "max": 40,
+			"patterns": ["/stigning[^0-9]{0,30}?(\\d{1,2})\\s*%/iu", "/(\\d{1,2})\\s*%\\s*(?:stigning|incline)/iu", "/stigning.*?(?:opptil|til)\\s*(\\d{1,2})/iu"]
+		},
+		"motor_incline": { "type": "flag", "keywords": ["stigning", "motbakke", "incline"], "estimate": [{ "gte": 8500, "value": true }] },
+		"foldable": { "type": "flag", "keywords": ["sammenleggbar", "foldbar", "kompakt"] },
+		"app": { "type": "flag", "keywords": ["bluetooth", "zwift", "kinomap", "ifit", " app", "blåtann"], "estimate": [{ "gte": 12000, "value": true }] },
+		"screen": { "type": "flag", "keywords": ["touchskjerm", "touch screen", "berøringsskjerm", "tft"], "patterns": ["/tommer\\s+skjerm/iu", "/\"\\s*skjerm/iu"] },
+		"cushion": { "type": "flag", "keywords": ["demping", "skånsom", "støtdemp", "cushion"], "estimate": [{ "gte": 10000, "value": true }] },
+		"rehab": { "type": "flag", "keywords": ["rehabilitering", "opptrening", "gelender", "medisinsk", "rekkverk", "klinikk", "sykdom"] }
+	},
+	"pills": [
+		{ "field": "speed", "text": "Toppfart: {v} km/t" },
+		{ "field": "weight", "text": "Maks brukervekt: {v} kg" },
+		{ "field": "incline", "text": "{v}% stigning" },
+		{ "field": "motor_incline", "text": "Stigning", "unless": "incline" },
+		{ "field": "screen", "text": "Touchskjerm", "highlight": true },
+		{ "field": "app", "text": "App / BT", "highlight": true, "unless": "screen" },
+		{ "field": "foldable", "text": "Sammenleggbar", "highlight": true }
+	],
+	"limit": 4,
+	"feature_shop": "treningspartner",
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig tredemølle.",
+		"desc": "Svar på noen raske spørsmål. Vi skanner spesifikasjoner og priser hos våre samarbeidspartnere for å gi deg skreddersydde anbefalinger.",
+		"benefits": ["Analyserer toppfart og motorstyrke", "Vurderer tekniske spesifikasjoner", "Finner de beste tilbudene"],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "goal", "type": "choice", "title": "Hva er hovedmålet?",
+			"options": [
+				{ "val": "walk", "title": "Gåing & lett mosjon", "desc": "Rolig tempo, enklere behov" },
+				{ "val": "run", "title": "Regelmessig løping", "desc": "God motor og komfort (over 15 km/t)", "require": [{ "field": "speed", "op": "gte", "value": 15 }] },
+				{ "val": "interval", "title": "Tøffe intervaller / Sprint", "desc": "Krever høy toppfart og kraftig ramme", "require": [{ "field": "speed", "op": "gte", "value": 18 }] }
+			]
+		},
+		{
+			"id": "freq", "type": "choice", "title": "Hvor ofte skal den brukes?",
+			"options": [
+				{ "val": "light", "title": "Lett bruk", "desc": "1-2 økter i uka av én person" },
+				{ "val": "active", "title": "Aktiv bruk", "desc": "3+ økter i uka (Krever solid maskin)", "require": [{ "field": "weight", "op": "gte", "ref": "w", "add": 10 }] },
+				{ "val": "heavy", "title": "Veldig ofte / Flere brukere", "desc": "Nesten daglig. Krever kraftig motor og lang holdbarhet.", "require": [{ "field": "weight", "op": "gte", "ref": "w", "add": 15 }, { "field": "price", "op": "gte", "value": 8000 }] }
+			]
+		},
+		{
+			"id": "cushion", "type": "choice", "title": "Spesielle behov for demping?",
+			"options": [
+				{ "val": "standard", "title": "Standard demping", "desc": "Vanlig løping. Har ingen spesielle leddplager." },
+				{ "val": "soft", "title": "Ekstra myk demping", "desc": "Ønsker en maskin som er ekstra skånsom mot knær og ledd.", "require": [{ "field": "cushion", "op": "is", "value": true }], "bonus": [{ "field": "cushion", "op": "is", "value": true, "points": 4 }] },
+				{
+					"val": "rehab", "title": "Rehabilitering / Opptrening", "desc": "Krever svært stødig maskin, gjerne med gode håndtak/gelender.",
+					"require": [{ "any": [{ "field": "rehab", "op": "is", "value": true }, { "all": [{ "field": "weight", "op": "gte", "value": 130 }, { "field": "price", "op": "gte", "value": 8000 }] }] }],
+					"bonus": [{ "field": "rehab", "op": "is", "value": true, "points": 5 }]
+				}
+			]
+		},
+		{
+			"id": "space", "type": "choice", "title": "Hvordan skal den lagres?",
+			"options": [
+				{ "val": "foldable", "title": "Sammenleggbar", "desc": "Jeg må kunne vippe den opp for å spare gulvplass", "require": [{ "field": "foldable", "op": "is", "value": true }] },
+				{ "val": "any", "title": "Fast ramme / Spiller ingen rolle", "desc": "Har dedikert plass. Prioriterer maksimal stabilitet." }
+			]
+		},
+		{
+			"id": "incline", "type": "choice", "title": "Trenger du motbakke-funksjon?",
+			"options": [
+				{ "val": "yes", "title": "Ja, viktig for treningen", "desc": "Maskinen må ha motorisert stigning", "require": [{ "field": "motor_incline", "op": "is", "value": true }] },
+				{ "val": "no", "title": "Nei, ikke et absolutt krav", "desc": "Løper mest flatt, eller maskinen kan ha manuell stigning" }
+			]
+		},
+		{
+			"id": "tech", "type": "choice", "title": "Hvor viktig er teknologi og skjerm?",
+			"options": [
+				{ "val": "screen", "title": "Integrert touchskjerm", "desc": "Innebygd skjerm for video og interaktiv trening.", "require": [{ "field": "screen", "op": "is", "value": true }] },
+				{ "val": "app", "title": "Bruker eget nettbrett / apper", "desc": "Trenger Bluetooth-støtte for Zwift, Kinomap e.l.", "require": [{ "any": [{ "field": "app", "op": "is", "value": true }, { "field": "screen", "op": "is", "value": true }] }] },
+				{ "val": "none", "title": "Standard display holder", "desc": "Trenger kun det viktigste (tid, fart, distanse)." }
+			]
+		},
+		{
+			"id": "w", "type": "slider", "title": "Din vekt?",
+			"min": 50, "max": 180, "step": 5, "default": 90, "unit": "kg",
+			"subtitle": "Sikrer riktig slitasje-margin for din bruk",
+			"rules": [{ "field": "weight", "op": "gte", "ref": "w" }]
+		},
+		{
+			"id": "b", "type": "slider", "title": "Maks budsjett?",
+			"min": 5000, "max": 80000, "step": 1000, "default": 35000, "unit": "kr", "format": true,
+			"rules": [
+				{ "field": "price", "op": "lte", "ref": "b" },
+				{ "field": "price", "op": "gte", "ref": "b", "mul": 0.3, "if": { "step": "b", "op": "gt", "value": 15000 } }
+			]
+		}
+	],
+	"fallback": [
+		{ "field": "price", "op": "lte", "ref": "b", "mul": 1.2 },
+		{ "field": "weight", "op": "gte", "ref": "w" },
+		{ "field": "speed", "op": "gte", "value": 14 }
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": { "ref": "b", "factor": 10 },
+		"margins": [
+			{ "field": "speed", "from": { "step": "goal", "map": { "interval": 18, "run": 15 }, "default": 12 }, "per": 0.5, "cap": 4 },
+			{ "field": "weight", "from": { "ref": "w" }, "per": 0.1, "cap": 4 }
+		],
+		"shop_bias": { "treningspartner": 3.5, "maxa": -2 },
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling basert på dine kriterier. Optimal kombinasjon av ytelse og pris.",
+		"best_offer": "Stort priskutt akkurat nå. Mye for pengene innenfor dine preferanser.",
+		"pool": [
+			{ "when": { "any": [{ "step": "cushion", "op": "is", "value": "rehab" }, { "field": "rehab", "op": "is", "value": true }] }, "text": "Særdeles stabil og trygg maskin. Svært godt egnet for opptrening og rehabilitering." },
+			{ "when": { "any": [{ "step": "cushion", "op": "is", "value": "soft" }, { "field": "cushion", "op": "is", "value": true }] }, "text": "Utstyrt med et utmerket dempesystem som er ekstra skånsomt mot knær og ledd." },
+			{ "when": { "field": "screen", "op": "is", "value": true }, "text": "Topp moderne integrert skjerm for en interaktiv løpeopplevelse." },
+			{ "when": { "all": [{ "field": "app", "op": "is", "value": true }, { "field": "screen", "op": "is", "value": false }] }, "text": "Sømløs tilkobling via Bluetooth for bruk med favorittapper som Zwift." },
+			{ "when": { "field": "speed", "op": "gte", "value": 20 }, "text": "Solid og sterk motor. Laget for krevende sprinter og intervaller." },
+			{ "when": { "field": "weight", "op": "gte", "ref": "w", "add": 30 }, "text": "Massiv ramme og byggekvalitet. Tåler tung, daglig bruk." },
+			{ "when": { "field": "foldable", "op": "is", "value": true }, "text": "Smart og plassbesparende design. Kan vippes opp når den ikke er i bruk." },
+			{ "when": { "field": "motor_incline", "op": "is", "value": true }, "text": "Motorisert stigning gir deg mulighet til effektiv motbakketrening." }
+		],
+		"generic": [
+			"Et utmerket alternativ som gir deg skikkelig valuta for pengene.",
+			"En robust og driftssikker modell bygget for lang levetid.",
+			"Et meget sterkt valg som matcher dine viktigste kriterier.",
+			"Kombinerer høy byggekvalitet med smarte funksjoner til en fornuftig pris."
+		]
+	}
+}
