@@ -360,6 +360,8 @@ class Gear_Engine_Exercises_CPT {
 			<input class="widefat" id="gear-engine-exercise-video-url" name="gear_engine_exercise_video_url" type="url" value="<?php echo esc_attr( (string) $video_url ); ?>" placeholder="https://..." />
 			<span class="description"><?php esc_html_e( 'Paste an HTTPS ExorLive, YouTube, or Vimeo link. When provided, this link is used instead of the ExorLive exercise ID.', 'gear-engine' ); ?></span>
 		</p>
+		<details>
+			<summary><strong><?php esc_html_e( 'Advanced', 'gear-engine' ); ?></strong></summary>
 		<p>
 			<label for="gear-engine-video-culture"><?php esc_html_e( 'Video language', 'gear-engine' ); ?></label>
 			<input class="widefat" id="gear-engine-video-culture" name="gear_engine_video_culture" type="text" value="<?php echo esc_attr( $culture ? (string) $culture : 'nb-NO' ); ?>" />
@@ -372,6 +374,7 @@ class Gear_Engine_Exercises_CPT {
 			<label for="gear-engine-exercise-source"><?php esc_html_e( 'Source/reference URL', 'gear-engine' ); ?></label>
 			<input class="widefat" id="gear-engine-exercise-source" name="gear_engine_exercise_source_url" type="url" value="<?php echo esc_attr( (string) $source_url ); ?>" />
 		</p>
+		</details>
 		<?php
 	}
 

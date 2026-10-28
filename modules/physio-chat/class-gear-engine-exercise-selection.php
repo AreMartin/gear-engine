@@ -78,7 +78,7 @@ class Gear_Engine_Exercise_Selection {
 				),
 				'public'       => false,
 				'show_ui'      => true,
-				'show_in_menu' => 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE,
+				'show_in_menu' => 'tools.php',
 				'supports'     => array( 'title', 'editor' ),
 				'capabilities' => array( 'create_posts' => 'do_not_allow' ),
 				'map_meta_cap' => true,

@@ -171,23 +171,11 @@ class Gear_Engine_Protocols {
 				'label' => __( 'Sources / guideline references', 'gear-engine' ),
 				'help'  => __( 'Titles and links only. Used for your own review, never sent to the chat.', 'gear-engine' ),
 			),
-			'reviewer'  => array(
-				'meta'  => self::GEAR_ENGINE_META_REVIEWER,
-				'type'  => 'text',
-				'label' => __( 'Reviewed by', 'gear-engine' ),
-				'help'  => '',
-			),
-			'reviewed'  => array(
-				'meta'  => self::GEAR_ENGINE_META_REVIEWED,
-				'type'  => 'date',
-				'label' => __( 'Reviewed on', 'gear-engine' ),
-				'help'  => '',
-			),
 			'due'       => array(
 				'meta'  => self::GEAR_ENGINE_META_REVIEW_DUE,
 				'type'  => 'date',
-				'label' => __( 'Next review due', 'gear-engine' ),
-				'help'  => __( 'After this date the protocol is no longer used by the chat until re-approved.', 'gear-engine' ),
+				'label' => __( 'Review reminder (optional)', 'gear-engine' ),
+				'help'  => __( 'Optional. If set, the chat stops using this protocol after this date until you approve it again. Leave empty for no expiry.', 'gear-engine' ),
 			),
 		);
 	}
@@ -293,7 +281,7 @@ class Gear_Engine_Protocols {
 			$values[ $key ] = 'textarea' === $field['type'] ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
 			if ( 'codes' === $key ) {
 				$values[ $key ] = self::sanitize_codes( $values[ $key ] );
-			} elseif ( 'reviewed' === $key || 'due' === $key ) {
+			} elseif ( 'due' === $key ) {
 				$values[ $key ] = self::sanitize_date( $values[ $key ] );
 			}
 			update_term_meta( $term_id, $field['meta'], $values[ $key ] );
@@ -316,6 +304,11 @@ class Gear_Engine_Protocols {
 				);
 			}
 		}
+		if ( self::GEAR_ENGINE_STATUS_APPROVED === $status && self::GEAR_ENGINE_STATUS_APPROVED !== self::sanitize_status( get_term_meta( $term_id, self::GEAR_ENGINE_META_STATUS, true ) ) ) {
+			$user = function_exists( 'wp_get_current_user' ) ? wp_get_current_user() : null;
+			update_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEWER, is_object( $user ) && ! empty( $user->display_name ) ? sanitize_text_field( $user->display_name ) : '' );
+			update_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEWED, gmdate( 'Y-m-d' ) );
+		}
 		update_term_meta( $term_id, self::GEAR_ENGINE_META_STATUS, $status );
 	}
 
@@ -337,15 +330,6 @@ class Gear_Engine_Protocols {
 		if ( '' === trim( $values['red_flags'] ) ) {
 			$missing[] = __( 'red flags', 'gear-engine' );
 		}
-		if ( '' === trim( $values['reviewer'] ) ) {
-			$missing[] = __( 'reviewer', 'gear-engine' );
-		}
-		if ( '' === $values['reviewed'] ) {
-			$missing[] = __( 'review date', 'gear-engine' );
-		}
-		if ( '' === $values['due'] ) {
-			$missing[] = __( 'next review due', 'gear-engine' );
-		}
 		if ( ! self::get_published_exercise_ids( $term_id ) ) {
 			$missing[] = __( 'at least one published exercise', 'gear-engine' );
 		}
@@ -363,9 +347,6 @@ class Gear_Engine_Protocols {
 		$values = array(
 			'codes'     => (string) get_term_meta( $term_id, self::GEAR_ENGINE_META_CODES, true ),
 			'red_flags' => (string) get_term_meta( $term_id, self::GEAR_ENGINE_META_RED_FLAGS, true ),
-			'reviewer'  => (string) get_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEWER, true ),
-			'reviewed'  => (string) get_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEWED, true ),
-			'due'       => (string) get_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEW_DUE, true ),
 		);
 		return self::get_missing_requirements( $term_id, $values );
 	}
@@ -444,7 +425,7 @@ class Gear_Engine_Protocols {
 	}
 
 	/**
-	 * Effective status: approved, expired (approved but overdue) or draft.
+	 * Effective status: approved, expired (approved but past an optional reminder date) or draft.
 	 *
 	 * @param int $term_id Term ID.
 	 * @return string
@@ -454,7 +435,7 @@ class Gear_Engine_Protocols {
 			return self::GEAR_ENGINE_STATUS_DRAFT;
 		}
 		$due = self::sanitize_date( get_term_meta( $term_id, self::GEAR_ENGINE_META_REVIEW_DUE, true ) );
-		if ( '' === $due || $due < gmdate( 'Y-m-d' ) ) {
+		if ( '' !== $due && $due < gmdate( 'Y-m-d' ) ) {
 			return 'expired';
 		}
 		return self::GEAR_ENGINE_STATUS_APPROVED;

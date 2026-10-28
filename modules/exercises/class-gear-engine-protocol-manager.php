@@ -190,11 +190,88 @@ class Gear_Engine_Protocol_Manager {
 	}
 
 	/**
+	 * Count published exercises matching an extra query fragment.
+	 *
+	 * @param array<string, mixed> $extra WP_Query arguments.
+	 * @return int
+	 */
+	private static function count_published_exercises( array $extra = array() ): int {
+		$query = new WP_Query(
+			array_merge(
+				array(
+					'post_type'      => Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE,
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+					'fields'         => 'ids',
+				),
+				$extra
+			)
+		);
+		return (int) $query->found_posts;
+	}
+
+	/**
+	 * Short to-do list that replaces hunting through screens.
+	 *
+	 * @return void
+	 */
+	private function render_attention_box(): void {
+		$list_url = admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE );
+		$unrated  = self::count_published_exercises(
+			array(
+				'meta_query' => array(
+					'relation' => 'OR',
+					array( 'key' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, 'compare' => 'NOT EXISTS' ),
+					array( 'key' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, 'value' => '' ),
+				),
+			)
+		);
+		$untagged = self::count_published_exercises(
+			array(
+				'tax_query' => array(
+					array(
+						'taxonomy' => Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY,
+						'operator' => 'NOT EXISTS',
+					),
+				),
+			)
+		);
+		$drafts   = 0;
+		foreach ( self::get_protocol_tree() as $row ) {
+			if ( 0 === (int) $row['term']->parent && Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED !== Gear_Engine_Protocols::get_status( (int) $row['term']->term_id ) ) {
+				++$drafts;
+			}
+		}
+
+		$items = array(
+			array( $unrated, __( 'published exercises have no risk level (the chat cannot suggest them without a protocol)', 'gear-engine' ), add_query_arg( 'tab', 'matrix', admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE . '&page=' . self::GEAR_ENGINE_PAGE_SLUG ) ) ),
+			array( $untagged, __( 'published exercises are in no protocol', 'gear-engine' ), add_query_arg( 'gear_engine_protocol_filter', 'none', $list_url ) ),
+			array( $drafts, __( 'protocols are not approved or have expired', 'gear-engine' ), '' ),
+		);
+
+		echo '<div class="notice notice-info inline" style="padding:8px 12px"><p><strong>' . esc_html__( 'Needs attention', 'gear-engine' ) . '</strong></p><ul style="list-style:disc;margin-left:20px">';
+		$any = false;
+		foreach ( $items as $item ) {
+			if ( $item[0] < 1 ) {
+				continue;
+			}
+			$any  = true;
+			$text = $item[0] . ' ' . $item[1];
+			echo '<li>' . ( $item[2] ? '<a href="' . esc_url( $item[2] ) . '">' . esc_html( $text ) . '</a>' : esc_html( $text ) ) . '</li>';
+		}
+		if ( ! $any ) {
+			echo '<li>' . esc_html__( 'Everything is up to date.', 'gear-engine' ) . '</li>';
+		}
+		echo '</ul></div>';
+	}
+
+	/**
 	 * Protocol overview table.
 	 *
 	 * @return void
 	 */
 	private function render_overview(): void {
+		$this->render_attention_box();
 		$tree = self::get_protocol_tree();
 		$terms_url = admin_url( 'edit-tags.php?taxonomy=' . Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY . '&post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE );
 
@@ -207,7 +284,7 @@ class Gear_Engine_Protocol_Manager {
 		}
 
 		echo '<table class="widefat striped"><thead><tr>';
-		foreach ( array( __( 'Protocol / phase', 'gear-engine' ), __( 'Status', 'gear-engine' ), __( 'Codes', 'gear-engine' ), __( 'Published exercises', 'gear-engine' ), __( 'Next review due', 'gear-engine' ), __( 'Needs before approval', 'gear-engine' ) ) as $heading ) {
+		foreach ( array( __( 'Protocol / phase', 'gear-engine' ), __( 'Status', 'gear-engine' ), __( 'Codes', 'gear-engine' ), __( 'Published exercises', 'gear-engine' ), __( 'Review reminder', 'gear-engine' ), __( 'Needs before approval', 'gear-engine' ) ) as $heading ) {
 			echo '<th>' . esc_html( $heading ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';

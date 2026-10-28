@@ -1233,7 +1233,7 @@ assert_test( 1 === $updated && array( 11, 12 ) === $GLOBALS['wp_set_terms_calls'
 assert_test( 'moderate' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ), 'protocol_manager: Matrix save stores the risk level' );
 Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id ), array(), array( $imported_exercise_id => 'bogus' ) );
 assert_test( array() === $GLOBALS['wp_set_terms_calls'][1][1] && '' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ), 'protocol_manager: Unchecked boxes remove protocols and invalid risk is cleared' );
-assert_test( in_array( 'reviewer', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ) && ! in_array( 'matching codes', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ), 'protocols: Reports missing approval requirements' );
+assert_test( in_array( 'red flags', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ) && ! in_array( 'matching codes', Gear_Engine_Protocols::get_missing_for_term( 13 ), true ), 'protocols: Reports missing approval requirements' );
 
 // Suite 18: chat exercise selection modes and safety gate.
 echo "\nRunning Suite 18: Exercise selection modes...\n";
