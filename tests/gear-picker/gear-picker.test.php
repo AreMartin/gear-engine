@@ -76,4 +76,24 @@ t( 'decimal comma', 12.5 === $decimal['specs']['speed'] );
 $range = Gear_Engine_Gear_Picker::extract_specs( 'Brukervekt 30 kg', $config['specs'], 5000 );
 t( 'out of range ignored (falls back to estimate)', 120 === $range['specs']['weight'] );
 
+// Every bundled config must load and have compiling regexes and consistent references.
+foreach ( $types as $type ) {
+	$c = Gear_Engine_Gear_Picker::get_config( $type );
+	t( "$type: loads", is_array( $c ) );
+	if ( ! is_array( $c ) ) {
+		continue;
+	}
+	$patterns = $c['match']['exclude_patterns'] ?? array();
+	foreach ( $c['specs'] as $def ) {
+		$patterns = array_merge( $patterns, $def['patterns'] ?? array() );
+	}
+	t( "$type: regexes compile", ! array_filter( $patterns, function ( $p ) { return false === @preg_match( $p, '' ); } ) );
+	$slider_ids = array_column( array_filter( $c['steps'], function ( $st ) { return 'slider' === $st['type']; } ), 'id' );
+	t( "$type: scoring refs are sliders", in_array( $c['scoring']['price_margin']['ref'], $slider_ids, true ) );
+	$fields = array_merge( array_keys( $c['specs'] ), array( 'price' ) );
+	$used   = array_column( $c['pills'], 'field' );
+	t( "$type: pills use defined specs", ! array_diff( $used, $fields ) );
+	t( "$type: has base scoring", isset( $c['scoring']['base'], $c['scoring']['fallback_score'] ) );
+}
+
 exit( $failures ? 1 : 0 );

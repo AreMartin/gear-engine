@@ -1,0 +1,122 @@
+{
+	"id": "romaskin",
+	"label": "Romaskiner",
+	"match": {
+		"include": ["romaskin", "rowing", "rower", "roing"],
+		"exclude": ["reservedel", "vedlikehold", "tilbehør"],
+		"exclude_title": ["tredemølle", "sykkel", "matte", "underlag", "beskyttelse", "spray", "smøre", "håndkle", "pulsbelte", "trekk", "vaier", "skinne"],
+		"exclude_patterns": ["/(sete|håndtak|rem|skjerm|display|vifte|motstand|brett|stropp|føtter|fotbrett)\\s+(til|for)\\b/iu"],
+		"min_price": 1500
+	},
+	"specs": {
+		"weight": {
+			"type": "number", "min": 51, "max": 250,
+			"patterns": ["/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu", "/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt)[^0-9]{0,25}?(\\d{2,3})/iu"],
+			"estimate": [{ "gt": 10000, "value": 150 }, { "value": 120 }]
+		},
+		"magnetic": { "type": "flag", "keywords": ["magnetisk", "magnetmotstand", "magnet"] },
+		"air": { "type": "flag", "keywords": ["luftmotstand", "luftrormaskin", "air rower", "vifte"] },
+		"water": { "type": "flag", "keywords": ["vannmotstand", "vann-", "water rower", "waterrower", "vannrormaskin"] },
+		"quiet": { "type": "flag", "keywords": ["stillegående", "lydløs", "stille", "lav lyd", "støysvak"], "estimate": [{ "gte": 12000, "value": true }] },
+		"foldable": { "type": "flag", "keywords": ["sammenleggbar", "foldbar", "kompakt", "vertikalt", "oppbevaring", "klappbar"] },
+		"app": { "type": "flag", "keywords": ["bluetooth", "zwift", "kinomap", "ifit", "ergdata", "concept2", " app", "blåtann"], "estimate": [{ "gte": 12000, "value": true }] },
+		"screen": { "type": "flag", "keywords": ["touchskjerm", "touch screen", "berøringsskjerm", "tft", "lcd-skjerm", "monitor"], "patterns": ["/tommer\\s+skjerm/iu"] }
+	},
+	"pills": [
+		{ "field": "weight", "text": "Maks brukervekt: {v} kg" },
+		{ "field": "water", "text": "Vannmotstand" },
+		{ "field": "air", "text": "Luftmotstand" },
+		{ "field": "magnetic", "text": "Magnetisk motstand" },
+		{ "field": "quiet", "text": "Stillegående" },
+		{ "field": "screen", "text": "Skjerm" },
+		{ "field": "app", "text": "App / BT", "unless": "screen" },
+		{ "field": "foldable", "text": "Plassbesparende" }
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig romaskin.",
+		"desc": "Svar på noen raske spørsmål. Vi skanner spesifikasjoner og priser hos våre samarbeidspartnere for å gi deg skreddersydde anbefalinger.",
+		"benefits": ["Vurderer motstandstype og støynivå", "Tar hensyn til plass og brukervekt", "Finner de beste tilbudene"],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "resistance", "type": "choice", "title": "Hvilken type motstand foretrekker du?",
+			"options": [
+				{ "val": "magnetic", "title": "Magnetisk", "desc": "Jevn og stillegående. Passer de fleste.", "require": [{ "field": "magnetic", "op": "is", "value": true }] },
+				{ "val": "air", "title": "Luft", "desc": "Motstanden øker med innsatsen. Populært til intens trening.", "require": [{ "field": "air", "op": "is", "value": true }] },
+				{ "val": "water", "title": "Vann", "desc": "Mest naturlig romfølelse og pent design.", "require": [{ "field": "water", "op": "is", "value": true }] },
+				{ "val": "any", "title": "Vet ikke / spiller ingen rolle", "desc": "Vis meg de beste uansett type." }
+			]
+		},
+		{
+			"id": "noise", "type": "choice", "title": "Hvor viktig er lavt støynivå?",
+			"options": [
+				{ "val": "quiet", "title": "Veldig viktig", "desc": "Bor i leilighet eller trener når andre sover.", "require": [{ "any": [{ "field": "quiet", "op": "is", "value": true }, { "field": "magnetic", "op": "is", "value": true }, { "field": "water", "op": "is", "value": true }] }], "bonus": [{ "field": "quiet", "op": "is", "value": true, "points": 4 }] },
+				{ "val": "normal", "title": "Ikke avgjørende", "desc": "Jeg har et eget treningsrom." }
+			]
+		},
+		{
+			"id": "space", "type": "choice", "title": "Hvordan skal den lagres?",
+			"options": [
+				{ "val": "foldable", "title": "Må spare gulvplass", "desc": "Kan foldes eller settes på høykant.", "require": [{ "field": "foldable", "op": "is", "value": true }] },
+				{ "val": "any", "title": "Fast plass / spiller ingen rolle", "desc": "Har dedikert plass." }
+			]
+		},
+		{
+			"id": "tech", "type": "choice", "title": "Hvor viktig er teknologi og skjerm?",
+			"options": [
+				{ "val": "screen", "title": "Integrert skjerm", "desc": "Innebygd skjerm for treningsdata og programmer.", "require": [{ "field": "screen", "op": "is", "value": true }] },
+				{ "val": "app", "title": "Bruker egne apper", "desc": "Trenger Bluetooth for Kinomap, Zwift e.l.", "require": [{ "any": [{ "field": "app", "op": "is", "value": true }, { "field": "screen", "op": "is", "value": true }] }] },
+				{ "val": "none", "title": "Enkel monitor holder", "desc": "Trenger kun tid, tempo og distanse." }
+			]
+		},
+		{
+			"id": "w", "type": "slider", "title": "Din vekt?",
+			"min": 50, "max": 180, "step": 5, "default": 90, "unit": "kg",
+			"subtitle": "Sikrer at maskinen tåler brukeren",
+			"rules": [{ "field": "weight", "op": "gte", "ref": "w" }]
+		},
+		{
+			"id": "b", "type": "slider", "title": "Maks budsjett?",
+			"min": 2000, "max": 40000, "step": 500, "default": 15000, "unit": "kr", "format": true,
+			"rules": [
+				{ "field": "price", "op": "lte", "ref": "b" },
+				{ "field": "price", "op": "gte", "ref": "b", "mul": 0.3, "if": { "step": "b", "op": "gt", "value": 10000 } }
+			]
+		}
+	],
+	"fallback": [
+		{ "field": "price", "op": "lte", "ref": "b", "mul": 1.2 },
+		{ "field": "weight", "op": "gte", "ref": "w" }
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": { "ref": "b", "factor": 10 },
+		"margins": [
+			{ "field": "weight", "from": { "ref": "w" }, "per": 0.1, "cap": 4 }
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling basert på dine kriterier. Optimal kombinasjon av ytelse og pris.",
+		"best_offer": "Stort priskutt akkurat nå. Mye for pengene innenfor dine preferanser.",
+		"pool": [
+			{ "when": { "field": "water", "op": "is", "value": true }, "text": "Vannmotstand gir en naturlig og jevn romfølelse, med den beroligende lyden av vann." },
+			{ "when": { "field": "air", "op": "is", "value": true }, "text": "Luftmotstand tilpasser seg innsatsen din. Et godt valg for tøffe økter og intervaller." },
+			{ "when": { "field": "magnetic", "op": "is", "value": true }, "text": "Magnetisk motstand gir jevn og stillegående trening med lite vedlikehold." },
+			{ "when": { "field": "quiet", "op": "is", "value": true }, "text": "Stillegående konstruksjon som passer for trening hjemme uten å forstyrre andre." },
+			{ "when": { "field": "screen", "op": "is", "value": true }, "text": "Innebygd skjerm gir full oversikt over tempo, distanse og puls." },
+			{ "when": { "all": [{ "field": "app", "op": "is", "value": true }, { "field": "screen", "op": "is", "value": false }] }, "text": "Bluetooth lar deg koble til favorittappene dine for variert trening." },
+			{ "when": { "field": "foldable", "op": "is", "value": true }, "text": "Plassbesparende design som er enkel å sette bort etter økten." },
+			{ "when": { "field": "weight", "op": "gte", "ref": "w", "add": 30 }, "text": "Solid ramme med god margin til din vekt. Tåler jevnlig bruk." }
+		],
+		"generic": [
+			"Et utmerket alternativ som gir deg skikkelig valuta for pengene.",
+			"En robust og driftssikker modell bygget for lang levetid.",
+			"Et meget sterkt valg som matcher dine viktigste kriterier."
+		]
+	}
+}
