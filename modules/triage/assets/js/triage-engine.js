@@ -177,13 +177,18 @@
 	TriageApp.prototype.bindSwipe = function () {
 		var self = this;
 		var startX = 0;
+		var startY = 0;
 		this.el.addEventListener('touchstart', function (e) {
 			if (e.target.tagName === 'INPUT') { return; }
 			startX = e.changedTouches[0].screenX;
+			startY = e.changedTouches[0].screenY;
 		}, { passive: true });
 		this.el.addEventListener('touchend', function (e) {
 			if (e.target.tagName === 'INPUT') { return; }
-			if (e.changedTouches[0].screenX > startX + 60 && self.phase() === 'step' && self.stepIndex > 1 && !self.busy) {
+			var dx = e.changedTouches[0].screenX - startX;
+			var dy = Math.abs(e.changedTouches[0].screenY - startY);
+			// Only a mostly horizontal swipe goes back, so scrolling never triggers it.
+			if (dx > 60 && dx > dy * 1.5 && self.phase() === 'step' && self.stepIndex > 1 && !self.busy) {
 				self.go(self.stepIndex - 1, 'backward');
 			}
 		}, { passive: true });
@@ -232,6 +237,9 @@
 				break;
 			case 'print':
 				window.print();
+				break;
+			case 'print-plan':
+				this.printPlan();
 				break;
 			case 'reset':
 				this.reset();
@@ -461,12 +469,12 @@
 		var html = '<div class="get-result">';
 		var program = res.trainingProgram && safeUrl(res.trainingProgram.url) ? res.trainingProgram : null;
 
-		html += '<div class="get-result__head get-noprint"><span class="get-badge">' + icon('Check', 14) + ' Vurdering fullført</span>' +
+		html += '<div class="get-result__head get-noprint get-pp"><span class="get-badge">' + icon('Check', 14) + ' Vurdering fullført</span>' +
 			'<h2 class="get-title">' + esc(res.title) + '</h2>' +
 			'<div class="get-tags"><span class="get-tag">Kategori: ' + esc(res.category) + '</span>' +
 			'<span class="get-tag get-tag--severity ' + severityClass(res.severity) + '"><i></i> Alvorlighetsgrad: ' + esc(res.severity) + '</span></div></div>';
 
-		html += '<div class="get-card get-noprint"><h3>Hva betyr dette?</h3><p>' + esc(res.patientDesc) + '</p>' +
+		html += '<div class="get-card get-noprint get-pp"><h3>Hva betyr dette?</h3><p>' + esc(res.patientDesc) + '</p>' +
 			(res.patientDiff ? '<p class="get-muted"><strong>Kan forveksles med:</strong> ' + esc(res.patientDiff) + '</p>' : '') + '</div>';
 
 		html += this.renderPlan(res);
@@ -483,9 +491,23 @@
 		html += this.renderNote(res);
 
 		html += '<div class="get-actions get-noprint">' +
-			'<button type="button" class="get-btn get-btn--ghost" data-action="print">' + icon('Printer', 18) + ' Skriv ut / lagre</button>' +
+			'<button type="button" class="get-btn get-btn--ghost" data-action="print-plan">' + icon('Printer', 18) + ' Skriv ut min plan</button>' +
+			'<button type="button" class="get-btn get-btn--ghost" data-action="print">' + icon('Printer', 18) + ' Skriv ut klinisk notat</button>' +
 			'<button type="button" class="get-btn get-btn--ghost" data-action="reset">' + icon('RotateCcw', 18) + ' Start på nytt</button></div></div>';
 		return html;
+	};
+
+	/* Prints the patient's own plan instead of the clinical note. */
+	TriageApp.prototype.printPlan = function () {
+		var el = this.el;
+		var cls = 'get-print-plan';
+		var clear = function () {
+			el.classList.remove(cls);
+			window.removeEventListener('afterprint', clear);
+		};
+		el.classList.add(cls);
+		window.addEventListener('afterprint', clear);
+		window.print();
 	};
 
 	TriageApp.prototype.renderPlan = function (res) {
@@ -494,7 +516,7 @@
 			n++;
 			return '<div class="get-plan__step"><div class="get-plan__head"><span class="get-plan__num">' + n + '</span><h4>' + esc(title) + '</h4></div>' + body + '</div>';
 		};
-		var html = '<div class="get-plan get-noprint"><h3>Din handlingsplan</h3>';
+		var html = '<div class="get-plan get-noprint get-pp"><h3>Din handlingsplan</h3>';
 		if (res.phase1) {
 			html += step('Dette bør du gjøre nå', '<p>' + esc(res.phase1) + '</p>');
 		}

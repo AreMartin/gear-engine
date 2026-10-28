@@ -181,6 +181,13 @@
 	.gear-engine-triage .get-note { display: block !important; position: absolute; top: 0; left: 0; width: 100%; margin: 0; }
 	.gear-engine-triage .get-note__inner { border: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 	.gear-engine-triage .get-noprint { display: none !important; }
+
+	/* "Skriv ut min plan": print the patient's plan instead of the clinical note. */
+	.gear-engine-triage.get-print-plan .get-result,
+	.gear-engine-triage.get-print-plan .get-result * { visibility: visible !important; }
+	.gear-engine-triage.get-print-plan .get-result { position: absolute; top: 0; left: 0; width: 100%; }
+	.gear-engine-triage.get-print-plan .get-result > * { display: none !important; }
+	.gear-engine-triage.get-print-plan .get-result > .get-pp { display: block !important; }
 }
 
 @media (min-width: 640px) {

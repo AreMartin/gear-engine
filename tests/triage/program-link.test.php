@@ -34,6 +34,7 @@ function __( $s ) { return $s; }
 function wp_enqueue_style( $h ) {}
 function wp_enqueue_script( $h ) {}
 function wp_json_encode( $d, $f = 0 ) { return json_encode( $d, $f ); }
+function sanitize_text_field( $v ) { return trim( strip_tags( (string) $v ) ); }
 function wp_unslash( $v ) { return $v; }
 function current_user_can() { return false; }
 function shortcode_atts( $pairs, $atts ) { return array_merge( $pairs, array_intersect_key( $atts, $pairs ) ); }
@@ -221,5 +222,31 @@ t( 'automatic program refused for high severity', false !== strpos( $viewer->ren
 $_GET['dx'] = 'nope';
 t( 'automatic program refused for unknown diagnosis', false !== strpos( $viewer->render(), 'ikke tilgjengelig' ) );
 unset( $_GET['region'], $_GET['dx'], $_GET['pain'], $_GET['func'], $_GET['since'], $_GET['warn'] );
+
+// Fixes from review: keep other query args, change-answers link, phase 1 dead end.
+$_GET = array( 'page_id' => '123', 'region' => 'skulder', 'dx' => 'frozen_shoulder' );
+$page = $viewer->render();
+t( 'questions keep page_id for plain permalinks', false !== strpos( $page, 'name="page_id" value="123"' ) );
+t( 'questions do not duplicate their own fields', 1 === substr_count( $page, 'name="region"' ) );
+
+$_GET = array( 'region' => 'skulder', 'dx' => 'frozen_shoulder', 'pain' => 'mild', 'func' => 'normal', 'since' => 'chronic', 'warn' => 'no' );
+$page = $viewer->render();
+t( 'automatic program links back to the questions', false !== strpos( $page, 'Endre svar' ) && false !== strpos( $page, 'region=skulder&amp;dx=frozen_shoulder"' ) );
+$_GET = array( 'program' => 'saps-program' );
+t( 'curated program has no change-answers link', false === strpos( $viewer->render(), 'Endre svar' ) );
+
+$saved = $GLOBALS['area_exercises']['skulder'];
+$GLOBALS['area_exercises']['skulder'] = array( ex( 10, 'Bare moderat', array( 'risk' => 'moderate' ) ) );
+$_GET = array( 'region' => 'skulder', 'dx' => 'frozen_shoulder', 'pain' => 'severe', 'func' => 'limited', 'since' => 'chronic', 'warn' => 'no' );
+$page = $viewer->render();
+t( 'phase 1 without gentle exercises explains instead of erroring', false !== strpos( $page, 'ingen skånsomme øvelser' ) && false === strpos( $page, 'ikke tilgjengelig' ) && false === strpos( $page, 'Bare moderat' ) );
+$GLOBALS['area_exercises']['skulder'] = array();
+t( 'region without any exercises still unavailable', false !== strpos( $viewer->render(), 'ikke tilgjengelig' ) );
+$GLOBALS['area_exercises']['skulder'] = $saved;
+$_GET = array();
+
+// Primary and secondary buttons are separate styles.
+$css = file_get_contents( ABSPATH . 'modules/exercises/assets/css/protocol-viewer.css' );
+t( 'primary button style is not overridden later', 1 === substr_count( $css, ".gear-engine-program__btn { " ) && false !== strpos( $css, '.gear-engine-program__btn--secondary {' ) );
 
 exit( $failures ? 1 : 0 );

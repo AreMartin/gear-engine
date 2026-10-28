@@ -45,8 +45,8 @@
 .gear-engine-program__btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 1px solid transparent; border-radius: 999px; background: var(--gep-green); color: #fff; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.15s; }
 .gear-engine-program__play:hover,
 .gear-engine-program__btn:hover { background: var(--gep-green-dark); }
-.gear-engine-program__btn { background: #fff; border-color: var(--gep-border); color: var(--gep-navy); }
-.gear-engine-program__btn:hover { background: var(--gep-bg); }
+.gear-engine-program__btn--secondary { background: #fff; border-color: var(--gep-border); color: var(--gep-navy); }
+.gear-engine-program__btn--secondary:hover { background: var(--gep-bg); }
 .gear-engine-program__credit { font-size: 0.75rem; color: var(--gep-muted); }
 .gear-engine-program__credit a { color: inherit; }
 

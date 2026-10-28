@@ -463,7 +463,7 @@ class Gear_Engine_Exercise_Importer {
 			if ( '' !== $data['risk'] ) {
 				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, $data['risk'] );
 			}
-			if ( '' !== $data['good_for'] ) {
+			if ( isset( $data['good_for'] ) && '' !== $data['good_for'] ) {
 				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, $data['good_for'] );
 			}
 

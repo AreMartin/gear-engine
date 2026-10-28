@@ -2,7 +2,8 @@
 /**
  * Protocol (training program) page template.
  *
- * Expects $protocol (array) and $groups (array) from Gear_Engine_Protocol_Viewer::render().
+ * Expects $protocol (array) and $groups (array) from Gear_Engine_Protocol_Viewer::render();
+ * $change_url (optional) links back to the phase questions of an automatic program.
  *
  * @package GearEngine
  */
@@ -68,6 +69,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php esc_html_e( 'Programmet er generell veiledning og erstatter ikke undersøkelse av helsepersonell. Stopp og kontakt lege ved økende smerter eller nye symptomer.', 'gear-engine' ); ?>
 	</p>
 	<div class="gear-engine-program__actions gear-engine-program__noprint">
-		<button type="button" class="gear-engine-program__btn" data-action="print"><?php esc_html_e( 'Skriv ut', 'gear-engine' ); ?></button>
+		<button type="button" class="gear-engine-program__btn gear-engine-program__btn--secondary" data-action="print"><?php esc_html_e( 'Skriv ut', 'gear-engine' ); ?></button>
+		<?php if ( ! empty( $change_url ) ) : ?>
+			<a class="gear-engine-program__btn gear-engine-program__btn--secondary" href="<?php echo esc_url( $change_url ); ?>"><?php esc_html_e( 'Endre svar', 'gear-engine' ); ?></a>
+		<?php endif; ?>
 	</div>
 </div>

@@ -460,16 +460,20 @@ class Gear_Engine_Protocol_Viewer {
 			}
 			$phase       = self::compute_phase( $answers );
 			$warning_yes = isset( $_GET['warn'] ) && 'yes' === sanitize_key( wp_unslash( $_GET['warn'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$auto        = self::get_auto_program( $region, $dx, 0 === $phase ? 0 : $phase );
+			$auto        = self::get_auto_program( $region, $dx, $phase );
+			$change_url  = '';
 			if ( $auto && $warning_yes ) {
 				echo '<div class="gear-engine-program"><div class="gear-engine-program__warning" role="alert"><strong>' . esc_html__( 'Ikke start øvelser nå.', 'gear-engine' ) . '</strong><p>' . esc_html__( 'Nummenhet, kraftsvikt eller raskt økende smerter bør vurderes av lege eller fysioterapeut før du trener.', 'gear-engine' ) . '</p></div></div>';
 			} elseif ( $auto && 0 === $phase ) {
 				$question_title = $auto['protocol']['name'];
 				include GEAR_ENGINE_PATH . 'modules/exercises/templates/protocol-phase-questions.php';
 			} elseif ( $auto ) {
-				$protocol = $auto['protocol'];
-				$groups   = $auto['groups'];
+				$protocol   = $auto['protocol'];
+				$groups     = $auto['groups'];
+				$change_url = self::get_auto_program_url( $region, $dx );
 				include GEAR_ENGINE_PATH . 'modules/exercises/templates/protocol-view.php';
+			} elseif ( 1 === $phase && self::get_auto_program( $region, $dx, 2 ) ) {
+				echo '<div class="gear-engine-program"><p class="gear-engine-program__empty">' . esc_html__( 'Det finnes ingen skånsomme øvelser for dette området ennå. Hvil og unngå det som provoserer smertene, og ta kontakt med fysioterapeut hvis plagene vedvarer.', 'gear-engine' ) . '</p><p><a href="' . esc_url( self::get_auto_program_url( $region, $dx ) ) . '">' . esc_html__( 'Endre svar', 'gear-engine' ) . '</a></p></div>';
 			} else {
 				echo '<div class="gear-engine-program"><p class="gear-engine-program__empty">' . esc_html__( 'Dette treningsprogrammet er ikke tilgjengelig.', 'gear-engine' ) . '</p></div>';
 			}
