@@ -68,7 +68,7 @@ t( 'invalid config rejected', ! Gear_Engine_Triage::validate_config( array( 'tit
 $cards = Gear_Engine_Triage::get_region_cards();
 t( 'cards have label and url', isset( $cards[0] ) && 'Rygg' === $cards[0]['label'] && 'http://example.com/smertesjekk/rygg/' === $cards[0]['url'] );
 
-t( 'icon svg for known key', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'knee' ), '<circle cx="12" cy="13"' ) );
+t( 'icon svg for known key', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'knee' ), '<circle cx="11" cy="12.5"' ) );
 t( 'icon falls back', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'nope' ), 'points="22 12 18 12' ) );
 
 $triage = new Gear_Engine_Triage();

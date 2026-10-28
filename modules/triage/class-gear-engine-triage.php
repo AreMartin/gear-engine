@@ -148,12 +148,12 @@ class Gear_Engine_Triage {
 	public static function get_icon_paths(): array {
 		$icons = array(
 			'activity' => '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
-			'back'     => '<path d="M12 3v18"/><path d="M8 6h8"/><path d="M8.5 10h7"/><path d="M8 14h8"/><path d="M8.5 18h7"/>',
-			'knee'     => '<path d="M9 2v8a3 3 0 0 0 3 3"/><path d="M12 13a3 3 0 0 1 3 3v6"/><circle cx="12" cy="13" r="2.5"/>',
-			'shoulder' => '<circle cx="12" cy="5" r="2.5"/><path d="M4 21v-5a8 8 0 0 1 16 0v5"/><path d="M4 12c0-3 2-5 5-5"/>',
-			'foot'     => '<path d="M5 20h13a2 2 0 0 0 2-2v-1a4 4 0 0 0-3-3.9L12 12V4H8v8l-3 2.5z"/>',
-			'hip'      => '<path d="M5 4c0 5 1 8 4 10l-1 6"/><path d="M19 4c0 5-1 8-4 10l1 6"/><path d="M9 14h6"/>',
-			'neck'     => '<circle cx="12" cy="6" r="3"/><path d="M12 9v5"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/>',
+			'back'     => '<rect x="8.5" y="2.5" width="7" height="3.4" rx="1.3"/><rect x="8" y="7.3" width="8" height="3.4" rx="1.3"/><rect x="7.5" y="12.1" width="9" height="3.4" rx="1.3"/><rect x="8" y="16.9" width="8" height="3.4" rx="1.3"/>',
+			'knee'     => '<path d="M8 2.5l2.25 7.5"/><path d="M12.36 14.72L16.5 21.5"/><circle cx="11" cy="12.5" r="2.6"/>',
+			'shoulder' => '<circle cx="11" cy="5" r="2.6"/><path d="M4.5 21v-5.5A4.5 4.5 0 0 1 9 11h6.6"/><circle cx="18.2" cy="11" r="2.6"/><path d="M18.2 13.6V21"/>',
+			'foot'     => '<path d="M7.5 3v9L4 17.4a2 2 0 0 0 1.7 3.1H19a2 2 0 0 0 2-2V17a2.5 2.5 0 0 0-1.7-2.4L13.5 13V3"/>',
+			'hip'      => '<path d="M3.5 5c0 5.5 1.5 8.5 5 10"/><path d="M20.5 5c0 5.5-1.5 8.5-5 10"/><circle cx="8" cy="18" r="2.6"/><circle cx="16" cy="18" r="2.6"/>',
+			'neck'     => '<circle cx="12" cy="6" r="3.4"/><path d="M10.2 9.6v4M13.8 9.6v4"/><path d="M3.5 21.5c0-4 3-6.5 8.5-6.5s8.5 2.5 8.5 6.5"/>',
 		);
 
 		/**
@@ -173,7 +173,7 @@ class Gear_Engine_Triage {
 	public static function get_icon_svg( string $name ): string {
 		$icons = self::get_icon_paths();
 		$body  = $icons[ $name ] ?? ( $icons['activity'] ?? '' );
-		return '<svg class="gear-engine-triage-picker__icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $body . '</svg>';
+		return '<svg class="gear-engine-triage-picker__icon" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $body . '</svg>';
 	}
 
 	/**
