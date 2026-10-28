@@ -40,6 +40,7 @@ class WP_Error {
 	public function get_error_message() { return $this->message; }
 }
 
+require_once ABSPATH . 'includes/class-gear-engine-config-loader.php';
 require_once ABSPATH . 'modules/triage/class-gear-engine-triage.php';
 
 $failures = 0;

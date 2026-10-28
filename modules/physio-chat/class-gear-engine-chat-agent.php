@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_Chat_Agent
+ * Class Gear_Engine_Chat_Agent
  */
-class GAE_Chat_Agent {
+class Gear_Engine_Chat_Agent {
 
 	public const GEAR_ENGINE_MAX_EXERCISES_PER_PROGRAM = 5;
 
@@ -305,7 +305,7 @@ EOT;
 		}
 
 		if ( ! empty( $associated_terms ) ) {
-			$assoc_products = GAE_Product_Service::search_products(
+			$assoc_products = Gear_Engine_Product_Service::search_products(
 				array(
 					'keywords'     => $associated_terms,
 					'min_price'    => $min_price,
@@ -341,7 +341,7 @@ EOT;
 		}
 
 		if ( ! empty( $clean_sokeord ) ) {
-			$broad_products = GAE_Product_Service::search_products(
+			$broad_products = Gear_Engine_Product_Service::search_products(
 				array(
 					'keywords'     => array_slice( $clean_sokeord, 0, 6 ),
 					'min_price'    => $min_price,
@@ -475,7 +475,7 @@ EOT;
 				$s_max = ! empty( $fn_args['max_price'] ) ? (float) $fn_args['max_price'] : $max_price;
 				$s_min = ! empty( $fn_args['min_price'] ) ? (float) $fn_args['min_price'] : $min_price;
 
-				$tool_products = GAE_Product_Service::search_products(
+				$tool_products = Gear_Engine_Product_Service::search_products(
 					array(
 						'keywords'     => explode( ' ', mb_strtolower( $q, 'UTF-8' ) ),
 						'min_price'    => $s_min,
@@ -872,3 +872,10 @@ EOT;
 		return $bot_data;
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_Chat_Agent', false ) ) {
+	class_alias( 'Gear_Engine_Chat_Agent', 'GAE_Chat_Agent' );
+}
+

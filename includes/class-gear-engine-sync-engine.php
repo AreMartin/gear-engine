@@ -10,12 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_Sync_Engine
+ * Class Gear_Engine_Sync_Engine
  *
  * Implements high-volume streaming XML feed parsing via XMLReader with pre-filtering,
  * EAN deduplication, batch database upserts, and daily WP-Cron scheduling.
  */
-class GAE_Sync_Engine {
+class Gear_Engine_Sync_Engine {
 
 	/**
 	 * Daily cron hook name.
@@ -33,11 +33,22 @@ class GAE_Sync_Engine {
 	public const BATCH_SIZE = 25;
 
 	/**
+	 * Follow-up cron hook that resumes a capped feed from its saved cursor.
+	 */
+	public const CONTINUE_HOOK = 'gae_sync_continue_event';
+
+	/**
+	 * Option storing per-feed scan cursors for chunked syncing.
+	 */
+	public const CURSOR_OPTION = 'gae_sync_cursor';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Hook WP-Cron scheduled task.
+		// Hook WP-Cron scheduled tasks.
 		add_action( self::CRON_HOOK, array( $this, 'run_sync' ) );
+		add_action( self::CONTINUE_HOOK, array( $this, 'run_sync' ) );
 	}
 
 	/**
@@ -116,13 +127,33 @@ class GAE_Sync_Engine {
 			}
 		}
 
+		// Chunked sync: daily cron cycles start fresh cursors; a continuation
+		// run resumes from saved scan offsets so capped feeds eventually finish
+		// instead of silently re-processing only their first chunk forever.
+		$in_cron         = function_exists( 'wp_doing_cron' ) && wp_doing_cron();
+		$is_continuation = $in_cron && function_exists( 'wp_next_scheduled' ) && wp_next_scheduled( self::CONTINUE_HOOK );
+
+		$cursor = get_option( self::CURSOR_OPTION, array() );
+		if ( ! is_array( $cursor ) ) {
+			$cursor = array();
+		}
+		if ( $in_cron && ! $is_continuation && ! empty( $cursor ) ) {
+			delete_option( self::CURSOR_OPTION );
+			$cursor = array();
+		}
+
 		foreach ( $feeds as $source_name => $feed_source ) {
 			if ( empty( $feed_source ) ) {
 				continue;
 			}
 
+			$feed_rules = $filter_rules;
+			if ( $in_cron && isset( $cursor[ $source_name ]['scanned'] ) && ( time() - (int) ( $cursor[ $source_name ]['ts'] ?? 0 ) ) < 6 * HOUR_IN_SECONDS ) {
+				$feed_rules['start_offset'] = max( 0, (int) $cursor[ $source_name ]['scanned'] );
+			}
+
 			try {
-				$this->process_feed( $source_name, $feed_source, $filter_rules, $report );
+				$this->process_feed( $source_name, $feed_source, $feed_rules, $report );
 			} catch ( \Throwable $e ) {
 				$report['errors'][] = sprintf(
 					'[%s] Error: %s',
@@ -131,10 +162,37 @@ class GAE_Sync_Engine {
 				);
 			}
 
-			// If total product limit or batch limit was hit, stop processing further feeds.
-			if ( ! empty( $report['batch_capped'] ) || ! empty( $report['total_capped'] ) ) {
+			if ( ! empty( $report['total_capped'] ) ) {
+				// Catalog cap reached: nothing more to import until the cap changes.
 				break;
 			}
+
+			$capped = ! empty( $report['batch_capped'] ) || ! empty( $report['scan_capped'] );
+
+			if ( ! $capped ) {
+				// Feed fully consumed within this batch: drop its stale cursor.
+				if ( isset( $cursor[ $source_name ] ) ) {
+					unset( $cursor[ $source_name ] );
+					update_option( self::CURSOR_OPTION, $cursor, false );
+				}
+				continue;
+			}
+
+			// Background runs queue a follow-up chunk. Manual dashboard runs
+			// keep their one-shot "this run" semantics and touch no cursors.
+			if ( $in_cron ) {
+				$cursor[ $source_name ] = array(
+					'scanned' => (int) ( $report['feed_scanned'] ?? 0 ),
+					'ts'      => time(),
+				);
+				update_option( self::CURSOR_OPTION, $cursor, false );
+				if ( function_exists( 'as_schedule_single_event' ) && function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( self::CONTINUE_HOOK ) ) {
+					as_schedule_single_event( time() + 60, self::CONTINUE_HOOK );
+				}
+			}
+
+			// Total product limit or batch limit was hit: stop this run here.
+			break;
 		}
 
 		// Re-enable term and comment counting and recalculate deferred counts.
@@ -149,8 +207,8 @@ class GAE_Sync_Engine {
 		update_option( 'gae_last_sync_report', $report, false );
 
 		// Periodically refresh available AI models list if transient expired (only during background cron, not blocking user AJAX).
-		if ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() && class_exists( 'GAE_AI_API' ) ) {
-			GAE_AI_API::get_available_models();
+		if ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() && class_exists( 'Gear_Engine_AI_API' ) ) {
+			Gear_Engine_AI_API::get_available_models();
 		}
 
 		// Release lock.
@@ -212,7 +270,7 @@ class GAE_Sync_Engine {
 	 */
 	public function get_catalog_product_count(): int {
 		if ( function_exists( 'wp_count_posts' ) ) {
-			$counts = wp_count_posts( GAE_CPT::POST_TYPE );
+			$counts = wp_count_posts( Gear_Engine_CPT::POST_TYPE );
 			return (int) ( $counts->publish ?? 0 );
 		}
 		if ( isset( $GLOBALS['wp_posts'] ) && is_array( $GLOBALS['wp_posts'] ) ) {
@@ -220,7 +278,7 @@ class GAE_Sync_Engine {
 			foreach ( $GLOBALS['wp_posts'] as $post ) {
 				$pt = is_object( $post ) ? ( $post->post_type ?? '' ) : ( $post['post_type'] ?? '' );
 				$ps = is_object( $post ) ? ( $post->post_status ?? 'publish' ) : ( $post['post_status'] ?? 'publish' );
-				if ( $pt === GAE_CPT::POST_TYPE && 'publish' === $ps ) {
+				if ( $pt === Gear_Engine_CPT::POST_TYPE && 'publish' === $ps ) {
 					$count++;
 				}
 			}
@@ -481,17 +539,15 @@ class GAE_Sync_Engine {
 			return;
 		}
 
-		$batch_counter = 0;
-		$feed_scanned  = 0;
-		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
-		$max_scan      = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
+		$batch_counter  = 0;
+		$feed_scanned   = 0;
+		$start_offset   = max( 0, (int) ( $filter_rules['start_offset'] ?? 0 ) );
+		$report['feed_scanned'] = $start_offset;
+		$max_limit      = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
+		$max_scan       = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
 
 		// Stream through the XML node by node.
 		while ( $reader->read() ) {
-			if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
-				$report['batch_capped'] = true;
-				break;
-			}
 			if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
 				$report['scan_capped'] = true;
 				break;
@@ -500,6 +556,15 @@ class GAE_Sync_Engine {
 			// Look for product/item node elements.
 			if ( \XMLReader::ELEMENT === $reader->nodeType && in_array( strtolower( $reader->localName ), array( 'product', 'item', 'article' ), true ) ) {
 				$feed_scanned++;
+				if ( $feed_scanned <= $start_offset ) {
+					// Already imported by a previous chunk of this cycle.
+					continue;
+				}
+				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+					$report['batch_capped'] = true;
+					break;
+				}
+				$report['feed_scanned'] = $feed_scanned;
 
 				// Extract outer XML for this node into SimpleXMLElement.
 				$raw_node_xml = $reader->readOuterXml();
@@ -557,11 +622,13 @@ class GAE_Sync_Engine {
 			return;
 		}
 
-		$batch_counter = 0;
-		$feed_scanned  = 0;
-		$max_limit     = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
-		$max_scan      = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
-		$depth         = 0;
+		$batch_counter  = 0;
+		$feed_scanned   = 0;
+		$start_offset   = max( 0, (int) ( $filter_rules['start_offset'] ?? 0 ) );
+		$report['feed_scanned'] = $start_offset;
+		$max_limit      = (int) ( $filter_rules['max_items_per_sync'] ?? 100 );
+		$max_scan       = (int) ( $filter_rules['max_scan_items'] ?? 5000 );
+		$depth          = 0;
 		$buffer        = '';
 		$in_string     = false;
 		$escape        = false;
@@ -583,10 +650,6 @@ class GAE_Sync_Engine {
 
 		if ( $is_ndjson ) {
 			while ( ( $line = fgets( $handle ) ) !== false ) {
-				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
-					$report['batch_capped'] = true;
-					break;
-				}
 				if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
 					$report['scan_capped'] = true;
 					break;
@@ -598,6 +661,14 @@ class GAE_Sync_Engine {
 				$raw = json_decode( $line, true );
 				if ( is_array( $raw ) ) {
 					$feed_scanned++;
+					if ( $feed_scanned <= $start_offset ) {
+						continue;
+					}
+					if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+						$report['batch_capped'] = true;
+						break;
+					}
+					$report['feed_scanned'] = $feed_scanned;
 					$item = $this->extract_json_item_data( $raw, $source_name );
 					$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
 				}
@@ -605,10 +676,6 @@ class GAE_Sync_Engine {
 		} else {
 			// Streaming parser for standard JSON array / object container.
 			while ( ( $chunk = fread( $handle, 8192 ) ) !== false && strlen( $chunk ) > 0 ) {
-				if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
-					$report['batch_capped'] = true;
-					break;
-				}
 				if ( $max_scan > 0 && $feed_scanned >= $max_scan ) {
 					$report['scan_capped'] = true;
 					break;
@@ -648,6 +715,15 @@ class GAE_Sync_Engine {
 								$raw = json_decode( $buffer, true );
 								if ( is_array( $raw ) ) {
 									$feed_scanned++;
+									if ( $feed_scanned <= $start_offset ) {
+										continue;
+									}
+									if ( $max_limit > 0 && ( $report['inserted'] + $report['updated'] ) >= $max_limit ) {
+										$report['batch_capped'] = true;
+										$report['feed_scanned'] = $feed_scanned - 1;
+										break;
+									}
+									$report['feed_scanned'] = $feed_scanned;
 									$item = $this->extract_json_item_data( $raw, $source_name );
 									$this->process_single_item( $item, $filter_rules, $report, $batch_counter );
 								}
@@ -1185,138 +1261,7 @@ class GAE_Sync_Engine {
 	 * @return bool True if product passes all filters, false to skip.
 	 */
 	public function passes_pre_filters( array $item, array $filter_rules, string &$reason = '' ): bool {
-		// 1. EAN / Barcode / Unique ID must be present.
-		if ( empty( $item['ean'] ) ) {
-			$reason = 'Missing EAN or Product ID';
-			return false;
-		}
-
-		// Title must not be empty.
-		if ( empty( $item['title'] ) ) {
-			$reason = 'Missing Product Title';
-			return false;
-		}
-
-		// 2. Minimum price filter.
-		$min_price = $filter_rules['min_price'] ?? 0;
-		if ( $min_price > 0 && $item['price'] < $min_price ) {
-			$reason = sprintf( 'Price below minimum threshold (%.0f kr)', $min_price );
-			return false;
-		}
-
-		// 3. Maximum price filter.
-		$max_price = $filter_rules['max_price'] ?? 0;
-		if ( $max_price > 0 && $item['price'] > $max_price ) {
-			$reason = sprintf( 'Price above maximum cap (%.0f kr)', $max_price );
-			return false;
-		}
-
-		// 4. Minimum discount percentage filter.
-		$min_discount_pct = $filter_rules['min_discount_pct'] ?? 0;
-		if ( $min_discount_pct > 0 ) {
-			$regular = (float) ( $item['regular_price'] ?? 0 );
-			$price   = (float) ( $item['price'] ?? 0 );
-			if ( $regular <= $price ) {
-				$reason = 'Not discounted (regular price <= current price)';
-				return false;
-			}
-			$discount_pct = ( ( $regular - $price ) / $regular ) * 100;
-			if ( $discount_pct < $min_discount_pct ) {
-				$reason = sprintf( 'Discount (%.0f%%) below min threshold (%.0f%%)', $discount_pct, $min_discount_pct );
-				return false;
-			}
-		}
-
-		// 5. Stock status filter (Only in-stock products).
-		$only_in_stock = ! empty( $filter_rules['only_in_stock'] );
-		if ( $only_in_stock && empty( $item['in_stock'] ) ) {
-			$reason = 'Item out of stock';
-			return false;
-		}
-
-		$item_merchant = mb_strtolower( (string) ( $item['merchant'] ?? '' ), 'UTF-8' );
-
-		// 6. Allowed merchants filter (whitelist).
-		$allowed_merchants = $filter_rules['allowed_merchants'] ?? array();
-		if ( ! empty( $allowed_merchants ) ) {
-			$merchant_matched = false;
-			foreach ( $allowed_merchants as $allowed_m ) {
-				if ( '' !== $allowed_m && false !== mb_strpos( $item_merchant, $allowed_m ) ) {
-					$merchant_matched = true;
-					break;
-				}
-			}
-			if ( ! $merchant_matched ) {
-				$reason = sprintf( 'Merchant "%s" not in allowed whitelist', $item['merchant'] ?: 'unknown' );
-				return false;
-			}
-		}
-
-		// 7. Excluded merchants filter (blacklist).
-		$excluded_merchants = $filter_rules['excluded_merchants'] ?? array();
-		if ( ! empty( $excluded_merchants ) ) {
-			foreach ( $excluded_merchants as $excluded_m ) {
-				if ( '' !== $excluded_m && false !== mb_strpos( $item_merchant, $excluded_m ) ) {
-					$reason = sprintf( 'Merchant "%s" matched blacklisted merchants', $item['merchant'] );
-					return false;
-				}
-			}
-		}
-
-		// Normalize text for category and keyword checks.
-		$item_title = mb_strtolower( (string) $item['title'], 'UTF-8' );
-		$item_cat   = mb_strtolower( (string) ( $item['category'] ?? '' ), 'UTF-8' );
-		$item_desc  = mb_strtolower( (string) ( $item['description'] ?? '' ), 'UTF-8' );
-		$searchable = $item_title . ' ' . $item_cat . ' ' . $item_desc;
-
-		// 8. Allowed categories filter.
-		$allowed_categories = $filter_rules['allowed_categories'] ?? array();
-		if ( ! empty( $allowed_categories ) ) {
-			$category_matched = false;
-			foreach ( $allowed_categories as $allowed_cat ) {
-				if ( '' !== $allowed_cat && ( false !== mb_strpos( $item_cat, $allowed_cat ) || false !== mb_strpos( $item_title, $allowed_cat ) ) ) {
-					$category_matched = true;
-					break;
-				}
-			}
-			if ( ! $category_matched ) {
-				$reason = sprintf( 'Category/Title did not match allowed categories (Cat: "%s")', $item['category'] ?: 'none' );
-				return false;
-			}
-		}
-
-		// 9. Blacklisted keywords filter.
-		$excluded_keywords = $filter_rules['excluded_keywords'] ?? array();
-		if ( ! empty( $excluded_keywords ) ) {
-			foreach ( $excluded_keywords as $keyword ) {
-				if ( '' !== $keyword ) {
-					// Use word boundary regex so keywords like 'manual' do not match 'manualer' (dumbbells).
-					$pattern = '/(?:\b|_)' . preg_quote( $keyword, '/' ) . '(?:\b|_)/iu';
-					if ( preg_match( $pattern, $searchable ) ) {
-						$reason = sprintf( 'Matched blacklisted keyword "%s"', $keyword );
-						return false;
-					}
-				}
-			}
-		}
-
-		// 10. Required keywords filter (product must contain at least one).
-		$required_keywords = $filter_rules['required_keywords'] ?? array();
-		if ( ! empty( $required_keywords ) ) {
-			$req_matched = false;
-			foreach ( $required_keywords as $req_kw ) {
-				if ( '' !== $req_kw && false !== mb_strpos( $searchable, $req_kw ) ) {
-					$req_matched = true;
-					break;
-				}
-			}
-			if ( ! $req_matched ) {
-				$reason = 'Did not contain any of the required keywords';
-				return false;
-			}
-		}
-
-		return true;
+		return $this->rules()->passes_pre_filters( $item, $filter_rules, $reason );
 	}
 
 	/**
@@ -1327,125 +1272,7 @@ class GAE_Sync_Engine {
 	 * @return string 'inserted', 'updated', 'catalog_capped', or 'failed'
 	 */
 	public function upsert_product( array $item, bool $prevent_new_insert = false ): string {
-		global $wpdb;
-
-		$ean = (string) $item['ean'];
-
-		// Fast indexed query by EAN meta value.
-		$existing_post_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s LIMIT 1",
-				GAE_CPT::META_EAN,
-				$ean
-			)
-		);
-
-		$now = current_time( 'mysql' );
-
-		if ( $existing_post_id ) {
-			$post_id = (int) $existing_post_id;
-
-			// Update post title/content if feed provided updated data.
-			$update_args = array(
-				'ID'         => $post_id,
-				'post_title' => wp_strip_all_tags( $item['title'] ),
-			);
-			if ( ! empty( $item['description'] ) ) {
-				$update_args['post_content'] = wp_kses_post( $item['description'] );
-			}
-			wp_update_post( $update_args );
-
-			// Update all meta values.
-			update_post_meta( $post_id, GAE_CPT::META_PRICE, (float) $item['price'] );
-			update_post_meta( $post_id, GAE_CPT::META_REGULAR_PRICE, (float) $item['regular_price'] );
-			update_post_meta( $post_id, GAE_CPT::META_IN_STOCK, $item['in_stock'] ? 1 : 0 );
-			update_post_meta( $post_id, GAE_CPT::META_AFFILIATE_URL, esc_url_raw( $item['affiliate_url'] ) );
-			update_post_meta( $post_id, GAE_CPT::META_MERCHANT, sanitize_text_field( $item['merchant'] ) );
-			update_post_meta( $post_id, GAE_CPT::META_CURRENCY, sanitize_text_field( $item['currency'] ) );
-			update_post_meta( $post_id, GAE_CPT::META_LAST_SYNCED, $now );
-
-			if ( ! empty( $item['image_url'] ) ) {
-				update_post_meta( $post_id, GAE_CPT::META_IMAGE_URL, esc_url_raw( $item['image_url'] ) );
-			}
-
-			// Update taxonomy if category given.
-			$this->assign_category( $post_id, (string) ( $item['category'] ?? '' ) );
-
-			return 'updated';
-		}
-
-		// If catalog cap is reached and this is a new product, block new insert.
-		if ( $prevent_new_insert ) {
-			return 'catalog_capped';
-		}
-
-		// Insert new post.
-		$post_args = array(
-			'post_type'    => GAE_CPT::POST_TYPE,
-			'post_status'  => 'publish',
-			'post_title'   => wp_strip_all_tags( $item['title'] ),
-			'post_content' => wp_kses_post( $item['description'] ),
-			'post_excerpt' => wp_strip_all_tags( wp_trim_words( $item['description'], 35 ) ),
-		);
-
-		$new_post_id = wp_insert_post( $post_args );
-		if ( is_wp_error( $new_post_id ) || 0 === $new_post_id ) {
-			return 'failed';
-		}
-
-		// Populate all affiliate meta fields.
-		update_post_meta( $new_post_id, GAE_CPT::META_EAN, sanitize_text_field( $ean ) );
-		update_post_meta( $new_post_id, GAE_CPT::META_PRICE, (float) $item['price'] );
-		update_post_meta( $new_post_id, GAE_CPT::META_REGULAR_PRICE, (float) $item['regular_price'] );
-		update_post_meta( $new_post_id, GAE_CPT::META_IN_STOCK, $item['in_stock'] ? 1 : 0 );
-		update_post_meta( $new_post_id, GAE_CPT::META_AFFILIATE_URL, esc_url_raw( $item['affiliate_url'] ) );
-		update_post_meta( $new_post_id, GAE_CPT::META_MERCHANT, sanitize_text_field( $item['merchant'] ) );
-		update_post_meta( $new_post_id, GAE_CPT::META_IMAGE_URL, esc_url_raw( $item['image_url'] ) );
-		update_post_meta( $new_post_id, GAE_CPT::META_CURRENCY, sanitize_text_field( $item['currency'] ) );
-		update_post_meta( $new_post_id, GAE_CPT::META_LAST_SYNCED, $now );
-
-		// Assign taxonomy term.
-		$this->assign_category( $new_post_id, (string) ( $item['category'] ?? '' ) );
-
-		return 'inserted';
-	}
-
-	/**
-	 * Assign category term to the exercise gear post.
-	 *
-	 * @param int    $post_id  Post ID.
-	 * @param string $category Raw category string from feed.
-	 * @return void
-	 */
-	protected function assign_category( int $post_id, string $category ): void {
-		if ( empty( $category ) ) {
-			return;
-		}
-
-		static $term_cache = array();
-
-		// Clean up category string (e.g. take final segment if breadcrumb like "Sport > Gym > Tredemølle").
-		$parts     = explode( '>', $category );
-		$leaf_name = sanitize_text_field( trim( end( $parts ) ) );
-
-		if ( empty( $leaf_name ) ) {
-			return;
-		}
-
-		if ( isset( $term_cache[ $leaf_name ] ) ) {
-			$term_id = $term_cache[ $leaf_name ];
-		} else {
-			$term = term_exists( $leaf_name, GAE_CPT::TAXONOMY );
-			if ( ! $term ) {
-				$term = wp_insert_term( $leaf_name, GAE_CPT::TAXONOMY );
-			}
-			$term_id = ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) ? (int) $term['term_id'] : 0;
-			$term_cache[ $leaf_name ] = $term_id;
-		}
-
-		if ( $term_id > 0 ) {
-			wp_set_object_terms( $post_id, $term_id, GAE_CPT::TAXONOMY, false );
-		}
+		return $this->upscaler()->upsert( $item, $prevent_new_insert );
 	}
 
 	/**
@@ -1502,4 +1329,37 @@ class GAE_Sync_Engine {
 	protected function release_lock(): void {
 		delete_transient( self::LOCK_KEY );
 	}
+
+	/**
+	 * Shared pre-filter rule evaluator.
+	 *
+	 * @return Gear_Engine_Sync_Rules
+	 */
+	private function rules(): Gear_Engine_Sync_Rules {
+		static $instance;
+		if ( null === $instance ) {
+			$instance = new Gear_Engine_Sync_Rules();
+		}
+		return $instance;
+	}
+
+	/**
+	 * Shared product persistence helper.
+	 *
+	 * @return Gear_Engine_Product_Upscaler
+	 */
+	private function upscaler(): Gear_Engine_Product_Upscaler {
+		static $instance;
+		if ( null === $instance ) {
+			$instance = new Gear_Engine_Product_Upscaler();
+		}
+		return $instance;
+	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_Sync_Engine', false ) ) {
+	class_alias( 'Gear_Engine_Sync_Engine', 'GAE_Sync_Engine' );
+}
+

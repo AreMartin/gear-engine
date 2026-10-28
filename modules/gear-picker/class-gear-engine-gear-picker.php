@@ -41,7 +41,7 @@ class Gear_Engine_Gear_Picker {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
-		add_action( 'save_post_' . GAE_CPT::POST_TYPE, array( __CLASS__, 'flush_cache' ) );
+		add_action( 'save_post_' . Gear_Engine_CPT::POST_TYPE, array( __CLASS__, 'flush_cache' ) );
 		add_action( 'deleted_post', array( __CLASS__, 'flush_cache' ) );
 	}
 
@@ -102,13 +102,19 @@ class Gear_Engine_Gear_Picker {
 			return self::$config_cache[ $type ];
 		}
 
-		$file = GEAR_ENGINE_PATH . 'modules/gear-picker/configs/' . $type . '.json';
-		if ( '' === $type || ! is_readable( $file ) ) {
-			return new WP_Error( 'gear_engine_picker_unknown', sprintf( 'Unknown gear picker type "%s".', $type ) );
-		}
+		$config = Gear_Engine_Config_Loader::load(
+			GEAR_ENGINE_PATH . 'modules/gear-picker/configs/',
+			$type,
+			static function ( $c ) {
+				return ! empty( $c['steps'] ) && ! empty( $c['match'] ) && isset( $c['specs'] );
+			}
+		);
 
-		$config = json_decode( (string) file_get_contents( $file ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local bundled file.
-		if ( ! is_array( $config ) || empty( $config['steps'] ) || empty( $config['match'] ) || ! isset( $config['specs'] ) ) {
+		if ( null === $config ) {
+			$file = GEAR_ENGINE_PATH . 'modules/gear-picker/configs/' . $type . '.json';
+			if ( '' === $type || ! is_readable( $file ) ) {
+				return new WP_Error( 'gear_engine_picker_unknown', sprintf( 'Unknown gear picker type "%s".', $type ) );
+			}
 			return new WP_Error( 'gear_engine_picker_invalid', sprintf( 'Invalid gear picker config "%s".', $type ) );
 		}
 
@@ -286,7 +292,7 @@ class Gear_Engine_Gear_Picker {
 	 * @return array{item: array<string, mixed>|null, reason: string}
 	 */
 	public static function evaluate_post( WP_Post $post, array $config, bool $has_scope = false ): array {
-		$terms = wp_get_post_terms( $post->ID, GAE_CPT::TAXONOMY, array( 'fields' => 'names' ) );
+		$terms = wp_get_post_terms( $post->ID, Gear_Engine_CPT::TAXONOMY, array( 'fields' => 'names' ) );
 		$terms = is_wp_error( $terms ) ? array() : $terms;
 		$title = get_the_title( $post );
 
@@ -295,9 +301,9 @@ class Gear_Engine_Gear_Picker {
 			return array( 'item' => null, 'reason' => $reason );
 		}
 
-		$in_stock = get_post_meta( $post->ID, GAE_CPT::META_IN_STOCK, true );
-		$price    = (float) get_post_meta( $post->ID, GAE_CPT::META_PRICE, true );
-		$url      = (string) get_post_meta( $post->ID, GAE_CPT::META_AFFILIATE_URL, true );
+		$in_stock = get_post_meta( $post->ID, Gear_Engine_CPT::META_IN_STOCK, true );
+		$price    = (float) get_post_meta( $post->ID, Gear_Engine_CPT::META_PRICE, true );
+		$url      = (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_AFFILIATE_URL, true );
 
 		if ( '0' === (string) $in_stock ) {
 			return array( 'item' => null, 'reason' => 'out_of_stock' );
@@ -312,45 +318,29 @@ class Gear_Engine_Gear_Picker {
 			return array( 'item' => null, 'reason' => 'no_link' );
 		}
 
-		$image = (string) get_post_meta( $post->ID, GAE_CPT::META_IMAGE_URL, true );
+		$image = (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_IMAGE_URL, true );
 		if ( has_post_thumbnail( $post->ID ) ) {
 			$thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'large' );
 			$image = ! empty( $thumb[0] ) ? $thumb[0] : $image;
 		}
 
-		$old  = (float) get_post_meta( $post->ID, GAE_CPT::META_REGULAR_PRICE, true );
+		$old  = (float) get_post_meta( $post->ID, Gear_Engine_CPT::META_REGULAR_PRICE, true );
 		$read = self::extract_specs( $title . ' ' . $post->post_excerpt . ' ' . $post->post_content, (array) $config['specs'], $price );
 
 		return array(
 			'item'   => array(
 				'id'    => $post->ID,
 				'name'  => $title,
-				'shop'  => (string) get_post_meta( $post->ID, GAE_CPT::META_MERCHANT, true ),
+				'shop'  => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ),
 				'price' => $price,
 				'old'   => $old > $price ? $old : 0,
-				'cur'   => (string) get_post_meta( $post->ID, GAE_CPT::META_CURRENCY, true ) ?: 'kr',
+				'cur'   => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',
 				'img'   => esc_url_raw( $image ),
 				'url'   => esc_url_raw( $url ),
 				'specs' => $read['specs'],
 				'est'   => $read['est'],
 			),
 			'reason' => '',
-		);
-	}
-
-	/**
-	 * Base query arguments for loading gear posts.
-	 *
-	 * @return array<string, mixed>
-	 */
-	public static function get_query_args(): array {
-		return array(
-			'post_type'              => GAE_CPT::POST_TYPE,
-			'post_status'            => 'publish',
-			'posts_per_page'         => (int) apply_filters( 'gear_engine_gear_picker_max_products', 1000 ),
-			'no_found_rows'          => true,
-			'update_post_term_cache' => true,
-			'update_post_meta_cache' => true,
 		);
 	}
 
@@ -369,19 +359,15 @@ class Gear_Engine_Gear_Picker {
 			return $cached;
 		}
 
-		$args = self::get_query_args();
-		if ( $category ) {
-			$args['tax_query'] = array(
-				array(
-					'taxonomy' => GAE_CPT::TAXONOMY,
-					'field'    => 'slug',
-					'terms'    => $category,
-				),
-			);
-		}
+		$posts = Gear_Engine_Product_Service::get_raw_posts(
+			array(
+				'posts_per_page' => (int) apply_filters( 'gear_engine_gear_picker_max_products', 1000 ),
+				'category'       => $category,
+			)
+		);
 
 		$items = array();
-		foreach ( get_posts( $args ) as $post ) {
+		foreach ( $posts as $post ) {
 			$item = self::build_item( $post, $config, (bool) $category );
 			if ( $item ) {
 				$items[] = $item;

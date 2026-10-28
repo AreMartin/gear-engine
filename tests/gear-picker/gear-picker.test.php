@@ -17,10 +17,11 @@ function _n( $a, $b, $n ) { return 1 === $n ? $a : $b; }
 function number_format_i18n( $n ) { return (string) $n; }
 class WP_Error {}
 class WP_Post {}
-class GAE_CPT {
+class Gear_Engine_CPT {
 	public const POST_TYPE = 'exercise_gear';
 }
 
+require_once ABSPATH . 'includes/class-gear-engine-config-loader.php';
 require_once ABSPATH . 'modules/gear-picker/class-gear-engine-gear-picker.php';
 require_once ABSPATH . 'modules/gear-picker/class-gear-engine-picker-diagnostics.php';
 

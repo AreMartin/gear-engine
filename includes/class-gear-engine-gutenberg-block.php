@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_Gutenberg_Block
+ * Class Gear_Engine_Gutenberg_Block
  *
  * Registers the native Gutenberg dynamic block and shortcode to render horizontal product cards.
  */
-class GAE_Gutenberg_Block {
+class Gear_Engine_Gutenberg_Block {
 
 	/**
 	 * Block identifier.
@@ -39,18 +39,18 @@ class GAE_Gutenberg_Block {
 		// Register editor script.
 		wp_register_script(
 			'gae-block-editor-script',
-			GAE_PLUGIN_URL . 'assets/js/block.js',
+			GEAR_ENGINE_URL . 'assets/js/block.js',
 			array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-server-side-render', 'wp-api-fetch' ),
-			GAE_VERSION,
+			GEAR_ENGINE_VERSION,
 			true
 		);
 
 		// Register shared block style.
 		wp_register_style(
 			'gae-block-style',
-			GAE_PLUGIN_URL . 'assets/css/product-card.css',
+			GEAR_ENGINE_URL . 'assets/css/product-card.css',
 			array(),
-			GAE_VERSION
+			GEAR_ENGINE_VERSION
 		);
 
 		register_block_type(
@@ -90,9 +90,9 @@ class GAE_Gutenberg_Block {
 	public function enqueue_frontend_assets(): void {
 		wp_enqueue_style(
 			'gae-product-card-css',
-			GAE_PLUGIN_URL . 'assets/css/product-card.css',
+			GEAR_ENGINE_URL . 'assets/css/product-card.css',
 			array(),
-			GAE_VERSION
+			GEAR_ENGINE_VERSION
 		);
 	}
 
@@ -142,7 +142,7 @@ class GAE_Gutenberg_Block {
 
 		// If EAN is supplied instead of ID, find product by EAN.
 		if ( 0 === $product_id && ! empty( $args['ean'] ) ) {
-			$found = GAE_CPT::get_product_by_ean( sanitize_text_field( $args['ean'] ) );
+			$found = Gear_Engine_CPT::get_product_by_ean( sanitize_text_field( $args['ean'] ) );
 			if ( $found ) {
 				$product_id = $found->ID;
 			}
@@ -169,13 +169,13 @@ class GAE_Gutenberg_Block {
 	 * @return string Rendered HTML.
 	 */
 	public function render_product_card( int $product_id, bool $show_ai_summary = true, string $custom_pitch = '', string $button_text = 'Order now' ): string {
-		$product = GAE_CPT::get_product_data( $product_id );
+		$product = Gear_Engine_CPT::get_product_data( $product_id );
 		if ( ! $product ) {
 			return '';
 		}
 
 		// Ensure CSS is loaded.
-		wp_enqueue_style( 'gae-product-card-css', GAE_PLUGIN_URL . 'assets/css/product-card.css', array(), GAE_VERSION );
+		wp_enqueue_style( 'gae-product-card-css', GEAR_ENGINE_URL . 'assets/css/product-card.css', array(), GEAR_ENGINE_VERSION );
 
 		// Determine AI insights summary text.
 		$ai_pitch = '';
@@ -275,3 +275,10 @@ class GAE_Gutenberg_Block {
 		return $fallback;
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_Gutenberg_Block', false ) ) {
+	class_alias( 'Gear_Engine_Gutenberg_Block', 'GAE_Gutenberg_Block' );
+}
+

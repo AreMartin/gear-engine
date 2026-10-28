@@ -10,10 +10,10 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/../' );
-define( 'GAE_VERSION', '1.0.0' );
-define( 'GAE_PLUGIN_FILE', ABSPATH . 'gear-engine.php' );
-define( 'GAE_PLUGIN_DIR', ABSPATH );
-define( 'GAE_PLUGIN_URL', 'http://example.com/wp-content/plugins/gear-engine/' );
+define( 'GEAR_ENGINE_VERSION', '1.0.0' );
+define( 'GEAR_ENGINE_FILE', ABSPATH . 'gear-engine.php' );
+define( 'GEAR_ENGINE_PATH', ABSPATH );
+define( 'GEAR_ENGINE_URL', 'http://example.com/wp-content/plugins/gear-engine/' );
 
 // Stub minimal WordPress functions for CLI testing.
 $GLOBALS['wp_options']    = array();
@@ -355,19 +355,23 @@ class MockWPDB {
 $GLOBALS['wpdb'] = new MockWPDB();
 
 // Require our plugin classes
-require_once ABSPATH . 'includes/class-gae-settings.php';
-require_once ABSPATH . 'includes/class-gae-cpt.php';
-require_once ABSPATH . 'includes/class-gae-sync-engine.php';
-require_once ABSPATH . 'includes/class-gae-gutenberg-block.php';
-require_once ABSPATH . 'includes/class-gae-ai-api.php';
-require_once ABSPATH . 'includes/class-gae-product-service.php';
+require_once ABSPATH . 'includes/class-gear-engine-config-loader.php';
+require_once ABSPATH . 'includes/class-gear-engine-settings.php';
+require_once ABSPATH . 'includes/class-gear-engine-cpt.php';
+require_once ABSPATH . 'includes/class-gear-engine-sync-engine.php';
+require_once ABSPATH . 'includes/class-gear-engine-sync-rules.php';
+require_once ABSPATH . 'includes/class-gear-engine-product-upscaler.php';
+require_once ABSPATH . 'includes/class-gear-engine-gutenberg-block.php';
+require_once ABSPATH . 'includes/class-gear-engine-ai-api.php';
+require_once ABSPATH . 'includes/class-gear-engine-product-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocols.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-manager.php';
 require_once ABSPATH . 'modules/physio-chat/class-gear-engine-exercise-selection.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-importer.php';
-require_once ABSPATH . 'modules/physio-chat/class-gae-physio-chat.php';
+require_once ABSPATH . 'modules/physio-chat/class-gear-engine-physio-chat.php';
+require_once ABSPATH . 'modules/physio-chat/class-gear-engine-chat-agent.php';
 
 // Test runner helper
 function assert_test( $condition, string $test_name ) {
@@ -383,7 +387,7 @@ echo "========================================================\n";
 echo "Starting Gear Affiliate Engine Verification Tests...\n";
 echo "========================================================\n";
 
-$sync_engine = new GAE_Sync_Engine();
+$sync_engine = new Gear_Engine_Sync_Engine();
 
 // TEST 1: Price cleaning logic
 assert_test( $sync_engine->clean_price( '14 999 kr' ) === 14999.0, 'clean_price: Handles space separation and currency text' );
@@ -657,14 +661,14 @@ assert_test( $update_report['updated'] === 1, 'deduplication: Same EAN resulted 
 assert_test( $update_report['inserted'] === 0, 'deduplication: Zero new posts inserted on update' );
 
 // Verify the postmeta was updated
-$found_post = GAE_CPT::get_product_by_ean( '7071234567890' );
+$found_post = Gear_Engine_CPT::get_product_by_ean( '7071234567890' );
 assert_test( $found_post !== null, 'get_product_by_ean: Successfully retrieved post by EAN' );
-$product_data = GAE_CPT::get_product_data( $found_post );
+$product_data = Gear_Engine_CPT::get_product_data( $found_post );
 assert_test( $product_data['price'] === 13999.0, 'deduplication: Price updated in postmeta' );
 assert_test( $product_data['regular_price'] === 19999.0, 'deduplication: Regular price preserved in postmeta' );
 
 // TEST 6: Multi-Variant Transients Caching logic
-$ai_api = new GAE_AI_API();
+$ai_api = new Gear_Engine_AI_API();
 $context = 'Brukeren ønsker en stillegående tredemølle til leilighet for maratontrening, under 18000 kr';
 $ean = $product_data['ean'];
 $cache_key = 'gae_ai_' . md5( $context . '_' . $ean );
@@ -684,7 +688,7 @@ $random_pick = $cached[ array_rand( $cached ) ];
 assert_test( in_array( $random_pick, $variations, true ), 'ai_caching: Random variation selected from cache' );
 
 // TEST 7: Gutenberg Card HTML & Flexbox CSS classes rendering
-$block_module = new GAE_Gutenberg_Block();
+$block_module = new Gear_Engine_Gutenberg_Block();
 $rendered_html = $block_module->render_product_card( $product_data['id'], true, 'Custom AI Pitch for marathon runner', 'Order now' );
 
 assert_test( str_contains( $rendered_html, 'class="gae-product-card"' ), 'html_render: Contains .gae-product-card wrapper' );
@@ -697,12 +701,12 @@ assert_test( str_contains( $rendered_html, '13 999 kr' ), 'html_render: Formatte
 assert_test( str_contains( $rendered_html, '19 999 kr' ), 'html_render: Formatted strikethrough regular price displayed' );
 
 // TEST 8: Dynamic Gemini Models List & Auto-Update
-$available_models = GAE_AI_API::get_available_models();
+$available_models = Gear_Engine_AI_API::get_available_models();
 assert_test( isset( $available_models['gemini-3.8-flash'] ), 'models_list: Gemini 3.8 Flash is present in available models' );
 assert_test( str_contains( $available_models['gemini-3.8-flash'], 'Recommended' ), 'models_list: Gemini 3.8 Flash marked as recommended' );
 assert_test( isset( $available_models['gemini-2.5-flash'] ), 'models_list: Gemini 2.5 Flash is present' );
 assert_test( isset( $available_models['gemini-2.0-flash'] ), 'models_list: Gemini 2.0 Flash is present' );
-$models_transient = get_transient( GAE_AI_API::MODELS_CACHE_KEY );
+$models_transient = get_transient( Gear_Engine_AI_API::MODELS_CACHE_KEY );
 assert_test( is_array( $models_transient ) && isset( $models_transient['gemini-3.8-flash'] ), 'models_caching: Models cached in transient for periodic automatic refresh' );
 
 // TEST 9: JSON Feed Streaming Parser & Format Auto-Detection
@@ -751,7 +755,7 @@ assert_test( $json_report['inserted'] === 1, 'json_streaming: Exactly 1 valid pr
 assert_test( $json_report['skipped'] === 1, 'json_streaming: Non-compliant product skipped by pre-filters' );
 
 // Verify the post was imported into exercise_gear CPT
-$found_rower = GAE_CPT::get_product_by_ean( '7079999000001' );
+$found_rower = Gear_Engine_CPT::get_product_by_ean( '7079999000001' );
 assert_test( $found_rower !== null, 'json_cpt: Product from JSON feed directly imported into exercise_gear CPT' );
 assert_test( $found_rower->post_title === 'Concept2 RowErg Romaskin', 'json_cpt: Post title matches JSON name' );
 
@@ -778,7 +782,7 @@ assert_test( $ndjson_report['inserted'] === 1, 'ndjson_streaming: 1 valid AirBik
 assert_test( $ndjson_report['skipped'] === 1, 'ndjson_streaming: 1 blacklisted item skipped' );
 
 // TEST 11: Hardcoded Test Products for Gutenberg Block Testing
-$test_products = GAE_CPT::get_sample_products_definitions();
+$test_products = Gear_Engine_CPT::get_sample_products_definitions();
 assert_test( count( $test_products ) === 2, 'sample_products: Exactly 2 test products defined' );
 assert_test( $test_products[0]['title'] === 'NordicTrack T Series 6.5S Treadmill', 'sample_products: Product 1 is NordicTrack Treadmill' );
 assert_test( $test_products[1]['title'] === 'Concept2 RowErg Romaskin PM5', 'sample_products: Product 2 is Concept2 RowErg' );
@@ -793,11 +797,11 @@ assert_test( str_contains( $card_2_html, 'Concept2 RowErg Romaskin' ), 'block_te
 assert_test( str_contains( $card_2_html, 'kr' ), 'block_test: Test Product 2 price renders' );
 
 // Test seeding
-$seeded_ids = GAE_CPT::seed_sample_products();
+$seeded_ids = Gear_Engine_CPT::seed_sample_products();
 assert_test( count( $seeded_ids ) === 2, 'sample_products: Both sample products seeded into exercise_gear CPT' );
 
 // TEST 12: Feed URL Sanitization & Entity Decoding
-$settings_module = new GAE_Settings();
+$settings_module = new Gear_Engine_Settings();
 $raw_url_with_entities = 'https://secure.adtraction.com/productfeed.htm?type=feed&amp;format=XML&amp;encoding=UTF8';
 $clean_url = $settings_module->sanitize_feed_url( $raw_url_with_entities );
 assert_test( ! str_contains( $clean_url, '&amp;' ) && str_contains( $clean_url, '&format=XML' ), 'feed_sanitization: &amp; decoded to plain &' );
@@ -897,6 +901,27 @@ $sync_engine->stream_parse_xml( $gz_stream_file, 'AdtractionGzip', array_merge( 
 unlink( $gz_stream_file );
 
 assert_test( $gz_stream_report['processed'] === 3, 'gzip_streaming: Stream-parsed all 3 nodes directly from GZIP archive via compress.zlib://' );
+
+// 13.5 Chunked sync cursors: start_offset resumes where the previous chunk stopped.
+$tmp_chunk_file = tempnam( sys_get_temp_dir(), 'gae_chunk_' );
+file_put_contents( $tmp_chunk_file, $multi_item_xml );
+
+$chunk1 = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array() );
+$sync_engine->stream_parse_xml( $tmp_chunk_file, 'TestChunk', array_merge( $filter_rules, array( 'max_items_per_sync' => 1 ) ), $chunk1 );
+assert_test( 1 === $chunk1['inserted'] + $chunk1['updated'] && 1 === $chunk1['feed_scanned'] && ! empty( $chunk1['batch_capped'] ), 'chunked: first chunk imports one product and reports cursor 1' );
+
+$chunk2 = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array() );
+$sync_engine->stream_parse_xml( $tmp_chunk_file, 'TestChunk', array_merge( $filter_rules, array( 'max_items_per_sync' => 1, 'start_offset' => 1 ) ), $chunk2 );
+assert_test( 1 === $chunk2['inserted'] + $chunk2['updated'] && 2 === $chunk2['feed_scanned'], 'chunked: second chunk skips the first product and takes the next one' );
+
+$chunk3 = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array() );
+$sync_engine->stream_parse_xml( $tmp_chunk_file, 'TestChunk', array_merge( $filter_rules, array( 'max_items_per_sync' => 1, 'start_offset' => 2 ) ), $chunk3 );
+assert_test( 1 === $chunk3['inserted'] + $chunk3['updated'] && empty( $chunk3['batch_capped'] ) && empty( $chunk3['scan_capped'] ), 'chunked: final chunk completes the feed without hitting caps' );
+
+$drained = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array() );
+$sync_engine->stream_parse_xml( $tmp_chunk_file, 'TestChunk', array_merge( $filter_rules, array( 'max_items_per_sync' => 5, 'start_offset' => 3 ) ), $drained );
+assert_test( 0 === $drained['processed'] && 3 === $drained['feed_scanned'], 'chunked: exhausted cursor processes nothing and never rewinds' );
+unlink( $tmp_chunk_file );
 assert_test( $gz_stream_report['inserted'] > 0 || $gz_stream_report['updated'] > 0, 'gzip_streaming: Successfully ingested products from gzipped feed' );
 
 // 13.5 Verify memory cleanup for skipped items
@@ -935,7 +960,7 @@ delete_option( 'gae_feeds' );
 update_option( 'gae_adtraction_url', 'https://feed.adtraction.com/v2/legacy.xml' );
 update_option( 'gae_tradetracker_url', 'https://tradetracker.com/legacy.xml' );
 
-$slots = GAE_Settings::get_feed_slots();
+$slots = Gear_Engine_Settings::get_feed_slots();
 assert_test( count( $slots ) === 5, 'feed_slots: Always returns exactly 5 feed slots' );
 assert_test( $slots[0]['enabled'] === 1 && $slots[0]['url'] === 'https://feed.adtraction.com/v2/legacy.xml', 'feed_slots: Slot 0 migrated from legacy Adtraction URL' );
 assert_test( $slots[1]['enabled'] === 1 && $slots[1]['url'] === 'https://tradetracker.com/legacy.xml', 'feed_slots: Slot 1 migrated from legacy TradeTracker URL' );
@@ -969,7 +994,7 @@ assert_test( ! empty( $sync_report['date'] ), 'selective_sync: Successfully exec
 
 // TEST 15: Modular Physio Advisor AI Chat Interface & Product Service
 // 15.1 Verify Product Service search with keyword matching & CPT extraction
-$product_search = GAE_Product_Service::search_products( array(
+$product_search = Gear_Engine_Product_Service::search_products( array(
 	'keywords' => 'tredemølle løpebånd',
 	'limit'    => 4,
 ) );
@@ -977,19 +1002,19 @@ assert_test( is_array( $product_search ) && ! empty( $product_search ), 'product
 assert_test( isset( $product_search[0]['tittel'] ) && isset( $product_search[0]['pris'] ) && isset( $product_search[0]['url'] ), 'product_service: Product card contains tittel, pris, and affiliate URL' );
 
 // 15.2 Verify Product Service price constraint enforcement
-$cheap_search = GAE_Product_Service::search_products( array(
+$cheap_search = Gear_Engine_Product_Service::search_products( array(
 	'keywords'  => 'tredemølle',
 	'max_price' => 5000,
 ) );
 assert_test( empty( $cheap_search ), 'product_service: Properly filters out items above maximum price limit' );
 
 // 15.3 Verify Norwegian Master Clinical Prompt
-$prompt = GAE_Chat_Agent::get_default_prompt();
+$prompt = Gear_Engine_Chat_Agent::get_default_prompt();
 assert_test( false !== strpos( $prompt, "Du er 'Fysionett-assistenten'" ), 'chat_agent: Master prompt defines Norwegian Fysionett assistant persona' );
 assert_test( false !== strpos( $prompt, 'search_products' ) && false !== strpos( $prompt, 'find_physiotherapist' ), 'chat_agent: Master prompt declares search_products and find_physiotherapist tools' );
 assert_test( false !== strpos( $prompt, 'triage_resultat' ) && false !== strpos( $prompt, 'exorlive' ), 'chat_agent: Master prompt defines triage and exorlive schema' );
 assert_test( false !== strpos( $prompt, 'maksimalt fem øvelser' ) && false !== strpos( $prompt, 'library_id' ), 'chat_agent: Exercise prompt specifies CPT candidate IDs and five-exercise cap' );
-$normalizer = new ReflectionMethod( GAE_Chat_Agent::class, 'normalize_bot_response' );
+$normalizer = new ReflectionMethod( Gear_Engine_Chat_Agent::class, 'normalize_bot_response' );
 $normalized_program = $normalizer->invoke(
 	null,
 	array(
@@ -1026,19 +1051,19 @@ assert_test( '' === $malformed_program['card']['data']['ovelser'][0]['video_url'
 
 // 15.4 Verify local clinical protocol JSON files (knee, shoulder, back, foot)
 $data_dir = ABSPATH . 'modules/physio-chat/data/';
-$kne_ovelser = GAE_Chat_Agent::read_safe_json( $data_dir . 'ovelser_kne.json' );
-$kne_triage  = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_kne.json' );
+$kne_ovelser = Gear_Engine_Chat_Agent::read_safe_json( $data_dir . 'ovelser_kne.json' );
+$kne_triage  = Gear_Engine_Chat_Agent::read_safe_json( $data_dir . 'triage_kne.json' );
 assert_test( ! empty( $kne_ovelser['ovelser'] ) && count( $kne_ovelser['ovelser'] ) >= 2, 'protocols: Knee exercise protocol contains structured exercises' );
 assert_test( ! empty( $kne_triage['notat_hypotese'] ) && ! empty( $kne_triage['notat_icpc2'] ), 'protocols: Knee triage contains clinical hypothesis and ICPC-2 code' );
 
-$skulder_triage = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_skulder.json' );
+$skulder_triage = Gear_Engine_Chat_Agent::read_safe_json( $data_dir . 'triage_skulder.json' );
 assert_test( ! empty( $skulder_triage['alvorlighetsgrad'] ) && ! empty( $skulder_triage['notat_icd10'] ), 'protocols: Shoulder triage contains severity and ICD-10 code' );
 
-$rygg_triage = GAE_Chat_Agent::read_safe_json( $data_dir . 'triage_rygg.json' );
+$rygg_triage = Gear_Engine_Chat_Agent::read_safe_json( $data_dir . 'triage_rygg.json' );
 assert_test( ! empty( $rygg_triage['tiltak_na'] ) && ! empty( $rygg_triage['tiltak_videre'] ), 'protocols: Back triage contains immediate and long-term action plan' );
 
 // 15.5 Verify Physio Chat Module instantiation and shortcode rendering
-$physio_chat = new GAE_Physio_Chat();
+$physio_chat = new Gear_Engine_Physio_Chat();
 $shortcode_html = $physio_chat->render_chat_shortcode();
 assert_test( false !== strpos( $shortcode_html, 'fysio-app-container' ), 'shortcode_render: Renders main .fysio-app-container element' );
 assert_test( false !== strpos( $shortcode_html, 'fysio-message-container' ), 'shortcode_render: Contains message injection container' );
@@ -1048,13 +1073,13 @@ assert_test( false !== strpos( $shortcode_html, 'tpl-exorlive-btn' ) && false !=
 
 // 15.6 Verify Chat Agent handles empty message gracefully
 $empty_req = new WP_REST_Request( array( 'message' => '' ) );
-$empty_res = GAE_Chat_Agent::handle_chat_request( $empty_req );
+$empty_res = Gear_Engine_Chat_Agent::handle_chat_request( $empty_req );
 assert_test( 400 === $empty_res->status, 'chat_agent: Returns 400 status on empty message' );
 
 // 15.7 Verify Chat Agent handles missing API key gracefully
 delete_option( 'gae_google_ai_key' );
 $no_key_req = new WP_REST_Request( array( 'message' => 'Hei, jeg har vondt i kneet' ) );
-$no_key_res = GAE_Chat_Agent::handle_chat_request( $no_key_req );
+$no_key_res = Gear_Engine_Chat_Agent::handle_chat_request( $no_key_req );
 assert_test( 200 === $no_key_res->status && false !== strpos( $no_key_res->data['message'], 'Google AI Studio API-nøkkel er ikke konfigurert' ), 'chat_agent: Returns helpful Norwegian setup instruction when API key is missing' );
 
 // TEST 16: Shared curated exercise library

@@ -13,9 +13,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_Product_Service
+ * Class Gear_Engine_Product_Service
  */
-class GAE_Product_Service {
+class Gear_Engine_Product_Service {
+
+	/**
+	 * Shared read path for raw gear posts.
+	 *
+	 * Feature modules that need full post objects (title, content, meta) must
+	 * fetch them through this method instead of issuing their own queries, so
+	 * published-only rules and post-type scope stay defined in one place.
+	 *
+	 * @param array $args {
+	 *     Optional. Query criteria.
+	 *     @type int   $posts_per_page Maximum posts to return (default 1000, capped at 2000).
+	 *     @type array $category       gear_category term slugs to restrict the query to.
+	 * }
+	 * @return \WP_Post[] Published gear posts.
+	 */
+	public static function get_raw_posts( array $args = array() ): array {
+		$posts_per_page = isset( $args['posts_per_page'] ) ? max( 1, min( 2000, absint( $args['posts_per_page'] ) ) ) : 1000;
+		$category       = isset( $args['category'] ) && is_array( $args['category'] ) ? array_values( array_filter( array_map( 'sanitize_title', $args['category'] ) ) ) : array();
+
+		$query_args = array(
+			'post_type'              => Gear_Engine_CPT::POST_TYPE,
+			'post_status'            => 'publish',
+			'posts_per_page'         => $posts_per_page,
+			'no_found_rows'          => true,
+			'update_post_term_cache' => true,
+			'update_post_meta_cache' => true,
+		);
+
+		if ( ! empty( $category ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => Gear_Engine_CPT::TAXONOMY,
+					'field'    => 'slug',
+					'terms'    => $category,
+				),
+			);
+		}
+
+		$query = new WP_Query( $query_args );
+
+		return is_array( $query->posts ) ? $query->posts : array();
+	}
 
 	/**
 	 * Search and rank products from the exercise_gear CPT.
@@ -60,7 +102,7 @@ class GAE_Product_Service {
 
 		if ( $min_price > 0 ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_PRICE,
+				'key'     => Gear_Engine_CPT::META_PRICE,
 				'value'   => $min_price,
 				'type'    => 'NUMERIC',
 				'compare' => '>=',
@@ -69,7 +111,7 @@ class GAE_Product_Service {
 
 		if ( $max_price > 0 ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_PRICE,
+				'key'     => Gear_Engine_CPT::META_PRICE,
 				'value'   => $max_price,
 				'type'    => 'NUMERIC',
 				'compare' => '<=',
@@ -78,14 +120,14 @@ class GAE_Product_Service {
 
 		if ( $in_stock_only ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_IN_STOCK,
+				'key'     => Gear_Engine_CPT::META_IN_STOCK,
 				'value'   => 1,
 				'compare' => '=',
 			);
 		}
 
 		$query_args = array(
-			'post_type'              => GAE_CPT::POST_TYPE,
+			'post_type'              => Gear_Engine_CPT::POST_TYPE,
 			'post_status'            => 'publish',
 			'posts_per_page'         => 50,
 			'no_found_rows'          => true,
@@ -99,7 +141,7 @@ class GAE_Product_Service {
 		if ( ! empty( $category ) ) {
 			$query_args['tax_query'] = array(
 				array(
-					'taxonomy' => GAE_CPT::TAXONOMY,
+					'taxonomy' => Gear_Engine_CPT::TAXONOMY,
 					'field'    => 'slug',
 					'terms'    => $category,
 				),
@@ -111,13 +153,13 @@ class GAE_Product_Service {
 
 		// If no posts in DB, fall back to seeded sample products for development/testing.
 		if ( ! $query->have_posts() ) {
-			$samples = GAE_CPT::get_sample_products_definitions();
+			$samples = Gear_Engine_CPT::get_sample_products_definitions();
 			foreach ( $samples as $sample ) {
 				$matched[] = self::score_and_format_item( $sample, $keywords, $exclude_urls, $min_price, $max_price );
 			}
 		} else {
 			foreach ( $query->posts as $post ) {
-				$item_data = GAE_CPT::get_product_data( $post );
+				$item_data = Gear_Engine_CPT::get_product_data( $post );
 				if ( ! empty( $item_data ) ) {
 					$matched[] = self::score_and_format_item( $item_data, $keywords, $exclude_urls, $min_price, $max_price );
 				}
@@ -236,3 +278,10 @@ class GAE_Product_Service {
 		);
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_Product_Service', false ) ) {
+	class_alias( 'Gear_Engine_Product_Service', 'GAE_Product_Service' );
+}
+

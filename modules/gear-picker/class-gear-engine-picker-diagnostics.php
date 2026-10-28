@@ -44,7 +44,7 @@ class Gear_Engine_Picker_Diagnostics {
 	 */
 	public function register_page(): void {
 		$hook = add_submenu_page(
-			'edit.php?post_type=' . GAE_CPT::POST_TYPE,
+			'edit.php?post_type=' . Gear_Engine_CPT::POST_TYPE,
 			__( 'Gear Pickers Health', 'gear-engine' ),
 			__( 'Gear Pickers Health', 'gear-engine' ),
 			'manage_options',
@@ -369,8 +369,8 @@ class Gear_Engine_Picker_Diagnostics {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function build_report(): array {
-		$posts = get_posts( Gear_Engine_Gear_Picker::get_query_args() );
-		$terms = get_terms( array( 'taxonomy' => GAE_CPT::TAXONOMY, 'hide_empty' => true ) );
+		$posts = Gear_Engine_Product_Service::get_raw_posts();
+		$terms = get_terms( array( 'taxonomy' => Gear_Engine_CPT::TAXONOMY, 'hide_empty' => true ) );
 		$terms = is_wp_error( $terms ) ? array() : array_map(
 			static function ( $t ) {
 				return array(

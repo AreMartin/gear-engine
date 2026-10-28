@@ -12,13 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-require_once dirname( __FILE__ ) . '/class-gear-engine-exercise-selection.php';
-require_once dirname( __FILE__ ) . '/class-gae-chat-agent.php';
-
 /**
- * Class GAE_Physio_Chat
+ * Class Gear_Engine_Physio_Chat
  */
-class GAE_Physio_Chat {
+class Gear_Engine_Physio_Chat {
 
 	/**
 	 * Module identifier.
@@ -53,7 +50,7 @@ class GAE_Physio_Chat {
 			array(
 				array(
 					'methods'             => 'POST',
-					'callback'            => array( 'GAE_Chat_Agent', 'handle_chat_request' ),
+					'callback'            => array( 'Gear_Engine_Chat_Agent', 'handle_chat_request' ),
 					'permission_callback' => '__return_true',
 				),
 			)
@@ -66,7 +63,7 @@ class GAE_Physio_Chat {
 			array(
 				array(
 					'methods'             => 'POST',
-					'callback'            => array( 'GAE_Chat_Agent', 'handle_chat_request' ),
+					'callback'            => array( 'Gear_Engine_Chat_Agent', 'handle_chat_request' ),
 					'permission_callback' => '__return_true',
 				),
 			)
@@ -79,7 +76,7 @@ class GAE_Physio_Chat {
 	 * @return void
 	 */
 	public function register_assets(): void {
-		$plugin_url = plugin_dir_url( GAE_PLUGIN_FILE );
+		$plugin_url = plugin_dir_url( GEAR_ENGINE_FILE );
 
 		// FontAwesome 6.4.0.
 		wp_register_style(
@@ -102,7 +99,7 @@ class GAE_Physio_Chat {
 			'gae-physio-chat-css',
 			$plugin_url . 'modules/physio-chat/assets/css/physio-chat.css',
 			array( 'gae-fontawesome', 'gae-poppins-font' ),
-			GAE_VERSION
+			GEAR_ENGINE_VERSION
 		);
 
 		// Module Client JavaScript.
@@ -110,7 +107,7 @@ class GAE_Physio_Chat {
 			'gae-physio-chat-js',
 			$plugin_url . 'modules/physio-chat/assets/js/physio-chat.js',
 			array(),
-			GAE_VERSION,
+			GEAR_ENGINE_VERSION,
 			true
 		);
 
@@ -172,13 +169,13 @@ class GAE_Physio_Chat {
 			return;
 		}
 
-		$plugin_url = plugin_dir_url( GAE_PLUGIN_FILE );
+		$plugin_url = plugin_dir_url( GEAR_ENGINE_FILE );
 
 		wp_register_script(
 			'gae-physio-block-editor',
 			$plugin_url . 'modules/physio-chat/assets/js/block-editor.js',
 			array( 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components' ),
-			GAE_VERSION,
+			GEAR_ENGINE_VERSION,
 			true
 		);
 
@@ -197,3 +194,10 @@ class GAE_Physio_Chat {
 		);
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_Physio_Chat', false ) ) {
+	class_alias( 'Gear_Engine_Physio_Chat', 'GAE_Physio_Chat' );
+}
+

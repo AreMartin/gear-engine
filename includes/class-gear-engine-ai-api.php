@@ -10,12 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_AI_API
+ * Class Gear_Engine_AI_API
  *
  * Exposes custom REST API endpoints for the "Utstyrsvelger" (Equipment Chooser)
  * and interfaces with Google AI Studio (Gemini) with 30-day multi-variant caching.
  */
-class GAE_AI_API {
+class Gear_Engine_AI_API {
 
 	/**
 	 * REST API Namespace.
@@ -154,11 +154,11 @@ class GAE_AI_API {
 		// Resolve product data.
 		$product = null;
 		if ( $product_id > 0 ) {
-			$product = GAE_CPT::get_product_data( $product_id );
+			$product = Gear_Engine_CPT::get_product_data( $product_id );
 		} elseif ( ! empty( $ean ) ) {
-			$found = GAE_CPT::get_product_by_ean( $ean );
+			$found = Gear_Engine_CPT::get_product_by_ean( $ean );
 			if ( $found ) {
-				$product = GAE_CPT::get_product_data( $found );
+				$product = Gear_Engine_CPT::get_product_data( $found );
 			}
 		}
 
@@ -383,7 +383,7 @@ class GAE_AI_API {
 
 		if ( $min_price > 0 ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_PRICE,
+				'key'     => Gear_Engine_CPT::META_PRICE,
 				'value'   => $min_price,
 				'type'    => 'NUMERIC',
 				'compare' => '>=',
@@ -392,7 +392,7 @@ class GAE_AI_API {
 
 		if ( $max_price > 0 ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_PRICE,
+				'key'     => Gear_Engine_CPT::META_PRICE,
 				'value'   => $max_price,
 				'type'    => 'NUMERIC',
 				'compare' => '<=',
@@ -401,18 +401,18 @@ class GAE_AI_API {
 
 		if ( null !== $in_stock ) {
 			$meta_query[] = array(
-				'key'     => GAE_CPT::META_IN_STOCK,
+				'key'     => Gear_Engine_CPT::META_IN_STOCK,
 				'value'   => rest_sanitize_boolean( $in_stock ) ? 1 : 0,
 				'compare' => '=',
 			);
 		}
 
 		$query_args = array(
-			'post_type'      => GAE_CPT::POST_TYPE,
+			'post_type'      => Gear_Engine_CPT::POST_TYPE,
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
 			'orderby'        => 'meta_value_num',
-			'meta_key'       => GAE_CPT::META_PRICE,
+			'meta_key'       => Gear_Engine_CPT::META_PRICE,
 			'order'          => 'ASC',
 		);
 
@@ -423,7 +423,7 @@ class GAE_AI_API {
 		if ( ! empty( $category ) ) {
 			$query_args['tax_query'] = array(
 				array(
-					'taxonomy' => GAE_CPT::TAXONOMY,
+					'taxonomy' => Gear_Engine_CPT::TAXONOMY,
 					'field'    => 'name',
 					'terms'    => $category,
 				),
@@ -434,7 +434,7 @@ class GAE_AI_API {
 		$items = array();
 
 		foreach ( $query->posts as $post ) {
-			$data = GAE_CPT::get_product_data( $post );
+			$data = Gear_Engine_CPT::get_product_data( $post );
 			if ( $data ) {
 				$items[] = $data;
 			}
@@ -545,3 +545,10 @@ class GAE_AI_API {
 		);
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_AI_API', false ) ) {
+	class_alias( 'Gear_Engine_AI_API', 'GAE_AI_API' );
+}
+

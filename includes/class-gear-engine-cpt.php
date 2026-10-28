@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GAE_CPT
+ * Class Gear_Engine_CPT
  *
  * Registers the `exercise_gear` post type, custom taxonomy, and affiliate meta fields.
  */
-class GAE_CPT {
+class Gear_Engine_CPT {
 
 	/**
 	 * Post type slug.
@@ -779,3 +779,10 @@ class GAE_CPT {
 		return $seeded_ids;
 	}
 }
+
+
+// Deprecated alias preserved for backwards compatibility.
+if ( ! class_exists( 'GAE_CPT', false ) ) {
+	class_alias( 'Gear_Engine_CPT', 'GAE_CPT' );
+}
+

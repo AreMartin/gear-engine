@@ -284,9 +284,11 @@ class Gear_Engine_Triage {
 		}
 
 		if ( ! array_key_exists( $region, self::$config_cache ) ) {
-			$raw    = file_get_contents( self::get_configs_dir() . $region . '.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local plugin file.
-			$config = false === $raw ? null : json_decode( $raw, true );
-			self::$config_cache[ $region ] = self::validate_config( $config ) ? $config : null;
+			self::$config_cache[ $region ] = Gear_Engine_Config_Loader::load(
+				self::get_configs_dir(),
+				$region,
+				array( __CLASS__, 'validate_config' )
+			);
 		}
 
 		$config = self::$config_cache[ $region ];
