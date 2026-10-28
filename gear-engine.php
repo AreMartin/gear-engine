@@ -69,6 +69,7 @@ function gae_init_plugin(): void {
 
 	// Instantiate feature modules.
 	new GAE_Physio_Chat();
+	new Gear_Engine_Exercise_Selection();
 }
 add_action( 'plugins_loaded', 'gae_init_plugin' );
 

@@ -346,6 +346,29 @@ class GAE_Settings {
 				'description' => __( 'Optional override for the AI Physio Advisor system instructions. Leave blank to use default clinical protocol prompt.', 'gear-engine' ),
 			)
 		);
+
+		register_setting(
+			self::OPTION_GROUP,
+			'gear_engine_disable_general_exercises',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+
+		add_settings_field(
+			'gear_engine_disable_general_exercises',
+			__( 'Exercise suggestions without a protocol', 'gear-engine' ),
+			array( $this, 'render_field_checkbox' ),
+			self::PAGE_SLUG,
+			'gae_section_ai',
+			array(
+				'id'          => 'gear_engine_disable_general_exercises',
+				'label'       => __( 'Disable general suggestions', 'gear-engine' ),
+				'description' => __( 'When checked, the chat only suggests exercises from Approved protocols. Otherwise it may choose from Low and Moderate risk exercises for the body area and labels them as general guidance.', 'gear-engine' ),
+			)
+		);
 	}
 
 	/**

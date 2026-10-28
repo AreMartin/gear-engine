@@ -247,41 +247,30 @@ EOT;
 		$injected_context    = '';
 		$exercise_candidates = array();
 
-		if ( $is_ovelser && class_exists( 'Gear_Engine_Exercise_Service' ) ) {
-			$area_aliases = array(
-				'kne'     => 'kne',
-				'skulder' => 'skulder',
-				'rygg'    => 'rygg',
-				'fot'     => 'fot-ankel',
-				'ankel'   => 'fot-ankel',
-				'hofte'   => 'hofte',
-				'albue'   => 'albue',
-			);
-			$search_args = array( 'limit' => self::GEAR_ENGINE_MAX_EXERCISES_PER_PROGRAM );
-			if ( isset( $area_aliases[ $detected_part ] ) ) {
-				$search_args['area'] = $area_aliases[ $detected_part ];
+		$selection = array( 'mode' => 'none', 'candidates' => array() );
+		if ( class_exists( 'Gear_Engine_Exercise_Selection' ) && class_exists( 'Gear_Engine_Exercise_Service' ) ) {
+			$triage    = Gear_Engine_Exercise_Selection::extract_triage( $history );
+			$area_slug = Gear_Engine_Exercise_Selection::area_slug_for( $detected_part );
+			if ( '' === $area_slug ) {
+				$area_slug = Gear_Engine_Exercise_Selection::area_slug_for( (string) ( $triage['category'] ?? '' ) );
 			}
 
-			$exercise_candidates = Gear_Engine_Exercise_Service::search_exercises( $search_args );
-			if ( ! empty( $exercise_candidates ) ) {
-				$compact_candidates = array_map(
-					static function ( array $exercise ): array {
-						return array(
-							'library_id' => $exercise['id'],
-							'title'      => $exercise['title'],
-							'summary'    => wp_trim_words( $exercise['summary'] ?: $exercise['description'], 24 ),
-							'area'       => $exercise['area'],
-							'equipment'  => $exercise['equipment'],
-							'dosage'     => $exercise['dosage'],
-						);
-					},
-					$exercise_candidates
-				);
-				$injected_context .= "\nCPT_EXERCISE_LIBRARY (velg kun relevante øvelser og returner library_id):\n" . wp_json_encode( $compact_candidates );
+			$recent_user_text = $user_message;
+			$user_turns       = 0;
+			for ( $i = count( $history ) - 1; $i >= 0 && $user_turns < 3; $i-- ) {
+				if ( ( $history[ $i ]['role'] ?? '' ) === 'user' && is_string( $history[ $i ]['parts'][0]['text'] ?? null ) ) {
+					$recent_user_text .= ' ' . $history[ $i ]['parts'][0]['text'];
+					++$user_turns;
+				}
 			}
+
+			$selection           = Gear_Engine_Exercise_Selection::select( $triage, $area_slug, $recent_user_text, ! get_option( 'gear_engine_disable_general_exercises', false ), $is_ovelser );
+			$exercise_candidates = $selection['candidates'];
+			$injected_context   .= Gear_Engine_Exercise_Selection::build_context( $selection );
 		}
 
-		if ( $is_ovelser && empty( $exercise_candidates ) && ! empty( $detected_ovelser_file ) ) {
+		// The legacy JSON fallback is never used when red flags block exercises.
+		if ( $is_ovelser && 'blocked' !== $selection['mode'] && empty( $exercise_candidates ) && ! empty( $detected_ovelser_file ) ) {
 			$t_result = self::read_safe_json( $detected_ovelser_file );
 			if ( ! empty( $t_result ) ) {
 				$injected_context .= "\nSYSTEM-DATA (ØVELSER FUNNET for {$detected_part}):\n" . wp_json_encode( $t_result );
@@ -402,9 +391,7 @@ EOT;
 			),
 		);
 
-		$exercise_selection_instruction = ! empty( $exercise_candidates )
-			? "\nFor treningsprogram: velg kun øvelser fra CPT_EXERCISE_LIBRARY. Returner valgt library_id per øvelse. Ikke skriv egne øvelsesdetaljer; backend fyller disse fra CPT."
-			: '';
+		$exercise_selection_instruction = class_exists( 'Gear_Engine_Exercise_Selection' ) ? Gear_Engine_Exercise_Selection::build_instruction( $selection ) : '';
 		$final_user_prompt = "BRUKER SIER:\n\"{$user_message}\"\n{$exercise_selection_instruction}" . ( ! empty( $injected_context ) ? "\n--- USYNLIG SYSTEM KONTEKST ---\n{$injected_context}" : '' );
 		$contents   = $history;
 		$contents[] = array( 'role' => 'user', 'parts' => array( array( 'text' => $final_user_prompt ) ) );
@@ -536,7 +523,11 @@ EOT;
 		}
 
 		// Normalize cards and choices.
-		$bot_data = self::normalize_bot_response( $bot_data, $exercise_candidates );
+		$rationales = class_exists( 'Gear_Engine_Exercise_Selection' ) ? Gear_Engine_Exercise_Selection::extract_rationales( $bot_data ) : array();
+		$bot_data   = self::normalize_bot_response( $bot_data, $exercise_candidates );
+		if ( class_exists( 'Gear_Engine_Exercise_Selection' ) ) {
+			$bot_data = Gear_Engine_Exercise_Selection::finalize_response( $bot_data, $selection, $rationales );
+		}
 
 		return new WP_REST_Response( $bot_data, 200 );
 	}
