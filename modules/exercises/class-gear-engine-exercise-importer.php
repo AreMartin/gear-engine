@@ -66,7 +66,7 @@ class Gear_Engine_Exercise_Importer {
 			<h1><?php esc_html_e( 'Import Exercises from CSV', 'gear-engine' ); ?></h1>
 			<p><?php esc_html_e( 'Upload a UTF-8 CSV file to preview and validate exercise records before importing them. New records are drafts unless you explicitly choose to publish them.', 'gear-engine' ); ?></p>
 			<p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=' . self::GEAR_ENGINE_TEMPLATE_ACTION ), self::GEAR_ENGINE_TEMPLATE_ACTION ) ); ?>"><?php esc_html_e( 'Download CSV template', 'gear-engine' ); ?></a></p>
-			<p><?php esc_html_e( 'Required columns: title, description (step-by-step instructions), and either exorlive_id or external_key. Add an optional HTTPS video_url from ExorLive, YouTube, or Vimeo; it takes precedence over exorlive_id. Optional risk (low, moderate, high) and protocol (existing protocol names or slugs) columns are supported; an absent protocol column leaves existing tags unchanged. Separate multiple area/equipment/protocol terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
+			<p><?php esc_html_e( 'Required columns: title, description (step-by-step instructions), and either exorlive_id or external_key. Add an optional HTTPS video_url from ExorLive, YouTube, or Vimeo; it takes precedence over exorlive_id, and for an ExorLive link (ex=...) the ID is filled in automatically if exorlive_id is empty. Optional risk (low, moderate, high) and protocol (existing protocol names or slugs) columns are supported; an absent protocol column leaves existing tags unchanged. Separate multiple area/equipment/protocol terms with semicolons. Existing records are updated by ExorLive ID first, then external key.', 'gear-engine' ); ?></p>
 
 			<?php $this->render_import_notice(); ?>
 
@@ -314,6 +314,17 @@ class Gear_Engine_Exercise_Importer {
 			$data['exorlive_id'] = Gear_Engine_Exercises_CPT::sanitize_exorlive_id_static( $data['exorlive_id'] );
 			if ( '' === $data['exorlive_id'] ) {
 				$errors[] = __( 'ExorLive ID must contain only digits.', 'gear-engine' );
+			}
+		}
+		// Derive the ID from a pasted ExorLive link (ex=1234) so only the URL is needed.
+		if ( '' === $data['exorlive_id'] && '' !== $data['video_url'] ) {
+			$url_host = wp_parse_url( $data['video_url'], PHP_URL_HOST );
+			$url_qs   = wp_parse_url( $data['video_url'], PHP_URL_QUERY );
+			if ( is_string( $url_host ) && is_string( $url_qs ) && false !== stripos( $url_host, 'exorlive.com' ) ) {
+				parse_str( $url_qs, $url_args );
+				if ( isset( $url_args['ex'] ) && is_scalar( $url_args['ex'] ) ) {
+					$data['exorlive_id'] = Gear_Engine_Exercises_CPT::sanitize_exorlive_id_static( (string) $url_args['ex'] );
+				}
 			}
 		}
 		if ( '' === $data['exorlive_id'] && '' === $data['external_key'] ) {

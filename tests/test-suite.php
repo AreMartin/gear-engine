@@ -1161,14 +1161,16 @@ file_put_contents(
 	. "csv-new-1,Duplicate curl,Instructions,Short,kne,strikk,3 x 10,,nb-NO,,\n"
 	. "bad-id,Bad ID,Instructions,Short,kne,strikk,3 x 10,72x2,nb-NO,,\n"
 	. "bad-url,Bad URL,Instructions,Short,kne,strikk,3 x 10,,nb-NO,https://example.com/video,\n"
+	. ",ExorLive only,Instructions,Short,kne,strikk,3 x 10,,nb-NO,https://exorlive.com/video/?culture=nb-NO&ex=7282,\n"
 );
 $csv_preview = Gear_Engine_Exercise_Importer::validate_csv_file( $csv_path );
 unlink( $csv_path );
-assert_test( is_array( $csv_preview ) && 4 === count( $csv_preview ), 'exercise_importer: Parses UTF-8 CSV and preserves quoted comma fields' );
+assert_test( is_array( $csv_preview ) && 5 === count( $csv_preview ), 'exercise_importer: Parses UTF-8 CSV and preserves quoted comma fields' );
+assert_test( empty( $csv_preview[4]['errors'] ) && '7282' === $csv_preview[4]['data']['exorlive_id'], 'exercise_importer: Derives the ExorLive ID from a pasted link' );
 assert_test( empty( $csv_preview[0]['errors'] ) && 'Instructions, with comma' === $csv_preview[0]['data']['description'] && 'https://www.youtube.com/watch?v=kJQP7kiw5Fk' === $csv_preview[0]['data']['video_url'], 'exercise_importer: Validates instructions and canonicalizes a video URL' );
 assert_test( ! empty( $csv_preview[1]['errors'] ) && ! empty( $csv_preview[2]['errors'] ) && ! empty( $csv_preview[3]['errors'] ), 'exercise_importer: Flags duplicate keys, invalid IDs, and unsupported video URLs during preview' );
 $import_summary = Gear_Engine_Exercise_Importer::import_rows( $csv_preview );
-assert_test( 1 === $import_summary['imported'] && 3 === $import_summary['skipped'] && 0 === $import_summary['failed'], 'exercise_importer: Imports valid rows and skips invalid preview rows' );
+assert_test( 2 === $import_summary['imported'] && 3 === $import_summary['skipped'] && 0 === $import_summary['failed'], 'exercise_importer: Imports valid rows and skips invalid preview rows' );
 $imported_exercise_id = 0;
 foreach ( $GLOBALS['wp_posts'] as $candidate_post ) {
 	if ( 'CSV curl' === $candidate_post->post_title ) {
