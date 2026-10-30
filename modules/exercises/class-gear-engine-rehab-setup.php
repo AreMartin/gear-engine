@@ -24,6 +24,7 @@ class Gear_Engine_Rehab_Setup {
 	public const PAGE_SLUG    = 'gear-engine-rehab-setup';
 	public const NONCE_ACTION = 'gear_engine_rehab_setup';
 	public const META_SUGGEST = '_gear_engine_exercise_suggestions';
+	public const META_TEXT_DRAFT = '_gear_engine_protocol_text_draft';
 	public const PHASE_COUNT  = 3;
 
 	/**
@@ -31,10 +32,12 @@ class Gear_Engine_Rehab_Setup {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_page' ) );
+		add_action( 'admin_menu', array( $this, 'tidy_menu' ), 99 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_post_gear_engine_rehab_enable', array( $this, 'handle_enable' ) );
 		add_action( 'admin_post_gear_engine_rehab_suggest', array( $this, 'handle_suggest' ) );
 		add_action( 'admin_post_gear_engine_rehab_confirm', array( $this, 'handle_confirm' ) );
+		add_action( 'admin_post_gear_engine_rehab_confirm_all', array( $this, 'handle_confirm_all' ) );
 		add_action( 'admin_post_gear_engine_rehab_seed', array( $this, 'handle_seed' ) );
 		add_action( 'admin_post_gear_engine_rehab_save_fields', array( $this, 'handle_save_fields' ) );
 		add_action( 'admin_post_gear_engine_rehab_slot_add', array( $this, 'handle_slot_add' ) );
@@ -204,8 +207,8 @@ class Gear_Engine_Rehab_Setup {
 					}
 				}
 			}
-			$suggested_tags = self::suggest_good_for( $text, array( array( 'all' => array_keys( $flat ) ) ) );
-			$suggested_role = self::suggest_role( $post->post_title . ' ' . $post->post_excerpt );
+			$suggested_tags = self::suggest_good_for( $text, array( array_keys( $flat ) ) );
+			$suggested_role = self::suggest_role( $text );
 			if ( ! $suggested_tags && '' === $suggested_role ) {
 				continue;
 			}
@@ -280,6 +283,11 @@ class Gear_Engine_Rehab_Setup {
 				$codes   = Gear_Engine_Protocols::sanitize_codes( implode( ', ', array_filter( array( (string) ( $dx['icd10'] ?? '' ), (string) ( $dx['icpc2'] ?? '' ) ) ) ) );
 				update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_CODES, $codes );
 				update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS, Gear_Engine_Protocols::GEAR_ENGINE_STATUS_DRAFT );
+				// Safe starter text so nobody faces a blank page; the draft flag
+				// blocks approval until a human has edited (and thereby owned) it.
+				update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_SUMMARY, sprintf( 'Utkast - rediger: treningsmål og ramme for %s.', mb_strtolower( $title, 'UTF-8' ) ) );
+				update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_RED_FLAGS, 'Utkast - rediger: Smertene øker kraftig, nummenhet, kraftsvikt eller nye symptomer. Du får feber eller blir syk. Kneskade: klarer ikke å belaste. Stopp og få det vurdert.' );
+				update_term_meta( $term_id, self::META_TEXT_DRAFT, 1 );
 				for ( $n = 1; $n <= self::PHASE_COUNT; ++$n ) {
 					$phase_slug = 'fase-' . $n;
 					$exists     = false;
@@ -300,13 +308,27 @@ class Gear_Engine_Rehab_Setup {
 	}
 
 	/**
+	 * Approval blockers: the taxonomy requirements plus the unedited-draft rule.
+	 *
+	 * @param int $term_id Protocol term ID.
+	 * @return array<int, string>
+	 */
+	public static function approval_blockers( int $term_id ): array {
+		$missing = Gear_Engine_Protocols::get_missing_for_term( $term_id );
+		if ( get_term_meta( $term_id, self::META_TEXT_DRAFT, true ) ) {
+			$missing[] = __( 'draft clinical text (edit the Utkast lines first)', 'gear-engine' );
+		}
+		return $missing;
+	}
+
+	/**
 	 * Approve a protocol if every requirement is met.
 	 *
 	 * @param int $term_id Protocol term ID.
 	 * @return array<int, string> Missing requirements; empty means approved.
 	 */
 	public static function try_approve( int $term_id ): array {
-		$missing = Gear_Engine_Protocols::get_missing_for_term( $term_id );
+		$missing = self::approval_blockers( $term_id );
 		if ( $missing ) {
 			return $missing;
 		}
@@ -403,6 +425,21 @@ class Gear_Engine_Rehab_Setup {
 			array( $this, 'render_page' ),
 			4
 		);
+	}
+
+	/**
+	 * Hide the power-user screens behind Rehab Setup so the menu shows one path.
+	 *
+	 * The pages themselves stay reachable by URL (and from the links at the
+	 * bottom of the setup page); only the menu clutter goes away.
+	 *
+	 * @return void
+	 */
+	public function tidy_menu(): void {
+		$parent = 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE;
+		remove_submenu_page( $parent, Gear_Engine_Protocol_Manager::GEAR_ENGINE_PAGE_SLUG );
+		remove_submenu_page( $parent, Gear_Engine_Coverage_Report::GEAR_ENGINE_PAGE_SLUG );
+		remove_submenu_page( $parent, 'edit-tags.php?taxonomy=' . Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY . '&post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE );
 	}
 
 	/**
@@ -516,6 +553,45 @@ class Gear_Engine_Rehab_Setup {
 	}
 
 	/**
+	 * Apply every pending suggestion in one pass.
+	 *
+	 * @return int Number of exercises confirmed.
+	 */
+	public static function confirm_all_suggestions(): int {
+		$posts = get_posts(
+			array(
+				'post_type'      => Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE,
+				'post_status'    => 'publish',
+				'posts_per_page' => 200,
+				'meta_query'     => array( array( 'key' => self::META_SUGGEST, 'compare' => 'EXISTS' ) ),
+			)
+		);
+		$count = 0;
+		foreach ( $posts as $post ) {
+			$s = get_post_meta( (int) $post->ID, self::META_SUGGEST, true );
+			if ( ! is_array( $s ) || ! current_user_can( 'edit_post', (int) $post->ID ) ) {
+				continue;
+			}
+			self::confirm_suggestions( (int) $post->ID, (array) ( $s['good_for'] ?? array() ), (string) ( $s['role'] ?? '' ) );
+			++$count;
+		}
+		return $count;
+	}
+
+	/**
+	 * Confirm every pending suggestion in one pass.
+	 *
+	 * @return void
+	 */
+	public function handle_confirm_all(): void {
+		check_admin_referer( self::NONCE_ACTION, 'gear_engine_rehab_nonce' );
+		$this->guard();
+		$count = self::confirm_all_suggestions();
+		$this->flash( sprintf( /* translators: %d: count */ _n( 'Confirmed suggestions for %d exercise.', 'Confirmed suggestions for %d exercises.', $count, 'gear-engine' ), $count ) );
+		$this->back();
+	}
+
+	/**
 	 * Seed protocols from the quiz configs.
 	 *
 	 * @return void
@@ -543,6 +619,8 @@ class Gear_Engine_Rehab_Setup {
 		update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_CODES, Gear_Engine_Protocols::sanitize_codes( wp_unslash( $_POST['field_codes'] ?? '' ) ) );
 		update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_SUMMARY, sanitize_textarea_field( wp_unslash( $_POST['field_summary'] ?? '' ) ) );
 		update_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_RED_FLAGS, sanitize_textarea_field( wp_unslash( $_POST['field_red_flags'] ?? '' ) ) );
+		// Saving from this page means a human owned the text: lift the draft block.
+		delete_term_meta( $term_id, self::META_TEXT_DRAFT );
 		$this->flash( __( 'Protocol text saved.', 'gear-engine' ) );
 		$this->back();
 	}
@@ -627,20 +705,73 @@ class Gear_Engine_Rehab_Setup {
 			return;
 		}
 
-		$this->render_step_library( $nonce );
-		$this->render_step_protocols( $nonce );
-		$this->render_step_fill( $nonce );
+		$published = (int) ( wp_count_posts( Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE )->publish ?? 0 );
+		$pending   = count( (array) get_posts(
+			array(
+				'post_type'      => Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE,
+				'post_status'    => 'publish',
+				'posts_per_page' => 200,
+				'fields'         => 'ids',
+				'meta_query'     => array( array( 'key' => self::META_SUGGEST, 'compare' => 'EXISTS' ) ),
+			)
+		) );
+		$conditions = 0;
+		$underfilled = 0;
+		foreach ( Gear_Engine_Protocol_Manager::get_protocol_tree() as $row ) {
+			if ( 0 === (int) $row['term']->parent ) {
+				++$conditions;
+			} elseif ( (int) $row['term']->count < Gear_Engine_Protocol_Autofill::TARGET_PER_PHASE ) {
+				++$underfilled;
+			}
+		}
+
+		$steps = array(
+			'library'    => array( $published > 0 && 0 === $pending, $published > 0 ? sprintf( /* translators: %d: published count */ __( 'Done — %d exercises published.', 'gear-engine' ), $published ) : __( 'Import exercises first.', 'gear-engine' ) ),
+			'protocols'  => array( $conditions > 0, $conditions > 0 ? sprintf( /* translators: %d: count */ __( 'Done — %d protocols exist.', 'gear-engine' ), $conditions ) : __( 'Create them from the quiz in one click.', 'gear-engine' ) ),
+			'fill'       => array( $conditions > 0 && 0 === $underfilled, $underfilled > 0 ? sprintf( /* translators: %d: count */ __( '%d phases below 5 exercises.', 'gear-engine' ), $underfilled ) : __( 'All phases filled.', 'gear-engine' ) ),
+		);
+		$next = array_key_first( array_filter( $steps, static function ( array $s ): bool { return ! $s[0]; } ) );
+		$next = null === $next ? '' : $next;
+
+		$this->render_step_library( $nonce, 'library' === $next );
+		$this->render_step_protocols( $nonce, 'protocols' === $next );
+		$this->render_step_fill( $nonce, 'fill' === $next );
 		$this->render_step_coverage();
+
+		$base = admin_url( 'edit.php?post_type=' . Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE );
+		echo '<p class="description" style="margin-top:16px">' . esc_html__( 'Power tools:', 'gear-engine' ) . ' <a href="' . esc_url( add_query_arg( array( 'page' => Gear_Engine_Protocol_Manager::GEAR_ENGINE_PAGE_SLUG, 'tab' => 'matrix' ), $base ) ) . '">' . esc_html__( 'full exercise matrix', 'gear-engine' ) . '</a> · <a href="' . esc_url( add_query_arg( 'page', Gear_Engine_Coverage_Report::GEAR_ENGINE_PAGE_SLUG, $base ) ) . '">' . esc_html__( 'coverage report', 'gear-engine' ) . '</a></p>';
 		echo '</div>';
+	}
+
+	/**
+	 * Open/closed wrapper so only the next actionable step is expanded.
+	 *
+	 * @param string $title   Step heading.
+	 * @param string $summary Collapsed-state line.
+	 * @param bool   $open    Whether this is the active step.
+	 * @return void
+	 */
+	private function step_open( string $title, string $summary, bool $open ): void {
+		echo '<details' . ( $open ? ' open' : '' ) . ' style="margin:12px 0;border:1px solid #dcdcde;padding:8px 12px;background:#fff"><summary style="cursor:pointer;font-size:1.1em;font-weight:600">' . esc_html( $title ) . ( $open ? '' : ' — <em style="font-weight:normal;color:#1e7e34">' . esc_html( $summary ) . '</em>' ) . '</summary>';
+	}
+
+	/**
+	 * Close a step wrapper.
+	 *
+	 * @return void
+	 */
+	private function step_close(): void {
+		echo '</details>';
 	}
 
 	/**
 	 * Step 1: library status and suggestion review.
 	 *
 	 * @param string $nonce Nonce.
+	 * @param bool   $open  Whether this step is the active one.
 	 * @return void
 	 */
-	private function render_step_library( string $nonce ): void {
+	private function render_step_library( string $nonce, bool $open ): void {
 		$total     = wp_count_posts( Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE );
 		$published = (int) ( $total->publish ?? 0 );
 		$rated_ids = get_posts(
@@ -667,7 +798,11 @@ class Gear_Engine_Rehab_Setup {
 			)
 		);
 
-		echo '<h2>' . esc_html__( '1. Exercise library', 'gear-engine' ) . '</h2>';
+		$this->step_open(
+			__( '1. Exercise library', 'gear-engine' ),
+			$published > 0 && 0 === count( $pending ) ? sprintf( /* translators: %d: count */ __( '%d exercises ready', 'gear-engine' ), $published ) : __( 'not finished', 'gear-engine' ),
+			$open
+		);
 		printf(
 			'<p>%s <strong>%d</strong> %s <strong>%d</strong>. %s</p>',
 			esc_html__( 'Published exercises:', 'gear-engine' ),
@@ -683,8 +818,13 @@ class Gear_Engine_Rehab_Setup {
 		echo ' <span class="description">' . esc_html__( 'Drafts Good-for conditions and session roles from your quiz vocabulary. Nothing changes until you confirm below.', 'gear-engine' ) . '</span></form>';
 
 		if ( ! $pending ) {
+			$this->step_close();
 			return;
 		}
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="margin-bottom:8px">';
+		wp_nonce_field( self::NONCE_ACTION, 'gear_engine_rehab_nonce' );
+		echo '<input type="hidden" name="action" value="gear_engine_rehab_confirm_all" /><button class="button button-primary">' . esc_html__( 'Confirm ALL suggestions below', 'gear-engine' ) . '</button>';
+		echo ' <span class="description">' . esc_html__( 'Uncheck anything wrong first — or fix it afterwards in the matrix.', 'gear-engine' ) . '</span></form>';
 		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Exercise', 'gear-engine' ) . '</th><th>' . esc_html__( 'Suggested conditions (tick to keep)', 'gear-engine' ) . '</th><th>' . esc_html__( 'Suggested role', 'gear-engine' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( $pending as $post ) {
 			$s = get_post_meta( (int) $post->ID, self::META_SUGGEST, true );
@@ -706,15 +846,17 @@ class Gear_Engine_Rehab_Setup {
 			echo '</select></td><td><button class="button button-small">' . esc_html__( 'Confirm', 'gear-engine' ) . '</button></td></form></tr>';
 		}
 		echo '</tbody></table>';
+		$this->step_close();
 	}
 
 	/**
 	 * Step 2: protocol scaffolding and clinical text.
 	 *
 	 * @param string $nonce Nonce.
+	 * @param bool   $open  Whether this step is the active one.
 	 * @return void
 	 */
-	private function render_step_protocols( string $nonce ): void {
+	private function render_step_protocols( string $nonce, bool $open ): void {
 		$conditions = array();
 		foreach ( Gear_Engine_Protocol_Manager::get_protocol_tree() as $row ) {
 			if ( 0 === (int) $row['term']->parent ) {
@@ -722,7 +864,11 @@ class Gear_Engine_Rehab_Setup {
 			}
 		}
 
-		echo '<h2>' . esc_html__( '2. Protocols', 'gear-engine' ) . '</h2>';
+		$this->step_open(
+			__( '2. Protocols', 'gear-engine' ),
+			$conditions ? sprintf( /* translators: %d: count */ __( '%d created', 'gear-engine' ), count( $conditions ) ) : __( 'none yet', 'gear-engine' ),
+			$open
+		);
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="margin-bottom:12px">';
 		wp_nonce_field( self::NONCE_ACTION, 'gear_engine_rehab_nonce' );
 		echo '<input type="hidden" name="action" value="gear_engine_rehab_seed" /><button class="button">' . esc_html__( 'Create protocols from the quiz (with codes)', 'gear-engine' ) . '</button>';
@@ -730,14 +876,16 @@ class Gear_Engine_Rehab_Setup {
 
 		if ( ! $conditions ) {
 			echo '<p class="description">' . esc_html__( 'No protocols yet — create them above.', 'gear-engine' ) . '</p>';
+			$this->step_close();
 			return;
 		}
 
+		echo '<p class="description">' . esc_html__( 'Seeded protocols carry draft starter text marked "Utkast". Edit the lines you own and save — approval unlocks only after you have.', 'gear-engine' ) . '</p>';
 		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Protocol', 'gear-engine' ) . '</th><th>' . esc_html__( 'Codes', 'gear-engine' ) . '</th><th>' . esc_html__( 'Summary', 'gear-engine' ) . '</th><th>' . esc_html__( 'Red flags', 'gear-engine' ) . '</th><th>' . esc_html__( 'Exercises', 'gear-engine' ) . '</th><th>' . esc_html__( 'Status', 'gear-engine' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( $conditions as $term ) {
 			$term_id = (int) $term->term_id;
 			$status  = Gear_Engine_Protocols::get_status( $term_id );
-			$missing = Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED === $status ? array() : Gear_Engine_Protocols::get_missing_for_term( $term_id );
+			$missing = Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED === $status ? array() : self::approval_blockers( $term_id );
 			echo '<tr><td><strong>' . esc_html( $term->name ) . '</strong></td>';
 			echo '<td><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">';
 			wp_nonce_field( self::NONCE_ACTION, 'gear_engine_rehab_nonce' );
@@ -761,16 +909,18 @@ class Gear_Engine_Rehab_Setup {
 			echo '</td></tr>';
 		}
 		echo '</tbody></table>';
+		$this->step_close();
 	}
 
 	/**
 	 * Step 3: auto-fill plus per-phase slot review.
 	 *
 	 * @param string $nonce Nonce.
+	 * @param bool   $open  Whether this step is the active one.
 	 * @return void
 	 */
-	private function render_step_fill( string $nonce ): void {
-		echo '<h2>' . esc_html__( '3. Fill and review the exercises', 'gear-engine' ) . '</h2>';
+	private function render_step_fill( string $nonce, bool $open ): void {
+		$this->step_open( __( '3. Fill and review the exercises', 'gear-engine' ), __( 'reviewed', 'gear-engine' ), $open );
 		echo '<p><button type="button" id="gear-engine-rehab-fill-all" class="button button-primary" data-nonce="' . esc_attr( wp_create_nonce( Gear_Engine_Protocol_Autofill::NONCE_ACTION ) ) . '" data-admin-url="' . esc_attr( admin_url( 'admin-post.php' ) ) . '">' . esc_html__( 'Auto-fill all protocols', 'gear-engine' ) . '</button> <span id="gear-engine-rehab-fill-status" aria-live="polite"></span></p>';
 
 		$tree = Gear_Engine_Protocol_Manager::get_protocol_tree();
@@ -806,6 +956,7 @@ class Gear_Engine_Rehab_Setup {
 			}
 			echo '</div>';
 		}
+		$this->step_close();
 	}
 
 	/**

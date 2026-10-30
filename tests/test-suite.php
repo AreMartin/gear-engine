@@ -1379,6 +1379,27 @@ $GLOBALS['wp_set_terms_calls'] = array();
 update_post_meta( $imported_exercise_id, Gear_Engine_Rehab_Setup::META_SUGGEST, array( 'good_for' => array( 'meniskskade' ), 'role' => 'mobility' ) );
 Gear_Engine_Rehab_Setup::confirm_suggestions( $imported_exercise_id, array( 'meniskskade' ), 'mobility' );
 assert_test( false !== strpos( (string) get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ), 'meniskskade' ) && array( $imported_exercise_id, array( 'mobility' ), Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY ) === $GLOBALS['wp_set_terms_calls'][0] && '' === get_post_meta( $imported_exercise_id, Gear_Engine_Rehab_Setup::META_SUGGEST, true ), 'rehab_setup: Confirming applies tags and clears the suggestion' );
+
+// Suite 17.9: suggestion pass end-to-end (regression: crashed on a malformed keyword shape).
+$suggest_post = new WP_Post();
+$suggest_post->ID = 6001;
+$suggest_post->post_type = Gear_Engine_Exercises_CPT::GEAR_ENGINE_POST_TYPE;
+$suggest_post->post_status = 'publish';
+$suggest_post->post_title = 'Stabilitetsøvelse ved meniskskade';
+$suggest_post->post_content = 'Balanser på ett ben etter meniskskade.';
+$suggest_post->post_excerpt = 'meniskskade';
+$GLOBALS['wp_posts'][6001] = $suggest_post;
+$suggest_count = Gear_Engine_Rehab_Setup::run_suggestions();
+$suggestion = get_post_meta( 6001, Gear_Engine_Rehab_Setup::META_SUGGEST, true );
+assert_test( $suggest_count >= 1 && is_array( $suggestion ) && in_array( 'meniskskade', (array) ( $suggestion['good_for'] ?? array() ), true ) && 'stability' === ( $suggestion['role'] ?? '' ), 'rehab_setup: Suggestion pass produces good-for and role drafts from exercise text' );
+update_post_meta( $imported_exercise_id, Gear_Engine_Rehab_Setup::META_SUGGEST, array( 'good_for' => array( 'hoppekne' ), 'role' => 'strength' ) );
+$confirmed_all = Gear_Engine_Rehab_Setup::confirm_all_suggestions();
+assert_test( $confirmed_all >= 2 && '' === get_post_meta( 6001, Gear_Engine_Rehab_Setup::META_SUGGEST, true ) && false !== strpos( (string) get_post_meta( 6001, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ), 'meniskskade' ), 'rehab_setup: Confirm-all applies every pending suggestion in one pass' );
+$GLOBALS['wp_terms'][15] = (object) array( 'term_id' => 15, 'slug' => 'draftproto', 'name' => 'Draftproto', 'parent' => 0 );
+$GLOBALS['wp_termmeta'][15][ Gear_Engine_Protocols::GEAR_ENGINE_META_CODES ] = 'M23';
+$GLOBALS['wp_termmeta'][15][ Gear_Engine_Protocols::GEAR_ENGINE_META_RED_FLAGS ] = 'x';
+$GLOBALS['wp_termmeta'][15][ Gear_Engine_Rehab_Setup::META_TEXT_DRAFT ] = 1;
+assert_test( array() === Gear_Engine_Protocols::get_missing_for_term( 15 ) && 1 === count( Gear_Engine_Rehab_Setup::approval_blockers( 15 ) ) && in_array( 'draft clinical text (edit the Utkast lines first)', Gear_Engine_Rehab_Setup::approval_blockers( 15 ), true ), 'rehab_setup: Seeded draft text blocks approval until a human edits it' );
 update_option( 'gear_engine_enable_protocols', true );
 $GLOBALS['last_wp_query_args'] = null;
 $sel_blocked = Gear_Engine_Exercise_Selection::select( array( 'severity' => 'Høy', 'codes' => array( 'M23.2' ) ), 'kne', 'øvelser', true );
