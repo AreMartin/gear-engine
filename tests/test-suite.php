@@ -101,6 +101,8 @@ class WP_REST_Response {
 function get_option( $key, $default = false ) {
 	return $GLOBALS['wp_options'][ $key ] ?? $default;
 }
+function delete_post_meta( $post_id, $key ) { unset( $GLOBALS['wp_postmeta'][ $post_id ][ $key ] ); return true; }
+function wp_count_posts( $post_type ) { return (object) array( 'publish' => count( array_filter( $GLOBALS['wp_posts'], static function ( $p ) use ( $post_type ) { return $p->post_type === $post_type && 'publish' === $p->post_status; } ) ) ); }
 function update_option( $key, $value, $autoload = null ) {
 	$GLOBALS['wp_options'][ $key ] = $value;
 	return true;
@@ -372,6 +374,8 @@ require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocols.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-manager.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-autofill.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-rehab-setup.php';
+require_once ABSPATH . 'modules/triage/class-gear-engine-triage.php';
 require_once ABSPATH . 'modules/physio-chat/class-gear-engine-exercise-selection.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-importer.php';
@@ -1350,6 +1354,31 @@ $coverage_unreachable = Gear_Engine_Coverage_Report::find_unreachable_protocols(
 	)
 );
 assert_test( array( 'ghost-proto' ) === $coverage_unreachable, 'coverage: Prefix code matching marks only truly unreachable protocols' );
+
+// Suite 17.8: rehab setup helpers.
+$kw_config = array(
+	'diagnoses' => array(
+		'meniscus_injury' => array( 'title' => 'Mulig meniskskade', 'severity' => 'Moderat' ),
+		'osteoarthritis'  => array( 'title' => 'Slitasjegikt i kneet (artrose)', 'severity' => 'Lav' ),
+	),
+);
+$kw = Gear_Engine_Rehab_Setup::diagnosis_keywords( $kw_config );
+assert_test( in_array( 'meniskskade', $kw['meniscus_injury'], true ) && 'artrose' === $kw['osteoarthritis'][0], 'rehab_setup: Diagnosis keywords come from parentheses first, then distinctive title words' );
+assert_test( in_array( 'meniskskade', Gear_Engine_Rehab_Setup::suggest_good_for( 'gode øvelser ved meniskskade', array( array( 'meniskskade', 'artrose' ) ) ), true ), 'rehab_setup: Exercise text matches diagnosis keywords' );
+assert_test( 'mobility' === Gear_Engine_Rehab_Setup::suggest_role( 'rolige strekk og rull' ) && 'stability' === Gear_Engine_Rehab_Setup::suggest_role( 'balanse på ett ben' ) && '' === Gear_Engine_Rehab_Setup::suggest_role( 'ingenting her' ), 'rehab_setup: Session role is suggested from movement vocabulary' );
+assert_test( false === Gear_Engine_Rehab_Setup::diagnosis_needs_program( array( 'severity' => 'Kritisk' ) ) && true === Gear_Engine_Rehab_Setup::diagnosis_needs_program( array( 'severity' => 'Lav' ) ), 'rehab_setup: Critical diagnoses are excluded from program scaffolding' );
+$seed_result = Gear_Engine_Rehab_Setup::seed_protocols_from_quiz();
+assert_test( $seed_result['created'] >= 30, 'rehab_setup: Seeding creates a protocol per non-critical quiz diagnosis' );
+$GLOBALS['wp_terms'][14] = (object) array( 'term_id' => 14, 'slug' => 'testproto', 'name' => 'Testproto', 'parent' => 0 );
+$GLOBALS['wp_termmeta'][14][ Gear_Engine_Protocols::GEAR_ENGINE_META_CODES ] = 'M23';
+$GLOBALS['wp_termmeta'][14][ Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS ] = Gear_Engine_Protocols::GEAR_ENGINE_STATUS_DRAFT;
+assert_test( in_array( 'red flags', Gear_Engine_Rehab_Setup::try_approve( 14 ), true ) && Gear_Engine_Protocols::GEAR_ENGINE_STATUS_DRAFT === get_term_meta( 14, Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS, true ), 'rehab_setup: Approval refuses while clinical fields are empty' );
+$GLOBALS['wp_termmeta'][14][ Gear_Engine_Protocols::GEAR_ENGINE_META_RED_FLAGS ] = 'Ikke ved feber';
+assert_test( array() === Gear_Engine_Rehab_Setup::try_approve( 14 ) && Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED === get_term_meta( 14, Gear_Engine_Protocols::GEAR_ENGINE_META_STATUS, true ), 'rehab_setup: Complete protocols approve with a review stamp' );
+$GLOBALS['wp_set_terms_calls'] = array();
+update_post_meta( $imported_exercise_id, Gear_Engine_Rehab_Setup::META_SUGGEST, array( 'good_for' => array( 'meniskskade' ), 'role' => 'mobility' ) );
+Gear_Engine_Rehab_Setup::confirm_suggestions( $imported_exercise_id, array( 'meniskskade' ), 'mobility' );
+assert_test( false !== strpos( (string) get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ), 'meniskskade' ) && array( $imported_exercise_id, array( 'mobility' ), Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY ) === $GLOBALS['wp_set_terms_calls'][0] && '' === get_post_meta( $imported_exercise_id, Gear_Engine_Rehab_Setup::META_SUGGEST, true ), 'rehab_setup: Confirming applies tags and clears the suggestion' );
 update_option( 'gear_engine_enable_protocols', true );
 $GLOBALS['last_wp_query_args'] = null;
 $sel_blocked = Gear_Engine_Exercise_Selection::select( array( 'severity' => 'Høy', 'codes' => array( 'M23.2' ) ), 'kne', 'øvelser', true );

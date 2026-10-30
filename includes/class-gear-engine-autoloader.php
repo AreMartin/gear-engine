@@ -38,6 +38,7 @@ function gear_engine_class_map(): array {
 		'Gear_Engine_Protocol_Manager'   => 'modules/exercises/class-gear-engine-protocol-manager.php',
 		'Gear_Engine_Protocol_Autofill'  => 'modules/exercises/class-gear-engine-protocol-autofill.php',
 		'Gear_Engine_Coverage_Report'    => 'modules/exercises/class-gear-engine-coverage-report.php',
+		'Gear_Engine_Rehab_Setup'        => 'modules/exercises/class-gear-engine-rehab-setup.php',
 		'Gear_Engine_Exercise_Service'   => 'modules/exercises/class-gear-engine-exercise-service.php',
 		'Gear_Engine_Exercise_Importer'  => 'modules/exercises/class-gear-engine-exercise-importer.php',
 		'Gear_Engine_Protocol_Viewer'    => 'modules/exercises/class-gear-engine-protocol-viewer.php',

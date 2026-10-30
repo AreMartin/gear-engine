@@ -63,6 +63,7 @@ function gear_engine_default_modules(): array {
 		'Gear_Engine_Protocol_Manager',
 		'Gear_Engine_Protocol_Autofill',
 		'Gear_Engine_Coverage_Report',
+		'Gear_Engine_Rehab_Setup',
 		'Gear_Engine_Exercise_Importer',
 		'Gear_Engine_Protocol_Viewer',
 		// Feature modules.
