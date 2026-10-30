@@ -936,6 +936,14 @@ unlink( $tmp_chunk_file );
 $GLOBALS['wp_options']['gae_feeds'] = array();
 $empty_feeds_report = $sync_engine->run_sync( array(), true );
 assert_test( ! empty( $empty_feeds_report['errors'] ) && false !== strpos( implode( ' ', $empty_feeds_report['errors'] ), 'No active feed URLs' ), 'sync: empty feed config reports the real reason' );
+
+// 13.7 A feed that opens but holds no product elements must report the reason.
+$nomatch_file = tempnam( sys_get_temp_dir(), 'gae_nomatch_' );
+file_put_contents( $nomatch_file, '<?xml version="1.0"?><catalog><widget><id>1</id></widget></catalog>' );
+$nomatch_report = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array() );
+$sync_engine->stream_parse_xml( $nomatch_file, 'TestNoMatch', $filter_rules, $nomatch_report );
+assert_test( 0 === $nomatch_report['processed'] && ! empty( $nomatch_report['errors'] ) && false !== strpos( implode( ' ', $nomatch_report['errors'] ), 'no <product>/<item>/<article> elements' ), 'sync: zero-element feeds report the reason with a file sample' );
+unlink( $nomatch_file );
 assert_test( $gz_stream_report['inserted'] > 0 || $gz_stream_report['updated'] > 0, 'gzip_streaming: Successfully ingested products from gzipped feed' );
 
 // 13.5 Verify memory cleanup for skipped items

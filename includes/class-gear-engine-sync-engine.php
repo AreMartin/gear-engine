@@ -529,6 +529,32 @@ class Gear_Engine_Sync_Engine {
 		return $tmp_file;
 	}
 
+	public function file_sample( string $file_path, int $length = 240 ): string {
+		$uri    = $this->is_gzipped( $file_path ) ? 'compress.zlib://' . $file_path : $file_path;
+		$handle = @fopen( $uri, 'r' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
+		if ( ! $handle ) {
+			return '(unreadable)';
+		}
+		$raw = (string) fread( $handle, $length );
+		fclose( $handle );
+
+		$clean = trim( sanitize_text_field( preg_replace( '/\s+/', ' ', $raw ) ) );
+		if ( '' === $clean ) {
+			$raw_handle = @fopen( $file_path, 'rb' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
+			$raw_head   = $raw_handle ? (string) fread( $raw_handle, 48 ) : '';
+			if ( $raw_handle ) {
+				fclose( $raw_handle );
+			}
+			return sprintf(
+				'(no readable feed text via %1$s; stored file starts with hex %2$s, size %3$d bytes)',
+				$uri === $file_path ? 'direct read' : 'zlib decompression',
+				substr( (string) bin2hex( $raw_head ), 0, 32 ),
+				(int) @filesize( $file_path )
+			);
+		}
+		return $clean;
+	}
+
 	/**
 	 * Stream-parse an XML file using XMLReader.
 	 *
@@ -614,6 +640,14 @@ class Gear_Engine_Sync_Engine {
 
 		$reader->close();
 		libxml_clear_errors();
+
+		if ( 0 === $feed_scanned ) {
+			$report['errors'][] = sprintf(
+				'[%1$s] Feed opened but no <product>/<item>/<article> elements were found (0 nodes scanned). First bytes: %2$s',
+				$source_name,
+				$this->file_sample( $file_path )
+			);
+		}
 	}
 
 	/**
@@ -752,6 +786,14 @@ class Gear_Engine_Sync_Engine {
 		}
 
 		fclose( $handle );
+
+		if ( 0 === $feed_scanned ) {
+			$report['errors'][] = sprintf(
+				'[%1$s] JSON feed opened but no item objects were recognised (0 nodes scanned). First bytes: %2$s',
+				$source_name,
+				$this->file_sample( $file_path )
+			);
+		}
 	}
 
 	/**
