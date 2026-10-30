@@ -93,6 +93,7 @@ class Gear_Engine_Exercise_Service {
 }
 
 require_once ABSPATH . 'includes/class-gear-engine-config-loader.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-viewer.php';
 require_once ABSPATH . 'modules/triage/class-gear-engine-triage.php';
 

@@ -502,10 +502,13 @@ class Gear_Engine_Triage {
 	/**
 	 * Slug of the approved protocol (with exercises) that fits a diagnosis, or an empty string.
 	 *
+	 * Public: the coverage report resolves the same way the result screen does,
+	 * so both always agree on what a diagnosis actually reaches.
+	 *
 	 * @param array<string, mixed> $diagnosis Diagnosis definition.
 	 * @return string
 	 */
-	private static function find_program_slug( array $diagnosis ): string {
+	public static function find_program_slug( array $diagnosis ): string {
 		$has_exercises = static function ( string $slug ): bool {
 			return (bool) Gear_Engine_Exercise_Service::search_exercises( array( 'protocol' => $slug, 'limit' => 1 ) );
 		};

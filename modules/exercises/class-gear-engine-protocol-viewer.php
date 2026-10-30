@@ -229,14 +229,28 @@ class Gear_Engine_Protocol_Viewer {
 		);
 		$title     = (string) ( $dx['title'] ?? '' );
 		$exercises = self::rank_exercises( $exercises, $title . ' ' . (string) ( $dx['description'] ?? '' ) );
-		if ( 3 === $phase ) {
-			usort(
-				$exercises,
-				static function ( array $a, array $b ): int {
-					return ( 'moderate' === ( $b['risk'] ?? '' ) ) <=> ( 'moderate' === ( $a['risk'] ?? '' ) );
-				}
-			);
+
+		// Session structure: mobility, activation, strength, stability, recovery.
+		// Untagged exercises hold the strength band; within a band phase 3 puts
+		// moderate-risk work first, and the diagnosis ranking stays otherwise.
+		$scored = array();
+		foreach ( $exercises as $index => $exercise ) {
+			$band    = Gear_Engine_Exercises_CPT::role_order( (string) ( $exercise['role'] ?? '' ) );
+			$heavier = ( 3 === $phase && 'moderate' === ( $exercise['risk'] ?? '' ) ) ? 0 : 1;
+			$scored[] = array( $band, $heavier, $index, $exercise );
 		}
+		usort(
+			$scored,
+			static function ( array $a, array $b ): int {
+				return $a[0] <=> $b[0] ?: $a[1] <=> $b[1] ?: $a[2] <=> $b[2];
+			}
+		);
+		$exercises = array_map(
+			static function ( array $row ): array {
+				return $row[3];
+			},
+			$scored
+		);
 		$exercises = array_slice( $exercises, 0, 1 === $phase ? self::AUTO_LIMIT - 3 : self::AUTO_LIMIT );
 		if ( ! $exercises ) {
 			return null;

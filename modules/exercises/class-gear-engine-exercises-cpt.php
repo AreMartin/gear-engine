@@ -17,6 +17,7 @@ class Gear_Engine_Exercises_CPT {
 	public const GEAR_ENGINE_POST_TYPE          = 'gear_engine_exercise';
 	public const GEAR_ENGINE_AREA_TAXONOMY      = 'gear_engine_exercise_area';
 	public const GEAR_ENGINE_EQUIPMENT_TAXONOMY = 'gear_engine_exercise_equipment';
+	public const GEAR_ENGINE_ROLE_TAXONOMY      = 'gear_engine_exercise_role';
 	public const GEAR_ENGINE_META_EXORLIVE_ID   = '_gear_engine_exorlive_id';
 	public const GEAR_ENGINE_META_VIDEO_CULTURE = '_gear_engine_video_culture';
 	public const GEAR_ENGINE_META_VIDEO_URL     = '_gear_engine_exercise_video_url';
@@ -31,6 +32,7 @@ class Gear_Engine_Exercises_CPT {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_content_types' ), 5 );
+		add_action( 'init', array( $this, 'ensure_role_terms' ), 8 );
 		add_action( 'init', array( $this, 'maybe_seed_sample_exercises' ), 20 );
 		add_action( 'add_meta_boxes_' . self::GEAR_ENGINE_POST_TYPE, array( $this, 'register_meta_box' ) );
 		add_action( 'save_post_' . self::GEAR_ENGINE_POST_TYPE, array( $this, 'save_meta_box' ), 10, 2 );
@@ -91,7 +93,89 @@ class Gear_Engine_Exercises_CPT {
 			)
 		);
 
+		register_taxonomy(
+			self::GEAR_ENGINE_ROLE_TAXONOMY,
+			array( self::GEAR_ENGINE_POST_TYPE ),
+			array(
+				'labels'       => array(
+					'name'          => __( 'Session Roles', 'gear-engine' ),
+					'singular_name' => __( 'Session Role', 'gear-engine' ),
+				),
+				'hierarchical' => false,
+				'show_in_rest' => true,
+				'meta_box_cb'  => false,
+				'rewrite'      => array( 'slug' => 'exercise-role' ),
+			)
+		);
+
 		$this->register_meta_fields();
+	}
+
+	/**
+	 * Session roles in rehabilitation order, keyed by term slug.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_roles(): array {
+		return array(
+			'mobility'   => __( 'Mobility / warm-up', 'gear-engine' ),
+			'activation' => __( 'Activation', 'gear-engine' ),
+			'strength'   => __( 'Strength', 'gear-engine' ),
+			'stability'  => __( 'Stability / control', 'gear-engine' ),
+			'recovery'   => __( 'Recovery / cool-down', 'gear-engine' ),
+		);
+	}
+
+	/**
+	 * Position of a role in the session order; untagged holds the strength band.
+	 *
+	 * @param string $role Role slug.
+	 * @return int
+	 */
+	public static function role_order( string $role ): int {
+		$index = array_search( $role, array_keys( self::get_roles() ), true );
+		return false === $index ? 3 : $index + 1;
+	}
+
+	/**
+	 * Accept only a known session role slug.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_role( $value ): string {
+		$value = is_scalar( $value ) ? strtolower( trim( (string) $value ) ) : '';
+		return isset( self::get_roles()[ $value ] ) ? $value : '';
+	}
+
+	/**
+	 * First session role assigned to an exercise, or empty string.
+	 *
+	 * @param int $post_id Exercise ID.
+	 * @return string
+	 */
+	public static function get_first_role( int $post_id ): string {
+		if ( ! function_exists( 'wp_get_post_terms' ) ) {
+			return '';
+		}
+		$terms = wp_get_post_terms( $post_id, self::GEAR_ENGINE_ROLE_TAXONOMY, array( 'fields' => 'slugs' ) );
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) || empty( $terms ) ) {
+			return '';
+		}
+		return self::sanitize_role( (string) reset( $terms ) );
+	}
+
+	/**
+	 * Create the fixed role terms once so they are always selectable.
+	 *
+	 * @return void
+	 */
+	public function ensure_role_terms(): void {
+		foreach ( self::get_roles() as $slug => $label ) {
+			if ( ! term_exists( $slug, self::GEAR_ENGINE_ROLE_TAXONOMY ) ) {
+				wp_insert_term( $label, self::GEAR_ENGINE_ROLE_TAXONOMY, array( 'slug' => $slug ) );
+			}
+		}
 	}
 
 	/**
@@ -366,7 +450,18 @@ class Gear_Engine_Exercises_CPT {
 		$source_url  = get_post_meta( $post->ID, self::GEAR_ENGINE_META_SOURCE_URL, true );
 		$risk        = self::sanitize_risk( get_post_meta( $post->ID, self::GEAR_ENGINE_META_RISK, true ) );
 		$good_for    = get_post_meta( $post->ID, self::GEAR_ENGINE_META_GOOD_FOR, true );
+		$role        = self::get_first_role( $post->ID );
 		?>
+		<p>
+			<label for="gear-engine-exercise-role"><?php esc_html_e( 'Session role', 'gear-engine' ); ?></label>
+			<select class="widefat" id="gear-engine-exercise-role" name="gear_engine_exercise_role">
+				<option value=""><?php esc_html_e( 'Untagged (keeps strength position)', 'gear-engine' ); ?></option>
+				<?php foreach ( self::get_roles() as $slug => $label ) : ?>
+					<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $role, $slug ); ?>><?php echo esc_html( $label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<span class="description"><?php esc_html_e( 'Where this exercise belongs in a session: warm-up first, cool-down last.', 'gear-engine' ); ?></span>
+		</p>
 		<p>
 			<label for="gear-engine-exercise-risk"><?php esc_html_e( 'Risk level', 'gear-engine' ); ?></label>
 			<select class="widefat" id="gear-engine-exercise-risk" name="gear_engine_exercise_risk">
@@ -442,6 +537,8 @@ class Gear_Engine_Exercises_CPT {
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_SOURCE_URL, $this->sanitize_source_url( wp_unslash( $_POST['gear_engine_exercise_source_url'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_RISK, self::sanitize_risk( wp_unslash( $_POST['gear_engine_exercise_risk'] ?? '' ) ) );
 		update_post_meta( $post_id, self::GEAR_ENGINE_META_GOOD_FOR, self::sanitize_good_for( wp_unslash( $_POST['gear_engine_exercise_good_for'] ?? '' ) ) );
+		$role = self::sanitize_role( wp_unslash( $_POST['gear_engine_exercise_role'] ?? '' ) );
+		wp_set_object_terms( $post_id, '' === $role ? array() : array( $role ), self::GEAR_ENGINE_ROLE_TAXONOMY );
 	}
 
 	/**

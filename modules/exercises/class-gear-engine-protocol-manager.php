@@ -92,9 +92,10 @@ class Gear_Engine_Protocol_Manager {
 	 * @param array<int|string, mixed>      $risk     Map of exercise ID to risk level.
 	 * @param array<int|string, mixed>|null $good_for Map of exercise ID to "good for" tags; null leaves them unchanged.
 	 * @param bool                          $sync_protocols Whether to replace protocol assignments.
+	 * @param array<int|string, mixed>|null $roles    Map of exercise ID to session role slug; null leaves them unchanged.
 	 * @return int Number of exercises updated.
 	 */
-	public static function apply_matrix_changes( array $post_ids, array $assign, array $risk, ?array $good_for = null, bool $sync_protocols = true ): int {
+	public static function apply_matrix_changes( array $post_ids, array $assign, array $risk, ?array $good_for = null, bool $sync_protocols = true, ?array $roles = null ): int {
 		$valid_terms = array();
 		foreach ( self::get_protocol_tree() as $row ) {
 			$valid_terms[] = (int) $row['term']->term_id;
@@ -116,6 +117,10 @@ class Gear_Engine_Protocol_Manager {
 			}
 			if ( null !== $good_for && isset( $good_for[ $post_id ] ) ) {
 				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, Gear_Engine_Exercises_CPT::sanitize_good_for( $good_for[ $post_id ] ) );
+			}
+			if ( null !== $roles && isset( $roles[ $post_id ] ) ) {
+				$role = Gear_Engine_Exercises_CPT::sanitize_role( $roles[ $post_id ] );
+				wp_set_object_terms( $post_id, '' === $role ? array() : array( $role ), Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY );
 			}
 			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, Gear_Engine_Exercises_CPT::sanitize_risk( $risk[ $post_id ] ?? '' ) );
 			++$updated;
@@ -139,7 +144,8 @@ class Gear_Engine_Protocol_Manager {
 		$assign   = isset( $_POST['gear_engine_assign'] ) && is_array( $_POST['gear_engine_assign'] ) ? wp_unslash( $_POST['gear_engine_assign'] ) : array();
 		$risk     = isset( $_POST['gear_engine_risk'] ) && is_array( $_POST['gear_engine_risk'] ) ? wp_unslash( $_POST['gear_engine_risk'] ) : array();
 		$good_for = isset( $_POST['gear_engine_good_for'] ) && is_array( $_POST['gear_engine_good_for'] ) ? wp_unslash( $_POST['gear_engine_good_for'] ) : null;
-		$count    = self::apply_matrix_changes( $post_ids, $assign, $risk, $good_for, Gear_Engine_Protocols::is_enabled() );
+		$roles    = isset( $_POST['gear_engine_role'] ) && is_array( $_POST['gear_engine_role'] ) ? wp_unslash( $_POST['gear_engine_role'] ) : null;
+		$count    = self::apply_matrix_changes( $post_ids, $assign, $risk, $good_for, Gear_Engine_Protocols::is_enabled(), $roles );
 
 		$return = isset( $_POST['gear_engine_return'] ) ? esc_url_raw( wp_unslash( $_POST['gear_engine_return'] ) ) : '';
 		$return = $return ? wp_validate_redirect( $return, admin_url( 'edit.php' ) ) : admin_url( 'edit.php' );
@@ -307,8 +313,11 @@ class Gear_Engine_Protocol_Manager {
 			return;
 		}
 
+		echo '<p><button type="button" id="gear-engine-autofill-all" class="button button-primary">' . esc_html__( 'Auto-fill empty slots in all protocols', 'gear-engine' ) . '</button> <span id="gear-engine-autofill-status" aria-live="polite"></span></p>';
+		echo '<p class="description">' . esc_html__( 'The assistant only adds exercises to under-filled phases and never approves anything. Review the matrix, adjust, then approve as usual.', 'gear-engine' ) . '</p>';
+
 		echo '<table class="widefat striped"><thead><tr>';
-		foreach ( array( __( 'Protocol / phase', 'gear-engine' ), __( 'Status', 'gear-engine' ), __( 'Codes', 'gear-engine' ), __( 'Published exercises', 'gear-engine' ), __( 'Review reminder', 'gear-engine' ), __( 'Needs before approval', 'gear-engine' ) ) as $heading ) {
+		foreach ( array( __( 'Protocol / phase', 'gear-engine' ), __( 'Status', 'gear-engine' ), __( 'Codes', 'gear-engine' ), __( 'Published exercises', 'gear-engine' ), __( 'Review reminder', 'gear-engine' ), __( 'Needs before approval', 'gear-engine' ), __( 'Auto proposals', 'gear-engine' ) ) as $heading ) {
 			echo '<th>' . esc_html( $heading ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
@@ -338,7 +347,41 @@ class Gear_Engine_Protocol_Manager {
 			echo '<td>' . esc_html( (string) get_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_CODES, true ) ) . '</td>';
 			echo '<td><a href="' . esc_url( $list ) . '">' . esc_html( (string) (int) $row['term']->count ) . '</a></td>';
 			echo '<td>' . esc_html( (string) get_term_meta( $term_id, Gear_Engine_Protocols::GEAR_ENGINE_META_REVIEW_DUE, true ) ) . '</td>';
-			echo '<td>' . esc_html( implode( ', ', $missing ) ) . '</td></tr>';
+			echo '<td>' . esc_html( implode( ', ', $missing ) ) . '</td>';
+
+			if ( 0 === (int) $row['depth'] ) {
+				printf(
+					'<td><button type="button" class="button button-small gear-engine-autofill-btn" data-term-id="%1$d" data-nonce="%2$s" data-admin-url="%3$s">%4$s</button></td>',
+					esc_attr( (string) $term_id ),
+					esc_attr( wp_create_nonce( Gear_Engine_Protocol_Autofill::NONCE_ACTION ) ),
+					esc_attr( admin_url( 'admin-post.php' ) ),
+					esc_html__( 'Auto-fill empty slots', 'gear-engine' )
+				);
+			} else {
+				$auto_count = count( array_filter( array_map( 'absint', (array) get_term_meta( $term_id, Gear_Engine_Protocol_Autofill::META_AUTO_IDS, true ) ) ) );
+				if ( $auto_count > 0 ) {
+					printf(
+						'<td><span title="%s">%d auto</span> · <a href="%s">%s</a></td>',
+						esc_attr__( 'Proposed by the auto-fill assistant; remove with Clear.', 'gear-engine' ),
+						(int) $auto_count,
+						esc_url(
+							add_query_arg(
+								array(
+									'action'                    => 'gear_engine_autofill_clear',
+									'term_id'                   => $term_id,
+									'_wpnonce'                  => wp_create_nonce( Gear_Engine_Protocol_Autofill::NONCE_ACTION ),
+									'_wp_http_referer'          => $terms_url,
+								),
+								admin_url( 'admin-post.php' )
+							)
+						),
+						esc_html__( 'Clear auto', 'gear-engine' )
+					);
+				} else {
+					echo '<td>—</td>';
+				}
+			}
+			echo '</tr>';
 		}
 		echo '</tbody></table>';
 	}
@@ -399,7 +442,7 @@ class Gear_Engine_Protocol_Manager {
 		echo '<input type="hidden" name="gear_engine_return" value="' . esc_url( $return ) . '" />';
 		wp_nonce_field( self::GEAR_ENGINE_SAVE_ACTION, 'gear_engine_matrix_nonce' );
 
-		echo '<div style="overflow-x:auto"><table class="widefat striped"><thead><tr><th>' . esc_html__( 'Exercise', 'gear-engine' ) . '</th><th>' . esc_html__( 'Risk', 'gear-engine' ) . '</th><th>' . esc_html__( 'Good for (comma-separated)', 'gear-engine' ) . '</th>';
+		echo '<div style="overflow-x:auto"><table class="widefat striped"><thead><tr><th>' . esc_html__( 'Exercise', 'gear-engine' ) . '</th><th>' . esc_html__( 'Risk', 'gear-engine' ) . '</th><th>' . esc_html__( 'Session role', 'gear-engine' ) . '</th><th>' . esc_html__( 'Good for (comma-separated)', 'gear-engine' ) . '</th>';
 		foreach ( $tree as $row ) {
 			echo '<th style="text-align:center;font-weight:' . ( $row['depth'] ? 'normal' : '700' ) . '">' . ( $row['depth'] ? '&mdash; ' : '' ) . esc_html( $row['term']->name ) . '</th>';
 		}
@@ -410,6 +453,7 @@ class Gear_Engine_Protocol_Manager {
 			$assigned = wp_get_object_terms( $post_id, Gear_Engine_Protocols::GEAR_ENGINE_TAXONOMY, array( 'fields' => 'ids' ) );
 			$assigned = is_array( $assigned ) ? array_map( 'absint', $assigned ) : array();
 			$risk     = Gear_Engine_Exercises_CPT::sanitize_risk( get_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ) );
+			$role     = Gear_Engine_Exercises_CPT::get_first_role( $post_id );
 			$can_edit = current_user_can( 'edit_post', $post_id );
 
 			echo '<tr><td><input type="hidden" name="gear_engine_post_ids[]" value="' . esc_attr( (string) $post_id ) . '" />';
@@ -418,6 +462,11 @@ class Gear_Engine_Protocol_Manager {
 			echo '</td><td><select name="gear_engine_risk[' . esc_attr( (string) $post_id ) . ']"' . ( $can_edit ? '' : ' disabled' ) . '>';
 			foreach ( array( '' => __( 'Not rated', 'gear-engine' ), 'low' => __( 'Low', 'gear-engine' ), 'moderate' => __( 'Moderate', 'gear-engine' ), 'high' => __( 'High', 'gear-engine' ) ) as $value => $label ) {
 				echo '<option value="' . esc_attr( $value ) . '"' . selected( $risk, $value, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			echo '</select></td><td><select name="gear_engine_role[' . esc_attr( (string) $post_id ) . ']"' . ( $can_edit ? '' : ' disabled' ) . '>';
+			echo '<option value="">—</option>';
+			foreach ( Gear_Engine_Exercises_CPT::get_roles() as $role_slug => $role_label ) {
+				echo '<option value="' . esc_attr( $role_slug ) . '"' . selected( $role, $role_slug, false ) . '>' . esc_html( $role_label ) . '</option>';
 			}
 			echo '</select></td><td><input type="text" class="regular-text" name="gear_engine_good_for[' . esc_attr( (string) $post_id ) . ']" value="' . esc_attr( (string) get_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ) ) . '"' . ( $can_edit ? '' : ' disabled' ) . ' /></td>';
 			foreach ( $tree as $row ) {
@@ -453,6 +502,7 @@ class Gear_Engine_Protocol_Manager {
 	 */
 	public function register_list_columns( array $columns ): array {
 		$columns['gear_engine_risk'] = __( 'Risk', 'gear-engine' );
+		$columns['gear_engine_role'] = __( 'Session role', 'gear-engine' );
 		return $columns;
 	}
 
@@ -464,6 +514,12 @@ class Gear_Engine_Protocol_Manager {
 	 * @return void
 	 */
 	public function render_list_column( string $column, int $post_id ): void {
+		if ( 'gear_engine_role' === $column ) {
+			$role   = Gear_Engine_Exercises_CPT::get_first_role( $post_id );
+			$labels = Gear_Engine_Exercises_CPT::get_roles();
+			echo '' === $role ? '<em>' . esc_html__( 'Untagged', 'gear-engine' ) . '</em>' : esc_html( (string) ( $labels[ $role ] ?? $role ) );
+			return;
+		}
 		if ( 'gear_engine_risk' !== $column ) {
 			return;
 		}
@@ -555,6 +611,15 @@ class Gear_Engine_Protocol_Manager {
 					<option value="high"><?php esc_html_e( 'High', 'gear-engine' ); ?></option>
 				</select>
 			</label>
+			<label>
+				<span class="title"><?php esc_html_e( 'Session role', 'gear-engine' ); ?></span>
+				<select name="gear_engine_bulk_role">
+					<option value=""><?php esc_html_e( '— No change —', 'gear-engine' ); ?></option>
+					<?php foreach ( Gear_Engine_Exercises_CPT::get_roles() as $role_slug => $role_label ) : ?>
+						<option value="<?php echo esc_attr( $role_slug ); ?>"><?php echo esc_html( $role_label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</label>
 		</div></fieldset>
 		<?php
 	}
@@ -566,15 +631,23 @@ class Gear_Engine_Protocol_Manager {
 	 * @return void
 	 */
 	public function save_bulk_edit( int $post_id ): void {
-		if ( ! isset( $_REQUEST['bulk_edit'], $_REQUEST['_wpnonce'], $_REQUEST['gear_engine_bulk_risk'] ) ) {
+		if ( ! isset( $_REQUEST['bulk_edit'], $_REQUEST['_wpnonce'] ) ) {
 			return;
 		}
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'bulk-posts' ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
-		$risk = Gear_Engine_Exercises_CPT::sanitize_risk( wp_unslash( $_REQUEST['gear_engine_bulk_risk'] ) );
-		if ( '' !== $risk ) {
-			update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, $risk );
+		if ( isset( $_REQUEST['gear_engine_bulk_risk'] ) ) {
+			$risk = Gear_Engine_Exercises_CPT::sanitize_risk( wp_unslash( $_REQUEST['gear_engine_bulk_risk'] ) );
+			if ( '' !== $risk ) {
+				update_post_meta( $post_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, $risk );
+			}
+		}
+		if ( isset( $_REQUEST['gear_engine_bulk_role'] ) ) {
+			$role = Gear_Engine_Exercises_CPT::sanitize_role( wp_unslash( $_REQUEST['gear_engine_bulk_role'] ) );
+			if ( '' !== $role ) {
+				wp_set_object_terms( $post_id, array( $role ), Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY );
+			}
 		}
 	}
 }

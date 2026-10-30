@@ -167,6 +167,10 @@ function get_term_by( $field, $value, $taxonomy = '' ) {
 	return false;
 }
 function get_current_user_id() { return 1; }
+function delete_term_meta( $term_id, $key ) { unset( $GLOBALS['wp_termmeta'][ $term_id ][ $key ] ); return true; }
+function wp_get_post_terms( $post_id, $taxonomy = '', $args = array() ) {
+	return $GLOBALS['test_post_terms'][ $post_id . '|' . $taxonomy ] ?? array();
+}
 function current_user_can( $capability, ...$args ) {
 	return true;
 }
@@ -367,6 +371,7 @@ require_once ABSPATH . 'includes/class-gear-engine-product-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocols.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-manager.php';
+require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-autofill.php';
 require_once ABSPATH . 'modules/physio-chat/class-gear-engine-exercise-selection.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-service.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-exercise-importer.php';
@@ -1293,6 +1298,58 @@ assert_test( array() === Gear_Engine_Protocols::find_approved_by_codes( array( '
 $GLOBALS['wp_set_terms_calls'] = array();
 Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id ), array(), array(), array( $imported_exercise_id => 'meniscus; kne' ), false );
 assert_test( array() === $GLOBALS['wp_set_terms_calls'] && 'meniscus, kne' === get_post_meta( $imported_exercise_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ), 'protocol_manager: Rating screen saves good_for without touching protocol tags' );
+
+// Suite 17.5: session roles.
+assert_test( 'mobility' === Gear_Engine_Exercises_CPT::sanitize_role( ' Mobility ' ) && '' === Gear_Engine_Exercises_CPT::sanitize_role( 'cardio' ), 'exercise_role: Accepts only known role slugs' );
+assert_test( 1 === Gear_Engine_Exercises_CPT::role_order( 'mobility' ) && 3 === Gear_Engine_Exercises_CPT::role_order( '' ) && 5 === Gear_Engine_Exercises_CPT::role_order( 'recovery' ), 'exercise_role: Session order runs mobility first and recovery last' );
+Gear_Engine_Exercise_Service::search_exercises( array( 'role' => 'stability' ) );
+$role_args = $GLOBALS['last_wp_query_args'];
+assert_test( Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY === $role_args['tax_query'][0]['taxonomy'] && 'stability' === $role_args['tax_query'][0]['terms'], 'exercise_role: The query service can filter by session role' );
+$GLOBALS['wp_set_terms_calls'] = array();
+Gear_Engine_Protocol_Manager::apply_matrix_changes( array( $imported_exercise_id ), array(), array(), null, false, array( $imported_exercise_id => 'activation' ) );
+assert_test( array( $imported_exercise_id, array( 'activation' ), Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY ) === $GLOBALS['wp_set_terms_calls'][0], 'exercise_role: Matrix save applies the session role' );
+
+// Suite 17.6: protocol auto-fill assistant.
+$autofill_pool = array(
+	array( 'id' => 101, 'title' => 'Knebøy', 'risk' => 'low', 'good_for' => 'meniscus', 'role' => 'strength' ),
+	array( 'id' => 102, 'title' => 'Ankle pumps', 'risk' => 'low', 'good_for' => 'fot', 'role' => 'mobility' ),
+	array( 'id' => 103, 'title' => 'Beinpress', 'risk' => 'moderate', 'good_for' => 'meniscus, kneartrose', 'role' => 'strength' ),
+	array( 'id' => 104, 'title' => 'Tung knebøy', 'risk' => 'high', 'good_for' => 'meniscus', 'role' => 'strength' ),
+	array( 'id' => 105, 'title' => 'Quad set', 'risk' => 'low', 'good_for' => 'meniscus', 'role' => 'activation' ),
+);
+$phase1_ids = array_map( static function ( array $p ): int { return (int) $p['exercise']['id']; }, Gear_Engine_Protocol_Autofill::pick_candidates( $autofill_pool, 'meniscus', array(), 5, 1 ) );
+assert_test( array( 105, 101 ) === $phase1_ids, 'autofill: Phase 1 keeps low risk only and orders activation before strength' );
+$phase3_ids = array_map( static function ( array $p ): int { return (int) $p['exercise']['id']; }, Gear_Engine_Protocol_Autofill::pick_candidates( $autofill_pool, 'meniscus', array(), 5, 3 ) );
+assert_test( array( 105, 103, 101 ) === $phase3_ids, 'autofill: Phase 3 allows moderate and puts it first within the same band' );
+$excluded_ids = array_map( static function ( array $p ): int { return (int) $p['exercise']['id']; }, Gear_Engine_Protocol_Autofill::pick_candidates( $autofill_pool, 'meniscus', array( 105, 103 ), 5, 3 ) );
+assert_test( array( 101 ) === $excluded_ids, 'autofill: Exercises already in the protocol tree are never proposed again' );
+assert_test( array() === Gear_Engine_Protocol_Autofill::pick_candidates( $autofill_pool, 'meniscus', array(), 0, 1 ), 'autofill: A full phase proposes nothing (idempotent re-runs)' );
+$number_term = (object) array( 'slug' => 'fase-2', 'name' => 'Phase 2 – bygg' );
+assert_test( 2 === Gear_Engine_Protocol_Autofill::phase_number_for( $number_term ) && 0 === Gear_Engine_Protocol_Autofill::phase_number_for( (object) array( 'slug' => 'general', 'name' => 'General' ) ), 'autofill: Phase numbers come from term slug or name' );
+$GLOBALS['wp_set_terms_calls'] = array();
+$GLOBALS['wp_termmeta'][12][ Gear_Engine_Protocol_Autofill::META_AUTO_IDS ] = array( 7, 8 );
+$GLOBALS['test_post_terms']['7|gear_engine_protocol'] = array( 11, 12 );
+$GLOBALS['test_post_terms']['8|gear_engine_protocol'] = array( 12 );
+$cleared = Gear_Engine_Protocol_Autofill::clear_auto_for_term( 12 );
+assert_test( 2 === $cleared && array( 11 ) === $GLOBALS['wp_set_terms_calls'][0][1] && array() === $GLOBALS['wp_set_terms_calls'][1][1], 'autofill: Clear removes only the phase from auto-proposed exercises, keeping human tags' );
+assert_test( ! isset( $GLOBALS['wp_termmeta'][12][ Gear_Engine_Protocol_Autofill::META_AUTO_IDS ] ), 'autofill: Clearing forgets the recorded auto assignments' );
+
+// Suite 17.7: program coverage report states.
+require_once ABSPATH . 'modules/exercises/class-gear-engine-coverage-report.php';
+assert_test( 'by-design' === Gear_Engine_Coverage_Report::classify_diagnosis( array( 'severity' => 'Høy' ), 'meniscus', true )['state'], 'coverage: High severity results never count as gaps' );
+assert_test( 'curated' === Gear_Engine_Coverage_Report::classify_diagnosis( array( 'severity' => 'Lav' ), 'meniscus', false )['state'], 'coverage: Reached approved protocol is curated' );
+assert_test( 'broken' === Gear_Engine_Coverage_Report::classify_diagnosis( array( 'severity' => 'Lav', 'protocol' => 'ghost' ), '', true )['state'], 'coverage: A named protocol that resolves nowhere is broken' );
+assert_test( 'auto' === Gear_Engine_Coverage_Report::classify_diagnosis( array( 'severity' => 'Lav' ), '', true )['state'] && 'missing' === Gear_Engine_Coverage_Report::classify_diagnosis( array( 'severity' => 'Lav' ), '', false )['state'], 'coverage: Without a protocol, auto availability decides the state' );
+$coverage_unreachable = Gear_Engine_Coverage_Report::find_unreachable_protocols(
+	array(
+		array( 'slug' => 'meniscus', 'codes' => array( 'M23' ) ),
+		array( 'slug' => 'ghost-proto', 'codes' => array( 'Z99' ) ),
+	),
+	array(
+		array( 'protocol' => '', 'codes' => array( 'M23.2' ) ),
+	)
+);
+assert_test( array( 'ghost-proto' ) === $coverage_unreachable, 'coverage: Prefix code matching marks only truly unreachable protocols' );
 update_option( 'gear_engine_enable_protocols', true );
 $GLOBALS['last_wp_query_args'] = null;
 $sel_blocked = Gear_Engine_Exercise_Selection::select( array( 'severity' => 'Høy', 'codes' => array( 'M23.2' ) ), 'kne', 'øvelser', true );

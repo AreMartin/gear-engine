@@ -43,7 +43,7 @@ class Gear_Engine_Exercise_Service {
 	 * Callers may request larger result sets for non-program features. A plan
 	 * builder should explicitly request no more than five exercises.
 	 *
-	 * @param array<string, mixed> $args Search options: keywords, area, equipment, protocol (slug), max_risk (low|moderate|high), limit.
+	 * @param array<string, mixed> $args Search options: keywords, area, equipment, role (slug), protocol (slug), max_risk (low|moderate|high), limit.
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function search_exercises( array $args = array() ): array {
@@ -77,6 +77,13 @@ class Gear_Engine_Exercise_Service {
 				'taxonomy' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_EQUIPMENT_TAXONOMY,
 				'field'    => 'slug',
 				'terms'    => sanitize_title( (string) $args['equipment'] ),
+			);
+		}
+		if ( isset( $args['role'] ) && is_scalar( $args['role'] ) && '' !== (string) $args['role'] ) {
+			$tax_query[] = array(
+				'taxonomy' => Gear_Engine_Exercises_CPT::GEAR_ENGINE_ROLE_TAXONOMY,
+				'field'    => 'slug',
+				'terms'    => sanitize_title( (string) $args['role'] ),
 			);
 		}
 		if ( isset( $args['protocol'] ) && is_scalar( $args['protocol'] ) && '' !== (string) $args['protocol'] ) {
@@ -169,6 +176,7 @@ class Gear_Engine_Exercise_Service {
 			'dosage'           => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_DOSAGE, true ),
 			'area'             => $area,
 			'equipment'        => $equipment,
+			'role'             => Gear_Engine_Exercises_CPT::get_first_role( $post->ID ),
 			'risk'             => Gear_Engine_Exercises_CPT::sanitize_risk( get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ) ),
 			'good_for'         => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ),
 			'video_culture'    => $culture,
