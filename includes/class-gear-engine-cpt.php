@@ -38,6 +38,7 @@ class Gear_Engine_CPT {
 	public const META_IMAGE_URL     = '_product_image_url';
 	public const META_CURRENCY      = '_currency';
 	public const META_LAST_SYNCED   = '_last_synced';
+	public const META_SPEC_PREFIX   = '_gear_engine_spec_';
 
 	/**
 	 * Constructor.
@@ -268,6 +269,53 @@ class Gear_Engine_CPT {
 				'auth_callback'     => array( $this, 'meta_auth_callback' ),
 			)
 		);
+
+		// 10. Manual gear picker spec overrides (numeric).
+		$numeric_spec_keys = array( 'weight', 'speed', 'incline', 'levels' );
+		foreach ( $numeric_spec_keys as $key ) {
+			register_post_meta(
+				self::POST_TYPE,
+				self::META_SPEC_PREFIX . $key,
+				array(
+					'show_in_rest'      => true,
+					'single'            => true,
+					'type'              => 'number',
+					'description'       => sprintf( __( 'Manual spec override for %s.', 'gear-engine' ), $key ),
+					'sanitize_callback' => array( $this, 'sanitize_numeric_spec_meta' ),
+					'auth_callback'     => array( $this, 'meta_auth_callback' ),
+				)
+			);
+		}
+
+		// 11. Manual gear picker spec overrides (flags).
+		$flag_spec_keys = array( 'motor_incline', 'cushion', 'foldable', 'screen', 'app', 'rehab', 'magnetic', 'air', 'water', 'quiet' );
+		foreach ( $flag_spec_keys as $key ) {
+			register_post_meta(
+				self::POST_TYPE,
+				self::META_SPEC_PREFIX . $key,
+				array(
+					'show_in_rest'      => true,
+					'single'            => true,
+					'type'              => 'string',
+					'description'       => sprintf( __( 'Manual flag override for %s.', 'gear-engine' ), $key ),
+					'sanitize_callback' => 'sanitize_key',
+					'auth_callback'     => array( $this, 'meta_auth_callback' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Sanitize numeric spec override value for post meta.
+	 *
+	 * Note: WordPress sanitize_meta() passes 4 arguments ($meta_value, $meta_key, $meta_type, $object_subtype).
+	 * In PHP 8+, internal functions like floatval() throw ArgumentCountError if passed >1 argument.
+	 *
+	 * @param mixed $value Numeric spec value.
+	 * @return float
+	 */
+	public function sanitize_numeric_spec_meta( $value ): float {
+		return floatval( $value );
 	}
 
 	/**
@@ -388,6 +436,102 @@ class Gear_Engine_CPT {
 			</tr>
 			<?php endif; ?>
 		</table>
+
+		<h3 style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #c3c4c7;">
+			<?php esc_html_e( 'Spesifikasjoner & Overstyringer (Gear Picker)', 'gear-engine' ); ?>
+		</h3>
+		<p class="description" style="margin-bottom: 12px;">
+			<?php esc_html_e( 'Verdier angitt her overstyrer automatisk uthenting fra produkttekst og prisestimater. La felt stå tomme for å bruke automatisk gjenkjenning.', 'gear-engine' ); ?>
+		</p>
+		<table class="form-table">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Numeriske spesifikasjoner', 'gear-engine' ); ?></th>
+				<td>
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; max-width: 800px;">
+						<?php
+						$numeric_specs = array(
+							'weight'  => array(
+								'label'       => __( 'Maks brukervekt (kg)', 'gear-engine' ),
+								'step'        => '1',
+								'min'         => '0',
+								'placeholder' => __( 'F.eks. 150', 'gear-engine' ),
+							),
+							'speed'   => array(
+								'label'       => __( 'Toppfart (km/t)', 'gear-engine' ),
+								'step'        => '0.1',
+								'min'         => '0',
+								'placeholder' => __( 'F.eks. 20.0', 'gear-engine' ),
+							),
+							'incline' => array(
+								'label'       => __( 'Maks stigning (%)', 'gear-engine' ),
+								'step'        => '0.5',
+								'min'         => '0',
+								'placeholder' => __( 'F.eks. 12', 'gear-engine' ),
+							),
+							'levels'  => array(
+								'label'       => __( 'Motstandsnivåer', 'gear-engine' ),
+								'step'        => '1',
+								'min'         => '0',
+								'placeholder' => __( 'F.eks. 16', 'gear-engine' ),
+							),
+						);
+
+						foreach ( $numeric_specs as $key => $spec_data ) :
+							$val = get_post_meta( $post->ID, self::META_SPEC_PREFIX . $key, true );
+							?>
+							<div>
+								<label for="gae_spec_<?php echo esc_attr( $key ); ?>" style="display: block; font-weight: 600; margin-bottom: 4px;">
+									<?php echo esc_html( $spec_data['label'] ); ?>
+								</label>
+								<input type="number"
+									step="<?php echo esc_attr( $spec_data['step'] ); ?>"
+									min="<?php echo esc_attr( $spec_data['min'] ); ?>"
+									id="gae_spec_<?php echo esc_attr( $key ); ?>"
+									name="gae_spec_<?php echo esc_attr( $key ); ?>"
+									value="<?php echo '' !== $val ? esc_attr( (string) $val ) : ''; ?>"
+									placeholder="<?php echo esc_attr( $spec_data['placeholder'] ); ?>"
+									class="regular-text" style="width: 100%;" />
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Egenskaper & Funksjoner (Ja/Nei)', 'gear-engine' ); ?></th>
+				<td>
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; max-width: 800px;">
+						<?php
+						$flag_specs = array(
+							'motor_incline' => __( 'Motorisert stigning', 'gear-engine' ),
+							'cushion'       => __( 'Ekstra støtdemping', 'gear-engine' ),
+							'foldable'      => __( 'Sammenleggbar', 'gear-engine' ),
+							'screen'        => __( 'Skjerm / berøringsskjerm', 'gear-engine' ),
+							'app'           => __( 'App / Bluetooth-støtte', 'gear-engine' ),
+							'rehab'         => __( 'Rehab / lav startfart', 'gear-engine' ),
+							'magnetic'      => __( 'Magnetisk motstand', 'gear-engine' ),
+							'air'           => __( 'Luftmotstand', 'gear-engine' ),
+							'water'         => __( 'Vannmotstand', 'gear-engine' ),
+							'quiet'         => __( 'Stillegående drift', 'gear-engine' ),
+						);
+
+						foreach ( $flag_specs as $key => $label ) :
+							$val = get_post_meta( $post->ID, self::META_SPEC_PREFIX . $key, true );
+							?>
+							<div>
+								<label for="gae_spec_<?php echo esc_attr( $key ); ?>" style="display: block; font-weight: 600; margin-bottom: 4px;">
+									<?php echo esc_html( $label ); ?>
+								</label>
+								<select id="gae_spec_<?php echo esc_attr( $key ); ?>" name="gae_spec_<?php echo esc_attr( $key ); ?>" style="width: 100%;">
+									<option value="" <?php selected( (string) $val, '' ); ?>><?php esc_html_e( 'Automatisk (fra tekst/pris)', 'gear-engine' ); ?></option>
+									<option value="1" <?php selected( (string) $val, '1' ); ?>><?php esc_html_e( 'Ja (Tving aktiv)', 'gear-engine' ); ?></option>
+									<option value="0" <?php selected( (string) $val, '0' ); ?>><?php esc_html_e( 'Nei (Tving inaktiv)', 'gear-engine' ); ?></option>
+								</select>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 
@@ -451,6 +595,33 @@ class Gear_Engine_CPT {
 		// Save Currency.
 		if ( isset( $_POST['gae_currency'] ) ) {
 			update_post_meta( $post_id, self::META_CURRENCY, sanitize_text_field( wp_unslash( $_POST['gae_currency'] ) ) );
+		}
+
+		// Save manual spec overrides.
+		$numeric_spec_keys = array( 'weight', 'speed', 'incline', 'levels' );
+		foreach ( $numeric_spec_keys as $key ) {
+			$field = 'gae_spec_' . $key;
+			if ( isset( $_POST[ $field ] ) ) {
+				$val = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+				if ( '' === $val ) {
+					delete_post_meta( $post_id, self::META_SPEC_PREFIX . $key );
+				} else {
+					update_post_meta( $post_id, self::META_SPEC_PREFIX . $key, floatval( $val ) );
+				}
+			}
+		}
+
+		$flag_spec_keys = array( 'motor_incline', 'cushion', 'foldable', 'screen', 'app', 'rehab', 'magnetic', 'air', 'water', 'quiet' );
+		foreach ( $flag_spec_keys as $key ) {
+			$field = 'gae_spec_' . $key;
+			if ( isset( $_POST[ $field ] ) ) {
+				$val = sanitize_key( wp_unslash( $_POST[ $field ] ) );
+				if ( '1' === $val || '0' === $val ) {
+					update_post_meta( $post_id, self::META_SPEC_PREFIX . $key, $val );
+				} else {
+					delete_post_meta( $post_id, self::META_SPEC_PREFIX . $key );
+				}
+			}
 		}
 	}
 

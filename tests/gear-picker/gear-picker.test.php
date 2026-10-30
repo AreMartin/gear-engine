@@ -9,16 +9,53 @@ define( 'GEAR_ENGINE_URL', 'http://example.com/' );
 define( 'GEAR_ENGINE_VERSION', '1.0.0' );
 
 function add_action() {}
-function apply_filters( $tag, $value ) { return $value; }
+$GLOBALS['_test_filters'] = array();
+function add_filter( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+	$GLOBALS['_test_filters'][ $tag ][] = $callback;
+}
+function apply_filters( $tag, $value, ...$args ) {
+	if ( ! empty( $GLOBALS['_test_filters'][ $tag ] ) ) {
+		foreach ( $GLOBALS['_test_filters'][ $tag ] as $callback ) {
+			$value = call_user_func_array( $callback, array_merge( array( $value ), $args ) );
+		}
+	}
+	return $value;
+}
 function sanitize_key( $k ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $k ) ); }
 function wp_strip_all_tags( $s ) { return strip_tags( (string) $s ); }
 function __( $s ) { return $s; }
 function _n( $a, $b, $n ) { return 1 === $n ? $a : $b; }
 function number_format_i18n( $n ) { return (string) $n; }
+function esc_url_raw( $url ) { return (string) $url; }
+function has_post_thumbnail( $id ) { return false; }
+function get_the_title( $post ) { return $post->post_title ?? ''; }
+$GLOBALS['_test_post_meta'] = array();
+function get_post_meta( $id, $key, $single = false ) {
+	return $GLOBALS['_test_post_meta'][ $id ][ $key ] ?? '';
+}
+function wp_get_post_terms( $id, $tax, $args = array() ) { return array(); }
+
 class WP_Error {}
-class WP_Post {}
+function is_wp_error( $thing ) { return $thing instanceof WP_Error; }
+class WP_Post {
+	public $ID = 0;
+	public $post_title = '';
+	public $post_excerpt = '';
+	public $post_content = '';
+}
 class Gear_Engine_CPT {
-	public const POST_TYPE = 'exercise_gear';
+	public const POST_TYPE          = 'exercise_gear';
+	public const TAXONOMY           = 'gear_category';
+	public const META_EAN           = '_product_ean';
+	public const META_PRICE         = '_affiliate_price';
+	public const META_REGULAR_PRICE = '_regular_price';
+	public const META_IN_STOCK      = '_in_stock';
+	public const META_AFFILIATE_URL = '_affiliate_url';
+	public const META_MERCHANT      = '_merchant_name';
+	public const META_IMAGE_URL     = '_product_image_url';
+	public const META_CURRENCY      = '_currency';
+	public const META_LAST_SYNCED   = '_last_synced';
+	public const META_SPEC_PREFIX   = '_gear_engine_spec_';
 }
 
 require_once ABSPATH . 'includes/class-gear-engine-config-loader.php';
@@ -129,5 +166,50 @@ $weak = $base;
 $weak['specs']['speed']['found'] = 2;
 t( 'advice: weak spec coverage needs attention', 'attention' === $D::status( $D::advise( $weak, array(), 1 ) ) );
 t( 'advice: unused is only a tip', 'ready' === $D::status( $D::advise( $base, array(), 0 ) ) );
+
+// Test manual spec overrides & gear_engine_picker_item filter in evaluate_post.
+$post = new WP_Post();
+$post->ID = 101;
+$post->post_title = 'Sole F85 Tredemølle';
+$post->post_excerpt = 'Solid tredemølle for løping i toppklasse.';
+$post->post_content = 'Kraftig motor og god ramme.';
+
+$GLOBALS['_test_post_meta'][101] = array(
+	Gear_Engine_CPT::META_IN_STOCK      => '1',
+	Gear_Engine_CPT::META_PRICE         => 24990,
+	Gear_Engine_CPT::META_REGULAR_PRICE => 29990,
+	Gear_Engine_CPT::META_AFFILIATE_URL => 'https://example.com/sole-f85',
+	Gear_Engine_CPT::META_MERCHANT      => 'Treningspartner',
+);
+
+$res_auto = Gear_Engine_Gear_Picker::evaluate_post( $post, $config );
+t( 'evaluate_post: qualifies', null !== $res_auto['item'] );
+t( 'evaluate_post: speed estimated before override', in_array( 'speed', $res_auto['item']['est'], true ) );
+
+// Apply manual overrides.
+$GLOBALS['_test_post_meta'][101]['_gear_engine_spec_speed']   = '22.5';
+$GLOBALS['_test_post_meta'][101]['_gear_engine_spec_cushion'] = '1';
+$res_over = Gear_Engine_Gear_Picker::evaluate_post( $post, $config );
+
+t( 'override: speed override value applied', 22.5 === $res_over['item']['specs']['speed'] );
+t( 'override: speed removed from estimates', ! in_array( 'speed', $res_over['item']['est'], true ) );
+t( 'override: cushion flag forced to true', true === $res_over['item']['specs']['cushion'] );
+
+// Test filter modification.
+add_filter( 'gear_engine_picker_item', function( $item, $post, $cfg ) {
+	if ( 101 === $item['id'] ) {
+		$item['custom_badge'] = 'Editor Pick';
+	}
+	return $item;
+}, 10, 3 );
+$res_filtered = Gear_Engine_Gear_Picker::evaluate_post( $post, $config );
+t( 'filter: gear_engine_picker_item mutates item', 'Editor Pick' === ( $res_filtered['item']['custom_badge'] ?? '' ) );
+
+// Test filter rejection.
+add_filter( 'gear_engine_picker_item', function( $item ) {
+	return null;
+} );
+$res_rejected = Gear_Engine_Gear_Picker::evaluate_post( $post, $config );
+t( 'filter: gear_engine_picker_item can reject item', null === $res_rejected['item'] && 'filtered' === $res_rejected['reason'] );
 
 exit( $failures ? 1 : 0 );

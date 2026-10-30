@@ -327,19 +327,56 @@ class Gear_Engine_Gear_Picker {
 		$old  = (float) get_post_meta( $post->ID, Gear_Engine_CPT::META_REGULAR_PRICE, true );
 		$read = self::extract_specs( $title . ' ' . $post->post_excerpt . ' ' . $post->post_content, (array) $config['specs'], $price );
 
+		// Apply manual post meta spec overrides.
+		if ( ! empty( $config['specs'] ) && is_array( $config['specs'] ) ) {
+			foreach ( $config['specs'] as $spec_key => $spec_def ) {
+				$override = get_post_meta( $post->ID, '_gear_engine_spec_' . $spec_key, true );
+				if ( '' !== $override && false !== $override && null !== $override ) {
+					$spec_type = is_array( $spec_def ) ? ( $spec_def['type'] ?? 'number' ) : 'number';
+					if ( 'flag' === $spec_type ) {
+						$read['specs'][ $spec_key ] = in_array( (string) $override, array( '1', 'yes', 'true' ), true );
+					} elseif ( 'number' === $spec_type ) {
+						$read['specs'][ $spec_key ] = (float) $override;
+					} else {
+						$read['specs'][ $spec_key ] = $override;
+					}
+					// Remove from estimates since it is now explicitly verified.
+					$read['est'] = array_values( array_diff( $read['est'], array( $spec_key ) ) );
+				}
+			}
+		}
+
+		$item = array(
+			'id'    => $post->ID,
+			'name'  => $title,
+			'shop'  => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ),
+			'price' => $price,
+			'old'   => $old > $price ? $old : 0,
+			'cur'   => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',
+			'img'   => esc_url_raw( $image ),
+			'url'   => esc_url_raw( $url ),
+			'specs' => $read['specs'],
+			'est'   => $read['est'],
+		);
+
+		/**
+		 * Filter the qualifying gear picker product item.
+		 *
+		 * @param array<string, mixed>|null $item   Item payload.
+		 * @param WP_Post                   $post   Post object.
+		 * @param array<string, mixed>      $config Gear picker configuration.
+		 */
+		$item = apply_filters( 'gear_engine_picker_item', $item, $post, $config );
+
+		if ( empty( $item ) || ! is_array( $item ) ) {
+			return array(
+				'item'   => null,
+				'reason' => 'filtered',
+			);
+		}
+
 		return array(
-			'item'   => array(
-				'id'    => $post->ID,
-				'name'  => $title,
-				'shop'  => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ),
-				'price' => $price,
-				'old'   => $old > $price ? $old : 0,
-				'cur'   => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',
-				'img'   => esc_url_raw( $image ),
-				'url'   => esc_url_raw( $url ),
-				'specs' => $read['specs'],
-				'est'   => $read['est'],
-			),
+			'item'   => $item,
 			'reason' => '',
 		);
 	}
