@@ -931,6 +931,11 @@ $drained = array( 'processed' => 0, 'inserted' => 0, 'updated' => 0, 'skipped' =
 $sync_engine->stream_parse_xml( $tmp_chunk_file, 'TestChunk', array_merge( $filter_rules, array( 'max_items_per_sync' => 5, 'start_offset' => 3 ) ), $drained );
 assert_test( 0 === $drained['processed'] && 3 === $drained['feed_scanned'], 'chunked: exhausted cursor processes nothing and never rewinds' );
 unlink( $tmp_chunk_file );
+
+// 13.6 An empty feed configuration must say so instead of ending at silent zeros.
+$GLOBALS['wp_options']['gae_feeds'] = array();
+$empty_feeds_report = $sync_engine->run_sync( array(), true );
+assert_test( ! empty( $empty_feeds_report['errors'] ) && false !== strpos( implode( ' ', $empty_feeds_report['errors'] ), 'No active feed URLs' ), 'sync: empty feed config reports the real reason' );
 assert_test( $gz_stream_report['inserted'] > 0 || $gz_stream_report['updated'] > 0, 'gzip_streaming: Successfully ingested products from gzipped feed' );
 
 // 13.5 Verify memory cleanup for skipped items

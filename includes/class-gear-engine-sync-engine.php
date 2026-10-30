@@ -127,6 +127,20 @@ class Gear_Engine_Sync_Engine {
 			}
 		}
 
+		// Never end a run silently with all zeros: say why nothing happened.
+		if ( empty( $feeds ) ) {
+			$report['errors'][] = __( 'No active feed URLs found. Add a feed under Settings, tick its Active checkbox and save before syncing.', 'gear-engine' );
+			if ( function_exists( 'wp_defer_term_counting' ) ) {
+				wp_defer_term_counting( false );
+			}
+			if ( function_exists( 'wp_defer_comment_counting' ) ) {
+				wp_defer_comment_counting( false );
+			}
+			update_option( 'gae_last_sync_report', $report, false );
+			$this->release_lock();
+			return $report;
+		}
+
 		// Chunked sync: daily cron cycles start fresh cursors; a continuation
 		// run resumes from saved scan offsets so capped feeds eventually finish
 		// instead of silently re-processing only their first chunk forever.
