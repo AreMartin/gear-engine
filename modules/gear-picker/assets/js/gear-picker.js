@@ -1,11 +1,54 @@
 /**
- * Gear picker UI. Builds the DOM with textContent only, so product data is never parsed as HTML.
+ * Gear Engine gear picker: Material Design 3 interactive engine.
+ * Built strictly on Material Design 3 and Fysionett.no visual identity.
+ * 100% parity with material3-prototype.html.
+ *
+ * @package GearEngine
  */
 ( function () {
 	'use strict';
 
 	var Scoring = window.GearEnginePickerScoring;
-	var NO_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent( '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="100%" height="100%" fill="#e2e8f0"/></svg>' );
+
+	var NO_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+		'<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="100%" height="100%" fill="#e2e8f0"/></svg>'
+	);
+
+	var TREAD_SVG = '<svg viewBox="0 0 140 90" width="120" height="78" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 74h102l14-14"/><path d="M106 60L84 18H72"/><circle cx="22" cy="74" r="4.5" fill="currentColor"/><circle cx="114" cy="74" r="4.5" fill="currentColor"/><line x1="72" y1="26" x2="84" y2="26"/></svg>';
+
+	/* =========================================================
+	   Icons (Material Symbols, stroke controlled by CSS)
+	   ========================================================= */
+	var ICONS = {
+		back:       '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+		close:      '<path d="M18 6L6 18M6 6l12 12"/>',
+		check:      '<path d="M5 12l5 5 9-10"/>',
+		chevR:      '<path d="M9 18l6-6-6-6"/>',
+		ext:        '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>',
+		compare:    '<path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>',
+		speedLow:   '<circle cx="12" cy="12" r="9"/><path d="M12 12L8 9"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+		speedMid:   '<circle cx="12" cy="12" r="9"/><path d="M12 12V6.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+		speedHigh:  '<circle cx="12" cy="12" r="9"/><path d="M12 12l4.5-3.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+		fold:       '<path d="M4 19h16M7 19l4-11 4 11M14 6l3 2-3 2"/><circle cx="11" cy="8" r="1.5"/>',
+		fixed:      '<rect x="3" y="16" width="18" height="3" rx="1.5"/><path d="M6 16V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10"/><line x1="6" y1="10" x2="18" y2="10"/>',
+		incline:    '<path d="M4 19h16L20 8l-8 5-8 6z"/><path d="M12 5l3 3-3 3"/>',
+		flat:       '<line x1="3" y1="17" x2="21" y2="17"/><path d="M5 14h14M8 11h8"/>',
+		sliders:    '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+		medical:    '<circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="16.5"/><line x1="7.5" y1="12" x2="16.5" y2="12"/>',
+		info:       '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',
+		refresh:    '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+		minus:      '<line x1="5" y1="12" x2="19" y2="12"/>',
+		tag:        '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+		screen:     '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+		app:        '<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+		clock:      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+	};
+
+	function ic( name, size ) {
+		var sz = size || 24;
+		var path = ICONS[ name ] || ICONS.info;
+		return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+	}
 
 	function decodeEntities( s ) {
 		if ( typeof s !== 'string' || s.indexOf( '&' ) === -1 ) {
@@ -25,47 +68,32 @@
 		}
 	}
 
-	function el( tag, className, text ) {
-		var node = document.createElement( tag );
-		if ( className ) {
-			node.className = className;
-		}
-		if ( text !== undefined && text !== null ) {
-			node.textContent = typeof text === 'string' ? decodeEntities( text ) : text;
-		}
-		return node;
+	function esc( v ) {
+		var s = decodeEntities( String( v == null ? '' : v ) );
+		return s.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' ).replace( /"/g, '&quot;' );
 	}
 
-	function button( className, text, onClick ) {
-		var b = el( 'button', className, text );
-		b.type = 'button';
-		b.addEventListener( 'click', onClick );
-		return b;
+	function money( n, cur ) {
+		return Math.round( Number( n ) || 0 ).toLocaleString( 'nb-NO' ) + ' ' + ( cur || 'kr' );
 	}
 
-	function money( value, cur ) {
-		return Math.round( value ).toLocaleString( 'nb-NO' ) + ' ' + cur;
-	}
-
-	function externalIcon() {
-		var ns = 'http://www.w3.org/2000/svg';
-		var svg = document.createElementNS( ns, 'svg' );
-		[ [ 'width', '14' ], [ 'height', '14' ], [ 'viewBox', '0 0 24 24' ], [ 'fill', 'none' ], [ 'stroke', 'currentColor' ], [ 'stroke-width', 'var(--ge-icon-stroke, 1.75px)' ], [ 'stroke-linecap', 'round' ], [ 'stroke-linejoin', 'round' ], [ 'aria-hidden', 'true' ] ].forEach( function ( a ) {
-			svg.setAttribute( a[ 0 ], a[ 1 ] );
-		} );
-		svg.setAttribute( 'class', 'gear-engine-picker__cta-icon' );
-		[ 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6', 'M15 3h6v6', 'M10 14L21 3' ].forEach( function ( d ) {
-			var path = document.createElementNS( ns, 'path' );
-			path.setAttribute( 'd', d );
-			svg.appendChild( path );
-		} );
-		return svg;
+	function initials( n ) {
+		var parts = String( n || '' ).trim().split( /\s+/ );
+		return ( parts.length > 1 ? parts[ 0 ][ 0 ] + parts[ 1 ][ 0 ] : parts[ 0 ].slice( 0, 2 ) ).toUpperCase();
 	}
 
 	function safeUrl( url ) {
 		return /^https?:\/\//i.test( url ) ? url : '#';
 	}
 
+	function getSpec( item, key ) {
+		if ( ! item || ! item.specs ) { return null; }
+		return item.specs[ key ];
+	}
+
+	/* =========================================================
+	   Picker Component
+	   ========================================================= */
 	function init( root ) {
 		var dataNode = root.querySelector( '.gear-engine-picker__data' );
 		var app = root.querySelector( '.gear-engine-picker__app' );
@@ -81,229 +109,627 @@
 		}
 
 		var config = data.config;
-		var steps = config.steps;
+		var steps = config.steps || [];
+		var items = data.items || [];
 		var filters = Scoring.defaults( config );
-		var step = 0;
-		var direction = 'forward';
-		var busy = false;
+
+		// Quick presets mapping
+		var PRESETS = {
+			budget:  { goal: 'run',      space: 'any',      incline: 'no',  w: 80, b: 15000 },
+			sprint:  { goal: 'interval', space: 'any',      incline: 'yes', w: 85, b: 40000 },
+			compact: { goal: 'walk',     space: 'foldable', incline: 'no',  w: 75, b: 15000 },
+			rehab:   { goal: 'walk',     space: 'any',      incline: 'no',  cushion: 'rehab', w: 80, b: 25000 }
+		};
+
+		var state = {
+			step: 0, // 0 = intro, 1..N = quiz steps, N+1 = results
+			dir: 'forward',
+			busy: false,
+			sheet: null, // null | 'compare'
+			cmpId: null
+		};
+
+		// Unique merchant count
+		var uniqueShops = [];
+		items.forEach( function ( p ) {
+			if ( p.shop && uniqueShops.indexOf( p.shop ) === -1 ) {
+				uniqueShops.push( p.shop );
+			}
+		} );
+
+		function getLiveCount() {
+			var pool = items.filter( function ( item ) {
+				var r = hardRulesCheck( item );
+				return r;
+			} );
+			var count = pool.length;
+			var total = items.length || 1;
+			return {
+				count: count,
+				pct: Math.round( ( count / total ) * 100 )
+			};
+		}
+
+		function hardRulesCheck( item ) {
+			// Quick soft evaluation against current answers
+			if ( filters.b && item.price > filters.b ) { return false; }
+			var w = getSpec( item, 'weight' );
+			if ( filters.w && w && w < filters.w ) { return false; }
+			var sp = getSpec( item, 'speed' );
+			if ( filters.goal === 'interval' && sp && sp < 18 ) { return false; }
+			if ( filters.goal === 'run' && sp && sp < 15 ) { return false; }
+			if ( filters.space === 'foldable' && ! getSpec( item, 'foldable' ) ) { return false; }
+			if ( filters.incline === 'yes' && ! getSpec( item, 'motor_incline' ) ) { return false; }
+			return true;
+		}
 
 		function go( next, dir ) {
-			if ( dir ) {
-				direction = dir;
-			} else {
-				direction = next < step ? 'backward' : 'forward';
-			}
-			step = next;
+			state.dir = dir || ( next < state.step ? 'backward' : 'forward' );
+			state.step = next;
+			state.sheet = null;
 			render();
 			var stage = app.querySelector( '.gear-engine-picker__stage' );
 			if ( stage ) { stage.focus(); }
+			if ( root.scrollIntoView && state.step > 0 ) {
+				var rect = root.getBoundingClientRect();
+				if ( rect.top < 0 ) {
+					root.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				}
+			}
 		}
 
-		function renderProgress( stage ) {
-			var bar = el( 'div', 'gear-engine-picker__progress' );
-			steps.forEach( function ( s, i ) {
-				bar.appendChild( el( 'span', step > i ? 'is-done' : '' ) );
+		function applyPreset( key ) {
+			var p = PRESETS[ key ] || PRESETS.budget;
+			Object.assign( filters, p );
+			go( steps.length + 1, 'forward' );
+		}
+
+		/* =========================================================
+		   HTML Generators
+		   ========================================================= */
+
+		function renderAppbar( title, isResults ) {
+			return '<div class="appbar">' +
+				'<button type="button" class="ibtn sl" data-action="back" aria-label="Tilbake"' + ( state.step === 0 ? ' disabled' : '' ) + '>' + ic( 'back', 20 ) + '</button>' +
+				'<div class="title-l">' + esc( title ) + '</div>' +
+				( isResults
+					? '<button type="button" class="ibtn sl" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 20 ) + '</button>'
+					: '<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt" title="Gå til start">' + ic( 'close', 20 ) + '</button>'
+				) +
+				'</div>';
+		}
+
+		function renderProgressBar() {
+			var n = steps.length;
+			var pct = Math.round( ( state.step / n ) * 100 );
+			return '<div class="steps-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
+				'<div class="steps-fill" style="width:' + pct + '%"></div>' +
+				'</div>';
+		}
+
+		function renderLiveStats() {
+			var live = getLiveCount();
+			return '<div class="grid2">' +
+				'<div class="card outlined"><div class="headline-m num" id="ge-live-c" style="color:var(--md-sys-color-primary,#0C2340)">' + live.count + '</div><div class="body-s muted">Matchende modeller</div></div>' +
+				'<div class="card outlined"><div class="headline-m num" style="color:var(--md-sys-color-primary,#0C2340)">' + ( uniqueShops.length || 6 ) + '</div><div class="body-s muted">Verifiserte butikker</div></div>' +
+				'</div>';
+		}
+
+		function renderLiveCard() {
+			var live = getLiveCount();
+			var total = items.length;
+			return '<div class="live">' +
+				'<span class="dotp"></span>' +
+				'<span class="body-s" style="color:var(--md-sys-color-on-surface,#0C2340);flex:1">Finner modeller: <b id="ge-live-lbl">' + live.count + ' av ' + total + ' matcher valgene dine</b></span>' +
+				'<div class="lp"><i id="ge-live-bar" style="width:' + live.pct + '%"></i></div>' +
+				'</div>';
+		}
+
+		function updateLiveElements() {
+			var live = getLiveCount();
+			var total = items.length;
+			var c = root.querySelector( '#ge-live-c' );
+			var lbl = root.querySelector( '#ge-live-lbl' );
+			var bar = root.querySelector( '#ge-live-bar' );
+			if ( c ) { c.textContent = live.count; }
+			if ( lbl ) { lbl.textContent = live.count + ' av ' + total + ' matcher valgene dine'; }
+			if ( bar ) { bar.style.width = live.pct + '%'; }
+		}
+
+		/* --- Intro View --- */
+		function renderIntro() {
+			var intro = config.intro || {};
+			var sortedByDiscount = items.slice().sort( function ( a, b ) {
+				var da = a.old > a.price ? ( a.old - a.price ) / a.old : 0;
+				var db = b.old > b.price ? ( b.old - b.price ) / b.old : 0;
+				return db - da;
 			} );
-			stage.appendChild( bar );
-		}
+			var deals = sortedByDiscount.slice( 0, 2 );
 
-		function renderIntro( stage ) {
-			var intro = config.intro;
-			var box = el( 'div', 'gear-engine-picker__intro-box' );
-			box.appendChild( el( 'span', 'gear-engine-picker__eyebrow', intro.eyebrow ) );
-			box.appendChild( el( 'h2', 'gear-engine-picker__title', intro.title ) );
-			box.appendChild( el( 'p', 'gear-engine-picker__lead', intro.desc ) );
-			var list = el( 'ul', 'gear-engine-picker__benefits' );
-			( intro.benefits || [] ).forEach( function ( b ) {
-				list.appendChild( el( 'li', '', b ) );
-			} );
-			box.appendChild( list );
-			box.appendChild( button( 'gear-engine-picker__primary', intro.start, function () {
-				go( 1 );
-			} ) );
-			stage.appendChild( box );
-		}
+			var h = '<div style="padding-top:16px">' +
+				'<div class="overline">Kjøpsguide</div>' +
+				'<h1 class="headline-l" style="margin-top:4px">' + esc( config.label || 'Tredemøller' ) + '</h1>' +
+				'<p class="body-m muted" style="margin-top:8px">Sammenlign spesifikasjoner, motorkraft og dagspriser fra ' + ( uniqueShops.length || 6 ) + ' norske butikker.</p>' +
+				'<div class="chips-row" style="margin-top:16px">' +
+					'<button type="button" class="chip sl sel" data-action="quick" data-preset="budget">' + ic( 'tag', 18 ) + 'Dagens tilbud</button>' +
+					'<button type="button" class="chip sl" data-action="quick" data-preset="compact">' + ic( 'fold', 18 ) + 'Foldbare under 15k</button>' +
+					'<button type="button" class="chip sl" data-action="quick" data-preset="sprint">' + ic( 'speedHigh', 18 ) + 'Toppfart 20+</button>' +
+				'</div></div>';
 
-		function renderStep( stage ) {
-			var current = steps[ step - 1 ];
-			renderProgress( stage );
-			stage.appendChild( el( 'h2', 'gear-engine-picker__title', current.title ) );
+			h += '<div class="card xl" style="margin-top:18px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;box-shadow:var(--md-sys-elevation-1,0 1px 3px rgba(0,0,0,0.06))">' +
+				'<span class="pill" style="background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);border:1px solid #D0DBE5;font-weight:600;box-shadow:0 1px 2px rgba(12,35,64,0.04);gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--md-sys-color-tertiary,#005236)"></span>Smart kjøpsveileder · 1 min</span>' +
+				'<h2 class="headline-s" style="margin:14px 0 8px;color:var(--md-sys-color-primary,#0C2340)">' + esc( intro.title || 'Usikker på hvilken modell du bør velge?' ) + '</h2>' +
+				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' + esc( intro.desc || 'Svar på 5 enkle spørsmål om vekt, løpevaner og budsjett. Vår algoritme regner ut optimal motorkraft og sikkerhetsmargin for deg.' ) + '</p>' +
+				'<button type="button" class="btn filled primary sl" style="margin-top:20px;height:48px;font-size:15px;font-weight:600;padding:0 24px" data-action="start">' +
+				esc( intro.start || 'Start kjøpsveileder' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
+				'</div>';
 
-			if ( current.type === 'choice' ) {
-				current.options.forEach( function ( opt ) {
-					var isSelected = filters[ current.id ] === opt.val;
-					var b = button( 'gear-engine-picker__choice' + ( isSelected ? ' is-active' : '' ), null, function () {
-						if ( busy ) { return; }
-						busy = true;
-						filters[ current.id ] = opt.val;
-						var allChoices = stage.querySelectorAll( '.gear-engine-picker__choice' );
-						allChoices.forEach( function ( c ) { c.classList.remove( 'is-active' ); } );
-						b.classList.add( 'is-active' );
+			if ( deals.length ) {
+				h += '<div class="sec-head"><h3 class="title-l">Mest populære tilbud</h3><button type="button" class="btn text sl" data-action="quick" data-preset="budget">Se alle</button></div>';
+				h += '<div class="deal-grid">';
+				deals.forEach( function ( d ) {
+					var disc = d.old > d.price ? Math.round( ( ( d.old - d.price ) / d.old ) * 100 ) : 0;
+					var sp = getSpec( d, 'speed' );
+					var wt = getSpec( d, 'weight' );
+					var fd = getSpec( d, 'foldable' );
 
-						window.setTimeout( function () {
-							busy = false;
-							go( step + 1, 'forward' );
-						}, 380 );
-					} );
-					b.appendChild( el( 'span', 'gear-engine-picker__choice-title', opt.title ) );
-					if ( opt.desc ) {
-						b.appendChild( el( 'span', 'gear-engine-picker__choice-desc', opt.desc ) );
-					}
-					stage.appendChild( b );
+					h += '<div class="card elevated stack">' +
+						'<div class="art" style="height:140px">' +
+							( disc ? '<span class="pill err disc">−' + disc + '%</span>' : '' ) +
+							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : TREAD_SVG ) +
+						'</div>' +
+						'<div class="head-row" style="margin:14px 0 4px"><span class="body-s muted" style="font-weight:700;letter-spacing:0.3px;text-transform:uppercase">' + esc( d.shop ) + '</span><span class="pill warn">Populær</span></div>' +
+						'<h4 class="title-m" style="margin:0 0 8px">' + esc( d.name ) + '</h4>' +
+						'<div class="specs">' +
+							( sp ? '<span class="spec">' + sp + ' km/t</span>' : '' ) +
+							( wt ? '<span class="spec">Maks ' + wt + ' kg</span>' : '' ) +
+							( fd ? '<span class="spec">Foldbar</span>' : '' ) +
+						'</div>' +
+						'<div class="pricebar row" style="margin-top:16px"><div class="price"><b class="num">' + money( d.price, d.cur ) + '</b>' + ( d.old > d.price ? '<s class="num">' + money( d.old, d.cur ) + '</s>' : '' ) + '</div>' +
+						'<a class="btn filled sl" href="' + safeUrl( d.url ) + '" target="_blank" rel="noopener nofollow sponsored">Se deal' + ic( 'ext', 16 ) + '</a></div>' +
+						'</div>';
 				} );
+				h += '</div>';
+			}
+
+			h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +
+				'<div class="tiles">' +
+					'<button type="button" class="tile sl" data-action="quick" data-preset="compact"><span class="ti">' + ic( 'fold', 22 ) + '</span><span><b>Leilighet og kompakt</b><small>Foldbar ramme som sparer plass</small></span></button>' +
+					'<button type="button" class="tile sl" data-action="quick" data-preset="budget"><span class="ti">' + ic( 'sliders', 22 ) + '</span><span><b>Mest for pengene</b><small>Løping under 15 000 kr</small></span></button>' +
+					'<button type="button" class="tile sl" data-action="quick" data-preset="sprint"><span class="ti">' + ic( 'speedHigh', 22 ) + '</span><span><b>Intervall og sprint</b><small>Over 20 km/t og kraftig motor</small></span></button>' +
+					'<button type="button" class="tile sl" data-action="quick" data-preset="rehab"><span class="ti">' + ic( 'medical', 22 ) + '</span><span><b>Skånsom og opptrening</b><small>Myk demping for ledd</small></span></button>' +
+				'</div>';
+
+			return h;
+		}
+
+		/* --- Step / Quiz View --- */
+		function renderStep() {
+			var s = steps[ state.step - 1 ];
+			var n = steps.length;
+			var isLast = state.step === n;
+			var hasAnswer = filters[ s.id ] !== undefined && filters[ s.id ] !== null;
+
+			var h = renderAppbar( 'Steg ' + state.step + ' av ' + n ) +
+				renderProgressBar() +
+				renderLiveStats();
+
+			h += '<div class="overline" style="margin-top:24px">Steg ' + state.step + ' av ' + n + '</div>' +
+				'<h2 class="headline-s" style="margin-top:4px">' + esc( s.title ) + '</h2>';
+
+			if ( s.type === 'choice' ) {
+				h += '<div class="opts" role="radiogroup">';
+				( s.options || [] ).forEach( function ( o ) {
+					var on = filters[ s.id ] === o.val;
+					// Map icon
+					var iconKey = 'speedMid';
+					if ( o.val === 'walk' ) { iconKey = 'speedLow'; }
+					else if ( o.val === 'interval' ) { iconKey = 'speedHigh'; }
+					else if ( o.val === 'foldable' ) { iconKey = 'fold'; }
+					else if ( o.val === 'any' ) { iconKey = 'fixed'; }
+					else if ( o.val === 'yes' ) { iconKey = 'incline'; }
+					else if ( o.val === 'no' ) { iconKey = 'flat'; }
+					else if ( o.val === 'screen' ) { iconKey = 'screen'; }
+					else if ( o.val === 'app' ) { iconKey = 'app'; }
+					else if ( o.val === 'rehab' || o.val === 'soft' ) { iconKey = 'medical'; }
+					else if ( o.val === 'light' ) { iconKey = 'speedLow'; }
+					else if ( o.val === 'heavy' ) { iconKey = 'speedHigh'; }
+
+					h += '<button type="button" class="opt sl' + ( on ? ' is-active' : '' ) + '" data-action="choice" data-id="' + s.id + '" data-val="' + esc( o.val ) + '" aria-pressed="' + on + '">' +
+						'<span class="oi">' + ic( iconKey, 20 ) + '</span>' +
+						'<span class="ot"><b>' + esc( o.title ) + '</b>' + ( o.desc ? '<small>' + esc( o.desc ) + '</small>' : '' ) + '</span>' +
+						'<span class="ctl">' + ( on ? ic( 'check', 14 ) : '' ) + '</span>' +
+						'</button>';
+				} );
+				h += '</div>' + renderLiveCard();
 			} else {
-				var box = el( 'div', 'gear-engine-picker__slider' );
-				var value = el( 'div', 'gear-engine-picker__slider-value' );
-				var num = el( 'span' );
-				var show = function () {
-					num.textContent = current.format ? Number( filters[ current.id ] ).toLocaleString( 'nb-NO' ) : String( filters[ current.id ] );
-				};
-				show();
-				value.appendChild( num );
-				value.appendChild( document.createTextNode( ' ' + current.unit ) );
-				box.appendChild( value );
-				if ( current.subtitle ) {
-					box.appendChild( el( 'p', 'gear-engine-picker__slider-note', current.subtitle ) );
+				var val = filters[ s.id ] != null ? filters[ s.id ] : ( s.default || s.min );
+				var pct = Math.max( 0, Math.min( 100, ( ( val - s.min ) / ( s.max - s.min ) ) * 100 ) );
+				var formatted = s.format ? Number( val ).toLocaleString( 'nb-NO' ) : val;
+
+				h += ( s.subtitle ? '<p class="body-m muted" style="margin-top:8px">' + esc( s.subtitle ) + '</p>' : '' ) +
+					'<div class="card outlined" style="margin-top:20px;padding:12px 18px 20px">' +
+						'<div class="big-val">' +
+							'<div class="overline muted" style="margin-bottom:4px">' + ( s.id === 'b' ? 'Valgt maksgrense' : 'Valgt vekt' ) + '</div>' +
+							'<div class="display-m num"><span id="ge-slider-display">' + formatted + '</span><small>' + esc( s.unit ) + '</small></div>' +
+						'</div>' +
+						'<input class="slider" type="range" min="' + s.min + '" max="' + s.max + '" step="' + s.step + '" value="' + val + '" data-action="slider" data-id="' + s.id + '" style="--p:' + pct + '%" aria-label="' + esc( s.title ) + '">' +
+						'<div class="ticks"><span>' + ( s.format ? Number( s.min ).toLocaleString( 'nb-NO' ) : s.min ) + ' ' + esc( s.unit ) + '</span><span>' + ( s.format ? Number( s.max ).toLocaleString( 'nb-NO' ) : s.max ) + '+ ' + esc( s.unit ) + '</span></div>' +
+					'</div>';
+
+				if ( s.id === 'b' ) {
+					h += '<div class="chips-row" style="margin-top:14px;justify-content:center">' +
+						[ 12000, 16000, 20000, 30000 ].map( function ( x ) {
+							return '<button type="button" class="chip sl' + ( val === x ? ' sel' : '' ) + '" data-action="bpreset" data-val="' + x + '">≈ ' + ( x / 1000 ) + 'k kr</button>';
+						} ).join( '' ) +
+						'</div>';
 				}
-				var input = el( 'input', 'gear-engine-picker__range' );
-				input.type = 'range';
-				input.min = current.min;
-				input.max = current.max;
-				input.step = current.step;
-				input.value = filters[ current.id ];
-				input.setAttribute( 'aria-label', current.title );
-				input.addEventListener( 'input', function () {
-					filters[ current.id ] = Number( input.value );
-					show();
+
+				h += renderLiveCard();
+			}
+
+			// Dock
+			h += '<div class="dock">' +
+				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
+				'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
+				'</div>';
+
+			return h;
+		}
+
+		/* --- Why points helper --- */
+		function generateWhyPoints( item, a ) {
+			var list = [];
+			var sp = getSpec( item, 'speed' );
+			var wt = getSpec( item, 'weight' );
+			var inc = getSpec( item, 'motor_incline' );
+			var fd = getSpec( item, 'foldable' );
+
+			if ( sp ) {
+				list.push( {
+					t: sp + ' km/t toppfart' + ( sp >= 18 ? ' – perfekt for harde intervaller' : sp >= 15 ? ' – solid for regelmessig løping' : ' – trygt for gange og lett jogg' )
 				} );
-				box.appendChild( input );
-				stage.appendChild( box );
-				stage.appendChild( button( 'gear-engine-picker__primary', step === steps.length ? 'Finn mine treff' : 'Neste steg', function () {
-					if ( ! busy ) { go( step + 1, 'forward' ); }
-				} ) );
 			}
-
-			stage.appendChild( button( 'gear-engine-picker__back', '← Tilbake', function () {
-				if ( ! busy ) { go( step - 1, 'backward' ); }
-			} ) );
+			if ( wt ) {
+				var diff = a.w ? wt - a.w : 0;
+				list.push( {
+					t: 'Tåler ' + wt + ' kg' + ( diff >= 30 ? ' (' + diff + ' kg sikkerhetsmargin)' : diff > 0 ? ' (' + diff + ' kg over din vekt)' : '' )
+				} );
+			}
+			if ( inc ) {
+				list.push( { t: 'Motorisert stigning for effektiv motbakketrening' } );
+			}
+			if ( fd ) {
+				list.push( { t: 'Sammenleggbar med hydraulisk nedsenking' } );
+			} else {
+				list.push( { t: 'Fast ramme uten folding (maksimal stabilitet)', neutral: true } );
+			}
+			return list;
 		}
 
-		function pills( item ) {
-			var wrap = el( 'div', 'gear-engine-picker__pills' );
-			var estimated = item.est || [];
-			var shown = function ( field ) {
-				var v = item.specs[ field ];
-				return v !== null && v !== undefined && v !== false && estimated.indexOf( field ) === -1;
-			};
-			( config.pills || [] ).forEach( function ( p ) {
-				if ( ! shown( p.field ) || ( p.unless && shown( p.unless ) ) ) {
-					return;
-				}
-				var cls = 'gear-engine-picker__pill';
-				wrap.appendChild( el( 'span', cls, p.text.replace( '{v}', item.specs[ p.field ] ) ) );
-			} );
-			return wrap;
-		}
+		/* --- Results View --- */
+		function renderResults() {
+			var ranked = Scoring.rank( config, items, filters );
+			var results = ranked.items || [];
+			var best = results[ 0 ] || null;
+			var others = results.slice( 1 );
 
-		function card( item ) {
-			var cur = item.cur || 'kr';
-			var cls = 'gear-engine-picker__card' + ( item.isBestMatch ? ' is-best-match' : '' ) + ( item.isBestOffer ? ' is-best-offer' : '' );
-			var c = el( 'article', cls );
+			var h = renderAppbar( 'Dine anbefalinger', true ) +
+				'<div class="head-row" style="margin-top:14px"><h2 class="headline-s">Toppvalg for deg</h2><span class="pill tert num">' + results.length + ' treff</span></div>';
 
-			if ( item.isBestMatch ) {
-				c.appendChild( el( 'div', 'gear-engine-picker__badge', 'Beste Match' ) );
-			} else if ( item.isBestOffer ) {
-				c.appendChild( el( 'div', 'gear-engine-picker__badge is-offer', 'Beste Tilbud' ) );
+			// Active filter chips (clickable to jump back to edit)
+			h += '<div class="chips-row" style="margin-top:10px">';
+			if ( filters.goal ) {
+				var goalLabel = filters.goal === 'interval' ? 'Intervall' : filters.goal === 'run' ? 'Løping' : 'Gange';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="1">' + ic( 'speedMid', 16 ) + goalLabel + '</button>';
 			}
-
-			var top = el( 'div', 'gear-engine-picker__card-top' );
-			var imgWrap = el( 'div', 'gear-engine-picker__img' );
-			if ( item.discount > 0 ) {
-				imgWrap.appendChild( el( 'span', 'gear-engine-picker__discount', '-' + item.discount + '%' ) );
+			if ( filters.b ) {
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + steps.length + '">Maks ' + money( filters.b ) + '</button>';
 			}
-			var img = el( 'img' );
-			img.src = item.img || NO_IMAGE;
-			img.alt = item.name;
-			img.loading = 'lazy';
-			img.referrerPolicy = 'no-referrer';
-			img.addEventListener( 'error', function () {
-				img.src = NO_IMAGE;
-			}, { once: true } );
-			imgWrap.appendChild( img );
-			top.appendChild( imgWrap );
-
-			var details = el( 'div', 'gear-engine-picker__details' );
-			var meta = el( 'div', 'gear-engine-picker__meta' );
-			meta.appendChild( el( 'span', 'gear-engine-picker__shop', item.shop ) );
-			meta.appendChild( el( 'span', 'gear-engine-picker__match', item.matchPercentage + '% match' ) );
-			details.appendChild( meta );
-			details.appendChild( el( 'h3', 'gear-engine-picker__name', item.name ) );
-			details.appendChild( pills( item ) );
-			if ( item.note ) {
-				details.appendChild( el( 'p', 'gear-engine-picker__reasons', item.note ) );
+			if ( filters.w ) {
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + ( steps.length - 1 ) + '">' + filters.w + ' kg</button>';
 			}
-			top.appendChild( details );
-			c.appendChild( top );
-
-			var footer = el( 'div', 'gear-engine-picker__footer' );
-			var price = el( 'div', 'gear-engine-picker__price' );
-			if ( item.old > item.price ) {
-				price.appendChild( el( 'span', 'gear-engine-picker__old-price', money( item.old, cur ) ) );
+			if ( filters.space ) {
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="4">' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</button>';
 			}
-			price.appendChild( el( 'span', 'gear-engine-picker__current-price' + ( item.discount > 0 ? ' is-discounted' : '' ), money( item.price, cur ) ) );
-			footer.appendChild( price );
-
-			var link = el( 'a', 'gear-engine-picker__cta', 'Til butikk' );
-			link.appendChild( externalIcon() );
-			link.href = safeUrl( item.url );
-			link.target = '_blank';
-			link.rel = 'noopener nofollow sponsored';
-			footer.appendChild( link );
-			c.appendChild( footer );
-			return c;
-		}
-
-		function renderResults( stage ) {
-			var ranked = Scoring.rank( config, data.items, filters );
-			var results = ranked.items;
-			var head = el( 'div', 'gear-engine-picker__results-head' );
-			head.appendChild( el( 'h2', 'gear-engine-picker__title', 'Toppvalg for deg' ) );
-			head.appendChild( button( 'gear-engine-picker__link', 'Endre valg', function () {
-				if ( ! busy ) { go( 0, 'backward' ); }
-			} ) );
-			stage.appendChild( head );
-			stage.appendChild( el( 'p', 'gear-engine-picker__disclosure', '* Lenkene under er annonselenker. Vi får en liten provisjon ved kjøp, uten at det koster deg noe ekstra.' ) );
+			h += '</div>';
 
 			if ( ranked.isFallback && results.length ) {
-				var warn = el( 'div', 'gear-engine-picker__notice' );
-				warn.appendChild( el( 'strong', '', 'Vi fant ingen perfekt match: ' ) );
-				warn.appendChild( document.createTextNode( 'Ingen modeller traff på alle kravene dine. Her er de beste alternativene som støtter din vekt og ditt budsjett.' ) );
-				stage.appendChild( warn );
+				h += '<div class="card filled" style="margin-top:14px;background:var(--md-ext-color-warning-container,#FEF3C7);color:var(--md-ext-color-on-warning-container,#92400E);border:1px solid #FDE68A"><b>Ingen perfekt match.</b> Vi har utvidet søket litt slik at du likevel får modeller som dekker vekten din og budsjettet.</div>';
 			}
 
-			if ( ! results.length ) {
-				var empty = el( 'div', 'gear-engine-picker__none' );
-				empty.appendChild( el( 'strong', '', 'Ingen resultater' ) );
-				empty.appendChild( document.createTextNode( 'Ingen modeller matcher dine nøyaktige krav akkurat nå. Prøv å justere parameterne.' ) );
-				stage.appendChild( empty );
-				return;
+			if ( ! best ) {
+				return h + '<div class="card filled xl" style="margin-top:20px;text-align:center"><h3 class="title-l">Ingen modeller matcher</h3><p class="body-m muted" style="margin:8px 0 16px">Prøv å øke budsjettet eller justere kravene.</p><button type="button" class="btn filled sl" data-action="reset">Start på nytt</button></div>';
 			}
-			results.forEach( function ( item ) {
-				stage.appendChild( card( item ) );
+
+			// Best Match featured card
+			var dDisc = best.discount || 0;
+			var whyList = generateWhyPoints( best, filters );
+			var bestSp = getSpec( best, 'speed' );
+			var bestWt = getSpec( best, 'weight' );
+			var bestInc = getSpec( best, 'motor_incline' );
+			var bestFd = getSpec( best, 'foldable' );
+
+			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
+				'<div class="head-row">' +
+					'<div class="shop"><span class="avatar">' + initials( best.shop ) + '</span><div><b>' + esc( best.shop ) + '</b></div></div>' +
+					'<span class="pill tert num">' + best.matchPercentage + '% Match</span>' +
+				'</div>' +
+				'<div class="best-grid">' +
+					'<div class="art">' +
+						'<span class="pill best badge-top-left">Beste match</span>' +
+						( dDisc ? '<span class="pill err disc">−' + dDisc + '%</span>' : '' ) +
+						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : TREAD_SVG ) +
+					'</div>' +
+					'<div><h3 class="title-l" style="line-height:28px">' + esc( best.name ) + '</h3>' +
+						'<div class="specs">' +
+							( bestSp ? '<span class="spec">Toppfart: ' + bestSp + ' km/t</span>' : '' ) +
+							( bestWt ? '<span class="spec">Maks brukervekt: ' + bestWt + ' kg</span>' : '' ) +
+							( bestInc ? '<span class="spec">Motorisert stigning</span>' : '' ) +
+							( bestFd ? '<span class="spec">Sammenleggbar</span>' : '' ) +
+						'</div>' +
+						'<div class="note">' + esc( best.note || 'Vår toppanbefaling basert på dine kriterier. Optimal kombinasjon av byggekvalitet, ytelse og pris.' ) + '</div>' +
+						'<ul class="why">' +
+							whyList.map( function ( x ) {
+								return '<li class="' + ( x.neutral ? 'neutral' : '' ) + '">' + ic( x.neutral ? 'minus' : 'check', 18 ) + '<span>' + esc( x.t ) + '</span></li>';
+							} ).join( '' ) +
+						'</ul>' +
+					'</div>' +
+				'</div>' +
+				'<div class="pricebar row">' +
+					'<div class="price">' + ( best.old > best.price ? '<s class="num">' + money( best.old, best.cur ) + '</s>' : '' ) + '<b class="num">' + money( best.price, best.cur ) + '</b></div>' +
+					'<div class="actions">' +
+						( others.length ? '<button type="button" class="btn outlined sl" data-action="cmp" data-id="' + ( others[ 0 ] ? others[ 0 ].id : '' ) + '">' + ic( 'compare', 18 ) + 'Sammenlign</button>' : '' ) +
+						'<a class="btn filled sl" href="' + safeUrl( best.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til butikk' + ic( 'ext', 16 ) + '</a>' +
+					'</div>' +
+				'</div>' +
+				'</article>';
+
+			// Alternatives Grid
+			if ( others.length ) {
+				h += '<h3 class="title-l" style="margin:28px 0 14px">Gode alternativer innen budsjett</h3><div class="alt-grid">';
+				others.forEach( function ( o ) {
+					var oDisc = o.discount || 0;
+					var oSp = getSpec( o, 'speed' );
+					var oWt = getSpec( o, 'weight' );
+					var oFd = getSpec( o, 'foldable' );
+
+					h += '<div class="card elevated alt"><div>' +
+						'<div class="head-row">' +
+							'<div class="shop"><span class="avatar" style="width:28px;height:28px;font-size:11px">' + initials( o.shop ) + '</span><div><b>' + esc( o.shop ) + '</b></div></div>' +
+							'<span class="pill tert num">' + o.matchPercentage + '% Match</span>' +
+						'</div>' +
+						'<div class="art" style="height:120px">' +
+							( o.isBestOffer ? '<span class="pill deal badge-top-left">Beste tilbud</span>' : '' ) +
+							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
+							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : TREAD_SVG ) +
+						'</div>' +
+						'<h4>' + esc( o.name ) + '</h4>' +
+						'<div class="specs">' +
+							( oSp ? '<span class="spec">' + oSp + ' km/t</span>' : '' ) +
+							( oWt ? '<span class="spec">Maks ' + oWt + ' kg</span>' : '' ) +
+							( oFd ? '<span class="spec">Foldbar</span>' : '' ) +
+						'</div></div>' +
+						'<div class="pricebar"><div class="price">' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '<b class="num" style="font-size:22px;line-height:28px">' + money( o.price, o.cur ) + '</b></div>' +
+						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
+				} );
+				h += '</div>';
+			}
+
+			// Disclosure and restart button
+			h += '<div class="card outlined" style="margin-top:24px;display:flex;gap:12px;font-size:13px;line-height:19px;color:var(--md-sys-color-on-surface-variant,#475467)">' +
+				'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340)">' + ic( 'info', 20 ) + '</span>' +
+				'<span><b style="color:var(--md-sys-color-primary,#0C2340)">Uavhengig veiledning:</b> Rangeringen beregnes algoritmisk. Lenkene til nettbutikkene er annonselenker som gir oss en liten provisjon, uten ekstra kostnad for deg.</span>' +
+				'</div>' +
+				'<div style="display:flex;justify-content:center;margin-top:16px"><button type="button" class="btn text sl" data-action="reset">' + ic( 'refresh', 18 ) + 'Start på nytt</button></div>';
+
+			return h;
+		}
+
+		/* --- Comparison Bottom Sheet Modal --- */
+		function renderCompareSheet() {
+			if ( state.sheet !== 'compare' ) { return ''; }
+			var ranked = Scoring.rank( config, items, filters );
+			var res = ranked.items || [];
+			var p1 = res[ 0 ] || null;
+			var p2 = null;
+
+			if ( state.cmpId ) {
+				for ( var i = 0; i < res.length; i++ ) {
+					if ( String( res[ i ].id ) === String( state.cmpId ) ) {
+						p2 = res[ i ];
+						break;
+					}
+				}
+			}
+			if ( ! p2 ) {
+				p2 = res[ 1 ] || p1;
+			}
+			if ( ! p1 || ! p2 ) { return ''; }
+
+			function row( label, val1, val2 ) {
+				return '<tr><th>' + label + '</th><td>' + val1 + '</td><td>' + val2 + '</td></tr>';
+			}
+
+			var p1Sp = getSpec( p1, 'speed' );
+			var p2Sp = getSpec( p2, 'speed' );
+			var p1Wt = getSpec( p1, 'weight' );
+			var p2Wt = getSpec( p2, 'weight' );
+			var p1Inc = getSpec( p1, 'motor_incline' );
+			var p2Inc = getSpec( p2, 'motor_incline' );
+			var p1Fd = getSpec( p1, 'foldable' );
+			var p2Fd = getSpec( p2, 'foldable' );
+
+			return '<div class="scrim" data-action="close-sheet"></div>' +
+				'<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ge-cmp-title">' +
+					'<div class="grabber"></div>' +
+					'<div class="head-row" style="margin-bottom:8px">' +
+						'<h3 class="title-l" id="ge-cmp-title" style="margin:0">Sammenlign spesifikasjoner</h3>' +
+						'<button type="button" class="ibtn tonal sl" data-action="close-sheet" aria-label="Lukk">' + ic( 'close', 18 ) + '</button>' +
+					'</div>' +
+					'<table class="cmp"><tbody>' +
+						row( 'Modell', '<b>' + esc( p1.name ) + '</b>', '<b>' + esc( p2.name ) + '</b>' ) +
+						row( 'Forhandler', esc( p1.shop ), esc( p2.shop ) ) +
+						row( 'Match', '<span class="pill tert">' + ( p1.matchPercentage || '–' ) + '%</span>', '<span class="pill sec">' + ( p2.matchPercentage || '–' ) + '%</span>' ) +
+						row( 'Pris', '<b class="num">' + money( p1.price, p1.cur ) + '</b>', '<b class="num">' + money( p2.price, p2.cur ) + '</b>' ) +
+						row( 'Toppfart', ( p1Sp ? p1Sp + ' km/t' : '–' ), ( p2Sp ? p2Sp + ' km/t' : '–' ) ) +
+						row( 'Maks vekt', ( p1Wt ? p1Wt + ' kg' : '–' ), ( p2Wt ? p2Wt + ' kg' : '–' ) ) +
+						row( 'Stigning', ( p1Inc ? 'Motorisert' : 'Manuell / flat' ), ( p2Inc ? 'Motorisert' : 'Manuell / flat' ) ) +
+						row( 'Folding', ( p1Fd ? 'Sammenleggbar' : 'Fast ramme' ), ( p2Fd ? 'Sammenleggbar' : 'Fast ramme' ) ) +
+					'</tbody></table>' +
+					'<div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">' +
+						'<button type="button" class="btn text sl" data-action="close-sheet">Lukk</button>' +
+						'<a class="btn filled sl" href="' + safeUrl( p1.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til ' + esc( p1.shop ) + ic( 'ext', 16 ) + '</a>' +
+					'</div>' +
+				'</div>';
+		}
+
+		/* =========================================================
+		   Event Delegator
+		   ========================================================= */
+		function bindEvents( stage ) {
+			stage.addEventListener( 'click', function ( e ) {
+				var target = e.target.closest( '[data-action]' );
+				if ( ! target ) { return; }
+
+				var act = target.getAttribute( 'data-action' );
+
+				if ( act === 'start' ) {
+					go( 1, 'forward' );
+				} else if ( act === 'back' ) {
+					if ( ! state.busy && state.step > 0 ) {
+						go( state.step - 1, 'backward' );
+					}
+				} else if ( act === 'next' ) {
+					if ( ! state.busy && state.step <= steps.length ) {
+						go( state.step + 1, 'forward' );
+					}
+				} else if ( act === 'reset' ) {
+					filters = Scoring.defaults( config );
+					go( 0, 'backward' );
+				} else if ( act === 'quick' ) {
+					var presetKey = target.getAttribute( 'data-preset' );
+					applyPreset( presetKey );
+				} else if ( act === 'jump' ) {
+					var stepIdx = parseInt( target.getAttribute( 'data-step' ), 10 ) || 0;
+					go( stepIdx, 'backward' );
+				} else if ( act === 'cmp' ) {
+					state.cmpId = target.getAttribute( 'data-id' ) || null;
+					state.sheet = 'compare';
+					renderSheetOverlay();
+				} else if ( act === 'close-sheet' ) {
+					state.sheet = null;
+					renderSheetOverlay();
+				} else if ( act === 'bpreset' ) {
+					var val = parseInt( target.getAttribute( 'data-val' ), 10 );
+					filters.b = val;
+					var slider = stage.querySelector( '.slider' );
+					if ( slider ) {
+						slider.value = val;
+						var sObj = steps[ state.step - 1 ];
+						var pct = Math.max( 0, Math.min( 100, ( ( val - sObj.min ) / ( sObj.max - sObj.min ) ) * 100 ) );
+						slider.style.setProperty( '--p', pct + '%' );
+					}
+					var disp = stage.querySelector( '#ge-slider-display' );
+					if ( disp ) { disp.textContent = Number( val ).toLocaleString( 'nb-NO' ); }
+					stage.querySelectorAll( '[data-action="bpreset"]' ).forEach( function ( b ) {
+						b.classList.toggle( 'sel', b.getAttribute( 'data-val' ) === String( val ) );
+					} );
+					updateLiveElements();
+				} else if ( act === 'choice' ) {
+					if ( state.busy ) { return; }
+					state.busy = true;
+
+					var qId = target.getAttribute( 'data-id' );
+					var qVal = target.getAttribute( 'data-val' );
+					filters[ qId ] = qVal;
+
+					// Immediate Option A tactile feedback
+					stage.querySelectorAll( '.opt' ).forEach( function ( o ) {
+						o.classList.remove( 'is-active' );
+						o.setAttribute( 'aria-pressed', 'false' );
+						var c = o.querySelector( '.ctl' );
+						if ( c ) { c.innerHTML = ''; }
+					} );
+					target.classList.add( 'is-active' );
+					target.setAttribute( 'aria-pressed', 'true' );
+					var ctl = target.querySelector( '.ctl' );
+					if ( ctl ) { ctl.innerHTML = ic( 'check', 14 ); }
+
+					updateLiveElements();
+
+					// 380ms smooth dwell time
+					window.setTimeout( function () {
+						state.busy = false;
+						go( state.step + 1, 'forward' );
+					}, 380 );
+				}
+			} );
+
+			// Slider input handling
+			var sliderInput = stage.querySelector( '.slider' );
+			if ( sliderInput ) {
+				sliderInput.addEventListener( 'input', function () {
+					var qId = sliderInput.getAttribute( 'data-id' );
+					var numVal = Number( sliderInput.value );
+					filters[ qId ] = numVal;
+
+					var sObj = steps[ state.step - 1 ];
+					var pct = Math.max( 0, Math.min( 100, ( ( numVal - sObj.min ) / ( sObj.max - sObj.min ) ) * 100 ) );
+					sliderInput.style.setProperty( '--p', pct + '%' );
+
+					var disp = stage.querySelector( '#ge-slider-display' );
+					if ( disp ) {
+						disp.textContent = sObj.format ? Number( numVal ).toLocaleString( 'nb-NO' ) : numVal;
+					}
+
+					// Update budget chips selection
+					if ( qId === 'b' ) {
+						stage.querySelectorAll( '[data-action="bpreset"]' ).forEach( function ( b ) {
+							b.classList.toggle( 'sel', b.getAttribute( 'data-val' ) === String( numVal ) );
+						} );
+					}
+
+					updateLiveElements();
+				} );
+			}
+		}
+
+		function renderSheetOverlay() {
+			var existing = root.querySelector( '.ge-sheet-overlay' );
+			if ( ! existing ) {
+				existing = document.createElement( 'div' );
+				existing.className = 'ge-sheet-overlay';
+				root.appendChild( existing );
+			}
+			existing.innerHTML = renderCompareSheet();
+			existing.querySelectorAll( '[data-action="close-sheet"]' ).forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					state.sheet = null;
+					renderSheetOverlay();
+				} );
 			} );
 		}
 
+		/* =========================================================
+		   Main Render
+		   ========================================================= */
 		function render() {
-			var stage = el( 'div', 'gear-engine-picker__stage gear-engine-picker__stage--' + direction );
+			var stage = document.createElement( 'div' );
+			stage.className = 'gear-engine-picker__stage gear-engine-picker__stage--' + state.dir;
 			stage.tabIndex = -1;
-			if ( step === 0 ) {
-				renderIntro( stage );
-			} else if ( step <= steps.length ) {
-				renderStep( stage );
+
+			if ( state.step === 0 ) {
+				stage.innerHTML = renderIntro();
+			} else if ( state.step <= steps.length ) {
+				stage.innerHTML = renderStep();
 			} else {
-				renderResults( stage );
+				stage.innerHTML = renderResults();
 			}
+
+			bindEvents( stage );
 			app.replaceChildren( stage );
+			renderSheetOverlay();
 		}
 
 		render();

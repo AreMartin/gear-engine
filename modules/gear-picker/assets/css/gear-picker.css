@@ -1,525 +1,792 @@
 /**
- * Gear Engine gear picker: scoped styles. All rules are namespaced under .gear-engine-picker.
- * Built strictly on Material Design 3 and Fysionett.no visual identity.
+ * Gear Engine gear picker: Material Design 3 scoped stylesheet.
+ * 100% pixel-aligned with material3-prototype.html and Fysionett.no visual identity.
  *
  * @package GearEngine
  */
+
+/* =========================================================
+   1. Scope & Typography
+   ========================================================= */
 .gear-engine-picker {
-	--gep-ink:        var(--ge-navy-primary, #0C2340);
-	--gep-btn:        var(--ge-navy-primary, #0C2340);
-	--gep-green:      var(--ge-accent-green, #005236);
-	--gep-green-bg:   var(--ge-accent-green-bg, #DCF5E8);
-	--gep-green-dark: var(--ge-green-900, #002B1C);
-	--gep-deal-bg:    var(--ge-amber-deal-bg, #FEF3C7);
-	--gep-deal-text:  var(--ge-amber-deal-text, #92400E);
-	--gep-deal-border:var(--ge-amber-deal-border, #FDE68A);
-	--gep-border:     var(--ge-border, #E4E7EC);
-	--gep-bg:         var(--ge-bg, #F5F7FA);
-	--gep-text:       var(--ge-text, #344054);
-	--gep-muted:      var(--ge-muted, #667085);
 	box-sizing: border-box;
-	max-width: 800px;
+	max-width: 760px;
 	margin: 0 auto;
-	padding: 10px 12px 40px;
-	color: var(--gep-text);
-	font-family: inherit;
+	padding: 0 16px 40px;
+	color: var(--md-sys-color-on-surface, #0C2340);
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
 	line-height: 1.5;
+	position: relative;
 }
 .gear-engine-picker *,
 .gear-engine-picker *::before,
-.gear-engine-picker *::after { box-sizing: border-box; }
-.gear-engine-picker button { font-family: inherit; cursor: pointer; }
-.gear-engine-picker svg { flex-shrink: 0; stroke-width: var(--ge-icon-stroke, 1.75px); }
+.gear-engine-picker *::after {
+	box-sizing: border-box;
+}
+.gear-engine-picker h1,
+.gear-engine-picker h2,
+.gear-engine-picker h3,
+.gear-engine-picker h4,
+.gear-engine-picker p,
+.gear-engine-picker ul {
+	margin: 0;
+}
+.gear-engine-picker button {
+	font-family: inherit;
+	cursor: pointer;
+}
 .gear-engine-picker button:focus-visible,
 .gear-engine-picker a:focus-visible,
 .gear-engine-picker input:focus-visible {
-	outline: 2.5px solid var(--gep-ink);
+	outline: 2.5px solid var(--md-sys-color-primary, #0C2340);
 	outline-offset: 2px;
 }
 .gear-engine-picker button:focus:not(:focus-visible),
 .gear-engine-picker a:focus:not(:focus-visible) {
 	outline: none;
 }
-.gear-engine-picker__stage,
-.gear-engine-picker__stage:focus,
-.gear-engine-picker__stage:focus-visible {
+.gear-engine-picker .gear-engine-picker__stage,
+.gear-engine-picker .gear-engine-picker__stage:focus,
+.gear-engine-picker .gear-engine-picker__stage:focus-visible,
+.gear-engine-picker .gear-engine-picker__app:focus,
+.gear-engine-picker .gear-engine-picker__app:focus-visible,
+.gear-engine-picker .opts:focus,
+.gear-engine-picker .opts:focus-visible {
 	outline: none !important;
 	box-shadow: none !important;
 }
-.gear-engine-picker__stage { animation: gep-in 0.3s ease-out both; }
-@keyframes gep-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .gear-engine-picker * { animation: none !important; transition: none !important; } }
-
-/* Hero / Intro Stage: Material 3 Tonal Container */
-.gear-engine-picker__intro-box {
-	background: var(--ge-navy-container, #EAF0F6);
-	border: 1px solid var(--ge-navy-border, #D5E1ED);
-	border-radius: var(--ge-r-lg, 20px);
-	padding: 32px 28px;
-	box-shadow: var(--ge-shadow-1);
+.gear-engine-picker svg {
+	flex-shrink: 0;
+	stroke-width: var(--ge-icon-stroke, 1.75px);
 }
-.gear-engine-picker__eyebrow {
+
+/* Type Scale */
+.gear-engine-picker .headline-l { font-size: 32px; line-height: 40px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); letter-spacing: -0.5px; }
+.gear-engine-picker .headline-m { font-size: 28px; line-height: 36px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .headline-s { font-size: 22px; line-height: 30px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .title-l { font-size: 20px; line-height: 26px; font-weight: 600; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .title-m { font-size: 16px; line-height: 24px; font-weight: 600; }
+.gear-engine-picker .body-m { font-size: 14.5px; line-height: 21px; color: var(--md-sys-color-on-surface-variant, #475467); }
+.gear-engine-picker .body-s { font-size: 12.5px; line-height: 18px; color: var(--md-sys-color-on-surface-variant, #475467); }
+.gear-engine-picker .muted { color: var(--md-sys-color-on-surface-variant, #667085); }
+.gear-engine-picker .overline { font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .num { font-variant-numeric: tabular-nums; }
+
+/* State Layer Animation */
+.gear-engine-picker .sl { position: relative; overflow: hidden; }
+.gear-engine-picker .sl::after { content: ""; position: absolute; inset: 0; background: currentColor; opacity: 0; transition: opacity 0.15s; pointer-events: none; border-radius: inherit; }
+.gear-engine-picker .sl:hover::after { opacity: 0.06; }
+.gear-engine-picker .sl:active::after { opacity: 0.12; }
+
+/* Top App Bar */
+.gear-engine-picker .appbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 60px;
+	margin: 0 -16px 12px;
+	padding: 0 16px;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+}
+.gear-engine-picker .appbar .title-l { flex: 1; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 17px; font-weight: 600; }
+.gear-engine-picker .ibtn {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	margin-bottom: 14px;
-	padding: 4px 12px;
-	border-radius: 999px;
-	background: #FFFFFF;
-	color: var(--gep-ink);
-	border: 1px solid #D0DBE5;
-	font-size: 12px;
-	font-weight: 600;
-	letter-spacing: 0.2px;
-	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
-}
-.gear-engine-picker__eyebrow::before {
-	content: "";
-	display: inline-block;
-	width: 6px;
-	height: 6px;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border: 0;
 	border-radius: 50%;
-	background: var(--gep-green);
+	background: transparent;
+	color: var(--md-sys-color-on-surface, #0C2340);
+	transition: background 0.15s;
 }
-.gear-engine-picker__title {
-	margin: 0 0 14px;
-	font-size: 28px;
-	font-weight: 700;
-	line-height: 1.25;
-	letter-spacing: -0.3px;
-	color: var(--gep-ink);
-}
-.gear-engine-picker__lead {
-	margin: 0 0 24px;
-	font-size: 15.5px;
-	line-height: 23px;
-	color: var(--gep-text);
-}
-.gear-engine-picker__benefits {
-	margin: 0 0 28px;
-	padding: 0;
-	list-style: none;
-	display: grid;
-	gap: 12px;
-}
-.gear-engine-picker__benefits li {
-	position: relative;
-	padding-left: 28px;
-	font-size: 14.5px;
-	font-weight: 500;
-	color: var(--gep-ink);
-}
-.gear-engine-picker__benefits li::before {
-	content: "\2713";
-	position: absolute;
-	left: 0;
-	color: var(--gep-green);
-	font-weight: 700;
-}
+.gear-engine-picker .ibtn:disabled { opacity: 0.35; cursor: default; }
+.gear-engine-picker .ibtn.tonal { background: var(--md-sys-color-surface-container-high, #ECEFF2); }
 
-/* Primary Button: Deep Navy */
-.gear-engine-picker__primary {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 48px;
-	padding: 0 24px;
-	border: 0;
-	border-radius: 999px;
-	background: var(--gep-btn);
-	color: #FFFFFF;
-	font-size: 15px;
-	font-weight: 600;
-	gap: 8px;
-	cursor: pointer;
-	transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-}
-.gear-engine-picker__primary:hover {
-	background: var(--ge-navy-800, #143154);
-	box-shadow: var(--ge-shadow-1);
-}
-.gear-engine-picker__primary:active {
-	transform: scale(0.99);
-}
-
-.gear-engine-picker__back,
-.gear-engine-picker__link {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	margin: 18px auto 0;
-	padding: 8px 14px;
-	border: 0;
-	background: none;
-	color: var(--gep-muted);
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-.gear-engine-picker__link {
-	margin: 0;
-	font-size: 13.5px;
-	text-decoration: underline;
-	text-underline-offset: 3px;
-}
-.gear-engine-picker__back:hover,
-.gear-engine-picker__link:hover {
-	color: var(--gep-ink);
-}
-
-/* Progress Indicator: Deep Navy */
-.gear-engine-picker__progress {
-	display: flex;
-	gap: 6px;
-	margin-bottom: 24px;
-}
-.gear-engine-picker__progress span {
-	flex: 1;
-	height: 5px;
-	border-radius: 999px;
-	background: var(--ge-grey-200, #E4E7EC);
-	transition: background 0.3s var(--ge-ease);
-}
-.gear-engine-picker__progress span.is-done {
-	background: var(--gep-ink);
-}
-
-/* Choice Cards */
-.gear-engine-picker__choice {
-	display: block;
-	width: 100%;
-	margin-bottom: 10px;
-	padding: 18px 22px;
-	border: 1px solid var(--gep-border);
-	border-radius: var(--ge-r-md, 16px);
-	background: #FFFFFF;
-	text-align: left;
-	box-shadow: var(--ge-shadow-1);
-	transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
-}
-.gear-engine-picker__choice:hover {
-	border-color: var(--gep-ink);
-	background: var(--ge-navy-selected-bg, #F0F4F8);
-	transform: translateY(-1px);
-}
-.gear-engine-picker__choice-title {
-	display: block;
-	margin-bottom: 4px;
-	font-size: 16px;
-	font-weight: 600;
-	color: var(--gep-ink);
-}
-.gear-engine-picker__choice-desc {
-	display: block;
-	font-size: 13.5px;
-	color: var(--gep-muted);
-	line-height: 1.4;
-}
-
-/* Slider (M3-style) */
-.gear-engine-picker__slider {
-	margin-bottom: 24px;
-	padding: 28px 24px;
-	border: 1px solid var(--gep-border);
-	border-radius: var(--ge-r-lg, 20px);
-	background: #FFFFFF;
-	text-align: center;
-	box-shadow: var(--ge-shadow-1);
-}
-.gear-engine-picker__slider-value {
-	margin-bottom: 8px;
-	font-size: 40px;
-	font-weight: 800;
-	letter-spacing: -1px;
-	color: var(--gep-ink);
-}
-.gear-engine-picker__slider-note {
-	margin: 0 0 16px;
-	font-size: 14px;
-	color: var(--gep-muted);
-}
-.gear-engine-picker__range {
-	width: 100%;
-	accent-color: var(--gep-ink);
-}
-
-/* Results Section */
-.gear-engine-picker__results-head {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 12px;
-	margin-bottom: 8px;
-}
-.gear-engine-picker__results-head .gear-engine-picker__title {
-	font-size: 24px;
-	margin-bottom: 0;
-}
-.gear-engine-picker__disclosure {
-	margin: 0 0 24px;
-	font-size: 12px;
-	color: var(--gep-muted);
-}
-.gear-engine-picker__none {
-	padding: 48px 20px;
-	border-radius: var(--ge-r-lg, 20px);
-	background: var(--gep-bg);
-	text-align: center;
-}
-.gear-engine-picker__none strong {
-	display: block;
-	margin-bottom: 8px;
-	font-size: 18px;
-	color: var(--gep-ink);
-}
-
-/* Product Card: Clean M3 Outlined */
-.gear-engine-picker__card {
-	position: relative;
-	margin: 20px 0;
-	padding: 24px;
-	border: 1px solid var(--gep-border);
-	border-radius: var(--ge-r-lg, 20px);
-	background: #FFFFFF;
-	box-shadow: var(--ge-shadow-1);
-	transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-}
-.gear-engine-picker__card:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--ge-shadow-2);
-}
-
-/* Badges: Beste Match (Green) and Beste Tilbud (Warm Amber) */
-.gear-engine-picker__badge {
-	position: absolute;
-	top: -12px;
-	left: 20px;
-	padding: 4px 14px;
-	border-radius: 999px;
-	background: var(--gep-green-bg);
-	color: var(--gep-green);
-	border: 1px solid var(--ge-accent-green-border, #BEE3D0);
-	font-size: 11.5px;
-	font-weight: 700;
-	letter-spacing: 0.3px;
-	box-shadow: 0 1px 3px rgba(0, 82, 54, 0.08);
-}
-.gear-engine-picker__badge.is-offer {
-	background: var(--gep-deal-bg);
-	color: var(--gep-deal-text);
-	border: 1px solid var(--gep-deal-border);
-	box-shadow: 0 1px 3px rgba(146, 64, 14, 0.08);
-}
-
-.gear-engine-picker__card-top {
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-}
-.gear-engine-picker__img {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 200px;
-	padding: 16px;
+/* Progress Track */
+.gear-engine-picker .steps-track {
+	height: 4px;
+	margin: 0 -16px 16px;
+	background: var(--md-sys-color-surface-container-high, #E5E9EE);
 	overflow: hidden;
-	border: 1px solid var(--ge-grey-100, #F0F2F5);
-	border-radius: var(--ge-r-md, 16px);
-	background: var(--ge-grey-50, #F5F7FA);
 }
-.gear-engine-picker__img img {
-	display: block;
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
-}
-.gear-engine-picker__discount {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	padding: 4px 10px;
-	border-radius: 999px;
-	background: var(--gep-deal-bg);
-	color: var(--gep-deal-text);
-	border: 1px solid var(--gep-deal-border);
-	font-size: 11.5px;
-	font-weight: 700;
-}
-.gear-engine-picker__details {
-	flex: 1;
-	min-width: 0;
-}
-.gear-engine-picker__meta {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	margin-bottom: 8px;
-}
-.gear-engine-picker__shop {
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.3px;
-	text-transform: uppercase;
-	color: var(--gep-muted);
-}
-.gear-engine-picker__match {
-	padding: 4px 12px;
-	border-radius: 999px;
-	background: var(--gep-green-bg);
-	color: var(--gep-green);
-	border: 1px solid var(--ge-accent-green-border, #BEE3D0);
-	font-size: 12px;
-	font-weight: 700;
-	white-space: nowrap;
-}
-.gear-engine-picker__name {
-	margin: 0 0 12px;
-	font-size: 18px;
-	font-weight: 700;
-	line-height: 1.3;
-	color: var(--gep-ink);
+.gear-engine-picker .steps-fill {
+	height: 100%;
+	background: var(--md-sys-color-primary, #0C2340);
+	transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Specs Pills: Sleek 24px height, neutral grey */
-.gear-engine-picker__pills {
+/* Chips Row */
+.gear-engine-picker .chips-row {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 6px;
-	margin-top: 6px;
+	gap: 8px;
 }
-.gear-engine-picker__pill {
+.gear-engine-picker .chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 36px;
+	padding: 0 14px;
+	border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
+	border-radius: 999px;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	color: var(--md-sys-color-on-surface, #0C2340);
+	font-size: 13.5px;
+	font-weight: 500;
+	transition: all 0.2s;
+}
+.gear-engine-picker .chip.sel {
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	color: var(--md-sys-color-primary, #0C2340);
+	border-color: #D5E1ED;
+	font-weight: 600;
+}
+.gear-engine-picker .chip:hover {
+	background: var(--md-sys-color-surface-container-high, #F0F4F8);
+}
+
+/* Badges & Pills */
+.gear-engine-picker .pill {
 	display: inline-flex;
 	align-items: center;
 	height: 24px;
 	padding: 0 10px;
-	border: 1px solid var(--ge-grey-200, #E4E7EC);
 	border-radius: 999px;
-	background: var(--ge-grey-100, #F0F2F5);
-	color: var(--gep-text);
-	font-size: 11.5px;
-	font-weight: 500;
-	letter-spacing: 0.15px;
+	font-size: 12px;
+	font-weight: 600;
 	white-space: nowrap;
 }
+.gear-engine-picker .pill.tert { background: var(--md-sys-color-tertiary-container, #DCF5E8); color: var(--md-sys-color-tertiary, #005236); }
+.gear-engine-picker .pill.sec { background: var(--md-sys-color-secondary-container, #EAF0F6); color: var(--md-sys-color-secondary, #143154); }
+.gear-engine-picker .pill.warn { background: var(--md-ext-color-warning-container, #FEF3C7); color: var(--md-ext-color-on-warning-container, #92400E); border: 1px solid #FDE68A; }
+.gear-engine-picker .pill.err { background: var(--md-sys-color-error-container, #FDE8E8); color: var(--md-sys-color-on-error-container, #9B1C1C); }
+.gear-engine-picker .pill.deal { background: var(--md-ext-color-warning-container, #FEF3C7); color: var(--md-ext-color-on-warning-container, #92400E); border: 1px solid #FDE68A; }
+.gear-engine-picker .pill.best { background: var(--md-sys-color-primary, #0C2340); color: #FFFFFF; }
 
-.gear-engine-picker__notice {
-	margin-bottom: 24px;
+/* Cards & Surfaces */
+.gear-engine-picker .card {
 	padding: 16px;
-	border: 1px solid var(--gep-deal-border);
-	border-radius: var(--ge-r-md, 16px);
-	background: var(--gep-deal-bg);
-	color: var(--gep-deal-text);
-	font-size: 13.5px;
-	line-height: 1.45;
+	border-radius: var(--md-sys-shape-lg, 16px);
+	background: var(--md-sys-color-surface, #FFFFFF);
+	transition: transform 0.2s, box-shadow 0.2s;
 }
-.gear-engine-picker__reasons {
-	margin: 14px 0 0;
-	padding: 12px 16px;
-	border-left: 3.5px solid var(--gep-green);
-	border-radius: 0 var(--ge-r-xs, 8px) var(--ge-r-xs, 8px) 0;
-	background: var(--ge-grey-50, #F5F7FA);
-	font-size: 13px;
-	line-height: 1.45;
-	font-style: italic;
-	color: var(--gep-text);
+.gear-engine-picker .card.xl { padding: 24px; border-radius: var(--md-sys-shape-xl, 24px); }
+.gear-engine-picker .card.elevated {
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.06));
+}
+.gear-engine-picker .card.elevated:hover {
+	box-shadow: var(--md-sys-elevation-2, 0 4px 12px rgba(0,0,0,0.08));
+}
+.gear-engine-picker .card.outlined {
+	border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
+	background: transparent;
+}
+.gear-engine-picker .card.filled {
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+	border: 0;
+}
+.gear-engine-picker .card.stack { display: flex; flex-direction: column; gap: 0; }
+
+/* Live Match Count Top Grid */
+.gear-engine-picker .grid2 {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+	margin-top: 8px;
+}
+.gear-engine-picker .grid2 .card.outlined {
+	background: var(--md-sys-color-surface, #FFFFFF);
+	padding: 14px 16px;
 }
 
-/* Product Card Footer */
-.gear-engine-picker__footer {
+/* Sections Header */
+.gear-engine-picker .sec-head {
 	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
-	gap: 16px;
-	margin-top: 20px;
-	padding-top: 18px;
-	border-top: 1px solid var(--ge-grey-200, #E4E7EC);
-}
-.gear-engine-picker__price {
-	display: flex;
-	flex-direction: column;
-}
-.gear-engine-picker__old-price {
-	margin-bottom: 2px;
-	font-size: 13px;
-	font-weight: 500;
-	color: var(--gep-muted);
-	text-decoration: line-through;
-}
-.gear-engine-picker__current-price {
-	font-size: 26px;
-	font-weight: 700;
-	line-height: 1;
-	letter-spacing: -0.5px;
-	color: var(--gep-ink);
-}
-.gear-engine-picker__current-price.is-discounted {
-	color: var(--gep-ink);
+	margin: 28px 0 14px;
 }
 
-/* Call To Action Button: Deep Navy with Hover Transition */
-.gear-engine-picker__cta {
+/* Deal Grid on Intro */
+.gear-engine-picker .deal-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 14px;
+}
+@media (min-width: 580px) {
+	.gear-engine-picker .deal-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Quick Tiles (Velg etter bruksområde) */
+.gear-engine-picker .tiles {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 12px;
+}
+@media (min-width: 500px) {
+	.gear-engine-picker .tiles { grid-template-columns: 1fr 1fr; }
+}
+.gear-engine-picker .tile {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px;
+	border-radius: var(--md-sys-shape-md, 14px);
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	background: #FFFFFF;
+	text-align: left;
+	color: var(--md-sys-color-on-surface, #0C2340);
+	transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+	box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.04));
+}
+.gear-engine-picker .tile:hover {
+	transform: translateY(-2px);
+	background: #F1F8F4;
+	border-color: #BEE3D0;
+	box-shadow: 0 6px 20px -4px rgba(0,82,54,.08), 0 2px 6px rgba(12,35,64,.04);
+}
+.gear-engine-picker .tile .ti {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	flex: none;
+	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+	color: var(--md-sys-color-primary, #0C2340);
+	transition: background 0.2s, color 0.2s;
+}
+.gear-engine-picker .tile:hover .ti {
+	background: var(--md-sys-color-tertiary, #005236);
+	color: #FFFFFF;
+}
+.gear-engine-picker .tile b { display: block; font-size: 14.5px; line-height: 20px; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .tile small { display: block; font-size: 12.5px; line-height: 17px; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 2px; }
+
+/* Options (Question Choices) */
+.gear-engine-picker .opts {
+	display: grid;
+	gap: 10px;
+	margin-top: 18px;
+}
+.gear-engine-picker .opt {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 18px;
+	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
+	border-radius: var(--md-sys-shape-md, 14px);
+	background: var(--md-sys-color-surface, #FFFFFF);
+	color: var(--md-sys-color-on-surface, #0C2340);
+	text-align: left;
+	transition: border-color 0.18s, background-color 0.18s, box-shadow 0.18s, transform 0.15s;
+}
+.gear-engine-picker .opt:hover {
+	border-color: var(--md-sys-color-primary, #0C2340);
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+}
+.gear-engine-picker .opt[aria-pressed=true],
+.gear-engine-picker .opt.is-active {
+	border-color: var(--md-sys-color-primary, #0C2340);
+	background: var(--ge-navy-selected-bg, #F0F4F8);
+	box-shadow: 0 0 0 1.5px var(--md-sys-color-primary, #0C2340);
+	transform: scale(0.995);
+}
+.gear-engine-picker .opt .oi {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+	color: var(--md-sys-color-primary, #0C2340);
+	flex: none;
+	transition: background 0.2s, color 0.2s;
+}
+.gear-engine-picker .opt[aria-pressed=true] .oi,
+.gear-engine-picker .opt.is-active .oi {
+	background: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF;
+}
+.gear-engine-picker .opt .ot { flex: 1; min-width: 0; }
+.gear-engine-picker .opt .ot b { display: block; font-size: 15px; line-height: 21px; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .opt .ot small { display: block; font-size: 13px; line-height: 18px; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 2px; }
+.gear-engine-picker .opt .ctl {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	border: 2px solid var(--md-sys-color-outline, #94A3B8);
+	display: grid;
+	place-items: center;
+	color: #FFFFFF;
+	flex: none;
+	transition: all 0.2s;
+}
+.gear-engine-picker .opt[aria-pressed=true] .ctl,
+.gear-engine-picker .opt.is-active .ctl {
+	background: var(--md-sys-color-primary, #0C2340);
+	border-color: var(--md-sys-color-primary, #0C2340);
+}
+
+/* Live Pulse Indicator Card */
+.gear-engine-picker .live {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	border-radius: var(--md-sys-shape-md, 14px);
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	margin-top: 18px;
+}
+.gear-engine-picker .dotp {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--md-sys-color-tertiary, #005236);
+	box-shadow: 0 0 0 0 rgba(0, 82, 54, 0.7);
+	animation: gep-pulse 1.8s infinite;
+	flex: none;
+}
+@keyframes gep-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(0, 82, 54, 0.7); }
+	70% { box-shadow: 0 0 0 8px rgba(0, 82, 54, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(0, 82, 54, 0); }
+}
+.gear-engine-picker .lp {
+	flex: 1;
+	max-width: 110px;
+	height: 6px;
+	border-radius: 3px;
+	background: var(--md-sys-color-surface-container-high, #E5E9EE);
+	overflow: hidden;
+}
+.gear-engine-picker .lp i {
+	display: block;
+	height: 100%;
+	background: var(--md-sys-color-tertiary, #005236);
+	transition: width 0.3s;
+}
+
+/* Slider Controls */
+.gear-engine-picker .big-val { text-align: center; margin: 20px 0 8px; }
+.gear-engine-picker .big-val .display-m { font-size: 38px; line-height: 44px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .big-val small { font-size: 20px; color: var(--md-sys-color-on-surface-variant, #667085); margin-left: 6px; font-weight: 500; }
+.gear-engine-picker .slider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 32px;
+	background: transparent;
+	margin: 12px 0 0;
+	cursor: pointer;
+	--p: 50%;
+}
+.gear-engine-picker .slider::-webkit-slider-runnable-track {
+	height: 16px;
+	border-radius: 8px;
+	background: linear-gradient(to right, var(--md-sys-color-primary, #0C2340) var(--p), var(--md-sys-color-secondary-container, #DCE4EE) var(--p));
+}
+.gear-engine-picker .slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 6px;
+	height: 32px;
+	margin-top: -8px;
+	border-radius: 3px;
+	background: var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 0 0 6px var(--md-sys-color-surface, #FFFFFF);
+}
+.gear-engine-picker .slider::-moz-range-track {
+	height: 16px;
+	border-radius: 8px;
+	background: linear-gradient(to right, var(--md-sys-color-primary, #0C2340) var(--p), var(--md-sys-color-secondary-container, #DCE4EE) var(--p));
+}
+.gear-engine-picker .slider::-moz-range-thumb {
+	width: 6px;
+	height: 32px;
+	border: 0;
+	border-radius: 3px;
+	background: var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 0 0 6px var(--md-sys-color-surface, #FFFFFF);
+}
+.gear-engine-picker .ticks {
+	display: flex;
+	justify-content: space-between;
+	font-size: 12px;
+	letter-spacing: 0.3px;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	padding: 6px 4px 0;
+}
+
+/* Bottom Navigation Dock */
+.gear-engine-picker .dock {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 28px;
+	padding-top: 18px;
+	border-top: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+}
+.gear-engine-picker .dock .btn-back {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	border-radius: 50%;
+}
+.gear-engine-picker .dock .btn.primary {
+	flex: 1;
+	height: 48px;
+	font-size: 15px;
+}
+
+/* General Buttons */
+.gear-engine-picker .btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	height: 44px;
-	padding: 0 22px;
-	border-radius: 999px;
-	background: var(--gep-btn);
-	color: #FFFFFF !important;
 	gap: 8px;
-	font-size: 13.5px;
+	height: 44px;
+	padding: 0 20px;
+	border-radius: 999px;
+	font-size: 14px;
 	font-weight: 600;
+	border: 0;
 	text-decoration: none;
 	cursor: pointer;
 	transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
-.gear-engine-picker__cta:hover {
-	background: var(--ge-navy-800, #143154);
+.gear-engine-picker .btn.filled {
+	background: var(--md-sys-color-primary, #0C2340);
 	color: #FFFFFF !important;
-	transform: translateY(-1px);
-	box-shadow: var(--ge-shadow-1);
 }
-.gear-engine-picker__cta svg {
-	width: 14px;
-	height: 14px;
+.gear-engine-picker .btn.filled:hover {
+	background: #143154;
+	box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.1));
+}
+.gear-engine-picker .btn.outlined {
+	border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
+	background: transparent;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-picker .btn.outlined:hover {
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+}
+.gear-engine-picker .btn.text {
+	background: transparent;
+	color: var(--md-sys-color-primary, #0C2340);
+	padding: 0 12px;
+}
+.gear-engine-picker .btn.text:hover {
+	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+}
+.gear-engine-picker .btn:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	pointer-events: none;
 }
 
+/* Product Art & Imagery */
+.gear-engine-picker .art {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--md-sys-shape-md, 14px);
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	position: relative;
+	color: var(--md-sys-color-primary, #0C2340);
+	padding: 16px;
+	box-sizing: border-box;
+	min-height: 180px;
+	height: 100%;
+	overflow: hidden;
+}
+.gear-engine-picker .art svg,
+.gear-engine-picker .art img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	height: auto;
+}
+.gear-engine-picker .art .disc {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: var(--md-sys-color-error-container, #FDE8E8);
+	color: var(--md-sys-color-on-error-container, #9B1C1C);
+	font-weight: 700;
+	font-size: 11.5px;
+	border-radius: 999px;
+	padding: 3px 9px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.gear-engine-picker .art .badge-top-left {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Shop and Merchant Presentation */
+.gear-engine-picker .shop {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.gear-engine-picker .avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 11.5px;
+	font-weight: 700;
+	flex: none;
+	border: 1px solid #D5E1ED;
+}
+.gear-engine-picker .shop b {
+	font-size: 14px;
+	line-height: 20px;
+	font-weight: 600;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-picker .head-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+/* Best Match Layout */
+.gear-engine-picker .best-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 20px;
+}
+@media (min-width: 620px) {
+	.gear-engine-picker .best-grid {
+		grid-template-columns: 240px 1fr;
+		gap: 24px;
+		align-items: stretch;
+	}
+}
+
+/* Specs & Note */
+.gear-engine-picker .specs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+.gear-engine-picker .spec {
+	display: inline-flex;
+	align-items: center;
+	height: 24px;
+	padding: 0 10px;
+	border-radius: 999px;
+	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+	color: var(--md-sys-color-on-surface, #0C2340);
+	font-size: 11.5px;
+	font-weight: 500;
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	white-space: nowrap;
+}
+.gear-engine-picker .note {
+	padding: 12px 16px;
+	border-radius: 0 var(--md-sys-shape-md, 12px) var(--md-sys-shape-md, 12px) 0;
+	border-left: 3.5px solid var(--md-sys-color-tertiary, #005236);
+	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	font-size: 13px;
+	line-height: 20px;
+	font-style: italic;
+	margin: 16px 0 0;
+}
+.gear-engine-picker .why {
+	list-style: none;
+	padding: 0;
+	display: grid;
+	gap: 10px;
+	margin-top: 16px;
+}
+.gear-engine-picker .why li {
+	display: flex;
+	gap: 10px;
+	font-size: 13.5px;
+	line-height: 20px;
+	color: var(--md-sys-color-on-surface, #0C2340);
+	align-items: flex-start;
+}
+.gear-engine-picker .why li svg {
+	flex: none;
+	color: var(--md-sys-color-tertiary, #005236);
+	margin-top: 2px;
+}
+.gear-engine-picker .why li.neutral svg {
+	color: var(--md-sys-color-outline, #94A3B8);
+}
+
+/* Price Bar & CTAs */
+.gear-engine-picker .pricebar {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	margin-top: 18px;
+	padding-top: 16px;
+	border-top: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+}
+.gear-engine-picker .price {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+}
+.gear-engine-picker .price b {
+	font-size: 26px;
+	line-height: 32px;
+	font-weight: 700;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-picker .price s {
+	font-size: 13.5px;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	text-decoration: line-through;
+}
+.gear-engine-picker .actions {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: 1fr 1fr;
+}
+@media (min-width: 480px) {
+	.gear-engine-picker .pricebar.row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.gear-engine-picker .pricebar.row .actions {
+		grid-template-columns: auto auto;
+	}
+}
+
+/* Alternative Products Grid */
+.gear-engine-picker .alt-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 14px;
+}
 @media (min-width: 600px) {
-	.gear-engine-picker__card-top { flex-direction: row; gap: 24px; }
-	.gear-engine-picker__img { flex-shrink: 0; width: 200px; height: 200px; }
+	.gear-engine-picker .alt-grid { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 599px) {
-	.gear-engine-picker__footer { flex-direction: column; align-items: stretch; }
-	.gear-engine-picker__price { align-items: flex-start; }
-	.gear-engine-picker__cta { width: 100%; }
+.gear-engine-picker .alt {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+.gear-engine-picker .alt h4 {
+	font-size: 15.5px;
+	line-height: 22px;
+	font-weight: 600;
+	color: var(--md-sys-color-primary, #0C2340);
+	margin: 12px 0 6px;
+}
+.gear-engine-picker .alt .pricebar { margin-top: 14px; }
+
+/* Overlays: Comparison Sheet & Dialog */
+.gear-engine-picker .scrim {
+	position: fixed;
+	inset: 0;
+	z-index: 9998;
+	background: rgba(12, 35, 64, 0.45);
+	backdrop-filter: blur(2px);
+	animation: gep-fadein 0.2s both;
+}
+.gear-engine-picker .sheet {
+	position: fixed;
+	z-index: 9999;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	max-height: 85vh;
+	overflow-y: auto;
+	padding: 16px 20px 28px;
+	border-radius: 24px 24px 0 0;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	box-shadow: var(--md-sys-elevation-3, 0 8px 30px rgba(0,0,0,0.18));
+	animation: gep-up 0.3s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@media (min-width: 640px) {
+	.gear-engine-picker .sheet {
+		left: 50%;
+		right: auto;
+		bottom: auto;
+		top: 50%;
+		width: 600px;
+		max-width: calc(100% - 32px);
+		border-radius: 24px;
+		transform: translate(-50%, -50%);
+		animation: gep-fadein 0.2s both;
+	}
+}
+.gear-engine-picker .grabber {
+	width: 36px;
+	height: 4px;
+	border-radius: 2px;
+	background: var(--md-sys-color-on-surface-variant, #94A3B8);
+	opacity: 0.4;
+	margin: 0 auto 16px;
+}
+.gear-engine-picker .cmp {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+	margin-top: 14px;
+}
+.gear-engine-picker .cmp th,
+.gear-engine-picker .cmp td {
+	padding: 11px 8px;
+	border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	text-align: left;
+	vertical-align: middle;
+}
+.gear-engine-picker .cmp th {
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	font-weight: 500;
+	width: 28%;
 }
 
-/* Stage Motion: Material 3 Emphasized Directional Slide */
-.gear-engine-picker__stage--forward {
-	animation: gep-slide-forward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+/* Animations */
+@keyframes gep-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gep-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+/* Stage Transitions: Material 3 Emphasized Directional Slide */
+.gear-engine-picker .gear-engine-picker__stage--forward {
+	animation: gep-slide-fwd 0.32s cubic-bezier(0.2, 0, 0, 1) both;
 }
-.gear-engine-picker__stage--backward {
-	animation: gep-slide-backward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+.gear-engine-picker .gear-engine-picker__stage--backward {
+	animation: gep-slide-bwd 0.32s cubic-bezier(0.2, 0, 0, 1) both;
 }
-@keyframes gep-slide-forward {
+@keyframes gep-slide-fwd {
 	from { opacity: 0; transform: translateX(24px); }
 	to { opacity: 1; transform: translateX(0); }
 }
-@keyframes gep-slide-backward {
+@keyframes gep-slide-bwd {
 	from { opacity: 0; transform: translateX(-24px); }
 	to { opacity: 1; transform: translateX(0); }
 }
 
-/* Choice Card Active / Pressed State */
-.gear-engine-picker__choice.is-active {
-	border-color: var(--gep-ink);
-	background: var(--ge-navy-selected-bg, #F0F4F8);
-	box-shadow: 0 0 0 1.5px var(--gep-ink);
-	transform: scale(0.99);
+@media (prefers-reduced-motion: reduce) {
+	.gear-engine-picker * {
+		animation: none !important;
+		transition: none !important;
+	}
 }
