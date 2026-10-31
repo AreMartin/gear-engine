@@ -34,7 +34,12 @@
 	}
 
 	function safeUrl(url) {
-		return typeof url === 'string' && /^https?:\/\//i.test(url.trim()) ? url.trim() : '';
+		if (typeof url !== 'string') { return ''; }
+		var trimmed = url.trim();
+		if (/^https?:\/\//i.test(trimmed)) { return trimmed; }
+		if (/^\/[a-zA-Z0-9_\-\.\/?&=%#]*/i.test(trimmed)) { return trimmed; }
+		if (/^\?[a-zA-Z0-9_\-\.\/?&=%#]*/i.test(trimmed)) { return trimmed; }
+		return '';
 	}
 
 	function clone(value) {
@@ -787,9 +792,17 @@
 		// Action plan
 		html += this.renderPlan(res);
 
-		// Training program (protocol)
-		var program = res.trainingProgram && safeUrl(res.trainingProgram.url) ? res.trainingProgram : null;
-		if (program) {
+		// Training program (protocol CTA box: always rendered for non-critical results)
+		if (!isHigh) {
+			var program = res.trainingProgram || {};
+			var programUrl = safeUrl(program.url);
+			if (!programUrl) {
+				var pageUrl = this.config.programPageUrl || '/treningsprogram/';
+				programUrl = pageUrl + (pageUrl.indexOf('?') === -1 ? '?' : '&') + 'region=' + encodeURIComponent(this.region) + '&dx=' + encodeURIComponent(res.id || '');
+			}
+			var programTitle = program.title || 'Åpne treningsprogram';
+			var programDesc = program.description || 'Et kvalitetssikret treningsprogram som bygger direkte på denne vurderingen.';
+
 			html += '<div class="get-noprint" style="margin-top:18px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid var(--ge-navy-border,#D5E1ED);box-shadow:var(--md-sys-elevation-1);border-radius:24px;padding:24px">' +
 				'<span class="pill" style="background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);border:1px solid #D0DBE5;font-weight:600;box-shadow:0 1px 2px rgba(12,35,64,0.04);gap:6px">' +
 				'<span style="width:6px;height:6px;border-radius:50%;background:var(--ge-green-800,#005236);display:inline-block"></span>' +
@@ -797,11 +810,11 @@
 				'</span>' +
 				'<h3 class="headline-s" style="margin:14px 0 6px;color:var(--md-sys-color-primary,#0C2340)">Klar for å komme i gang?</h3>' +
 				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' +
-				esc(program.description || 'Et kvalitetssikret treningsprogram som bygger direkte på denne vurderingen.') +
+				esc(programDesc) +
 				'</p>' +
 				'<div style="display:flex;justify-content:flex-end;margin-top:20px">' +
-				'<a class="btn filled primary sl" style="height:48px;font-size:15px;font-weight:600;padding:0 24px;text-decoration:none" href="' + esc(safeUrl(program.url)) + '" target="_blank" rel="noopener noreferrer">' +
-				esc(program.title || 'Åpne treningsprogram') + ' ' + icon('ExternalLink', 18) +
+				'<a class="btn filled primary sl" style="height:48px;font-size:15px;font-weight:600;padding:0 24px;text-decoration:none" href="' + esc(programUrl) + '"' + (/^https?:\/\//i.test(programUrl) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
+				esc(programTitle) + ' ' + icon('ExternalLink', 18) +
 				'</a>' +
 				'</div></div>';
 		}

@@ -470,6 +470,9 @@ class Gear_Engine_Triage {
 		}
 
 		$config = self::attach_programs( $config, $region );
+		if ( class_exists( 'Gear_Engine_Protocol_Viewer' ) ) {
+			$config['programPageUrl'] = trailingslashit( home_url( Gear_Engine_Protocol_Viewer::get_page_path() ) );
+		}
 
 		wp_enqueue_style( 'gear-engine-triage' );
 		wp_enqueue_script( 'gear-engine-triage' );
