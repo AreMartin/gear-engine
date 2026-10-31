@@ -748,7 +748,7 @@
 			'</div>' +
 			'</div>';
 
-		// High severity or red flags alert
+		// High severity or red flags alert (Legevakt 116 117 and Nødnummer 113)
 		if (isHigh || flagCount > 0) {
 			html += '<div style="margin-top:14px;padding:20px;border-radius:16px;background:var(--md-sys-color-error-container,#FEE2E2);color:var(--md-sys-color-on-error-container,#991B1B);border:1px solid #FCA5A5">' +
 				'<h3 class="title-m" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">' +
@@ -757,9 +757,12 @@
 				'<p class="body-m" style="margin-bottom:16px;line-height:22px">' +
 				esc(res.phase1 || 'Ved akutte eller vedvarende sterke smerter bør du oppsøke lege eller legevakt for en fysisk undersøkelse.') +
 				'</p>' +
-				'<div style="display:grid;gap:8px">' +
-				'<a class="btn err sl" href="tel:116117" style="display:flex;background:#B42318;color:#FFFFFF;text-decoration:none">' +
+				'<div style="display:grid;gap:10px">' +
+				'<a class="btn err sl block" href="tel:116117" style="display:flex;background:#B42318;color:#FFFFFF;text-decoration:none;height:44px;font-size:15px;font-weight:600">' +
 				icon('Phone', 18) + ' Ring Legevakt 116 117' +
+				'</a>' +
+				'<a class="btn outlined sl block" href="tel:113" style="display:flex;background:#FFFFFF;color:#991B1B;border:1.5px solid #991B1B;text-decoration:none;height:44px;font-size:15px;font-weight:600">' +
+				icon('Phone', 18) + ' Nødnummer 113 (Akutt)' +
 				'</a>' +
 				'</div>' +
 				'</div>';
