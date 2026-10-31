@@ -346,17 +346,25 @@ class Gear_Engine_Gear_Picker {
 			}
 		}
 
+		$raw_merchant = wp_strip_all_tags( html_entity_decode( (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ), ENT_QUOTES, 'UTF-8' ) );
+		$shop_name    = $raw_merchant;
+		if ( preg_match( '/\(([^)]+)\)$/', $raw_merchant, $shop_match ) ) {
+			$shop_name = trim( $shop_match[1] );
+		}
+
 		$item = array(
-			'id'    => $post->ID,
-			'name'  => $title,
-			'shop'  => wp_strip_all_tags( html_entity_decode( (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ), ENT_QUOTES, 'UTF-8' ) ),
-			'price' => $price,
-			'old'   => $old > $price ? $old : 0,
-			'cur'   => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',
-			'img'   => esc_url_raw( $image ),
-			'url'   => esc_url_raw( $url ),
-			'specs' => $read['specs'],
-			'est'   => $read['est'],
+			'id'        => $post->ID,
+			'name'      => $title,
+			'shop'      => $shop_name,
+			'raw_shop'  => $raw_merchant,
+			'shop_logo' => esc_url_raw( (string) apply_filters( 'gear_engine_merchant_logo', (string) get_post_meta( $post->ID, '_merchant_logo_url', true ), $shop_name, $post ) ),
+			'price'     => $price,
+			'old'       => $old > $price ? $old : 0,
+			'cur'       => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',
+			'img'       => esc_url_raw( $image ),
+			'url'       => esc_url_raw( $url ),
+			'specs'     => $read['specs'],
+			'est'       => $read['est'],
 		);
 
 		/**

@@ -77,11 +77,74 @@
 		return Math.round( Number( n ) || 0 ).toLocaleString( 'nb-NO' ) + ' ' + ( cur || 'kr' );
 	}
 
+	function cleanShopName( raw ) {
+		var s = decodeEntities( String( raw || '' ) ).trim();
+		var m = s.match( /\(([^)]+)\)$/ );
+		return m ? m[ 1 ].trim() : s;
+	}
+
 	function initials( n ) {
-		var clean = String( n || '' ).replace( /[()[\]{}_-]/g, ' ' ).trim();
+		var clean = cleanShopName( n ).replace( /[()[\]{}_-]/g, ' ' ).trim();
 		var parts = clean.split( /\s+/ ).filter( Boolean );
 		if ( ! parts.length ) { return 'GE'; }
 		return ( parts.length > 1 ? parts[ 0 ][ 0 ] + parts[ 1 ][ 0 ] : parts[ 0 ].slice( 0, 2 ) ).toUpperCase();
+	}
+
+	var KNOWN_MERCHANT_DOMAINS = {
+		'treningspartner': 'treningspartner.no',
+		'gymgrossisten':   'gymgrossisten.no',
+		'fjellsport':      'fjellsport.no',
+		'sportmann':       'sportmann.no',
+		'mylna':           'mylnasport.no',
+		'e-wheels':        'e-wheels.no',
+		'xxl':             'xxl.no',
+		'antonsport':      'antonsport.no',
+		'tights':          'tights.no',
+		'milrab':          'milrab.no',
+		'proteinfabrikken':'proteinfabrikken.no'
+	};
+
+	function getMerchantLogo( item ) {
+		if ( item.shop_logo ) {
+			return item.shop_logo;
+		}
+		var shopName = cleanShopName( item.shop || '' );
+		var lower = shopName.toLowerCase().replace( /[^a-z0-9]/g, '' );
+		var domain = null;
+
+		for ( var key in KNOWN_MERCHANT_DOMAINS ) {
+			if ( lower.indexOf( key ) !== -1 || key.indexOf( lower ) !== -1 ) {
+				domain = KNOWN_MERCHANT_DOMAINS[ key ];
+				break;
+			}
+		}
+
+		if ( ! domain && item.url && /^https?:\/\//i.test( item.url ) ) {
+			try {
+				var u = new URL( item.url );
+				var host = u.hostname.replace( /^www\./, '' );
+				if ( host && host.indexOf( 'adtr.co' ) === -1 && host.indexOf( 'tradetracker' ) === -1 && host.indexOf( 'example.com' ) === -1 ) {
+					domain = host;
+				}
+			} catch ( e ) {}
+		}
+
+		return domain ? 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=128' : null;
+	}
+
+	function renderShopAvatar( item, small ) {
+		var shopName = cleanShopName( item.shop || '' );
+		var inits = initials( shopName );
+		var logoUrl = getMerchantLogo( item );
+		var style = small ? ' style="width:28px;height:28px;font-size:11px"' : '';
+
+		if ( logoUrl ) {
+			return '<span class="avatar"' + style + '>' +
+				'<img src="' + esc( logoUrl ) + '" alt="' + esc( shopName ) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'grid\';}">' +
+				'<span class="avatar-inits" style="display:none;width:100%;height:100%;place-items:center">' + inits + '</span>' +
+				'</span>';
+		}
+		return '<span class="avatar"' + style + '><span class="avatar-inits">' + inits + '</span></span>';
 	}
 
 	function safeUrl( url ) {
@@ -277,7 +340,7 @@
 							( disc ? '<span class="pill err disc">−' + disc + '%</span>' : '' ) +
 							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : TREAD_SVG ) +
 						'</div>' +
-						'<div class="head-row" style="margin:14px 0 4px"><span class="body-s muted" style="font-weight:700;letter-spacing:0.3px;text-transform:uppercase">' + esc( d.shop ) + '</span><span class="pill warn">Populær</span></div>' +
+						'<div class="head-row" style="margin:14px 0 4px"><span class="body-s muted" style="font-weight:700;letter-spacing:0.3px;text-transform:uppercase">' + esc( cleanShopName( d.shop ) ) + '</span><span class="pill warn">Populær</span></div>' +
 						'<h4 class="title-m" style="margin:0 0 8px">' + esc( d.name ) + '</h4>' +
 						'<div class="specs">' +
 							( sp ? '<span class="spec">' + sp + ' km/t</span>' : '' ) +
@@ -457,7 +520,7 @@
 
 			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
 				'<div class="head-row">' +
-					'<div class="shop"><span class="avatar">' + initials( best.shop ) + '</span><div><b>' + esc( best.shop ) + '</b></div></div>' +
+					'<div class="shop">' + renderShopAvatar( best ) + '<div><b>' + esc( cleanShopName( best.shop ) ) + '</b></div></div>' +
 					'<span class="pill tert num">' + best.matchPercentage + '% Match</span>' +
 				'</div>' +
 				'<div class="best-grid">' +
@@ -501,7 +564,7 @@
 
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
-							'<div class="shop"><span class="avatar" style="width:28px;height:28px;font-size:11px">' + initials( o.shop ) + '</span><div><b>' + esc( o.shop ) + '</b></div></div>' +
+							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
 							'<span class="pill tert num">' + o.matchPercentage + '% Match</span>' +
 						'</div>' +
 						'<div class="art" style="height:120px">' +
@@ -580,7 +643,7 @@
 					'</div>' +
 					'<table class="cmp"><tbody>' +
 						row( 'Modell', '<b>' + esc( p1.name ) + '</b>', '<b>' + esc( p2.name ) + '</b>' ) +
-						row( 'Forhandler', esc( p1.shop ), esc( p2.shop ) ) +
+						row( 'Forhandler', esc( cleanShopName( p1.shop ) ), esc( cleanShopName( p2.shop ) ) ) +
 						row( 'Match', '<span class="pill tert">' + ( p1.matchPercentage || '–' ) + '%</span>', '<span class="pill sec">' + ( p2.matchPercentage || '–' ) + '%</span>' ) +
 						row( 'Pris', '<b class="num">' + money( p1.price, p1.cur ) + '</b>', '<b class="num">' + money( p2.price, p2.cur ) + '</b>' ) +
 						row( 'Toppfart', ( p1Sp ? p1Sp + ' km/t' : '–' ), ( p2Sp ? p2Sp + ' km/t' : '–' ) ) +
@@ -590,7 +653,7 @@
 					'</tbody></table>' +
 					'<div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">' +
 						'<button type="button" class="btn text sl" data-action="close-sheet">Lukk</button>' +
-						'<a class="btn filled sl" href="' + safeUrl( p1.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til ' + esc( p1.shop ) + ic( 'ext', 16 ) + '</a>' +
+						'<a class="btn filled sl" href="' + safeUrl( p1.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til ' + esc( cleanShopName( p1.shop ) ) + ic( 'ext', 16 ) + '</a>' +
 					'</div>' +
 				'</div>';
 		}

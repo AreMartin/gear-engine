@@ -547,12 +547,30 @@
 	border-radius: 50%;
 	display: grid;
 	place-items: center;
-	background: var(--md-sys-color-primary-container, #EAF0F6);
+	background: #FFFFFF;
 	color: var(--md-sys-color-primary, #0C2340);
 	font-size: 11.5px;
 	font-weight: 700;
 	flex: none;
-	border: 1px solid #D5E1ED;
+	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	overflow: hidden;
+	position: relative;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
+}
+.gear-engine-picker .avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+	padding: 3px;
+	box-sizing: border-box;
+}
+.gear-engine-picker .avatar .avatar-inits {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background: var(--md-sys-color-primary-container, #EAF0F6);
 }
 .gear-engine-picker .shop b {
 	font-size: 14px;
