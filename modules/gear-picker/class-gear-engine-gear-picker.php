@@ -294,7 +294,7 @@ class Gear_Engine_Gear_Picker {
 	public static function evaluate_post( WP_Post $post, array $config, bool $has_scope = false ): array {
 		$terms = wp_get_post_terms( $post->ID, Gear_Engine_CPT::TAXONOMY, array( 'fields' => 'names' ) );
 		$terms = is_wp_error( $terms ) ? array() : $terms;
-		$title = get_the_title( $post );
+		$title = wp_strip_all_tags( html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ) );
 
 		$reason = self::match_reason( $title, $terms, (array) $config['match'], $has_scope );
 		if ( '' !== $reason ) {
@@ -349,7 +349,7 @@ class Gear_Engine_Gear_Picker {
 		$item = array(
 			'id'    => $post->ID,
 			'name'  => $title,
-			'shop'  => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ),
+			'shop'  => wp_strip_all_tags( html_entity_decode( (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_MERCHANT, true ), ENT_QUOTES, 'UTF-8' ) ),
 			'price' => $price,
 			'old'   => $old > $price ? $old : 0,
 			'cur'   => (string) get_post_meta( $post->ID, Gear_Engine_CPT::META_CURRENCY, true ) ?: 'kr',

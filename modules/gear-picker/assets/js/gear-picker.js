@@ -7,13 +7,31 @@
 	var Scoring = window.GearEnginePickerScoring;
 	var NO_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent( '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="100%" height="100%" fill="#e2e8f0"/></svg>' );
 
+	function decodeEntities( s ) {
+		if ( typeof s !== 'string' || s.indexOf( '&' ) === -1 ) {
+			return s;
+		}
+		try {
+			var txt = document.createElement( 'textarea' );
+			txt.innerHTML = s;
+			return txt.value || s;
+		} catch ( e ) {
+			return s.replace( /&#(\d+);/g, function ( m, d ) { return String.fromCharCode( d ); } )
+				.replace( /&ndash;/g, '–' )
+				.replace( /&mdash;/g, '—' )
+				.replace( /&amp;/g, '&' )
+				.replace( /&quot;/g, '"' )
+				.replace( /&#039;/g, "'" );
+		}
+	}
+
 	function el( tag, className, text ) {
 		var node = document.createElement( tag );
 		if ( className ) {
 			node.className = className;
 		}
 		if ( text !== undefined && text !== null ) {
-			node.textContent = text;
+			node.textContent = typeof text === 'string' ? decodeEntities( text ) : text;
 		}
 		return node;
 	}
