@@ -36,10 +36,29 @@
 	font-family: inherit;
 	cursor: pointer;
 }
-.gear-engine-triage :focus-visible,
-.gear-engine-triage-picker :focus-visible {
+.gear-engine-triage button:focus-visible,
+.gear-engine-triage a:focus-visible,
+.gear-engine-triage input:focus-visible,
+.gear-engine-triage-picker button:focus-visible,
+.gear-engine-triage-picker a:focus-visible {
 	outline: 2.5px solid var(--md-sys-color-primary, #0C2340);
 	outline-offset: 2px;
+}
+.gear-engine-triage button:focus:not(:focus-visible),
+.gear-engine-triage a:focus:not(:focus-visible),
+.gear-engine-triage-picker button:focus:not(:focus-visible),
+.gear-engine-triage-picker a:focus:not(:focus-visible) {
+	outline: none;
+}
+.gear-engine-triage .get-stage,
+.gear-engine-triage .get-stage:focus,
+.gear-engine-triage .get-stage:focus-visible,
+.gear-engine-triage .get-app:focus,
+.gear-engine-triage .get-app:focus-visible,
+.gear-engine-triage .opts:focus,
+.gear-engine-triage .opts:focus-visible {
+	outline: none !important;
+	box-shadow: none !important;
 }
 .gear-engine-triage svg,
 .gear-engine-triage-picker svg {

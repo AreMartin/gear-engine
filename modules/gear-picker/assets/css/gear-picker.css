@@ -30,8 +30,22 @@
 .gear-engine-picker *::after { box-sizing: border-box; }
 .gear-engine-picker button { font-family: inherit; cursor: pointer; }
 .gear-engine-picker svg { flex-shrink: 0; stroke-width: var(--ge-icon-stroke, 1.75px); }
-.gear-engine-picker :focus-visible { outline: 2.5px solid var(--gep-ink); outline-offset: 2px; }
-.gear-engine-picker__stage:focus { outline: none; }
+.gear-engine-picker button:focus-visible,
+.gear-engine-picker a:focus-visible,
+.gear-engine-picker input:focus-visible {
+	outline: 2.5px solid var(--gep-ink);
+	outline-offset: 2px;
+}
+.gear-engine-picker button:focus:not(:focus-visible),
+.gear-engine-picker a:focus:not(:focus-visible) {
+	outline: none;
+}
+.gear-engine-picker__stage,
+.gear-engine-picker__stage:focus,
+.gear-engine-picker__stage:focus-visible {
+	outline: none !important;
+	box-shadow: none !important;
+}
 .gear-engine-picker__stage { animation: gep-in 0.3s ease-out both; }
 @keyframes gep-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .gear-engine-picker * { animation: none !important; transition: none !important; } }
