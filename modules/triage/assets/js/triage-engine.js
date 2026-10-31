@@ -67,6 +67,9 @@
 		this.savedState = null;
 		this.sliderValue = 5;
 		this.noteId = '';
+		this.activeSheet = null;
+		this.snackbar = null;
+		this.snackbarTimer = null;
 	}
 
 	TriageApp.prototype.init = function () {
@@ -260,6 +263,27 @@
 			case 'accept':
 				if (this.disclaimerAccepted) { this.go(this.stepIndex + 1, 'forward'); }
 				break;
+			case 'open-share':
+				this.activeSheet = 'share';
+				this.render();
+				break;
+			case 'close-sheet':
+				this.activeSheet = null;
+				this.render();
+				break;
+			case 'action-print-plan':
+				this.activeSheet = null;
+				this.render();
+				this.printPlan();
+				break;
+			case 'action-print-note':
+				this.activeSheet = null;
+				this.render();
+				this.printNote();
+				break;
+			case 'action-copy-summary':
+				this.copySummary();
+				break;
 			case 'toggle-note':
 				this.toggleNote();
 				break;
@@ -364,11 +388,105 @@
 		toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
 	};
 
+	TriageApp.prototype.showSnackbar = function (text) {
+		var self = this;
+		if (this.snackbarTimer) {
+			window.clearTimeout(this.snackbarTimer);
+		}
+		this.snackbar = text;
+		this.render();
+		this.snackbarTimer = window.setTimeout(function () {
+			self.snackbar = null;
+			self.snackbarTimer = null;
+			self.render();
+		}, 3000);
+	};
+
+	TriageApp.prototype.copySummary = function () {
+		var self = this;
+		var res = this.getDiagnosis();
+		if (!res) { return; }
+		var text = 'Fysionett Smertesjekk: ' + (this.config.label || this.config.title) + '\n' +
+			'Vurdering: ' + res.title + '\n' +
+			'Kategori: ' + res.category + ' (Alvorlighetsgrad: ' + res.severity + ')\n' +
+			'Tiltak nå: ' + (res.phase1 || '') + '\n' +
+			(res.exercises && res.exercises.length ? '\nAnbefalte tiltak:\n- ' + res.exercises.join('\n- ') : '') + '\n\n' +
+			'Kilde: ' + window.location.href;
+
+		this.activeSheet = null;
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(text).then(function () {
+				self.showSnackbar('Oppsummering kopiert til utklippstavle');
+			}).catch(function () {
+				self.fallbackCopyText(text);
+			});
+		} else {
+			this.fallbackCopyText(text);
+		}
+	};
+
+	TriageApp.prototype.fallbackCopyText = function (text) {
+		try {
+			var area = document.createElement('textarea');
+			area.value = text;
+			area.style.position = 'fixed';
+			area.style.left = '-9999px';
+			document.body.appendChild(area);
+			area.select();
+			document.execCommand('copy');
+			document.body.removeChild(area);
+			this.showSnackbar('Oppsummering kopiert til utklippstavle');
+		} catch (e) {
+			this.showSnackbar('Kunne ikke kopiere automatisk');
+		}
+	};
+
+	TriageApp.prototype.printNote = function () {
+		var note = this.el.querySelector('[data-role="note"]');
+		if (note) { note.style.display = 'block'; }
+		window.print();
+	};
+
+	TriageApp.prototype.renderShareSheet = function () {
+		if (this.activeSheet !== 'share') { return ''; }
+		return '<div class="scrim" data-action="close-sheet"></div>' +
+			'<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="get-share-title">' +
+			'<div class="grabber"></div>' +
+			'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+			'<h3 class="title-l" id="get-share-title" style="margin:0">Del eller skriv ut</h3>' +
+			'<button type="button" class="ibtn tonal sl" data-action="close-sheet" aria-label="Lukk">' + icon('Close', 18) + '</button>' +
+			'</div>' +
+			'<div class="stack" style="gap:4px">' +
+			'<button type="button" class="opt sl" style="border:0;background:transparent;padding:12px 8px" data-action="action-print-plan">' +
+			'<span class="oi">' + icon('Share', 20) + '</span>' +
+			'<span class="ot"><b>Skriv ut min plan</b><small>Råd og tiltak, for deg selv</small></span>' +
+			'</button>' +
+			'<button type="button" class="opt sl" style="border:0;background:transparent;padding:12px 8px" data-action="action-print-note">' +
+			'<span class="oi">' + icon('Medical', 20) + '</span>' +
+			'<span class="ot"><b>Skriv ut klinisk notat</b><small>Ta med til fysioterapeut eller lege</small></span>' +
+			'</button>' +
+			'<button type="button" class="opt sl" style="border:0;background:transparent;padding:12px 8px" data-action="action-copy-summary">' +
+			'<span class="oi">' + icon('Copy', 20) + '</span>' +
+			'<span class="ot"><b>Kopier oppsummering</b><small>Lim inn i melding eller e-post</small></span>' +
+			'</button>' +
+			'</div></div>';
+	};
+
+	TriageApp.prototype.renderSnackbar = function () {
+		if (!this.snackbar) { return ''; }
+		return '<div class="snack" role="status">' +
+			icon('Check', 18) +
+			'<span>' + esc(this.snackbar) + '</span>' +
+			'</div>';
+	};
+
 	TriageApp.prototype.reset = function () {
 		this.clearTimers();
 		this.busy = false;
 		this.answers = clone(this.config.defaultAnswers || {});
 		this.disclaimerAccepted = false;
+		this.activeSheet = null;
+		this.snackbar = null;
 		this.noteId = '';
 		this.clearState();
 		this.go(0, 'backward');
@@ -416,6 +534,10 @@
 		else if (phase === 'disclaimer') { html += this.renderDisclaimer(); }
 		else { html += this.renderResult(); }
 		html += '</div>';
+
+		// Overlays (sheets, snackbars)
+		html += this.renderShareSheet();
+		html += this.renderSnackbar();
 
 		this.el.setAttribute('data-steps', String(n));
 		this.el.querySelectorAll('.get-app').forEach(function (node) { node.remove(); });
@@ -603,10 +725,11 @@
 
 		var html = '<div class="get-result">';
 
-		// App bar
+		// App bar (with back arrow on left and share icon on right, matching prototype)
 		html += '<div class="appbar get-noprint">' +
-			'<button type="button" class="ibtn sl" data-action="reset" title="Start på nytt">' + icon('RotateCcw', 20) + '</button>' +
-			'<h1 class="title-l">Ditt resultat</h1>' +
+			'<button type="button" class="ibtn sl" data-action="back" title="Tilbake til kartlegging" aria-label="Tilbake">' + icon('ChevronLeft', 22) + '</button>' +
+			'<h1 class="title-l" style="flex:1">Ditt resultat</h1>' +
+			'<button type="button" class="ibtn sl" data-action="open-share" title="Del eller skriv ut" aria-label="Del eller skriv ut">' + icon('Share', 22) + '</button>' +
 			'</div>';
 
 		// Hero
@@ -683,13 +806,13 @@
 				'</div></div>';
 		}
 
-		// Actions bar
+		// Actions bar (Del / skriv ut triggers share sheet; Helsepersonell toggles clinical note)
 		html += '<div class="get-noprint" style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
-			'<button type="button" class="btn outlined sl" data-action="print-plan" style="height:44px;font-size:14px">' +
-			icon('Printer', 18) + ' Skriv ut min plan' +
+			'<button type="button" class="btn outlined sl" data-action="open-share" style="height:44px;font-size:14px">' +
+			icon('Share', 18) + ' Del / skriv ut' +
 			'</button>' +
 			'<button type="button" class="btn outlined sl" data-action="toggle-note" aria-expanded="false" aria-controls="get-note-' + esc(this.region) + '" style="height:44px;font-size:14px">' +
-			icon('Lock', 18) + ' Helsepersonell ' + icon('ChevronDown', 18) +
+			icon('Medical', 18) + ' Helsepersonell ' + icon('ChevronDown', 18) +
 			'</button>' +
 			'</div>';
 

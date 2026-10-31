@@ -578,3 +578,101 @@
 .gear-engine-triage__back:hover {
 	text-decoration: underline;
 }
+
+/* =========================================================
+   Bottom Sheet, Scrim & Snackbar Overlays (M3)
+   ========================================================= */
+.gear-engine-triage .scrim,
+.gear-engine-triage__scrim {
+	position: fixed;
+	inset: 0;
+	z-index: 99998;
+	background: rgba(12, 35, 64, 0.45);
+	backdrop-filter: blur(2px);
+	animation: ge-fadein 0.2s both;
+}
+@keyframes ge-fadein { from { opacity: 0; } to { opacity: 1; } }
+
+.gear-engine-triage .sheet,
+.gear-engine-triage__sheet {
+	position: fixed;
+	z-index: 99999;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	max-height: 85vh;
+	overflow-y: auto;
+	padding: 12px 20px 28px;
+	border-radius: 28px 28px 0 0;
+	background: #FFFFFF;
+	box-shadow: 0 -4px 28px rgba(12, 35, 64, 0.2);
+	animation: ge-sheet-up 0.3s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes ge-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+@media (min-width: 600px) {
+	.gear-engine-triage .sheet,
+	.gear-engine-triage__sheet {
+		left: 50%;
+		right: auto;
+		bottom: auto;
+		top: 50%;
+		width: min(500px, calc(100% - 32px));
+		transform: translate(-50%, -50%);
+		border-radius: 28px;
+		animation: ge-dialog-in 0.25s cubic-bezier(0.2, 0, 0, 1) both;
+	}
+}
+@keyframes ge-dialog-in { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+
+.gear-engine-triage .grabber,
+.gear-engine-triage__grabber {
+	width: 36px;
+	height: 4px;
+	border-radius: 2px;
+	background: var(--md-sys-color-outline, #98A2B3);
+	opacity: 0.5;
+	margin: 0 auto 16px;
+}
+@media (min-width: 600px) {
+	.gear-engine-triage .grabber,
+	.gear-engine-triage__grabber { display: none; }
+}
+
+.gear-engine-triage .snack,
+.gear-engine-triage__snack {
+	position: fixed;
+	z-index: 100000;
+	left: 16px;
+	right: 16px;
+	bottom: 24px;
+	max-width: 440px;
+	margin: 0 auto;
+	padding: 14px 20px;
+	border-radius: 12px;
+	background: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF;
+	font-size: 14px;
+	font-weight: 500;
+	box-shadow: 0 8px 24px rgba(12, 35, 64, 0.25);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	animation: ge-fadein 0.2s both;
+}
+.gear-engine-triage .snack svg,
+.gear-engine-triage__snack svg { color: var(--ge-green-100, #DCF5E8); flex: none; }
+
+.gear-engine-triage .ibtn.tonal {
+	background: var(--md-sys-color-secondary-container, #F2F4F7);
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	width: 36px;
+	height: 36px;
+}
+.gear-engine-triage .ibtn.tonal:hover {
+	background: var(--md-sys-color-surface-container-high, #EAECF0);
+}
+.gear-engine-triage .stack {
+	display: grid;
+	gap: 8px;
+}
