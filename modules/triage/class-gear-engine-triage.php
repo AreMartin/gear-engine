@@ -122,10 +122,25 @@ class Gear_Engine_Triage {
 			if ( is_wp_error( $config ) ) {
 				continue;
 			}
+			$chips = array();
+			if ( ! empty( $config['chips'] ) && is_array( $config['chips'] ) ) {
+				$chips = array_slice( $config['chips'], 0, 3 );
+			} elseif ( ! empty( $config['diagnoses'] ) && is_array( $config['diagnoses'] ) ) {
+				foreach ( $config['diagnoses'] as $diag_id => $diag ) {
+					if ( 'medical_referral' !== $diag_id && ! empty( $diag['title'] ) ) {
+						$chips[] = $diag['title'];
+						if ( count( $chips ) >= 3 ) {
+							break;
+						}
+					}
+				}
+			}
+
 			$cards[] = array(
 				'region'  => $region,
 				'label'   => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
 				'summary' => isset( $config['summary'] ) ? (string) $config['summary'] : '',
+				'chips'   => $chips,
 				'order'   => isset( $config['order'] ) ? (int) $config['order'] : 100,
 				'icon'    => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
 				'url'     => self::get_region_url( $region ),

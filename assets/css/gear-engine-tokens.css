@@ -1,15 +1,152 @@
 /**
- * Gear Engine shared design tokens.
- *
- * Single source for the colours used by the quiz and program pages. Modules reference
- * these with a fallback, e.g. var(--ge-navy, #1a2a3a), so they still render without this file.
+ * Gear Engine Shared Design Tokens
+ * 
+ * Minimalist, clinical design system built strictly for Fysionett.no
+ * based on Material Design 3 and Nordic healthcare aesthetics.
+ * 
+ * Primary: Deep Navy (#0C2340)
+ * Tonal Container: Ice Mist (#EAF0F6 / #D5E1ED)
+ * Semantic Accent: Clinical Sage (#005236 / #DCF5E8)
+ * Value Accent: Warm Amber (#FEF3C7 / #92400E)
+ * Surface: Pure White (#FFFFFF) & Quartz Greys (#F5F7FA)
+ * 
+ * @package GearEngine
  */
+
 :root {
-	--ge-navy: #1a2a3a;
-	--ge-green: #10b981;
-	--ge-green-dark: #059669;
-	--ge-border: #e2e8f0;
-	--ge-bg: #f8fafc;
-	--ge-text: #475569;
-	--ge-muted: #64748b;
+	/* =========================================================
+	   1. NAVY SCALE (Authority, Interaction & Structure)
+	   ========================================================= */
+	--ge-navy-950: #050E1A;
+	--ge-navy-900: #0C2340; /* Fysionett Official Deep Navy (Primary brand & action) */
+	--ge-navy-800: #143154;
+	--ge-navy-700: #1F426E;
+	--ge-navy-600: #2C568C;
+	--ge-navy-200: #CBD7E6;
+	--ge-navy-100: #EAF0F6; /* M3 Tonal Container Fill */
+	--ge-navy-50:  #F0F4F8; /* Active / Selected Choice Tint */
+
+	/* Semantic Navy Aliases */
+	--ge-navy:              var(--ge-navy-900);
+	--ge-navy-primary:      var(--ge-navy-900);
+	--ge-navy-container:    var(--ge-navy-100);
+	--ge-navy-border:       #D5E1ED;
+	--ge-navy-selected-bg:  var(--ge-navy-50);
+
+	/* =========================================================
+	   2. GREEN / SAGE SCALE (Positive Matches & Verification only)
+	   ========================================================= */
+	--ge-green-900: #002B1C;
+	--ge-green-800: #005236; /* Deep Clinical Sage (Text on mint / active accents) */
+	--ge-green-700: #007A50;
+	--ge-green-600: #00A86B; /* Vibrant Emerald Accent */
+	--ge-green-500: #24B784;
+	--ge-green-200: #BEE3D0; /* Mint border */
+	--ge-green-100: #DCF5E8; /* Mint Pill Background ("Beste match") */
+	--ge-green-50:  #F1F8F4; /* Soft Hover Tint */
+
+	/* Semantic Green Aliases */
+	--ge-green:               var(--ge-green-800);
+	--ge-green-dark:          var(--ge-green-900);
+	--ge-accent-green:        var(--ge-green-800);
+	--ge-accent-green-bg:     var(--ge-green-100);
+	--ge-accent-green-border: var(--ge-green-200);
+
+	/* =========================================================
+	   3. QUARTZ GREY SCALE (Pure Neutral Cards & Hairlines)
+	   ========================================================= */
+	--ge-white:    #FFFFFF;
+	--ge-grey-25:  #FAFBFC;
+	--ge-grey-50:  #F5F7FA; /* Standard Background Canvas */
+	--ge-grey-100: #F0F2F5; /* Neutral Specs Pills & Inset Fills */
+	--ge-grey-200: #E4E7EC; /* Clean M3 Hairline Borders */
+	--ge-grey-300: #D0D5DD;
+	--ge-grey-400: #98A2B3; /* Faint & Placeholder Text */
+	--ge-grey-500: #667085; /* Secondary / Metadata Labels (WCAG AA) */
+	--ge-grey-700: #344054; /* Subheaders & Body Text */
+	--ge-grey-800: #1D2939;
+	--ge-grey-900: #101828; /* High-contrast Ink */
+
+	/* Semantic Neutral Aliases */
+	--ge-bg:             var(--ge-grey-50);
+	--ge-border:         var(--ge-grey-200);
+	--ge-outline-subtle: var(--ge-grey-200);
+	--ge-text:           var(--ge-grey-700);
+	--ge-muted:          var(--ge-grey-500);
+
+	/* =========================================================
+	   4. STATUS, VALUE & SAFETY SIGNALS
+	   ========================================================= */
+	/* Warm Amber / Honey (Beste tilbud & Rabatt-chips, non-alarming) */
+	--ge-amber-deal-bg:     #FEF3C7;
+	--ge-amber-deal-text:   #92400E;
+	--ge-amber-deal-border: #FDE68A;
+
+	/* Warning & Critical Red Flags */
+	--ge-amber:    #B5770A; /* Moderate Caution */
+	--ge-amber-bg: #FEF8EC;
+	--ge-coral:    #D92D20; /* Acute Red Flag Medical Warning */
+	--ge-coral-bg: #FEF3F2;
+
+	/* =========================================================
+	   5. MATERIAL SYMBOLS & ICON SYSTEM (SVG Alternative B)
+	   ========================================================= */
+	--ge-icon-stroke: 1.75px;
+	--ge-icon-size:   20px;
+
+	/* =========================================================
+	   6. SPATIAL, RADII & ELEVATIONS (Material Design 3)
+	   ========================================================= */
+	--ge-r-xs: 8px;
+	--ge-r-sm: 12px;
+	--ge-r-md: 16px;
+	--ge-r-lg: 20px;
+	--ge-r-xl: 28px;
+	--ge-r-full: 9999px;
+
+	--ge-shadow-1: 0 1px 3px rgba(12, 35, 64, 0.05), 0 1px 2px rgba(12, 35, 64, 0.03);
+	--ge-shadow-2: 0 6px 16px -4px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04);
+	--ge-shadow-3: 0 16px 32px -8px rgba(12, 35, 64, 0.12);
+
+	/* Motion Curves */
+	--ge-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--ge-transition: all 0.22s var(--ge-ease);
+
+	/* Typography Stack */
+	--ge-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+
+	/* Material 3 Direct Mapping Aliases */
+	--md-sys-color-primary:                  var(--ge-navy-900);
+	--md-sys-color-on-primary:               #FFFFFF;
+	--md-sys-color-primary-container:        var(--ge-navy-container);
+	--md-sys-color-on-primary-container:     var(--ge-navy-900);
+	--md-sys-color-surface:                  var(--ge-white);
+	--md-sys-color-on-surface:               var(--ge-grey-900);
+	--md-sys-color-surface-container-low:    var(--ge-grey-25);
+	--md-sys-color-surface-container:        var(--ge-grey-50);
+	--md-sys-color-surface-container-high:   var(--ge-grey-100);
+	--md-sys-color-outline:                  var(--ge-grey-300);
+	--md-sys-color-outline-variant:          var(--ge-grey-200);
+	--md-sys-color-tertiary:                 var(--ge-green-800);
+	--md-sys-color-tertiary-container:       var(--ge-green-100);
+	--md-sys-color-on-tertiary-container:    var(--ge-green-900);
+}
+
+/* Dark Mode Theme */
+[data-theme="dark"] {
+	--ge-grey-50:  #08111E;
+	--ge-white:    #0F1D32;
+	--ge-grey-100: #162438;
+	--ge-grey-200: #1F334E;
+	--ge-grey-400: #627794;
+	--ge-grey-500: #889BB3;
+	--ge-grey-700: #C2D0E2;
+	--ge-grey-900: #F4F7FB;
+	--ge-navy-900: #142E50;
+	--ge-navy-100: #132237;
+	--ge-navy-50:  #162842;
+	--ge-green-50: rgba(0, 168, 107, 0.12);
+	--ge-green-100: rgba(0, 168, 107, 0.22);
+	--ge-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
+	--ge-shadow-2: 0 12px 32px -10px rgba(0, 0, 0, 0.6);
 }

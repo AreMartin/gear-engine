@@ -479,11 +479,14 @@
 
 		html += this.renderPlan(res);
 
-		if (program) {
-			html += '<div class="get-card get-card--cta get-noprint"><h3>Klar for å komme i gang?</h3>' +
-				'<p>Vi har satt sammen et kvalitetssikret treningsprogram som bygger direkte på denne vurderingen.</p>' +
-				'<a class="get-btn get-btn--primary get-btn--block" href="' + esc(safeUrl(program.url)) + '" target="_blank" rel="noopener noreferrer">' +
-				esc(program.title) + ' ' + icon('ExternalLink', 18) + '</a></div>';
+				if (program) {
+			html += '<div class="get-card get-card--cta get-noprint">' +
+				'<span class="get-badge" style="background:#FFFFFF;color:var(--get-navy);border:1px solid #D0DBE5;margin-bottom:12px;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:var(--get-green);display:inline-block;margin-right:6px"></span>Neste steg · Treningsprogram</span>' +
+				'<h3 style="margin:10px 0 6px">Klar for å komme i gang?</h3>' +
+				'<p>Et kvalitetssikret treningsprogram som bygger direkte på denne vurderingen.</p>' +
+				'<div class="get-cta-actions">' +
+				'<a class="get-btn get-btn--primary" href="' + esc(safeUrl(program.url)) + '" target="_blank" rel="noopener noreferrer">' +
+				esc(program.title) + ' ' + icon('ExternalLink', 18) + '</a></div></div>';
 		}
 
 		html += '<button type="button" class="get-note-toggle get-noprint" data-action="toggle-note" aria-expanded="false" aria-controls="get-note-' + esc(this.region) + '">' +

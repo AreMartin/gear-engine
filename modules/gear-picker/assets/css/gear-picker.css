@@ -1,16 +1,22 @@
 /**
  * Gear Engine gear picker: scoped styles. All rules are namespaced under .gear-engine-picker.
+ * Built strictly on Material Design 3 and Fysionett.no visual identity.
+ *
+ * @package GearEngine
  */
 .gear-engine-picker {
-	--gep-ink: var(--ge-navy, #1a2a3a);
-	--gep-btn: #000;
-	--gep-green: var(--ge-green, #10b981);
-	--gep-green-dark: var(--ge-green-dark, #059669);
-	--gep-border: var(--ge-border, #e2e8f0);
-	--gep-bg: var(--ge-bg, #f8fafc);
-	--gep-text: var(--ge-text, #475569);
-	--gep-muted: var(--ge-muted, #64748b);
-	--gep-red: #dc2626;
+	--gep-ink:        var(--ge-navy-primary, #0C2340);
+	--gep-btn:        var(--ge-navy-primary, #0C2340);
+	--gep-green:      var(--ge-accent-green, #005236);
+	--gep-green-bg:   var(--ge-accent-green-bg, #DCF5E8);
+	--gep-green-dark: var(--ge-green-900, #002B1C);
+	--gep-deal-bg:    var(--ge-amber-deal-bg, #FEF3C7);
+	--gep-deal-text:  var(--ge-amber-deal-text, #92400E);
+	--gep-deal-border:var(--ge-amber-deal-border, #FDE68A);
+	--gep-border:     var(--ge-border, #E4E7EC);
+	--gep-bg:         var(--ge-bg, #F5F7FA);
+	--gep-text:       var(--ge-text, #344054);
+	--gep-muted:      var(--ge-muted, #667085);
 	box-sizing: border-box;
 	max-width: 800px;
 	margin: 0 auto;
@@ -23,85 +29,459 @@
 .gear-engine-picker *::before,
 .gear-engine-picker *::after { box-sizing: border-box; }
 .gear-engine-picker button { font-family: inherit; cursor: pointer; }
-.gear-engine-picker :focus-visible { outline: 3px solid var(--gep-green); outline-offset: 2px; }
+.gear-engine-picker svg { flex-shrink: 0; stroke-width: var(--ge-icon-stroke, 1.75px); }
+.gear-engine-picker :focus-visible { outline: 2.5px solid var(--gep-ink); outline-offset: 2px; }
 .gear-engine-picker__stage:focus { outline: none; }
 .gear-engine-picker__stage { animation: gep-in 0.3s ease-out both; }
 @keyframes gep-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .gear-engine-picker * { animation: none !important; transition: none !important; } }
 
-.gear-engine-picker__eyebrow { display: block; margin-bottom: 12px; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gep-muted); }
-.gear-engine-picker__title { margin: 0 0 16px; font-size: 30px; font-weight: 800; line-height: 1.15; letter-spacing: -0.5px; color: var(--gep-ink); }
-.gear-engine-picker__lead { margin: 0 0 24px; font-size: 16px; }
-.gear-engine-picker__benefits { margin: 0 0 28px; padding: 0; list-style: none; display: grid; gap: 10px; }
-.gear-engine-picker__benefits li { position: relative; padding-left: 28px; font-size: 14px; font-weight: 600; color: var(--gep-ink); }
-.gear-engine-picker__benefits li::before { content: "\2713"; position: absolute; left: 0; color: var(--gep-green); font-weight: 900; }
+/* Hero / Intro Stage: Material 3 Tonal Container */
+.gear-engine-picker__intro-box {
+	background: var(--ge-navy-container, #EAF0F6);
+	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	border-radius: var(--ge-r-lg, 20px);
+	padding: 32px 28px;
+	box-shadow: var(--ge-shadow-1);
+}
+.gear-engine-picker__eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 14px;
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: #FFFFFF;
+	color: var(--gep-ink);
+	border: 1px solid #D0DBE5;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
+}
+.gear-engine-picker__eyebrow::before {
+	content: "";
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--gep-green);
+}
+.gear-engine-picker__title {
+	margin: 0 0 14px;
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.3px;
+	color: var(--gep-ink);
+}
+.gear-engine-picker__lead {
+	margin: 0 0 24px;
+	font-size: 15.5px;
+	line-height: 23px;
+	color: var(--gep-text);
+}
+.gear-engine-picker__benefits {
+	margin: 0 0 28px;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 12px;
+}
+.gear-engine-picker__benefits li {
+	position: relative;
+	padding-left: 28px;
+	font-size: 14.5px;
+	font-weight: 500;
+	color: var(--gep-ink);
+}
+.gear-engine-picker__benefits li::before {
+	content: "\2713";
+	position: absolute;
+	left: 0;
+	color: var(--gep-green);
+	font-weight: 700;
+}
 
-.gear-engine-picker__primary { display: block; width: 100%; padding: 16px 24px; border: 0; border-radius: 100px; background: var(--gep-btn); color: #fff; font-size: 16px; font-weight: 800; transition: opacity 0.2s, transform 0.2s; }
-.gear-engine-picker__primary:hover { opacity: 0.9; }
-.gear-engine-picker__primary:active { transform: scale(0.98); }
+/* Primary Button: Deep Navy */
+.gear-engine-picker__primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 48px;
+	padding: 0 24px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--gep-btn);
+	color: #FFFFFF;
+	font-size: 15px;
+	font-weight: 600;
+	gap: 8px;
+	cursor: pointer;
+	transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.gear-engine-picker__primary:hover {
+	background: var(--ge-navy-800, #143154);
+	box-shadow: var(--ge-shadow-1);
+}
+.gear-engine-picker__primary:active {
+	transform: scale(0.99);
+}
+
 .gear-engine-picker__back,
-.gear-engine-picker__link { display: block; margin: 16px auto 0; padding: 8px; border: 0; background: none; color: var(--gep-muted); font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-.gear-engine-picker__link { margin: 0; font-size: 13px; text-decoration: underline; text-transform: none; }
+.gear-engine-picker__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin: 18px auto 0;
+	padding: 8px 14px;
+	border: 0;
+	background: none;
+	color: var(--gep-muted);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+.gear-engine-picker__link {
+	margin: 0;
+	font-size: 13.5px;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
 .gear-engine-picker__back:hover,
-.gear-engine-picker__link:hover { color: var(--gep-ink); }
+.gear-engine-picker__link:hover {
+	color: var(--gep-ink);
+}
 
-.gear-engine-picker__progress { display: flex; gap: 4px; margin-bottom: 24px; }
-.gear-engine-picker__progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--gep-border); }
-.gear-engine-picker__progress span.is-done { background: var(--gep-ink); }
+/* Progress Indicator: Deep Navy */
+.gear-engine-picker__progress {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 24px;
+}
+.gear-engine-picker__progress span {
+	flex: 1;
+	height: 5px;
+	border-radius: 999px;
+	background: var(--ge-grey-200, #E4E7EC);
+	transition: background 0.3s var(--ge-ease);
+}
+.gear-engine-picker__progress span.is-done {
+	background: var(--gep-ink);
+}
 
-.gear-engine-picker__choice { display: block; width: 100%; margin-bottom: 12px; padding: 20px 24px; border: 1.5px solid var(--gep-border); border-radius: 18px; background: #fff; text-align: left; transition: border-color 0.2s, background 0.2s; }
-.gear-engine-picker__choice:hover { border-color: var(--gep-ink); background: var(--gep-bg); }
-.gear-engine-picker__choice-title { display: block; margin-bottom: 4px; font-size: 17px; font-weight: 800; color: var(--gep-ink); }
-.gear-engine-picker__choice-desc { display: block; font-size: 13px; color: var(--gep-muted); }
+/* Choice Cards */
+.gear-engine-picker__choice {
+	display: block;
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 18px 22px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--ge-r-md, 16px);
+	background: #FFFFFF;
+	text-align: left;
+	box-shadow: var(--ge-shadow-1);
+	transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.gear-engine-picker__choice:hover {
+	border-color: var(--gep-ink);
+	background: var(--ge-navy-selected-bg, #F0F4F8);
+	transform: translateY(-1px);
+}
+.gear-engine-picker__choice-title {
+	display: block;
+	margin-bottom: 4px;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--gep-ink);
+}
+.gear-engine-picker__choice-desc {
+	display: block;
+	font-size: 13.5px;
+	color: var(--gep-muted);
+	line-height: 1.4;
+}
 
-.gear-engine-picker__slider { margin-bottom: 24px; padding: 32px 24px; border: 1px solid var(--gep-border); border-radius: 20px; background: var(--gep-bg); text-align: center; }
-.gear-engine-picker__slider-value { margin-bottom: 8px; font-size: 44px; font-weight: 900; letter-spacing: -1.5px; color: var(--gep-ink); }
-.gear-engine-picker__slider-note { margin: 0 0 16px; font-size: 14px; }
-.gear-engine-picker__range { width: 100%; accent-color: var(--gep-ink); }
+/* Slider (M3-style) */
+.gear-engine-picker__slider {
+	margin-bottom: 24px;
+	padding: 28px 24px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--ge-r-lg, 20px);
+	background: #FFFFFF;
+	text-align: center;
+	box-shadow: var(--ge-shadow-1);
+}
+.gear-engine-picker__slider-value {
+	margin-bottom: 8px;
+	font-size: 40px;
+	font-weight: 800;
+	letter-spacing: -1px;
+	color: var(--gep-ink);
+}
+.gear-engine-picker__slider-note {
+	margin: 0 0 16px;
+	font-size: 14px;
+	color: var(--gep-muted);
+}
+.gear-engine-picker__range {
+	width: 100%;
+	accent-color: var(--gep-ink);
+}
 
-.gear-engine-picker__results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.gear-engine-picker__results-head .gear-engine-picker__title { font-size: 24px; margin-bottom: 6px; }
-.gear-engine-picker__disclosure { margin: 0 0 24px; font-size: 11px; color: #9ca3af; }
-.gear-engine-picker__none { padding: 48px 20px; border-radius: 20px; background: var(--gep-bg); text-align: center; }
-.gear-engine-picker__none strong { display: block; margin-bottom: 8px; font-size: 18px; color: var(--gep-ink); }
+/* Results Section */
+.gear-engine-picker__results-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+.gear-engine-picker__results-head .gear-engine-picker__title {
+	font-size: 24px;
+	margin-bottom: 0;
+}
+.gear-engine-picker__disclosure {
+	margin: 0 0 24px;
+	font-size: 12px;
+	color: var(--gep-muted);
+}
+.gear-engine-picker__none {
+	padding: 48px 20px;
+	border-radius: var(--ge-r-lg, 20px);
+	background: var(--gep-bg);
+	text-align: center;
+}
+.gear-engine-picker__none strong {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 18px;
+	color: var(--gep-ink);
+}
 
-.gear-engine-picker__card { position: relative; margin: 24px 0; padding: 24px; border: 1.5px solid var(--gep-border); border-radius: 24px; background: #fff; transition: box-shadow 0.2s, transform 0.2s; }
-.gear-engine-picker__card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); }
-.gear-engine-picker__card.is-best-match { border: 2px solid var(--gep-green); }
-.gear-engine-picker__card.is-best-offer { border: 2px solid var(--gep-red); }
-.gear-engine-picker__badge { position: absolute; top: -14px; left: 24px; padding: 6px 16px; border-radius: 100px; background: var(--gep-green); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-.gear-engine-picker__badge.is-offer { background: var(--gep-red); }
-.gear-engine-picker__card-top { display: flex; flex-direction: column; gap: 16px; }
-.gear-engine-picker__img { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 200px; padding: 20px; overflow: hidden; border: 1px solid #f1f5f9; border-radius: 16px; background: var(--gep-bg); }
-.gear-engine-picker__img img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
-.gear-engine-picker__discount { position: absolute; top: 12px; left: 12px; padding: 5px 12px; border-radius: 100px; background: #fee2e2; color: #b91c1c; font-size: 12px; font-weight: 800; }
-.gear-engine-picker__details { flex: 1; min-width: 0; }
-.gear-engine-picker__meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.gear-engine-picker__shop { font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gep-muted); }
-.gear-engine-picker__match { padding: 6px 14px; border-radius: 100px; background: #ecfdf5; color: var(--gep-green-dark); font-size: 13px; font-weight: 800; white-space: nowrap; }
-.gear-engine-picker__name { margin: 0 0 10px; font-size: 18px; font-weight: 800; line-height: 1.25; color: var(--gep-ink); }
-.gear-engine-picker__pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.gear-engine-picker__pill { padding: 4px 12px; border: 1px solid var(--gep-border); border-radius: 100px; background: var(--gep-bg); color: var(--gep-text); font-size: 11px; font-weight: 600; white-space: nowrap; }
-.gear-engine-picker__notice { margin-bottom: 24px; padding: 16px; border: 1px solid #fde68a; border-radius: 16px; background: #fffbeb; color: #92400e; font-size: 13px; }
-.gear-engine-picker__reasons { margin: 14px 0 0; padding: 12px 16px; border-left: 4px solid var(--gep-green); border-radius: 4px 12px 12px 4px; background: #f1f5f9; font-size: 13px; font-style: italic; }
-.gear-engine-picker__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; padding-top: 20px; border-top: 1.5px solid #f1f5f9; }
-.gear-engine-picker__price { display: flex; flex-direction: column; }
-.gear-engine-picker__old-price { margin-bottom: 2px; font-size: 13px; font-weight: 700; color: #9ca3af; text-decoration: line-through; }
-.gear-engine-picker__current-price { font-size: 28px; font-weight: 900; line-height: 1; letter-spacing: -1px; color: var(--gep-ink); }
-.gear-engine-picker__current-price.is-discounted { color: var(--gep-red); }
-.gear-engine-picker__cta { display: flex; flex: 1 1 auto; align-items: center; justify-content: center; min-width: 180px; max-width: 320px; padding: 16px 24px; border-radius: 20px; background: var(--gep-btn); color: #fff; gap: 6px; font-size: 14px; font-weight: 800; text-decoration: none; text-transform: uppercase; transition: background 0.2s, transform 0.2s; }
-.gear-engine-picker__card:hover .gear-engine-picker__cta { background: #1f2937; box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-.gear-engine-picker__cta:hover { background: #1f2937; color: #fff; transform: translateY(-2px); }
-.gear-engine-picker__cta::after { content: ""; position: absolute; inset: 0; border-radius: 24px; }
+/* Product Card: Clean M3 Outlined */
+.gear-engine-picker__card {
+	position: relative;
+	margin: 20px 0;
+	padding: 24px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--ge-r-lg, 20px);
+	background: #FFFFFF;
+	box-shadow: var(--ge-shadow-1);
+	transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+.gear-engine-picker__card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--ge-shadow-2);
+}
+
+/* Badges: Beste Match (Green) and Beste Tilbud (Warm Amber) */
+.gear-engine-picker__badge {
+	position: absolute;
+	top: -12px;
+	left: 20px;
+	padding: 4px 14px;
+	border-radius: 999px;
+	background: var(--gep-green-bg);
+	color: var(--gep-green);
+	border: 1px solid var(--ge-accent-green-border, #BEE3D0);
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	box-shadow: 0 1px 3px rgba(0, 82, 54, 0.08);
+}
+.gear-engine-picker__badge.is-offer {
+	background: var(--gep-deal-bg);
+	color: var(--gep-deal-text);
+	border: 1px solid var(--gep-deal-border);
+	box-shadow: 0 1px 3px rgba(146, 64, 14, 0.08);
+}
+
+.gear-engine-picker__card-top {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.gear-engine-picker__img {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 200px;
+	padding: 16px;
+	overflow: hidden;
+	border: 1px solid var(--ge-grey-100, #F0F2F5);
+	border-radius: var(--ge-r-md, 16px);
+	background: var(--ge-grey-50, #F5F7FA);
+}
+.gear-engine-picker__img img {
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+.gear-engine-picker__discount {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: var(--gep-deal-bg);
+	color: var(--gep-deal-text);
+	border: 1px solid var(--gep-deal-border);
+	font-size: 11.5px;
+	font-weight: 700;
+}
+.gear-engine-picker__details {
+	flex: 1;
+	min-width: 0;
+}
+.gear-engine-picker__meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+.gear-engine-picker__shop {
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	text-transform: uppercase;
+	color: var(--gep-muted);
+}
+.gear-engine-picker__match {
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: var(--gep-green-bg);
+	color: var(--gep-green);
+	border: 1px solid var(--ge-accent-green-border, #BEE3D0);
+	font-size: 12px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.gear-engine-picker__name {
+	margin: 0 0 12px;
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1.3;
+	color: var(--gep-ink);
+}
+
+/* Specs Pills: Sleek 24px height, neutral grey */
+.gear-engine-picker__pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 6px;
+}
+.gear-engine-picker__pill {
+	display: inline-flex;
+	align-items: center;
+	height: 24px;
+	padding: 0 10px;
+	border: 1px solid var(--ge-grey-200, #E4E7EC);
+	border-radius: 999px;
+	background: var(--ge-grey-100, #F0F2F5);
+	color: var(--gep-text);
+	font-size: 11.5px;
+	font-weight: 500;
+	letter-spacing: 0.15px;
+	white-space: nowrap;
+}
+
+.gear-engine-picker__notice {
+	margin-bottom: 24px;
+	padding: 16px;
+	border: 1px solid var(--gep-deal-border);
+	border-radius: var(--ge-r-md, 16px);
+	background: var(--gep-deal-bg);
+	color: var(--gep-deal-text);
+	font-size: 13.5px;
+	line-height: 1.45;
+}
+.gear-engine-picker__reasons {
+	margin: 14px 0 0;
+	padding: 12px 16px;
+	border-left: 3.5px solid var(--gep-green);
+	border-radius: 0 var(--ge-r-xs, 8px) var(--ge-r-xs, 8px) 0;
+	background: var(--ge-grey-50, #F5F7FA);
+	font-size: 13px;
+	line-height: 1.45;
+	font-style: italic;
+	color: var(--gep-text);
+}
+
+/* Product Card Footer */
+.gear-engine-picker__footer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-top: 20px;
+	padding-top: 18px;
+	border-top: 1px solid var(--ge-grey-200, #E4E7EC);
+}
+.gear-engine-picker__price {
+	display: flex;
+	flex-direction: column;
+}
+.gear-engine-picker__old-price {
+	margin-bottom: 2px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--gep-muted);
+	text-decoration: line-through;
+}
+.gear-engine-picker__current-price {
+	font-size: 26px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -0.5px;
+	color: var(--gep-ink);
+}
+.gear-engine-picker__current-price.is-discounted {
+	color: var(--gep-ink);
+}
+
+/* Call To Action Button: Deep Navy with Hover Transition */
+.gear-engine-picker__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 44px;
+	padding: 0 22px;
+	border-radius: 999px;
+	background: var(--gep-btn);
+	color: #FFFFFF !important;
+	gap: 8px;
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.gear-engine-picker__cta:hover {
+	background: var(--ge-navy-800, #143154);
+	color: #FFFFFF !important;
+	transform: translateY(-1px);
+	box-shadow: var(--ge-shadow-1);
+}
+.gear-engine-picker__cta svg {
+	width: 14px;
+	height: 14px;
+}
 
 @media (min-width: 600px) {
-	.gear-engine-picker__title { font-size: 36px; }
-	.gear-engine-picker__results-head .gear-engine-picker__title { font-size: 24px; }
-	.gear-engine-picker__card-top { flex-direction: row; gap: 28px; }
-	.gear-engine-picker__img { flex-shrink: 0; width: 220px; height: 220px; }
+	.gear-engine-picker__card-top { flex-direction: row; gap: 24px; }
+	.gear-engine-picker__img { flex-shrink: 0; width: 200px; height: 200px; }
 }
 @media (max-width: 599px) {
 	.gear-engine-picker__footer { flex-direction: column; align-items: stretch; }
-	.gear-engine-picker__price { align-items: center; }
-	.gear-engine-picker__cta { max-width: none; }
+	.gear-engine-picker__price { align-items: flex-start; }
+	.gear-engine-picker__cta { width: 100%; }
 }

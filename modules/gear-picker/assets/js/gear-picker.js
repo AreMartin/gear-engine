@@ -32,7 +32,7 @@
 	function externalIcon() {
 		var ns = 'http://www.w3.org/2000/svg';
 		var svg = document.createElementNS( ns, 'svg' );
-		[ [ 'width', '14' ], [ 'height', '14' ], [ 'viewBox', '0 0 24 24' ], [ 'fill', 'none' ], [ 'stroke', 'currentColor' ], [ 'stroke-width', '2' ], [ 'stroke-linecap', 'round' ], [ 'stroke-linejoin', 'round' ], [ 'aria-hidden', 'true' ] ].forEach( function ( a ) {
+		[ [ 'width', '14' ], [ 'height', '14' ], [ 'viewBox', '0 0 24 24' ], [ 'fill', 'none' ], [ 'stroke', 'currentColor' ], [ 'stroke-width', 'var(--ge-icon-stroke, 1.75px)' ], [ 'stroke-linecap', 'round' ], [ 'stroke-linejoin', 'round' ], [ 'aria-hidden', 'true' ] ].forEach( function ( a ) {
 			svg.setAttribute( a[ 0 ], a[ 1 ] );
 		} );
 		svg.setAttribute( 'class', 'gear-engine-picker__cta-icon' );
@@ -83,17 +83,19 @@
 
 		function renderIntro( stage ) {
 			var intro = config.intro;
-			stage.appendChild( el( 'span', 'gear-engine-picker__eyebrow', intro.eyebrow ) );
-			stage.appendChild( el( 'h2', 'gear-engine-picker__title', intro.title ) );
-			stage.appendChild( el( 'p', 'gear-engine-picker__lead', intro.desc ) );
+			var box = el( 'div', 'gear-engine-picker__intro-box' );
+			box.appendChild( el( 'span', 'gear-engine-picker__eyebrow', intro.eyebrow ) );
+			box.appendChild( el( 'h2', 'gear-engine-picker__title', intro.title ) );
+			box.appendChild( el( 'p', 'gear-engine-picker__lead', intro.desc ) );
 			var list = el( 'ul', 'gear-engine-picker__benefits' );
 			( intro.benefits || [] ).forEach( function ( b ) {
 				list.appendChild( el( 'li', '', b ) );
 			} );
-			stage.appendChild( list );
-			stage.appendChild( button( 'gear-engine-picker__primary', intro.start, function () {
+			box.appendChild( list );
+			box.appendChild( button( 'gear-engine-picker__primary', intro.start, function () {
 				go( 1 );
 			} ) );
+			stage.appendChild( box );
 		}
 
 		function renderStep( stage ) {
