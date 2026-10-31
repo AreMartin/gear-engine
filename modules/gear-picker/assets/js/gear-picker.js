@@ -78,7 +78,9 @@
 	}
 
 	function initials( n ) {
-		var parts = String( n || '' ).trim().split( /\s+/ );
+		var clean = String( n || '' ).replace( /[()[\]{}_-]/g, ' ' ).trim();
+		var parts = clean.split( /\s+/ ).filter( Boolean );
+		if ( ! parts.length ) { return 'GE'; }
 		return ( parts.length > 1 ? parts[ 0 ][ 0 ] + parts[ 1 ][ 0 ] : parts[ 0 ].slice( 0, 2 ) ).toUpperCase();
 	}
 
@@ -137,30 +139,23 @@
 			}
 		} );
 
+		function getStepIndex( id ) {
+			for ( var i = 0; i < steps.length; i++ ) {
+				if ( steps[ i ].id === id ) {
+					return i + 1;
+				}
+			}
+			return 1;
+		}
+
 		function getLiveCount() {
-			var pool = items.filter( function ( item ) {
-				var r = hardRulesCheck( item );
-				return r;
-			} );
-			var count = pool.length;
+			var ranked = Scoring.rank( config, items, filters );
+			var count = ranked.items ? ranked.items.length : 0;
 			var total = items.length || 1;
 			return {
 				count: count,
 				pct: Math.round( ( count / total ) * 100 )
 			};
-		}
-
-		function hardRulesCheck( item ) {
-			// Quick soft evaluation against current answers
-			if ( filters.b && item.price > filters.b ) { return false; }
-			var w = getSpec( item, 'weight' );
-			if ( filters.w && w && w < filters.w ) { return false; }
-			var sp = getSpec( item, 'speed' );
-			if ( filters.goal === 'interval' && sp && sp < 18 ) { return false; }
-			if ( filters.goal === 'run' && sp && sp < 15 ) { return false; }
-			if ( filters.space === 'foldable' && ! getSpec( item, 'foldable' ) ) { return false; }
-			if ( filters.incline === 'yes' && ! getSpec( item, 'motor_incline' ) ) { return false; }
-			return true;
 		}
 
 		function go( next, dir ) {
@@ -210,7 +205,7 @@
 		function renderLiveStats() {
 			var live = getLiveCount();
 			return '<div class="grid2">' +
-				'<div class="card outlined"><div class="headline-m num" id="ge-live-c" style="color:var(--md-sys-color-primary,#0C2340)">' + live.count + '</div><div class="body-s muted">Matchende modeller</div></div>' +
+				'<div class="card outlined"><div class="headline-m num" id="ge-live-c" style="color:var(--md-sys-color-primary,#0C2340)">' + live.count + '</div><div class="body-s muted" id="ge-live-c-label">' + ( live.count === 1 ? 'Matchende modell' : 'Matchende modeller' ) + '</div></div>' +
 				'<div class="card outlined"><div class="headline-m num" style="color:var(--md-sys-color-primary,#0C2340)">' + ( uniqueShops.length || 6 ) + '</div><div class="body-s muted">Verifiserte butikker</div></div>' +
 				'</div>';
 		}
@@ -220,7 +215,7 @@
 			var total = items.length;
 			return '<div class="live">' +
 				'<span class="dotp"></span>' +
-				'<span class="body-s" style="color:var(--md-sys-color-on-surface,#0C2340);flex:1">Finner modeller: <b id="ge-live-lbl">' + live.count + ' av ' + total + ' matcher valgene dine</b></span>' +
+				'<span class="body-s" style="color:var(--md-sys-color-on-surface,#0C2340);flex:1">Finner modeller: <b id="ge-live-lbl">' + ( live.count === 1 ? '1 modell matcher valgene dine' : live.count + ' av ' + total + ' matcher valgene dine' ) + '</b></span>' +
 				'<div class="lp"><i id="ge-live-bar" style="width:' + live.pct + '%"></i></div>' +
 				'</div>';
 		}
@@ -229,10 +224,14 @@
 			var live = getLiveCount();
 			var total = items.length;
 			var c = root.querySelector( '#ge-live-c' );
+			var cLabel = root.querySelector( '#ge-live-c-label' );
 			var lbl = root.querySelector( '#ge-live-lbl' );
 			var bar = root.querySelector( '#ge-live-bar' );
 			if ( c ) { c.textContent = live.count; }
-			if ( lbl ) { lbl.textContent = live.count + ' av ' + total + ' matcher valgene dine'; }
+			if ( cLabel ) { cLabel.textContent = live.count === 1 ? 'Matchende modell' : 'Matchende modeller'; }
+			if ( lbl ) {
+				lbl.textContent = live.count === 1 ? '1 modell matcher valgene dine' : live.count + ' av ' + total + ' matcher valgene dine';
+			}
 			if ( bar ) { bar.style.width = live.pct + '%'; }
 		}
 
@@ -386,9 +385,15 @@
 			var fd = getSpec( item, 'foldable' );
 
 			if ( sp ) {
-				list.push( {
-					t: sp + ' km/t toppfart' + ( sp >= 18 ? ' – perfekt for harde intervaller' : sp >= 15 ? ' – solid for regelmessig løping' : ' – trygt for gange og lett jogg' )
-				} );
+				var speedDesc = sp + ' km/t toppfart';
+				if ( a.goal === 'walk' ) {
+					speedDesc += ' – kraftig motor som gir jevn og stillegående gange';
+				} else if ( a.goal === 'interval' ) {
+					speedDesc += ( sp >= 18 ? ' – perfekt for harde intervaller og sprint' : ' – god for tempo og fartsøkninger' );
+				} else {
+					speedDesc += ( sp >= 15 ? ' – solid for regelmessig løpetrening' : ' – fin for lett jogg og oppvarming' );
+				}
+				list.push( { t: speedDesc } );
 			}
 			if ( wt ) {
 				var diff = a.w ? wt - a.w : 0;
@@ -421,16 +426,16 @@
 			h += '<div class="chips-row" style="margin-top:10px">';
 			if ( filters.goal ) {
 				var goalLabel = filters.goal === 'interval' ? 'Intervall' : filters.goal === 'run' ? 'Løping' : 'Gange';
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="1">' + ic( 'speedMid', 16 ) + goalLabel + '</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'goal' ) + '">' + ic( 'speedMid', 16 ) + goalLabel + '</button>';
 			}
 			if ( filters.b ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + steps.length + '">Maks ' + money( filters.b ) + '</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Maks ' + money( filters.b ) + '</button>';
 			}
 			if ( filters.w ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + ( steps.length - 1 ) + '">' + filters.w + ' kg</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'w' ) + '">' + filters.w + ' kg</button>';
 			}
 			if ( filters.space ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="4">' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'space' ) + '">' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</button>';
 			}
 			h += '</div>';
 
@@ -514,6 +519,12 @@
 						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
 				} );
 				h += '</div>';
+			} else {
+				h += '<div class="card filled" style="margin-top:20px;padding:16px 20px;text-align:left;background:var(--md-sys-color-surface-container-low,#F5F7FA);border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
+					'<div style="font-weight:600;color:var(--md-sys-color-primary,#0C2340);margin-bottom:4px">Kun 1 modell oppfyller alle dine krav</div>' +
+					'<p class="body-s muted">Dette er den eneste modellen i vårt utvalg som matcher alle dine spesifikke valg (inkludert vektkapasitet på ' + ( filters.w || 90 ) + ' kg og sammenleggbar ramme innenfor ' + money( filters.b || 35000 ) + ').</p>' +
+					'<div style="margin-top:10px"><button type="button" class="btn outlined sl" style="height:36px;font-size:13px;padding:0 14px" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Juster budsjett eller krav</button></div>' +
+					'</div>';
 			}
 
 			// Disclosure and restart button
