@@ -499,3 +499,27 @@
 	.gear-engine-picker__price { align-items: flex-start; }
 	.gear-engine-picker__cta { width: 100%; }
 }
+
+/* Stage Motion: Material 3 Emphasized Directional Slide */
+.gear-engine-picker__stage--forward {
+	animation: gep-slide-forward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+}
+.gear-engine-picker__stage--backward {
+	animation: gep-slide-backward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes gep-slide-forward {
+	from { opacity: 0; transform: translateX(24px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+@keyframes gep-slide-backward {
+	from { opacity: 0; transform: translateX(-24px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+
+/* Choice Card Active / Pressed State */
+.gear-engine-picker__choice.is-active {
+	border-color: var(--gep-ink);
+	background: var(--ge-navy-selected-bg, #F0F4F8);
+	box-shadow: 0 0 0 1.5px var(--gep-ink);
+	transform: scale(0.99);
+}

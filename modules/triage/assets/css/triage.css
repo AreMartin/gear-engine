@@ -209,6 +209,7 @@
 	background: var(--ge-navy-selected-bg, #F0F4F8);
 	border-color: var(--md-sys-color-primary, #0C2340);
 	box-shadow: 0 0 0 1.5px var(--md-sys-color-primary, #0C2340);
+	transform: scale(0.99);
 }
 .gear-engine-triage .opt .oi {
 	width: 40px;
@@ -675,4 +676,29 @@
 .gear-engine-triage .stack {
 	display: grid;
 	gap: 8px;
+}
+
+/* =========================================================
+   Step Motion: Material 3 Emphasized Directional Slide
+   ========================================================= */
+.gear-engine-triage .get-anim-forward {
+	animation: ge-slide-forward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+}
+.gear-engine-triage .get-anim-backward {
+	animation: ge-slide-backward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes ge-slide-forward {
+	from { opacity: 0; transform: translateX(24px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ge-slide-backward {
+	from { opacity: 0; transform: translateX(-24px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.gear-engine-triage .get-anim-forward,
+	.gear-engine-triage .get-anim-backward {
+		animation: none !important;
+		transform: none !important;
+	}
 }

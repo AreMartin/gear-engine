@@ -66,11 +66,19 @@
 		var steps = config.steps;
 		var filters = Scoring.defaults( config );
 		var step = 0;
+		var direction = 'forward';
+		var busy = false;
 
-		function go( next ) {
+		function go( next, dir ) {
+			if ( dir ) {
+				direction = dir;
+			} else {
+				direction = next < step ? 'backward' : 'forward';
+			}
 			step = next;
 			render();
-			app.querySelector( '.gear-engine-picker__stage' ).focus();
+			var stage = app.querySelector( '.gear-engine-picker__stage' );
+			if ( stage ) { stage.focus(); }
 		}
 
 		function renderProgress( stage ) {
@@ -105,9 +113,19 @@
 
 			if ( current.type === 'choice' ) {
 				current.options.forEach( function ( opt ) {
-					var b = button( 'gear-engine-picker__choice', null, function () {
+					var isSelected = filters[ current.id ] === opt.val;
+					var b = button( 'gear-engine-picker__choice' + ( isSelected ? ' is-active' : '' ), null, function () {
+						if ( busy ) { return; }
+						busy = true;
 						filters[ current.id ] = opt.val;
-						go( step + 1 );
+						var allChoices = stage.querySelectorAll( '.gear-engine-picker__choice' );
+						allChoices.forEach( function ( c ) { c.classList.remove( 'is-active' ); } );
+						b.classList.add( 'is-active' );
+
+						window.setTimeout( function () {
+							busy = false;
+							go( step + 1, 'forward' );
+						}, 380 );
 					} );
 					b.appendChild( el( 'span', 'gear-engine-picker__choice-title', opt.title ) );
 					if ( opt.desc ) {
@@ -143,12 +161,12 @@
 				box.appendChild( input );
 				stage.appendChild( box );
 				stage.appendChild( button( 'gear-engine-picker__primary', step === steps.length ? 'Finn mine treff' : 'Neste steg', function () {
-					go( step + 1 );
+					if ( ! busy ) { go( step + 1, 'forward' ); }
 				} ) );
 			}
 
 			stage.appendChild( button( 'gear-engine-picker__back', '← Tilbake', function () {
-				go( step - 1 );
+				if ( ! busy ) { go( step - 1, 'backward' ); }
 			} ) );
 		}
 
@@ -233,7 +251,7 @@
 			var head = el( 'div', 'gear-engine-picker__results-head' );
 			head.appendChild( el( 'h2', 'gear-engine-picker__title', 'Toppvalg for deg' ) );
 			head.appendChild( button( 'gear-engine-picker__link', 'Endre valg', function () {
-				go( 0 );
+				if ( ! busy ) { go( 0, 'backward' ); }
 			} ) );
 			stage.appendChild( head );
 			stage.appendChild( el( 'p', 'gear-engine-picker__disclosure', '* Lenkene under er annonselenker. Vi får en liten provisjon ved kjøp, uten at det koster deg noe ekstra.' ) );
@@ -258,7 +276,7 @@
 		}
 
 		function render() {
-			var stage = el( 'div', 'gear-engine-picker__stage' );
+			var stage = el( 'div', 'gear-engine-picker__stage gear-engine-picker__stage--' + direction );
 			stage.tabIndex = -1;
 			if ( step === 0 ) {
 				renderIntro( stage );
