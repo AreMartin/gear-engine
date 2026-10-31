@@ -122,9 +122,20 @@ class Gear_Engine_Triage {
 			if ( is_wp_error( $config ) ) {
 				continue;
 			}
+			$default_chips = array(
+				'rygg'      => array( 'Korsrygg', 'Isjias', 'Hekseskudd' ),
+				'kne'       => array( 'Menisk', 'Kneskål', 'Artrose' ),
+				'nakke'     => array( 'Nakkesperre', 'Hodepine', 'Utstråling' ),
+				'skulder'   => array( 'Impingement', 'Senebetennelse', 'Kalkskulder' ),
+				'hofte'     => array( 'Lyske', 'Trokanter', 'Hofteartrose' ),
+				'fot-ankel' => array( 'Overtråkk', 'Plantar fascitt', 'Akilles' ),
+			);
+
 			$chips = array();
 			if ( ! empty( $config['chips'] ) && is_array( $config['chips'] ) ) {
 				$chips = array_slice( $config['chips'], 0, 3 );
+			} elseif ( isset( $default_chips[ $region ] ) ) {
+				$chips = $default_chips[ $region ];
 			} elseif ( ! empty( $config['diagnoses'] ) && is_array( $config['diagnoses'] ) ) {
 				foreach ( $config['diagnoses'] as $diag_id => $diag ) {
 					if ( 'medical_referral' !== $diag_id && ! empty( $diag['title'] ) ) {
@@ -141,6 +152,7 @@ class Gear_Engine_Triage {
 				'label'   => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
 				'summary' => isset( $config['summary'] ) ? (string) $config['summary'] : '',
 				'chips'   => $chips,
+				'badge'   => 'rygg' === $region ? 'Vanligst' : '',
 				'order'   => isset( $config['order'] ) ? (int) $config['order'] : 100,
 				'icon'    => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
 				'url'     => self::get_region_url( $region ),
