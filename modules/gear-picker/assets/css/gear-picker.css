@@ -150,6 +150,17 @@
 .gear-engine-picker .chip:hover {
 	background: var(--md-sys-color-surface-container-high, #F0F4F8);
 }
+.gear-engine-picker .chip .chip-edit {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 3px;
+	opacity: 0.5;
+	transition: opacity 0.15s, transform 0.15s;
+}
+.gear-engine-picker .chip:hover .chip-edit {
+	opacity: 1;
+	transform: scale(1.15);
+}
 
 /* Badges & Pills */
 .gear-engine-picker .pill {

@@ -41,7 +41,8 @@
 		tag:        '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
 		screen:     '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
 		app:        '<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
-		clock:      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+		clock:      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+		edit:       '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
 	};
 
 	function ic( name, size ) {
@@ -482,25 +483,41 @@
 			var best = results[ 0 ] || null;
 			var others = results.slice( 1 );
 
-			var h = renderAppbar( 'Dine anbefalinger', true ) +
-				'<div class="head-row" style="margin-top:14px"><h2 class="headline-s">Toppvalg for deg</h2><span class="pill tert num">' + results.length + ' treff</span></div>';
+			var h = renderAppbar( 'Kjøpsveileder', true ) +
+				'<div class="head-row" style="margin-top:14px;align-items:center">' +
+					'<div style="display:flex;align-items:center;gap:10px">' +
+						'<h2 class="headline-s" style="margin:0">Dine anbefalinger</h2>' +
+						'<span class="pill tert num">' + results.length + ' treff</span>' +
+					'</div>' +
+					'<button type="button" class="btn text sl" data-action="how-we-rank" style="height:32px;padding:0 8px;font-size:12.5px;color:var(--md-sys-color-primary,#0C2340);gap:5px;font-weight:600">' +
+						ic( 'info', 16 ) + 'Slik rangerer vi' +
+					'</button>' +
+				'</div>';
 
-			// Active filter chips (clickable to jump back to edit)
-			h += '<div class="chips-row" style="margin-top:10px">';
+			// Active filter criteria chips with clear affordance and edit indication
+			h += '<div style="margin-top:14px">' +
+				'<div class="overline muted" style="font-size:11.5px;letter-spacing:0.4px;margin-bottom:6px">Dine kriterier · Trykk for å endre:</div>' +
+				'<div class="chips-row">';
+
 			if ( filters.goal ) {
 				var goalLabel = filters.goal === 'interval' ? 'Intervall' : filters.goal === 'run' ? 'Løping' : 'Gange';
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'goal' ) + '">' + ic( 'speedMid', 16 ) + goalLabel + '</button>';
+				var goalIcon = filters.goal === 'interval' ? 'speedHigh' : filters.goal === 'run' ? 'speedMid' : 'speedLow';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'goal' ) + '" title="Trykk for å endre bruksområde">' +
+					ic( goalIcon, 15 ) + '<span>' + esc( goalLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 			}
 			if ( filters.b ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Maks ' + money( filters.b ) + '</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'b' ) + '" title="Trykk for å endre budsjett">' +
+					'<span>Maks ' + money( filters.b ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 			}
 			if ( filters.w ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'w' ) + '">' + filters.w + ' kg</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" title="Trykk for å endre kroppsvekt">' +
+					'<span>' + filters.w + ' kg</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 			}
 			if ( filters.space ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'space' ) + '">' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</button>';
+				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'space' ) + '" title="Trykk for å endre rammekrav">' +
+					'<span>' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 			}
-			h += '</div>';
+			h += '</div></div>';
 
 			if ( ranked.isFallback && results.length ) {
 				h += '<div class="card filled" style="margin-top:14px;background:var(--md-ext-color-warning-container,#FEF3C7);color:var(--md-ext-color-on-warning-container,#92400E);border:1px solid #FDE68A"><b>Ingen perfekt match.</b> Vi har utvidet søket litt slik at du likevel får modeller som dekker vekten din og budsjettet.</div>';
@@ -658,6 +675,51 @@
 				'</div>';
 		}
 
+		/* --- Ranking Transparency Bottom Sheet Modal --- */
+		function renderRankingSheet() {
+			return '<div class="scrim" data-action="close-sheet"></div>' +
+				'<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ge-rank-title">' +
+					'<div class="grabber"></div>' +
+					'<div class="head-row" style="margin-bottom:14px">' +
+						'<h3 class="title-l" id="ge-rank-title" style="margin:0">Slik fungerer rangeringen</h3>' +
+						'<button type="button" class="ibtn tonal sl" data-action="close-sheet" aria-label="Lukk">' + ic( 'close', 18 ) + '</button>' +
+					'</div>' +
+					'<div class="rank-guide" style="display:flex;flex-direction:column;gap:16px;color:var(--md-sys-color-on-surface,#0C2340)">' +
+						'<div style="display:flex;gap:12px">' +
+							'<span style="flex:none;color:var(--md-sys-color-tertiary,#005236);margin-top:2px">' + ic( 'check', 20 ) + '</span>' +
+							'<div>' +
+								'<b style="display:block;margin-bottom:2px">1. Faglige sikkerhetsmarginer først</b>' +
+								'<span class="body-s muted" style="line-height:19px;display:block">Vi beregner motorkraft, toppfart og legger automatisk inn en sikkerhetsmargin på 10–20 kg over din oppgitte kroppsvekt så motoren ikke overbelastes under hard bruk.</span>' +
+							'</div>' +
+						'</div>' +
+						'<div style="display:flex;gap:12px">' +
+							'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340);margin-top:2px">' + ic( 'sliders', 20 ) + '</span>' +
+							'<div>' +
+								'<b style="display:block;margin-bottom:2px">2. Laveste dagspris vinner ved lik match</b>' +
+								'<span class="body-s muted" style="line-height:19px;display:block">Dersom to modeller har identisk matchprosent eller flere nettbutikker fører samme modell, rangeres alltid forhandleren med lavest dagspris øverst.</span>' +
+							'</div>' +
+						'</div>' +
+						'<div style="display:flex;gap:12px">' +
+							'<span style="flex:none;color:var(--md-ext-color-on-warning-container,#92400E);margin-top:2px">' + ic( 'tag', 20 ) + '</span>' +
+							'<div>' +
+								'<b style="display:block;margin-bottom:2px">3. Beste tilbud</b>' +
+								'<span class="body-s muted" style="line-height:19px;display:block">Merkelappen «Beste tilbud» tildeles modellen innenfor budsjettet ditt med størst reelt prosentvis prisavslag mot veiledende førpris.</span>' +
+							'</div>' +
+						'</div>' +
+						'<div style="display:flex;gap:12px">' +
+							'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340);margin-top:2px">' + ic( 'info', 20 ) + '</span>' +
+							'<div>' +
+								'<b style="display:block;margin-bottom:2px">4. 100 % uavhengig utvelgelse</b>' +
+								'<span class="body-s muted" style="line-height:19px;display:block">Rangeringen beregnes rent algoritmisk basert på dine svar. Nettbutikker kan ikke betale for opprykk eller bedre plassering.</span>' +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+					'<div style="display:flex;margin-top:22px;justify-content:flex-end">' +
+						'<button type="button" class="btn filled primary sl" data-action="close-sheet">Forstått</button>' +
+					'</div>' +
+				'</div>';
+		}
+
 		/* =========================================================
 		   Event Delegator
 		   ========================================================= */
@@ -690,6 +752,9 @@
 				} else if ( act === 'cmp' ) {
 					state.cmpId = target.getAttribute( 'data-id' ) || null;
 					state.sheet = 'compare';
+					renderSheetOverlay();
+				} else if ( act === 'how-we-rank' ) {
+					state.sheet = 'ranking';
 					renderSheetOverlay();
 				} else if ( act === 'close-sheet' ) {
 					state.sheet = null;
@@ -776,7 +841,13 @@
 				existing.className = 'ge-sheet-overlay';
 				root.appendChild( existing );
 			}
-			existing.innerHTML = renderCompareSheet();
+			if ( state.sheet === 'compare' ) {
+				existing.innerHTML = renderCompareSheet();
+			} else if ( state.sheet === 'ranking' ) {
+				existing.innerHTML = renderRankingSheet();
+			} else {
+				existing.innerHTML = '';
+			}
 			existing.querySelectorAll( '[data-action="close-sheet"]' ).forEach( function ( btn ) {
 				btn.addEventListener( 'click', function () {
 					state.sheet = null;
