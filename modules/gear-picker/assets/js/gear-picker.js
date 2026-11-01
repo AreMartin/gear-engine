@@ -14,7 +14,8 @@
 		'<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="100%" height="100%" fill="#e2e8f0"/></svg>'
 	);
 
-	var TREAD_SVG = '<svg viewBox="0 0 140 90" width="120" height="78" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 74h102l14-14"/><path d="M106 60L84 18H72"/><circle cx="22" cy="74" r="4.5" fill="currentColor"/><circle cx="114" cy="74" r="4.5" fill="currentColor"/><line x1="72" y1="26" x2="84" y2="26"/></svg>';
+	var PLACEHOLDER_SVG = '<svg viewBox="0 0 140 90" width="120" height="78" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"><rect x="20" y="22" width="100" height="46" rx="8" stroke-dasharray="4 3"/><circle cx="50" cy="45" r="10"/><path d="M70 45h20M90 38v14"/></svg>';
+	var TREAD_SVG = PLACEHOLDER_SVG;
 
 	/* =========================================================
 	   Icons (Material Symbols, stroke controlled by CSS)
@@ -157,6 +158,45 @@
 		return item.specs[ key ];
 	}
 
+	function renderProductPills( config, item, isCompact ) {
+		var defs = ( config && config.pills ) || [];
+		var pills = [];
+		var activeFields = {};
+
+		defs.forEach( function ( p ) {
+			if ( p.unless && activeFields[ p.unless ] ) {
+				return;
+			}
+			var val = getSpec( item, p.field );
+			if ( val === null || val === undefined || val === false ) {
+				return;
+			}
+			activeFields[ p.field ] = true;
+			var text = p.text || String( val );
+			if ( typeof val === 'number' || typeof val === 'string' ) {
+				text = text.replace( '{v}', val );
+			}
+			pills.push( text );
+		} );
+
+		if ( ! pills.length ) {
+			var sp = getSpec( item, 'speed' );
+			var wt = getSpec( item, 'weight' );
+			var fd = getSpec( item, 'foldable' );
+			if ( sp ) { pills.push( 'Toppfart: ' + sp + ' km/t' ); }
+			if ( wt ) { pills.push( 'Maks brukervekt: ' + wt + ' kg' ); }
+			if ( fd ) { pills.push( 'Sammenleggbar' ); }
+		}
+
+		if ( isCompact && pills.length > 3 ) {
+			pills = pills.slice( 0, 3 );
+		}
+
+		return pills.map( function ( txt ) {
+			return '<span class="spec">' + esc( txt ) + '</span>';
+		} ).join( '' );
+	}
+
 	/* =========================================================
 	   Picker Component
 	   ========================================================= */
@@ -179,15 +219,22 @@
 		var items = data.items || [];
 		var filters = Scoring.defaults( config );
 
-		// Quick presets mapping (clean criteria without arbitrary lifestyle locks)
-		var PRESETS = {
-			budget:       { b: 15000, w: 80 },
-			sprint:       { goal: 'interval', w: 80 },
-			compact:      { space: 'foldable', b: 20000, w: 80 },
-			rehab:        { cushion: 'rehab', w: 80 },
-			foldable_15k: { space: 'foldable', b: 15000, w: 80 },
-			speed_20:     { goal: 'interval', w: 80 }
-		};
+		// Dynamic presets mapping from config with fallback
+		var PRESETS = {};
+		if ( Array.isArray( config.presets ) && config.presets.length ) {
+			config.presets.forEach( function ( p ) {
+				PRESETS[ p.key ] = p.filters || {};
+			} );
+		} else {
+			PRESETS = {
+				budget:       { b: 15000, w: 80 },
+				sprint:       { goal: 'interval', w: 80 },
+				compact:      { space: 'foldable', b: 20000, w: 80 },
+				rehab:        { cushion: 'rehab', w: 80 },
+				foldable_15k: { space: 'foldable', b: 15000, w: 80 },
+				speed_20:     { goal: 'interval', w: 80 }
+			};
+		}
 
 		var state = {
 			step: 0, // 0 = intro, 1..N = quiz steps, N+1 = results
@@ -414,18 +461,24 @@
 
 			var h = '<div style="padding-top:16px">' +
 				'<div class="overline">Kjøpsguide</div>' +
-				'<h1 class="headline-l" style="margin-top:4px">' + esc( config.label || 'Tredemøller' ) + '</h1>' +
-				'<p class="body-m muted" style="margin-top:8px">Sammenlign spesifikasjoner, motorkraft og dagspriser fra ' + ( uniqueShops.length || 6 ) + ' norske butikker.</p>' +
+				'<h1 class="headline-l" style="margin-top:4px">' + esc( config.label || 'Treningsutstyr' ) + '</h1>' +
+				'<p class="body-m muted" style="margin-top:8px">Sammenlign spesifikasjoner, egenskaper og dagspriser fra ' + ( uniqueShops.length || 6 ) + ' norske butikker.</p>' +
 				'<div class="chips-row" style="margin-top:16px">' +
-					'<button type="button" class="chip sl sel" data-action="deals">' + ic( 'tag', 18 ) + 'Dagens tilbud</button>' +
-					'<button type="button" class="chip sl" data-action="quick" data-preset="foldable_15k">' + ic( 'fold', 18 ) + 'Foldbare under 15k</button>' +
-					'<button type="button" class="chip sl" data-action="quick" data-preset="speed_20">' + ic( 'speedHigh', 18 ) + 'Toppfart 20+</button>' +
-				'</div></div>';
+					'<button type="button" class="chip sl sel" data-action="deals">' + ic( 'tag', 18 ) + 'Dagens tilbud</button>';
+
+			if ( config.presets && config.presets.length ) {
+				config.presets.slice( 0, 2 ).forEach( function ( pr ) {
+					h += '<button type="button" class="chip sl" data-action="quick" data-preset="' + esc( pr.key ) + '">' +
+						ic( pr.icon || 'sliders', 18 ) + esc( pr.label ) + '</button>';
+				} );
+			}
+
+			h += '</div></div>';
 
 			h += '<div class="card xl" style="margin-top:18px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;box-shadow:var(--md-sys-elevation-1,0 1px 3px rgba(0,0,0,0.06))">' +
 				'<span class="pill" style="background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);border:1px solid #D0DBE5;font-weight:600;box-shadow:0 1px 2px rgba(12,35,64,0.04);gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--md-sys-color-tertiary,#005236)"></span>Smart kjøpsveileder · 1 min</span>' +
 				'<h2 class="headline-s" style="margin:14px 0 8px;color:var(--md-sys-color-primary,#0C2340)">' + esc( intro.title || 'Usikker på hvilken modell du bør velge?' ) + '</h2>' +
-				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' + esc( intro.desc || 'Svar på 5 enkle spørsmål om vekt, løpevaner og budsjett. Vår algoritme regner ut optimal motorkraft og sikkerhetsmargin for deg.' ) + '</p>' +
+				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' + esc( intro.desc || 'Svar på noen enkle spørsmål om behov og budsjett. Vår algoritme finner de beste modellene for deg.' ) + '</p>' +
 				'<button type="button" class="btn filled primary sl" style="margin-top:20px;height:48px;font-size:15px;font-weight:600;padding:0 24px" data-action="start">' +
 				esc( intro.start || 'Start kjøpsveileder' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
 				'</div>';
@@ -435,22 +488,15 @@
 				h += '<div class="deal-grid">';
 				deals.forEach( function ( d ) {
 					var disc = d.old > d.price ? Math.round( ( ( d.old - d.price ) / d.old ) * 100 ) : 0;
-					var sp = getSpec( d, 'speed' );
-					var wt = getSpec( d, 'weight' );
-					var fd = getSpec( d, 'foldable' );
 
 					h += '<div class="card elevated stack">' +
 						'<div class="art" style="height:140px">' +
 							( disc ? '<span class="pill err disc">−' + disc + '%</span>' : '' ) +
-							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : TREAD_SVG ) +
+							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
 						'<div class="head-row" style="margin:14px 0 4px"><span class="body-s muted" style="font-weight:700;letter-spacing:0.3px;text-transform:uppercase">' + esc( cleanShopName( d.shop ) ) + '</span><span class="pill warn">Populær</span></div>' +
 						'<h4 class="title-m" style="margin:0 0 8px">' + esc( d.name ) + '</h4>' +
-						'<div class="specs">' +
-							( sp ? '<span class="spec">' + sp + ' km/t</span>' : '' ) +
-							( wt ? '<span class="spec">Maks ' + wt + ' kg</span>' : '' ) +
-							( fd ? '<span class="spec">Foldbar</span>' : '' ) +
-						'</div>' +
+						'<div class="specs">' + renderProductPills( config, d, true ) + '</div>' +
 						'<div class="pricebar row" style="margin-top:16px"><div class="price"><b class="num">' + money( d.price, d.cur ) + '</b>' + ( d.old > d.price ? '<s class="num">' + money( d.old, d.cur ) + '</s>' : '' ) + '</div>' +
 						'<a class="btn filled sl" href="' + safeUrl( d.url ) + '" target="_blank" rel="noopener nofollow sponsored">Se deal' + ic( 'ext', 16 ) + '</a></div>' +
 						'</div>';
@@ -458,13 +504,14 @@
 				h += '</div>';
 			}
 
-			h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +
-				'<div class="tiles">' +
-					'<button type="button" class="tile sl" data-action="quick" data-preset="compact"><span class="ti">' + ic( 'fold', 22 ) + '</span><span><b>Leilighet og kompakt</b><small>Foldbar ramme som sparer plass</small></span></button>' +
-					'<button type="button" class="tile sl" data-action="quick" data-preset="budget"><span class="ti">' + ic( 'sliders', 22 ) + '</span><span><b>Mest for pengene</b><small>Gode modeller under 15 000 kr</small></span></button>' +
-					'<button type="button" class="tile sl" data-action="quick" data-preset="sprint"><span class="ti">' + ic( 'speedHigh', 22 ) + '</span><span><b>Intervall og sprint</b><small>Over 20 km/t og kraftig motor</small></span></button>' +
-					'<button type="button" class="tile sl" data-action="quick" data-preset="rehab"><span class="ti">' + ic( 'medical', 22 ) + '</span><span><b>Skånsom og opptrening</b><small>Ekstra god støtdemping</small></span></button>' +
-				'</div>';
+			if ( config.presets && config.presets.length ) {
+				h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +
+					'<div class="tiles">';
+				config.presets.forEach( function ( pr ) {
+					h += '<button type="button" class="tile sl" data-action="quick" data-preset="' + esc( pr.key ) + '"><span class="ti">' + ic( pr.icon || 'sliders', 22 ) + '</span><span><b>' + esc( pr.label ) + '</b><small>' + esc( pr.desc ) + '</small></span></button>';
+				} );
+				h += '</div>';
+			}
 
 			return h;
 		}
@@ -546,37 +593,74 @@
 		/* --- Why points helper --- */
 		function generateWhyPoints( item, a ) {
 			var list = [];
-			var sp = getSpec( item, 'speed' );
+			var pillsDefs = ( config && config.pills ) || [];
 			var wt = getSpec( item, 'weight' );
-			var inc = getSpec( item, 'motor_incline' );
-			var fd = getSpec( item, 'foldable' );
+			var sp = getSpec( item, 'speed' );
 
+			// 1. Weight capacity check with safety margin
+			if ( wt ) {
+				var diff = ( a && a.w ) ? ( wt - a.w ) : 0;
+				if ( diff >= 30 ) {
+					list.push( { t: 'Tåler ' + wt + ' kg (' + diff + ' kg god sikkerhetsmargin over din vekt)' } );
+				} else if ( diff > 0 ) {
+					list.push( { t: 'Tåler ' + wt + ' kg (' + diff + ' kg over din vekt)' } );
+				} else {
+					list.push( { t: 'Maks brukervekt på ' + wt + ' kg' } );
+				}
+			}
+
+			// 2. Speed / primary metric
 			if ( sp ) {
 				var speedDesc = sp + ' km/t toppfart';
-				if ( a.goal === 'walk' ) {
-					speedDesc += ' – kraftig motor som gir jevn og stillegående gange';
-				} else if ( a.goal === 'interval' ) {
-					speedDesc += ( sp >= 18 ? ' – perfekt for harde intervaller og sprint' : ' – god for tempo og fartsøkninger' );
-				} else {
-					speedDesc += ( sp >= 15 ? ' – solid for regelmessig løpetrening' : ' – fin for lett jogg og oppvarming' );
+				if ( a && a.goal === 'walk' ) {
+					speedDesc += ' – jevn og stabil gange';
+				} else if ( a && a.goal === 'interval' ) {
+					speedDesc += ( sp >= 18 ? ' – ideell for høypuls og intervaller' : ' – god for tempo og fartsøkninger' );
+				} else if ( a && a.goal ) {
+					speedDesc += ( sp >= 15 ? ' – solid for regelmessig løpetrening' : ' – fin for mosjon og lett jogg' );
 				}
 				list.push( { t: speedDesc } );
 			}
-			if ( wt ) {
-				var diff = a.w ? wt - a.w : 0;
-				list.push( {
-					t: 'Tåler ' + wt + ' kg' + ( diff >= 30 ? ' (' + diff + ' kg sikkerhetsmargin)' : diff > 0 ? ' (' + diff + ' kg over din vekt)' : '' )
-				} );
-			}
-			if ( inc ) {
+
+			// 3. Dynamic points based on config pills
+			pillsDefs.forEach( function ( p ) {
+				if ( p.field === 'weight' || p.field === 'speed' ) {
+					return;
+				}
+				var val = getSpec( item, p.field );
+				if ( val === null || val === undefined || val === false ) {
+					return;
+				}
+				var text = p.text || String( val );
+				if ( typeof val === 'number' || typeof val === 'string' ) {
+					text = text.replace( '{v}', val );
+				}
+				list.push( { t: text } );
+			} );
+
+			// 4. Incline or frame notes if not already covered in pills
+			var inc = getSpec( item, 'motor_incline' );
+			if ( inc && ! pillsDefs.some( function ( p ) { return p.field === 'motor_incline'; } ) ) {
 				list.push( { t: 'Motorisert stigning for effektiv motbakketrening' } );
 			}
-			if ( fd ) {
-				list.push( { t: 'Sammenleggbar med hydraulisk nedsenking' } );
-			} else {
-				list.push( { t: 'Fast ramme uten folding (maksimal stabilitet)', neutral: true } );
+
+			var fd = getSpec( item, 'foldable' );
+			if ( fd !== null && fd !== undefined && ! pillsDefs.some( function ( p ) { return p.field === 'foldable'; } ) ) {
+				if ( fd ) {
+					list.push( { t: 'Sammenleggbar ramme – enkel å oppbevare' } );
+				} else {
+					list.push( { t: 'Fast ramme for maksimal stabilitet under hard belastning', neutral: true } );
+				}
 			}
-			return list;
+
+			// 5. Discount highlight
+			var disc = item.discount || ( ( item.old && item.old > item.price ) ? Math.round( ( ( item.old - item.price ) / item.old ) * 100 ) : 0 );
+			var save = ( item.old && item.old > item.price ) ? ( item.old - item.price ) : 0;
+			if ( disc >= 15 && save > 0 ) {
+				list.push( { t: 'Prisavslag på ' + disc + '% (Spar ' + money( save, item.cur ) + ')' } );
+			}
+
+			return list.slice( 0, 4 );
 		}
 
 		/* --- Results View --- */
@@ -602,33 +686,62 @@
 				'<div class="overline muted" style="font-size:11.5px;letter-spacing:0.4px;margin-bottom:6px">Dine kriterier · Trykk for å endre:</div>' +
 				'<div class="chips-row">';
 
-			if ( filters.goal ) {
-				var goalLabel = filters.goal === 'interval' ? 'Intervall' : filters.goal === 'run' ? 'Løping' : 'Gange';
-				var goalIcon = filters.goal === 'interval' ? 'speedHigh' : filters.goal === 'run' ? 'speedMid' : 'speedLow';
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'goal' ) + '" title="Trykk for å endre bruksområde">' +
-					ic( goalIcon, 15 ) + '<span>' + esc( goalLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
-			}
-			if ( filters.b && ( ! state.presetApplied || filters.b < 80000 ) ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'b' ) + '" title="Trykk for å endre budsjett">' +
-					'<span>Maks ' + money( filters.b ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
-			}
-			if ( filters.w ) {
-				var wLabel = state.presetApplied ? 'Standardvekt (' + filters.w + ' kg)' : filters.w + ' kg';
-				var wTitle = state.presetApplied ? 'Trykk for å oppgi din faktiske vekt' : 'Trykk for å endre kroppsvekt';
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" title="' + esc( wTitle ) + '">' +
-					'<span>' + esc( wLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
-			}
-			if ( filters.space && filters.space !== 'any' ) {
-				h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + getStepIndex( 'space' ) + '" title="Trykk for å endre rammekrav">' +
-					'<span>' + ( filters.space === 'foldable' ? 'Sammenleggbar' : 'Fast ramme' ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
-			}
+			steps.forEach( function ( s, idx ) {
+				var val = filters[ s.id ];
+				if ( val === undefined || val === null || val === 'any' || val === '' ) {
+					return;
+				}
+				var stepNum = idx + 1;
+				var chipLabel = '';
+				var chipIcon = 'sliders';
+
+				if ( s.type === 'choice' ) {
+					var opt = null;
+					( s.options || [] ).forEach( function ( o ) {
+						if ( o.val === val ) { opt = o; }
+					} );
+					if ( ! opt ) { return; }
+					chipLabel = opt.title;
+
+					if ( val === 'walk' ) { chipIcon = 'speedLow'; }
+					else if ( val === 'run' ) { chipIcon = 'speedMid'; }
+					else if ( val === 'interval' ) { chipIcon = 'speedHigh'; }
+					else if ( val === 'foldable' ) { chipIcon = 'fold'; }
+					else if ( val === 'yes' ) { chipIcon = 'incline'; }
+					else if ( val === 'no' ) { chipIcon = 'flat'; }
+					else if ( val === 'screen' ) { chipIcon = 'screen'; }
+					else if ( val === 'app' ) { chipIcon = 'app'; }
+					else if ( val === 'rehab' || val === 'soft' ) { chipIcon = 'medical'; }
+					else if ( val === 'quiet' ) { chipIcon = 'speedLow'; }
+					else if ( val === 'air' || val === 'water' ) { chipIcon = 'speedMid'; }
+					else { chipIcon = 'check'; }
+
+					h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + stepNum + '" title="Trykk for å endre ' + esc( s.title ) + '">' +
+						ic( chipIcon, 15 ) + '<span>' + esc( chipLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
+				} else if ( s.type === 'slider' ) {
+					if ( s.id === 'b' ) {
+						if ( state.presetApplied && val >= ( s.max || 80000 ) ) {
+							return;
+						}
+						chipLabel = 'Maks ' + money( val );
+					} else if ( s.id === 'w' ) {
+						chipLabel = state.presetApplied ? ( 'Standardvekt (' + val + ' kg)' ) : ( val + ' kg' );
+					} else {
+						chipLabel = val + ( s.unit ? ' ' + s.unit : '' );
+					}
+
+					var sTitle = ( state.presetApplied && s.id === 'w' ) ? 'Trykk for å oppgi din faktiske vekt' : ( 'Trykk for å endre ' + s.title );
+					h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + stepNum + '" title="' + esc( sTitle ) + '">' +
+						'<span>' + esc( chipLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
+				}
+			} );
 			h += '</div></div>';
 
 			if ( state.presetApplied ) {
 				h += '<div class="card filled" style="margin-top:12px;padding:12px 16px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;display:flex;align-items:center;gap:12px">' +
 					'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340)">' + ic( 'info', 18 ) + '</span>' +
 					'<span class="body-s" style="color:var(--md-sys-color-on-surface,#0C2340);flex:1">' +
-						'<b>Beregnet med standardvekt (80 kg):</b> Veier du mer enn 80 kg? <button type="button" class="btn text sl" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" style="padding:0;text-decoration:underline;height:auto;font-size:13px;display:inline;font-weight:600;color:var(--md-sys-color-primary,#0C2340)">Juster vekten din her</button> for å sikre at motoren har tilstrekkelig kraft.' +
+						'<b>Beregnet med standardvekt (' + ( filters.w || 80 ) + ' kg):</b> Veier du mer? <button type="button" class="btn text sl" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" style="padding:0;text-decoration:underline;height:auto;font-size:13px;display:inline;font-weight:600;color:var(--md-sys-color-primary,#0C2340)">Juster vekten din her</button> for å sikre at utstyret har optimal kapasitet og sikkerhetsmargin.' +
 					'</span>' +
 				'</div>';
 			}
@@ -644,10 +757,6 @@
 			// Best Match featured card
 			var dDisc = best.discount || 0;
 			var whyList = generateWhyPoints( best, filters );
-			var bestSp = getSpec( best, 'speed' );
-			var bestWt = getSpec( best, 'weight' );
-			var bestInc = getSpec( best, 'motor_incline' );
-			var bestFd = getSpec( best, 'foldable' );
 
 			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
 				'<div class="head-row">' +
@@ -658,15 +767,10 @@
 					'<div class="art">' +
 						'<span class="pill best badge-top-left">Beste match</span>' +
 						( dDisc ? '<span class="pill err disc">−' + dDisc + '%</span>' : '' ) +
-						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : TREAD_SVG ) +
+						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 					'</div>' +
 					'<div><h3 class="title-l" style="line-height:28px">' + esc( best.name ) + '</h3>' +
-						'<div class="specs">' +
-							( bestSp ? '<span class="spec">Toppfart: ' + bestSp + ' km/t</span>' : '' ) +
-							( bestWt ? '<span class="spec">Maks brukervekt: ' + bestWt + ' kg</span>' : '' ) +
-							( bestInc ? '<span class="spec">Motorisert stigning</span>' : '' ) +
-							( bestFd ? '<span class="spec">Sammenleggbar</span>' : '' ) +
-						'</div>' +
+						'<div class="specs">' + renderProductPills( config, best, false ) + '</div>' +
 						'<div class="note">' + esc( best.note || 'Vår toppanbefaling basert på dine kriterier. Optimal kombinasjon av byggekvalitet, ytelse og pris.' ) + '</div>' +
 						'<ul class="why">' +
 							whyList.map( function ( x ) {
@@ -689,9 +793,6 @@
 				h += '<h3 class="title-l" style="margin:28px 0 14px">Gode alternativer innen budsjett</h3><div class="alt-grid">';
 				others.forEach( function ( o ) {
 					var oDisc = o.discount || 0;
-					var oSp = getSpec( o, 'speed' );
-					var oWt = getSpec( o, 'weight' );
-					var oFd = getSpec( o, 'foldable' );
 
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
@@ -701,14 +802,10 @@
 						'<div class="art" style="height:120px">' +
 							( o.isBestOffer ? '<span class="pill deal badge-top-left">Beste tilbud</span>' : '' ) +
 							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
-							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : TREAD_SVG ) +
+							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
 						'<h4>' + esc( o.name ) + '</h4>' +
-						'<div class="specs">' +
-							( oSp ? '<span class="spec">' + oSp + ' km/t</span>' : '' ) +
-							( oWt ? '<span class="spec">Maks ' + oWt + ' kg</span>' : '' ) +
-							( oFd ? '<span class="spec">Foldbar</span>' : '' ) +
-						'</div></div>' +
+						'<div class="specs">' + renderProductPills( config, o, true ) + '</div></div>' +
 						'<div class="pricebar"><div class="price">' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '<b class="num" style="font-size:22px;line-height:28px">' + money( o.price, o.cur ) + '</b></div>' +
 						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
 				} );
@@ -716,7 +813,7 @@
 			} else {
 				h += '<div class="card filled" style="margin-top:20px;padding:16px 20px;text-align:left;background:var(--md-sys-color-surface-container-low,#F5F7FA);border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
 					'<div style="font-weight:600;color:var(--md-sys-color-primary,#0C2340);margin-bottom:4px">Kun 1 modell oppfyller alle dine krav</div>' +
-					'<p class="body-s muted">Dette er den eneste modellen i vårt utvalg som matcher alle dine spesifikke valg (inkludert vektkapasitet på ' + ( filters.w || 90 ) + ' kg og sammenleggbar ramme innenfor ' + money( filters.b || 35000 ) + ').</p>' +
+					'<p class="body-s muted">Dette er den eneste modellen i vårt utvalg som matcher alle dine spesifikke valg (inkludert budsjett på ' + money( filters.b || 35000 ) + ( filters.w ? ' og vektkapasitet på ' + filters.w + ' kg' : '' ) + ').</p>' +
 					'<div style="margin-top:10px"><button type="button" class="btn outlined sl" style="height:36px;font-size:13px;padding:0 14px" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Juster budsjett eller krav</button></div>' +
 					'</div>';
 			}
@@ -766,9 +863,9 @@
 				'<div style="display:flex;align-items:flex-start;gap:12px">' +
 					'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340);margin-top:2px">' + ic( 'info', 20 ) + '</span>' +
 					'<div style="flex:1">' +
-						'<b style="color:var(--md-sys-color-primary,#0C2340);font-size:13.5px;display:block">Usikker på om tilbudet passer vekten din?</b>' +
+						'<b style="color:var(--md-sys-color-primary,#0C2340);font-size:13.5px;display:block">Usikker på om tilbudet dekker dine behov?</b>' +
 						'<span class="body-s muted" style="line-height:19px;display:block;margin-top:2px">' +
-							'En god pris er vel og bra, men for tung belastning på en for liten motor kan føre til overoppheting. Svar på 5 raske spørsmål for å finne den tryggeste modellen for din kroppsvekt og treningsform.' +
+							'En god pris er vel og bra, men feil dimensjonering eller for tung belastning kan gi unødig slitasje og dårlig opplevelse. Svar på noen raske spørsmål for å finne den tryggeste modellen for din kroppsvekt og treningsform.' +
 						'</span>' +
 					'</div>' +
 				'</div>' +
@@ -786,10 +883,7 @@
 			// Featured top deal card
 			var bestDisc = best.discount || ( ( best.old && best.old > best.price ) ? Math.round( ( ( best.old - best.price ) / best.old ) * 100 ) : 0 );
 			var bestSave = ( best.old && best.old > best.price ) ? ( best.old - best.price ) : 0;
-			var bestSp = getSpec( best, 'speed' );
-			var bestWt = getSpec( best, 'weight' );
-			var bestInc = getSpec( best, 'motor_incline' );
-			var bestFd = getSpec( best, 'foldable' );
+			var topWhyPoints = generateWhyPoints( best, filters );
 
 			var topBadgeLabel = isAmountSort
 				? ( 'Dagens største kroneavslag' + ( bestSave ? ' (Spar ' + money( bestSave, best.cur ) + ')' : '' ) )
@@ -812,22 +906,18 @@
 					'<div class="art">' +
 						'<span class="pill deal badge-top-left">Beste tilbud</span>' +
 						( bestDisc ? '<span class="pill err disc">−' + bestDisc + '%</span>' : '' ) +
-						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : TREAD_SVG ) +
+						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 					'</div>' +
 					'<div><h3 class="title-l" style="line-height:28px">' + esc( best.name ) + '</h3>' +
-						'<div class="specs">' +
-							( bestSp ? '<span class="spec">Toppfart: ' + bestSp + ' km/t</span>' : '' ) +
-							( bestWt ? '<span class="spec">Maks brukervekt: ' + bestWt + ' kg</span>' : '' ) +
-							( bestInc ? '<span class="spec">Motorisert stigning</span>' : '' ) +
-							( bestFd ? '<span class="spec">Sammenleggbar</span>' : '' ) +
-						'</div>' +
+						'<div class="specs">' + renderProductPills( config, best, false ) + '</div>' +
 						'<div class="note" style="border-left-color:var(--md-ext-color-on-warning-container,#92400E)">' +
 							esc( topNoteText ) +
 						'</div>' +
 						'<ul class="why">' +
 							( bestSave ? '<li>' + ic( 'check', 18 ) + '<span>' + esc( topWhyPoint ) + '</span></li>' : '' ) +
-							( bestWt ? '<li>' + ic( 'check', 18 ) + '<span>Maks brukervekt oppgitt til ' + bestWt + ' kg</span></li>' : '' ) +
-							( bestSp ? '<li>' + ic( 'check', 18 ) + '<span>Toppfart på ' + bestSp + ' km/t</span></li>' : '' ) +
+							topWhyPoints.map( function ( x ) {
+								return '<li class="' + ( x.neutral ? 'neutral' : '' ) + '">' + ic( x.neutral ? 'minus' : 'check', 18 ) + '<span>' + esc( x.t ) + '</span></li>';
+							} ).join( '' ) +
 						'</ul>' +
 					'</div>' +
 				'</div>' +
@@ -846,9 +936,6 @@
 				others.forEach( function ( o ) {
 					var oDisc = o.discount || ( ( o.old && o.old > o.price ) ? Math.round( ( ( o.old - o.price ) / o.old ) * 100 ) : 0 );
 					var oSave = ( o.old && o.old > o.price ) ? ( o.old - o.price ) : 0;
-					var oSp = getSpec( o, 'speed' );
-					var oWt = getSpec( o, 'weight' );
-					var oFd = getSpec( o, 'foldable' );
 
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
@@ -857,14 +944,10 @@
 						'</div>' +
 						'<div class="art" style="height:120px">' +
 							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
-							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : TREAD_SVG ) +
+							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
 						'<h4>' + esc( o.name ) + '</h4>' +
-						'<div class="specs">' +
-							( oSp ? '<span class="spec">' + oSp + ' km/t</span>' : '' ) +
-							( oWt ? '<span class="spec">Maks ' + oWt + ' kg</span>' : '' ) +
-							( oFd ? '<span class="spec">Foldbar</span>' : '' ) +
-						'</div></div>' +
+						'<div class="specs">' + renderProductPills( config, o, true ) + '</div></div>' +
 						'<div class="pricebar"><div class="price">' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '<b class="num" style="font-size:22px;line-height:28px">' + money( o.price, o.cur ) + '</b></div>' +
 						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
 				} );
@@ -905,14 +988,43 @@
 				return '<tr><th>' + label + '</th><td>' + val1 + '</td><td>' + val2 + '</td></tr>';
 			}
 
-			var p1Sp = getSpec( p1, 'speed' );
-			var p2Sp = getSpec( p2, 'speed' );
-			var p1Wt = getSpec( p1, 'weight' );
-			var p2Wt = getSpec( p2, 'weight' );
-			var p1Inc = getSpec( p1, 'motor_incline' );
-			var p2Inc = getSpec( p2, 'motor_incline' );
-			var p1Fd = getSpec( p1, 'foldable' );
-			var p2Fd = getSpec( p2, 'foldable' );
+			function formatCompareVal( pDef, item ) {
+				var val = getSpec( item, pDef.field );
+				if ( val === null || val === undefined || val === '' ) {
+					return '–';
+				}
+				if ( typeof val === 'boolean' ) {
+					return val ? 'Ja' : 'Nei';
+				}
+				var txt = pDef.text || String( val );
+				if ( typeof val === 'number' || typeof val === 'string' ) {
+					txt = txt.replace( '{v}', val );
+				}
+				return esc( txt );
+			}
+
+			var specRows = '';
+			var pillsDefs = ( config && config.pills ) || [];
+			if ( pillsDefs.length ) {
+				pillsDefs.forEach( function ( pDef ) {
+					var rawLabel = pDef.label || ( pDef.text ? pDef.text.replace( /:\s*\{v\}.*$/, '' ).replace( /\{v\}%?\s*/, '' ) : pDef.field );
+					var label = rawLabel.charAt( 0 ).toUpperCase() + rawLabel.slice( 1 );
+					specRows += row( label, formatCompareVal( pDef, p1 ), formatCompareVal( pDef, p2 ) );
+				} );
+			} else {
+				var p1Sp = getSpec( p1, 'speed' );
+				var p2Sp = getSpec( p2, 'speed' );
+				var p1Wt = getSpec( p1, 'weight' );
+				var p2Wt = getSpec( p2, 'weight' );
+				var p1Inc = getSpec( p1, 'motor_incline' );
+				var p2Inc = getSpec( p2, 'motor_incline' );
+				var p1Fd = getSpec( p1, 'foldable' );
+				var p2Fd = getSpec( p2, 'foldable' );
+				specRows += row( 'Toppfart', ( p1Sp ? p1Sp + ' km/t' : '–' ), ( p2Sp ? p2Sp + ' km/t' : '–' ) ) +
+					row( 'Maks vekt', ( p1Wt ? p1Wt + ' kg' : '–' ), ( p2Wt ? p2Wt + ' kg' : '–' ) ) +
+					row( 'Stigning', ( p1Inc ? 'Motorisert' : 'Manuell / flat' ), ( p2Inc ? 'Motorisert' : 'Manuell / flat' ) ) +
+					row( 'Folding', ( p1Fd ? 'Sammenleggbar' : 'Fast ramme' ), ( p2Fd ? 'Sammenleggbar' : 'Fast ramme' ) );
+			}
 
 			var metricRow = state.view === 'deals'
 				? row( 'Rabatt', '<span class="pill err num">−' + ( p1.discount || Math.round( ( ( p1.old - p1.price ) / p1.old ) * 100 ) || 0 ) + '%</span>', '<span class="pill err num">−' + ( p2.discount || Math.round( ( ( p2.old - p2.price ) / p2.old ) * 100 ) || 0 ) + '%</span>' )
@@ -930,10 +1042,7 @@
 						row( 'Forhandler', esc( cleanShopName( p1.shop ) ), esc( cleanShopName( p2.shop ) ) ) +
 						metricRow +
 						row( 'Pris', '<b class="num">' + money( p1.price, p1.cur ) + '</b>', '<b class="num">' + money( p2.price, p2.cur ) + '</b>' ) +
-						row( 'Toppfart', ( p1Sp ? p1Sp + ' km/t' : '–' ), ( p2Sp ? p2Sp + ' km/t' : '–' ) ) +
-						row( 'Maks vekt', ( p1Wt ? p1Wt + ' kg' : '–' ), ( p2Wt ? p2Wt + ' kg' : '–' ) ) +
-						row( 'Stigning', ( p1Inc ? 'Motorisert' : 'Manuell / flat' ), ( p2Inc ? 'Motorisert' : 'Manuell / flat' ) ) +
-						row( 'Folding', ( p1Fd ? 'Sammenleggbar' : 'Fast ramme' ), ( p2Fd ? 'Sammenleggbar' : 'Fast ramme' ) ) +
+						specRows +
 					'</tbody></table>' +
 					'<div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">' +
 						'<button type="button" class="btn text sl" data-action="close-sheet">Lukk</button>' +

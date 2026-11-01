@@ -430,7 +430,7 @@ class Gear_Engine_Gear_Picker {
 	 * @return array<string, mixed>
 	 */
 	public static function get_client_config( array $config ): array {
-		return array_intersect_key( $config, array_flip( array( 'id', 'label', 'pills', 'limit', 'feature_shop', 'intro', 'steps', 'fallback', 'scoring', 'notes' ) ) );
+		return array_intersect_key( $config, array_flip( array( 'id', 'label', 'pills', 'limit', 'feature_shop', 'intro', 'steps', 'fallback', 'scoring', 'notes', 'presets' ) ) );
 	}
 
 	/**
