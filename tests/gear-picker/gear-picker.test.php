@@ -212,4 +212,14 @@ add_filter( 'gear_engine_picker_item', function( $item ) {
 $res_rejected = Gear_Engine_Gear_Picker::evaluate_post( $post, $config );
 t( 'filter: gear_engine_picker_item can reject item', null === $res_rejected['item'] && 'filtered' === $res_rejected['reason'] );
 
+// Hub data verification.
+t( 'hub: shortcode constant defined', 'gear_engine_gear_picker_hub' === Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG );
+$hub_data = Gear_Engine_Gear_Picker::get_hub_data();
+t( 'hub: categories present', isset( $hub_data['categories']['kondisjon'], $hub_data['categories']['styrke'], $hub_data['categories']['rehab'] ) );
+$hub_slugs = array_column( $hub_data['items'], 'slug' );
+t( 'hub: treadmill and romaskin in items', in_array( 'treadmill', $hub_slugs, true ) && in_array( 'romaskin', $hub_slugs, true ) );
+$items_by_slug = array_column( $hub_data['items'], null, 'slug' );
+t( 'hub: bundled configs are available', true === $items_by_slug['treadmill']['available'] && true === $items_by_slug['romaskin']['available'] );
+t( 'hub: future configs marked upcoming', false === $items_by_slug['ergometersykkel']['available'] && false === $items_by_slug['manualer']['available'] );
+
 exit( $failures ? 1 : 0 );

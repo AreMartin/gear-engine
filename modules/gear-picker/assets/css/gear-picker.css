@@ -819,3 +819,352 @@
 		transition: none !important;
 	}
 }
+
+/* =========================================================
+   12. Gear Picker Hub (/kjopsveiledere/)
+   ========================================================= */
+.gear-engine-hub {
+	box-sizing: border-box;
+	max-width: 840px;
+	margin: 0 auto;
+	padding: 0 16px 48px;
+	color: var(--md-sys-color-on-surface, #0C2340);
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+	line-height: 1.5;
+	position: relative;
+}
+
+.gear-engine-hub *,
+.gear-engine-hub *::before,
+.gear-engine-hub *::after {
+	box-sizing: border-box;
+}
+
+.gear-engine-hub :focus-visible {
+	outline: 2.5px solid var(--md-sys-color-primary, #0C2340);
+	outline-offset: 2px;
+}
+
+.gear-engine-hub button:focus:not(:focus-visible),
+.gear-engine-hub a:focus:not(:focus-visible) {
+	outline: none;
+}
+
+.gear-engine-hub svg {
+	flex-shrink: 0;
+	stroke-width: var(--ge-icon-stroke, 1.75px);
+}
+
+.gear-engine-hub__header {
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	border-radius: var(--ge-r-xl, 24px);
+	padding: 28px 32px;
+	box-shadow: var(--ge-shadow-1);
+	margin-bottom: 28px;
+}
+
+.gear-engine-hub__badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 12px;
+	background: #FFFFFF;
+	border: 1px solid #D0DBE5;
+	border-radius: var(--ge-r-full, 9999px);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 12px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
+	margin-bottom: 12px;
+}
+
+.gear-engine-hub__badge-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--ge-green-800, #005236);
+	display: inline-block;
+}
+
+.gear-engine-hub__title {
+	margin: 0 0 8px;
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.02em;
+}
+
+.gear-engine-hub__ingress {
+	margin: 0;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	font-size: 0.98rem;
+	line-height: 1.6;
+}
+
+.gear-engine-hub__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 22px;
+}
+
+.gear-engine-hub__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	padding: 0 18px;
+	border-radius: var(--ge-r-full, 9999px);
+	border: 1.5px solid var(--ge-border, #E4E7EC);
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	font-family: inherit;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.03);
+	transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+	user-select: none;
+}
+
+.gear-engine-hub__chip:hover {
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	border-color: var(--ge-navy-border, #D5E1ED);
+	transform: translateY(-1px);
+}
+
+.gear-engine-hub__chip--active {
+	background: var(--md-sys-color-primary, #0C2340) !important;
+	border-color: var(--md-sys-color-primary, #0C2340) !important;
+	color: #FFFFFF !important;
+	box-shadow: var(--ge-shadow-1);
+}
+
+.gear-engine-hub__chip-emoji {
+	font-size: 15px;
+	line-height: 1;
+}
+
+.gear-engine-hub__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+	gap: 18px;
+}
+
+.gear-engine-hub__card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 24px;
+	border: 1px solid var(--ge-border, #E4E7EC);
+	border-radius: var(--ge-r-lg, 20px);
+	background: #FFFFFF;
+	box-shadow: var(--ge-shadow-1);
+	transition: border-color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+	min-height: 250px;
+}
+
+.gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) {
+	border-color: var(--ge-navy-200, #CBD7E6);
+	box-shadow: var(--ge-shadow-2);
+	transform: translateY(-2px);
+}
+
+.gear-engine-hub__card--upcoming {
+	background: var(--ge-grey-25, #FAFBFC);
+	border-style: dashed;
+}
+
+.gear-engine-hub__card-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.gear-engine-hub__card-cat-pill {
+	display: inline-block;
+	padding: 3px 10px;
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	border-radius: var(--ge-r-full, 9999px);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.gear-engine-hub__card-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	background: var(--ge-amber-deal-bg, #FEF3C7);
+	border: 1px solid var(--ge-amber-deal-border, #FDE68A);
+	border-radius: var(--ge-r-full, 9999px);
+	color: var(--ge-amber-deal-text, #92400E);
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.gear-engine-hub__card-badge--muted {
+	background: var(--ge-grey-100, #F0F2F5);
+	border-color: var(--ge-grey-200, #E4E7EC);
+	color: var(--ge-grey-500, #667085);
+}
+
+.gear-engine-hub__card-icon-box {
+	width: 44px;
+	height: 44px;
+	border-radius: var(--ge-r-sm, 12px);
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	color: var(--md-sys-color-primary, #0C2340);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 14px 0 10px;
+}
+
+.gear-engine-hub__card-title {
+	margin: 0 0 6px;
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 1.18rem;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.gear-engine-hub__card-desc {
+	margin: 0;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	font-size: 0.9rem;
+	line-height: 1.55;
+}
+
+.gear-engine-hub__card-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 18px;
+	padding-top: 14px;
+	border-top: 1px solid var(--ge-grey-100, #F0F2F5);
+}
+
+.gear-engine-hub__card-time {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	color: var(--ge-grey-500, #667085);
+	font-size: 12.5px;
+	font-weight: 500;
+}
+
+.gear-engine-hub__card-action-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 38px;
+	padding: 0 16px;
+	border-radius: var(--ge-r-full, 9999px);
+	background: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF;
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.08);
+	transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.gear-engine-hub__card-action-btn:hover {
+	background: var(--ge-navy-800, #143154);
+	color: #FFFFFF;
+	transform: translateY(-1px);
+	box-shadow: var(--ge-shadow-1);
+}
+
+.gear-engine-hub__card-action-muted {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: var(--ge-r-full, 9999px);
+	background: var(--ge-grey-100, #F0F2F5);
+	color: var(--ge-grey-400, #98A2B3);
+	font-size: 12.5px;
+	font-weight: 500;
+}
+
+.gear-engine-hub__trust-banner {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 32px;
+	padding: 20px 24px;
+	border-radius: var(--ge-r-md, 16px);
+	background: var(--ge-grey-50, #F5F7FA);
+	border: 1px solid var(--ge-border, #E4E7EC);
+}
+
+.gear-engine-hub__trust-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	color: var(--ge-grey-700, #344054);
+	font-size: 0.85rem;
+	line-height: 1.45;
+}
+
+.gear-engine-hub__trust-item svg {
+	color: var(--ge-green-800, #005236);
+	margin-top: 2px;
+}
+
+.gear-engine-hub__back-bar {
+	max-width: 760px;
+	margin: 0 auto 16px;
+	padding: 0 16px;
+}
+
+.gear-engine-hub__back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 16px;
+	border-radius: var(--ge-r-full, 9999px);
+	background: var(--md-sys-color-primary-container, #EAF0F6);
+	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: all 0.18s ease;
+}
+
+.gear-engine-hub__back-btn:hover {
+	background: var(--md-sys-color-primary, #0C2340);
+	border-color: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF;
+	transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+	.gear-engine-hub {
+		padding: 0 12px 36px;
+	}
+
+	.gear-engine-hub__header {
+		padding: 20px 18px;
+		border-radius: var(--ge-r-lg, 20px);
+	}
+
+	.gear-engine-hub__title {
+		font-size: 1.45rem;
+	}
+
+	.gear-engine-hub__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.gear-engine-hub__trust-banner {
+		grid-template-columns: 1fr;
+	}
+}
+

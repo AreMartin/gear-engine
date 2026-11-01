@@ -24,6 +24,11 @@ class Gear_Engine_Gear_Picker {
 	public const SHORTCODE_TAG = 'gear_engine_gear_picker';
 
 	/**
+	 * Hub shortcode tag.
+	 */
+	public const HUB_SHORTCODE_TAG = 'gear_engine_gear_picker_hub';
+
+	/**
 	 * Option holding the cache version; bumping it invalidates every cached product list.
 	 */
 	public const OPTION_CACHE_VERSION = 'gear_engine_picker_cache_version';
@@ -56,15 +61,17 @@ class Gear_Engine_Gear_Picker {
 		wp_register_style( 'gear-engine-gear-picker', $base . 'css/gear-picker.css', array( 'gear-engine-tokens' ), GEAR_ENGINE_VERSION );
 		wp_register_script( 'gear-engine-gear-picker-scoring', $base . 'js/gear-picker-scoring.js', array(), GEAR_ENGINE_VERSION, true );
 		wp_register_script( 'gear-engine-gear-picker', $base . 'js/gear-picker.js', array( 'gear-engine-gear-picker-scoring' ), GEAR_ENGINE_VERSION, true );
+		wp_register_script( 'gear-engine-gear-picker-hub', $base . 'js/gear-picker-hub.js', array(), GEAR_ENGINE_VERSION, true );
 	}
 
 	/**
-	 * Register the [gear_engine_gear_picker] shortcode.
+	 * Register the [gear_engine_gear_picker] and [gear_engine_gear_picker_hub] shortcodes.
 	 *
 	 * @return void
 	 */
 	public function register_shortcode(): void {
 		add_shortcode( self::SHORTCODE_TAG, array( $this, 'render' ) );
+		add_shortcode( self::HUB_SHORTCODE_TAG, array( $this, 'render_hub' ) );
 	}
 
 	/**
@@ -449,7 +456,11 @@ class Gear_Engine_Gear_Picker {
 			self::SHORTCODE_TAG
 		);
 
-		$type   = sanitize_key( $atts['type'] );
+		$type = sanitize_key( $atts['type'] );
+		if ( 'hub' === $type ) {
+			return $this->render_hub( $atts );
+		}
+
 		$config = self::get_config( $type );
 		if ( is_wp_error( $config ) ) {
 			return current_user_can( 'edit_posts' )
@@ -469,6 +480,232 @@ class Gear_Engine_Gear_Picker {
 
 		ob_start();
 		include GEAR_ENGINE_PATH . 'modules/gear-picker/templates/picker-container.php';
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Retrieve catalog structure and guides for the Hub view.
+	 *
+	 * @return array{categories: array<string, array<string, string>>, items: array<int, array<string, mixed>>}
+	 */
+	public static function get_hub_data(): array {
+		$available_types = self::get_types();
+
+		$categories = array(
+			'all'       => array(
+				'id'    => 'all',
+				'label' => __( 'Alle', 'gear-engine' ),
+				'emoji' => '',
+				'desc'  => __( 'Alle tilgjengelige kjøpsveiledere.', 'gear-engine' ),
+			),
+			'kondisjon' => array(
+				'id'    => 'kondisjon',
+				'label' => __( 'Kondisjon', 'gear-engine' ),
+				'emoji' => '🏃',
+				'desc'  => __( 'Apparater for hjerte, lunge og forbrenning.', 'gear-engine' ),
+			),
+			'styrke'    => array(
+				'id'    => 'styrke',
+				'label' => __( 'Styrke', 'gear-engine' ),
+				'emoji' => '🏋️',
+				'desc'  => __( 'Utstyr for muskelvekst og funksjonell styrke.', 'gear-engine' ),
+			),
+			'rehab'     => array(
+				'id'    => 'rehab',
+				'label' => __( 'Rehab & Helse', 'gear-engine' ),
+				'emoji' => '🩺',
+				'desc'  => __( 'Skånsomme apparater med minimal leddbelastning.', 'gear-engine' ),
+			),
+		);
+
+		$items = array(
+			// 1. Kondisjon
+			array(
+				'slug'          => 'treadmill',
+				'category'      => 'kondisjon',
+				'category_name' => __( 'Kondisjon', 'gear-engine' ),
+				'title'         => __( 'Tredemølle', 'gear-engine' ),
+				'desc'          => __( 'Finn riktig motorstyrke, demping og løpeflate for din vekt og treningsmengde.', 'gear-engine' ),
+				'badge'         => __( 'Mest populær', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'treadmill',
+				'available'     => in_array( 'treadmill', $available_types, true ),
+			),
+			array(
+				'slug'          => 'romaskin',
+				'category'      => 'kondisjon',
+				'category_name' => __( 'Kondisjon', 'gear-engine' ),
+				'title'         => __( 'Romaskin', 'gear-engine' ),
+				'desc'          => __( 'Vann-, luft- eller magnetmotstand tilpasset stue, støynivå og ryggbelastning.', 'gear-engine' ),
+				'badge'         => __( 'Mest effektiv', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'rower',
+				'available'     => in_array( 'romaskin', $available_types, true ),
+			),
+			array(
+				'slug'          => 'ergometersykkel',
+				'category'      => 'kondisjon',
+				'category_name' => __( 'Kondisjon', 'gear-engine' ),
+				'title'         => __( 'Ergometer- & Spinningsykkel', 'gear-engine' ),
+				'desc'          => __( 'Tråkkfrekvens, svinghjul og magnetmotstand for skånsom kondisjon og puls.', 'gear-engine' ),
+				'badge'         => __( 'Leddvennlig', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'bike',
+				'available'     => in_array( 'ergometersykkel', $available_types, true ),
+			),
+			array(
+				'slug'          => 'ellipsetrener',
+				'category'      => 'kondisjon',
+				'category_name' => __( 'Kondisjon', 'gear-engine' ),
+				'title'         => __( 'Ellipsetrener / Crosstrainer', 'gear-engine' ),
+				'desc'          => __( 'Helkroppstrening uten støtbelastning for knær, hofter og ankler.', 'gear-engine' ),
+				'badge'         => __( 'Skånsom', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'ellipse',
+				'available'     => in_array( 'ellipsetrener', $available_types, true ),
+			),
+
+			// 2. Styrke
+			array(
+				'slug'          => 'manualer',
+				'category'      => 'styrke',
+				'category_name' => __( 'Styrke', 'gear-engine' ),
+				'title'         => __( 'Justerbare Manualer', 'gear-engine' ),
+				'desc'          => __( 'Plassbesparende vektsystem for fullverdig styrketrening i hjemmegymmet.', 'gear-engine' ),
+				'badge'         => __( 'Plassbesparende', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'dumbbell',
+				'available'     => in_array( 'manualer', $available_types, true ),
+			),
+			array(
+				'slug'          => 'multigym',
+				'category'      => 'styrke',
+				'category_name' => __( 'Styrke', 'gear-engine' ),
+				'title'         => __( 'Multigym & Treningsstasjon', 'gear-engine' ),
+				'desc'          => __( 'Komplett styrketrening med vektmagasin og kabler for alle muskelgrupper.', 'gear-engine' ),
+				'badge'         => __( 'Helkropp', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'multigym',
+				'available'     => in_array( 'multigym', $available_types, true ),
+			),
+			array(
+				'slug'          => 'kneboystativ',
+				'category'      => 'styrke',
+				'category_name' => __( 'Styrke', 'gear-engine' ),
+				'title'         => __( 'Knebøystativ & Half Rack', 'gear-engine' ),
+				'desc'          => __( 'Sikker egentrening i tunge baseøvelser som knebøy, benkpress og markløft.', 'gear-engine' ),
+				'badge'         => __( 'Tung styrke', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'rack',
+				'available'     => in_array( 'kneboystativ', $available_types, true ),
+			),
+			array(
+				'slug'          => 'treningsbenk',
+				'category'      => 'styrke',
+				'category_name' => __( 'Styrke', 'gear-engine' ),
+				'title'         => __( 'Justerbar Treningsbenk', 'gear-engine' ),
+				'desc'          => __( 'Flat og skråbenk med god stabilitet og høy maksimal vektkapasitet.', 'gear-engine' ),
+				'badge'         => __( 'Basisutstyr', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'bench',
+				'available'     => in_array( 'treningsbenk', $available_types, true ),
+			),
+
+			// 3. Rehab & Helse
+			array(
+				'slug'          => 'skaansom-kondisjon',
+				'category'      => 'rehab',
+				'category_name' => __( 'Rehab & Helse', 'gear-engine' ),
+				'title'         => __( 'Skånsom Kondisjon', 'gear-engine' ),
+				'desc'          => __( 'Sykler og møller med ekstra lav innstigning, oppreist sittestilling og myk motstand.', 'gear-engine' ),
+				'badge'         => __( 'Leddskånsom', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'shield',
+				'available'     => in_array( 'skaansom-kondisjon', $available_types, true ),
+			),
+			array(
+				'slug'          => 'balanse',
+				'category'      => 'rehab',
+				'category_name' => __( 'Rehab & Helse', 'gear-engine' ),
+				'title'         => __( 'Balanse & Leddsirkulasjon', 'gear-engine' ),
+				'desc'          => __( 'Balanseputer, vippebrett og skånsomme hjelpemidler for leddstabilitet.', 'gear-engine' ),
+				'badge'         => __( 'Forebyggende', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'target',
+				'available'     => in_array( 'balanse', $available_types, true ),
+			),
+			array(
+				'slug'          => 'pedaltrener',
+				'category'      => 'rehab',
+				'category_name' => __( 'Rehab & Helse', 'gear-engine' ),
+				'title'         => __( 'Pedaltrener & Seniortrim', 'gear-engine' ),
+				'desc'          => __( 'Kompakt minisirkulasjonstrener for stol og sofa for skånsom bevegelse.', 'gear-engine' ),
+				'badge'         => __( 'Kompakt', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'activity',
+				'available'     => in_array( 'pedaltrener', $available_types, true ),
+			),
+		);
+
+		return apply_filters(
+			'gear_engine_gear_picker_hub_data',
+			array(
+				'categories' => $categories,
+				'items'      => $items,
+			)
+		);
+	}
+
+	/**
+	 * Render the hub shortcode [gear_engine_gear_picker_hub].
+	 *
+	 * @param array<string, string>|string $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_hub( $atts = array() ): string {
+		$atts = shortcode_atts(
+			array(
+				'kategori' => '',
+				'category' => '',
+			),
+			is_array( $atts ) ? $atts : array(),
+			self::HUB_SHORTCODE_TAG
+		);
+
+		// If a specific quiz type is requested via query param (e.g. ?type=treadmill), render that quiz with a back button.
+		if ( isset( $_GET['type'] ) && '' !== $_GET['type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only navigation.
+			$selected_type = sanitize_key( wp_unslash( $_GET['type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$type_config   = self::get_config( $selected_type );
+
+			if ( ! is_wp_error( $type_config ) ) {
+				$back_url = esc_url( remove_query_arg( 'type' ) );
+				$output   = '<div class="gear-engine-hub__back-bar">'
+					. '<a href="' . $back_url . '" class="gear-engine-hub__back-btn">'
+					. '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m7 7l-7-7 7-7"/></svg>'
+					. '<span>' . esc_html__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '</span>'
+					. '</a>'
+					. '</div>';
+				$output .= $this->render( array( 'type' => $selected_type ) );
+				return $output;
+			}
+		}
+
+		$hub_data         = self::get_hub_data();
+		$categories       = $hub_data['categories'] ?? array();
+		$items            = $hub_data['items'] ?? array();
+		$initial_category = sanitize_key( (string) ( $atts['kategori'] ?: $atts['category'] ) );
+
+		if ( '' === $initial_category && isset( $_GET['kategori'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$initial_category = sanitize_key( wp_unslash( $_GET['kategori'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		} elseif ( '' === $initial_category && isset( $_GET['cat'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$initial_category = sanitize_key( wp_unslash( $_GET['cat'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+
+		wp_enqueue_style( 'gear-engine-gear-picker' );
+		wp_enqueue_script( 'gear-engine-gear-picker-hub' );
+
+		ob_start();
+		include GEAR_ENGINE_PATH . 'modules/gear-picker/templates/picker-hub.php';
 		return (string) ob_get_clean();
 	}
 }

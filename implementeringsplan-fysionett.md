@@ -134,7 +134,7 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 ### Fase 1: Finjustere inngangene og forsiden (Fullført / Påbegynt)
 - [x] Kategori-agnostisk frontend for `gear-picker` (tredemølle, romaskin, etc.).
 - [x] Dagens tilbud med prosent vs. kroneavslag og fjernet dobbel badge.
-- [ ] Opprette dedikert landingsside for Kjøpsveiledere (`/kjopsveiledere/`) med tab-kategorier (Kondisjon, Styrke, Rehab).
+- [x] Opprette dedikert landingsside for Kjøpsveiledere (`/kjopsveiledere/`) med tab-kategorier (Kondisjon, Styrke, Rehab) via `[gear_engine_gear_picker_hub]`.
 - [ ] Oppdatere forsidens 4 bokser: Endre første boks til **«Symptomsjekker»** og koble den blå knappen til **AI Fysio-Chat**.
 
 ### Fase 2: Forbinde Triage med Treningsprogrammer
@@ -142,7 +142,7 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 - [ ] Legge inn 2–3 diskrete hjelpemidler i bunnen av ikke-kritiske Triage-resultater (strikk, balansepute, ispose) med gratisalternativer.
 
 ### Fase 3: Strukturere Rehabprotokoller (`exercises`)
-- [ ] Etablere mal for visning av protokoller (faseinndelt, øvelseskort med video/GIF og dosering).
+- [x] Etablere mal for visning av protokoller (faseinndelt, øvelseskort med video/GIF, dosering og fullt Material 3-design).
 - [ ] Legge inn et diskret felt for «Påkrevd / Anbefalt utstyr» per øvelse som automatisk genererer tilknyttede produktlenker.
 
 ### Fase 4: Integrere AI-chatten som universell rådgiver (`physio-chat`)
