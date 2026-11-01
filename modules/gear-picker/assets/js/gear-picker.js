@@ -196,6 +196,7 @@
 			sheet: null, // null | 'compare' | 'ranking'
 			cmpId: null,
 			view: 'quiz', // 'quiz' | 'deals'
+			dealSort: 'pct', // 'pct' | 'amount'
 			presetApplied: false
 		};
 
@@ -213,6 +214,7 @@
 						filters: filters,
 						step: state.step,
 						view: state.view,
+						dealSort: state.dealSort || 'pct',
 						presetApplied: !! state.presetApplied
 					} ) );
 				}
@@ -239,6 +241,9 @@
 					if ( saved.view ) {
 						state.view = saved.view;
 					}
+					if ( saved.dealSort ) {
+						state.dealSort = saved.dealSort;
+					}
 					if ( saved.presetApplied != null ) {
 						state.presetApplied = saved.presetApplied;
 					}
@@ -256,16 +261,22 @@
 			} catch ( e ) {}
 		}
 
-		// Helper to fetch all discounted products sorted by discount % and savings
-		function getDeals() {
+		// Helper to fetch all discounted products sorted by discount % or kr savings
+		function getDeals( sortMode ) {
+			var mode = sortMode || state.dealSort || 'pct';
 			return items.filter( function ( p ) {
 				return ( p.old && p.old > p.price ) || ( p.discount && p.discount > 0 );
 			} ).sort( function ( a, b ) {
 				var da = a.discount || ( ( a.old && a.old > a.price ) ? Math.round( ( ( a.old - a.price ) / a.old ) * 100 ) : 0 );
 				var db = b.discount || ( ( b.old && b.old > b.price ) ? Math.round( ( ( b.old - b.price ) / b.old ) * 100 ) : 0 );
+				var saveA = ( a.old && a.old > a.price ) ? ( a.old - a.price ) : 0;
+				var saveB = ( b.old && b.old > b.price ) ? ( b.old - b.price ) : 0;
+
+				if ( mode === 'amount' ) {
+					if ( saveB !== saveA ) { return saveB - saveA; }
+					return db - da;
+				}
 				if ( db !== da ) { return db - da; }
-				var saveA = ( a.old || 0 ) - a.price;
-				var saveB = ( b.old || 0 ) - b.price;
 				return saveB - saveA;
 			} );
 		}
@@ -737,11 +748,17 @@
 					'</button>' +
 				'</div>';
 
-			// Context tags
+			// Context tags and interactive sort toggles
+			var isAmountSort = state.dealSort === 'amount';
 			h += '<div style="margin-top:14px">' +
 				'<div class="chips-row">' +
-					'<span class="chip sl sel" style="cursor:default;gap:6px">' + ic( 'tag', 15 ) + 'Kun nedsatte modeller</span>' +
-					'<span class="chip sl" style="cursor:default">Sortert etter rabatt</span>' +
+					'<span class="chip sl" style="cursor:default;gap:6px">' + ic( 'tag', 15 ) + 'Kun nedsatte modeller</span>' +
+					'<button type="button" class="chip sl' + ( ! isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="pct" title="Sorter etter prosentvis prisavslag">' +
+						'% Størst rabatt' +
+					'</button>' +
+					'<button type="button" class="chip sl' + ( isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="amount" title="Sorter etter kroner spart">' +
+						'kr Størst kroneavslag' +
+					'</button>' +
 				'</div></div>';
 
 			// Guide & safety prompt
@@ -774,10 +791,22 @@
 			var bestInc = getSpec( best, 'motor_incline' );
 			var bestFd = getSpec( best, 'foldable' );
 
+			var topBadgeLabel = isAmountSort
+				? ( 'Dagens største kroneavslag' + ( bestSave ? ' (Spar ' + money( bestSave, best.cur ) + ')' : '' ) )
+				: ( 'Dagens største prosentkutt (−' + bestDisc + '%)' );
+
+			var topNoteText = isAmountSort
+				? ( bestSave ? 'Du sparer hele ' + money( bestSave, best.cur ) + ' (' + bestDisc + '% rabatt) i forhold til veiledende førpris.' : 'Sterkt nedsatt kampanjepris hos ' + esc( cleanShopName( best.shop ) ) + '.' )
+				: ( bestSave ? 'Du sparer ' + money( bestSave, best.cur ) + ' (' + bestDisc + '% rabatt) i forhold til veiledende førpris.' : 'Sterkt nedsatt kampanjepris hos ' + esc( cleanShopName( best.shop ) ) + '.' );
+
+			var topWhyPoint = isAmountSort
+				? ( 'Største besparelse i kroner og øre i dag (Spar ' + money( bestSave, best.cur ) + ')' )
+				: ( 'Største prosentvise priskutt i dag (−' + bestDisc + '%)' );
+
 			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
 				'<div class="head-row">' +
 					'<div class="shop">' + renderShopAvatar( best ) + '<div><b>' + esc( cleanShopName( best.shop ) ) + '</b></div></div>' +
-					'<span class="pill warn num" style="font-weight:700">Dagens største avslag</span>' +
+					'<span class="pill warn num" style="font-weight:700">' + esc( topBadgeLabel ) + '</span>' +
 				'</div>' +
 				'<div class="best-grid">' +
 					'<div class="art">' +
@@ -793,10 +822,10 @@
 							( bestFd ? '<span class="spec">Sammenleggbar</span>' : '' ) +
 						'</div>' +
 						'<div class="note" style="border-left-color:var(--md-ext-color-on-warning-container,#92400E)">' +
-							( bestSave ? 'Du sparer ' + money( bestSave, best.cur ) + ' (' + bestDisc + '% rabatt) i forhold til førpris.' : 'Sterkt nedsatt kampanjepris hos ' + esc( cleanShopName( best.shop ) ) + '.' ) +
+							esc( topNoteText ) +
 						'</div>' +
 						'<ul class="why">' +
-							( bestSave ? '<li>' + ic( 'check', 18 ) + '<span>Største prosentvise prisavslag i dag</span></li>' : '' ) +
+							( bestSave ? '<li>' + ic( 'check', 18 ) + '<span>' + esc( topWhyPoint ) + '</span></li>' : '' ) +
 							( bestWt ? '<li>' + ic( 'check', 18 ) + '<span>Maks brukervekt oppgitt til ' + bestWt + ' kg</span></li>' : '' ) +
 							( bestSp ? '<li>' + ic( 'check', 18 ) + '<span>Toppfart på ' + bestSp + ' km/t</span></li>' : '' ) +
 						'</ul>' +
@@ -824,7 +853,7 @@
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
 							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
-							( oSave ? '<span class="pill err num">−' + oDisc + '%</span>' : '' ) +
+							( oSave ? '<span class="pill sec num" style="font-weight:600;font-size:11.5px;color:var(--md-sys-color-primary,#0C2340)">Spar ' + money( oSave, o.cur ) + '</span>' : '' ) +
 						'</div>' +
 						'<div class="art" style="height:120px">' +
 							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
@@ -974,6 +1003,13 @@
 					go( 1, 'forward' );
 				} else if ( act === 'deals' ) {
 					openDeals();
+				} else if ( act === 'deal-sort' ) {
+					var sortType = target.getAttribute( 'data-sort' );
+					if ( sortType && state.dealSort !== sortType ) {
+						state.dealSort = sortType;
+						saveSession();
+						render();
+					}
 				} else if ( act === 'back' ) {
 					if ( state.view === 'deals' ) {
 						state.view = 'quiz';
