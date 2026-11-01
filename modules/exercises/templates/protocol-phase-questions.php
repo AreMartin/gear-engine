@@ -47,9 +47,14 @@ $gear_engine_questions = array(
 ?>
 <div class="gear-engine-program">
 	<header class="gear-engine-program__head">
+		<div class="gear-engine-program__badge">
+			<span class="gear-engine-program__badge-dot"></span>
+			<?php esc_html_e( 'Fasetilpasning · 30 sekunder', 'gear-engine' ); ?>
+		</div>
 		<h2 class="gear-engine-program__title"><?php echo esc_html( $question_title ); ?></h2>
-		<p class="gear-engine-program__summary"><?php esc_html_e( 'Svar på fire korte spørsmål, så velger vi øvelser som passer der du er nå.', 'gear-engine' ); ?></p>
+		<p class="gear-engine-program__summary"><?php esc_html_e( 'Svar på fire korte spørsmål, så velger vi øvelser som passer der du er i rehabiliteringsløpet akkurat nå.', 'gear-engine' ); ?></p>
 	</header>
+
 	<form method="get" class="gear-engine-program__questions">
 		<?php
 		// Keep other query arguments (such as page_id on plain permalinks) when the form is submitted.
@@ -67,12 +72,22 @@ $gear_engine_questions = array(
 		<input type="hidden" name="dx" value="<?php echo esc_attr( $dx ); ?>">
 		<?php foreach ( $gear_engine_questions as $gear_engine_key => $gear_engine_question ) : ?>
 			<fieldset class="gear-engine-program__question">
-				<legend><?php echo esc_html( $gear_engine_question[0] ); ?></legend>
-				<?php foreach ( $gear_engine_question[1] as $gear_engine_value => $gear_engine_label ) : ?>
-					<label><input type="radio" name="<?php echo esc_attr( $gear_engine_key ); ?>" value="<?php echo esc_attr( $gear_engine_value ); ?>" required> <?php echo esc_html( $gear_engine_label ); ?></label>
-				<?php endforeach; ?>
+				<legend class="gear-engine-program__question-legend"><?php echo esc_html( $gear_engine_question[0] ); ?></legend>
+				<div class="gear-engine-program__options">
+					<?php foreach ( $gear_engine_question[1] as $gear_engine_value => $gear_engine_label ) : ?>
+						<label class="gear-engine-program__option">
+							<input type="radio" name="<?php echo esc_attr( $gear_engine_key ); ?>" value="<?php echo esc_attr( $gear_engine_value ); ?>" required class="gear-engine-program__radio">
+							<span class="gear-engine-program__option-label"><?php echo esc_html( $gear_engine_label ); ?></span>
+						</label>
+					<?php endforeach; ?>
+				</div>
 			</fieldset>
 		<?php endforeach; ?>
-		<button type="submit" class="gear-engine-program__btn"><?php esc_html_e( 'Vis øvelser', 'gear-engine' ); ?></button>
+		<div class="gear-engine-program__submit-wrap">
+			<button type="submit" class="gear-engine-program__btn">
+				<span><?php esc_html_e( 'Vis tilpasset treningsprogram', 'gear-engine' ); ?></span>
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+			</button>
+		</div>
 	</form>
 </div>

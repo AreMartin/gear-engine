@@ -1,71 +1,692 @@
 /**
- * Gear Engine protocol (training program) page. Scoped to .gear-engine-program.
+ * Gear Engine Protocol Viewer: Material Design 3 scoped stylesheet.
+ * 100% aligned with Fysionett.no visual identity and Material Design 3 guidelines.
+ *
+ * @package GearEngine
  */
+
+/* =========================================================
+   1. Scope, Variables & Reset
+   ========================================================= */
 .gear-engine-program {
-	--gep-navy: var(--ge-navy, #1a2a3a);
-	--gep-green: var(--ge-green, #10b981);
-	--gep-green-dark: var(--ge-green-dark, #059669);
-	--gep-border: var(--ge-border, #e2e8f0);
-	--gep-bg: var(--ge-bg, #f8fafc);
-	--gep-text: var(--ge-text, #475569);
-	--gep-muted: var(--ge-muted, #64748b);
+	/* Semantic Aliases from gear-engine-tokens.css */
+	--gep-navy:              var(--ge-navy-900, #0C2340);
+	--gep-navy-container:    var(--ge-navy-container, #EAF0F6);
+	--gep-navy-border:       var(--ge-navy-border, #D5E1ED);
+	--gep-navy-selected-bg:  var(--ge-navy-selected-bg, #F0F4F8);
+
+	--gep-green:             var(--ge-green-800, #005236);
+	--gep-green-bg:          var(--ge-green-100, #DCF5E8);
+	--gep-green-border:      var(--ge-green-200, #BEE3D0);
+
+	--gep-border:            var(--ge-outline-subtle, #E4E7EC);
+	--gep-surface:           var(--ge-white, #FFFFFF);
+	--gep-bg:                var(--ge-grey-50, #F5F7FA);
+	--gep-text:              var(--ge-grey-700, #344054);
+	--gep-muted:             var(--ge-grey-500, #667085);
+	--gep-heading:           var(--ge-navy-900, #0C2340);
+
+	--gep-coral-bg:          var(--ge-coral-bg, #FEF3F2);
+	--gep-coral-border:      #FECDCA;
+	--gep-coral-text:        #912018;
+
+	--gep-radius-sm:         var(--ge-r-sm, 12px);
+	--gep-radius-md:         var(--ge-r-md, 16px);
+	--gep-radius-lg:         var(--ge-r-lg, 20px);
+	--gep-radius-xl:         var(--ge-r-xl, 24px);
+	--gep-radius-full:       var(--ge-r-full, 9999px);
+
+	--gep-shadow-1:          var(--ge-shadow-1, 0 1px 3px rgba(12, 35, 64, 0.05), 0 1px 2px rgba(12, 35, 64, 0.03));
+	--gep-shadow-2:          var(--ge-shadow-2, 0 6px 16px -4px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04));
+
 	box-sizing: border-box;
 	max-width: 760px;
 	margin: 0 auto;
-	padding: 0 12px 40px;
+	padding: 0 16px 48px;
 	color: var(--gep-text);
-	font-family: inherit;
+	font-family: var(--ge-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif);
 	line-height: 1.55;
+	position: relative;
 }
+
 .gear-engine-program *,
 .gear-engine-program *::before,
-.gear-engine-program *::after { box-sizing: border-box; }
-.gear-engine-program :focus-visible { outline: 3px solid var(--gep-green); outline-offset: 2px; }
-
-.gear-engine-program__title { margin: 0 0 8px; color: var(--gep-navy); font-size: 1.75rem; line-height: 1.2; }
-.gear-engine-program__summary { margin: 0 0 12px; font-size: 1.05rem; }
-.gear-engine-program__dosage { margin: 0 0 12px; color: var(--gep-navy); }
-.gear-engine-program__warning { margin: 16px 0; padding: 14px 16px; border: 1px solid #fecaca; border-radius: 12px; background: #fef2f2; color: #991b1b; }
-.gear-engine-program__warning p { margin: 4px 0 0; }
-
-.gear-engine-program__phase { margin-top: 28px; }
-.gear-engine-program__phase-title { margin: 0 0 6px; color: var(--gep-navy); font-size: 1.25rem; }
-.gear-engine-program__phase-desc { margin: 0 0 12px; color: var(--gep-muted); }
-
-.gear-engine-program__list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; counter-reset: gep; }
-.gear-engine-program__exercise { position: relative; padding: 18px 18px 18px 64px; border: 1px solid var(--gep-border); border-radius: 16px; background: #fff; counter-increment: gep; break-inside: avoid; }
-.gear-engine-program__exercise::before { content: counter(gep); position: absolute; left: 16px; top: 18px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--gep-navy); color: #fff; font-weight: 700; }
-.gear-engine-program__exercise h4 { margin: 0 0 4px; color: var(--gep-navy); font-size: 1.05rem; }
-.gear-engine-program__exercise p { margin: 6px 0 0; }
-.gear-engine-program__reps { color: var(--gep-green-dark); font-weight: 600; }
-
-.gear-engine-program__video { margin-top: 12px; }
-.gear-engine-program__video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: #000; }
-.gear-engine-program__play,
-.gear-engine-program__btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 1px solid transparent; border-radius: 999px; background: var(--gep-green); color: #fff; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-.gear-engine-program__play:hover,
-.gear-engine-program__btn:hover { background: var(--gep-green-dark); }
-.gear-engine-program__btn--secondary { background: #fff; border-color: var(--gep-border); color: var(--gep-navy); }
-.gear-engine-program__btn--secondary:hover { background: var(--gep-bg); }
-.gear-engine-program__credit { font-size: 0.75rem; color: var(--gep-muted); }
-.gear-engine-program__credit a { color: inherit; }
-
-.gear-engine-program__disclaimer { margin: 28px 0 16px; padding: 14px 16px; border-radius: 12px; background: var(--gep-bg); color: var(--gep-muted); font-size: 0.85rem; }
-.gear-engine-program__actions { display: flex; gap: 10px; }
-.gear-engine-program__empty { padding: 24px; border: 1px dashed var(--gep-border); border-radius: 16px; text-align: center; color: var(--gep-muted); }
-
-.gear-engine-program__index { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.gear-engine-program__card { display: block; padding: 18px 20px; border: 1px solid var(--gep-border); border-radius: 16px; background: #fff; color: inherit; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
-.gear-engine-program__card:hover { border-color: var(--gep-green); transform: translateY(-1px); }
-.gear-engine-program__card-title { display: block; color: var(--gep-navy); font-weight: 700; font-size: 1.1rem; }
-.gear-engine-program__card-summary { display: block; margin-top: 4px; color: var(--gep-muted); }
-
-@media print {
-	.gear-engine-program__noprint { display: none !important; }
-	.gear-engine-program { max-width: none; padding: 0; }
+.gear-engine-program *::after {
+	box-sizing: border-box;
 }
 
-.gear-engine-program__questions { display: grid; gap: 16px; }
-.gear-engine-program__question { border: 1px solid var(--ge-border, #e2e8f0); border-radius: 8px; padding: 12px 16px; margin: 0; }
-.gear-engine-program__question legend { font-weight: 600; color: var(--ge-navy, #1a2a3a); padding: 0 6px; }
-.gear-engine-program__question label { display: block; padding: 6px 0; cursor: pointer; }
+.gear-engine-program :focus-visible {
+	outline: 2.5px solid var(--gep-navy);
+	outline-offset: 2px;
+}
+
+.gear-engine-program button:focus:not(:focus-visible),
+.gear-engine-program a:focus:not(:focus-visible) {
+	outline: none;
+}
+
+.gear-engine-program svg {
+	flex-shrink: 0;
+	stroke-width: var(--ge-icon-stroke, 1.75px);
+}
+
+/* =========================================================
+   2. Header & Hero Tonal Container
+   ========================================================= */
+.gear-engine-program__head {
+	background: var(--gep-navy-container);
+	border: 1px solid var(--gep-navy-border);
+	border-radius: var(--gep-radius-xl);
+	padding: 24px 28px;
+	margin-bottom: 32px;
+	box-shadow: var(--gep-shadow-1);
+}
+
+.gear-engine-program__badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 12px;
+	background: var(--gep-surface);
+	border: 1px solid #D0DBE5;
+	border-radius: var(--gep-radius-full);
+	color: var(--gep-navy);
+	font-size: 12px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
+	margin-bottom: 12px;
+}
+
+.gear-engine-program__badge-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--gep-green);
+	display: inline-block;
+}
+
+.gear-engine-program__title {
+	margin: 0 0 10px;
+	color: var(--gep-heading);
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.02em;
+}
+
+.gear-engine-program__summary {
+	margin: 0 0 16px;
+	color: var(--gep-text);
+	font-size: 1rem;
+	line-height: 1.6;
+}
+
+.gear-engine-program__dosage {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0 0 12px;
+	padding: 10px 14px;
+	background: var(--gep-surface);
+	border: 1px solid var(--gep-navy-border);
+	border-radius: var(--gep-radius-sm);
+	color: var(--gep-navy);
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.gear-engine-program__dosage strong {
+	color: var(--gep-navy);
+	font-weight: 700;
+}
+
+.gear-engine-program__warning {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 16px 0 0;
+	padding: 14px 18px;
+	border: 1px solid var(--gep-coral-border);
+	border-radius: var(--gep-radius-md);
+	background: var(--gep-coral-bg);
+	color: var(--gep-coral-text);
+}
+
+.gear-engine-program__warning-icon {
+	margin-top: 2px;
+	color: #B42318;
+}
+
+.gear-engine-program__warning strong {
+	display: block;
+	font-size: 0.92rem;
+	font-weight: 700;
+	color: #912018;
+}
+
+.gear-engine-program__warning p {
+	margin: 4px 0 0;
+	font-size: 0.88rem;
+	line-height: 1.5;
+	color: #B42318;
+}
+
+/* =========================================================
+   3. Phase Sections
+   ========================================================= */
+.gear-engine-program__phase {
+	margin-top: 36px;
+}
+
+.gear-engine-program__phase-header {
+	margin-bottom: 16px;
+}
+
+.gear-engine-program__phase-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.gear-engine-program__phase-pill-indicator {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--gep-navy);
+}
+
+.gear-engine-program__phase-title {
+	margin: 0;
+	color: var(--gep-heading);
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.gear-engine-program__phase-desc {
+	margin: 4px 0 0;
+	color: var(--gep-muted);
+	font-size: 0.92rem;
+	line-height: 1.5;
+}
+
+/* =========================================================
+   4. Exercise Cards (M3 Outlined / Elevated)
+   ========================================================= */
+.gear-engine-program__list {
+	display: grid;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: gep;
+}
+
+.gear-engine-program__exercise {
+	position: relative;
+	padding: 22px 24px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--gep-radius-lg);
+	background: var(--gep-surface);
+	box-shadow: var(--gep-shadow-1);
+	counter-increment: gep;
+	break-inside: avoid;
+	transition: border-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gear-engine-program__exercise:hover {
+	border-color: var(--ge-navy-200, #CBD7E6);
+	box-shadow: var(--gep-shadow-2);
+	transform: translateY(-2px);
+}
+
+.gear-engine-program__exercise-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	margin-bottom: 12px;
+}
+
+.gear-engine-program__exercise-num {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: var(--gep-navy-container);
+	color: var(--gep-navy);
+	border: 1px solid var(--gep-navy-border);
+	font-weight: 700;
+	font-size: 0.9rem;
+	flex-shrink: 0;
+}
+
+.gear-engine-program__exercise-meta {
+	flex: 1;
+	min-width: 0;
+}
+
+.gear-engine-program__exercise-meta h4 {
+	margin: 0 0 6px;
+	color: var(--gep-heading);
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.gear-engine-program__exercise-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.gear-engine-program__reps {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 26px;
+	padding: 0 10px;
+	border-radius: var(--gep-radius-full);
+	background: var(--gep-green-bg);
+	border: 1px solid var(--gep-green-border);
+	color: var(--gep-green);
+	font-size: 0.78rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.gear-engine-program__equip-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	height: 26px;
+	padding: 0 10px;
+	border-radius: var(--gep-radius-full);
+	background: var(--ge-grey-100, #F0F2F5);
+	border: 1px solid var(--ge-grey-200, #E4E7EC);
+	color: var(--ge-grey-700, #344054);
+	font-size: 0.78rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.gear-engine-program__exercise-body p {
+	margin: 8px 0 0;
+	color: var(--gep-text);
+	font-size: 0.95rem;
+	line-height: 1.6;
+}
+
+/* =========================================================
+   5. Video Embed & Actions
+   ========================================================= */
+.gear-engine-program__video {
+	margin-top: 16px;
+}
+
+.gear-engine-program__video iframe {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	border: 0;
+	border-radius: var(--gep-radius-sm);
+	background: #000;
+	box-shadow: var(--gep-shadow-1);
+}
+
+.gear-engine-program__play {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 42px;
+	padding: 0 20px;
+	border: 1px solid var(--gep-navy-border);
+	border-radius: var(--gep-radius-full);
+	background: var(--gep-navy-container);
+	color: var(--gep-navy);
+	font-family: inherit;
+	font-size: 0.88rem;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+}
+
+.gear-engine-program__play:hover {
+	background: var(--gep-navy);
+	border-color: var(--gep-navy);
+	color: #FFFFFF;
+	transform: translateY(-1px);
+}
+
+.gear-engine-program__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 48px;
+	padding: 0 24px;
+	border: 1px solid transparent;
+	border-radius: var(--gep-radius-full);
+	background: var(--gep-navy);
+	color: #FFFFFF;
+	font-family: inherit;
+	font-size: 0.95rem;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+	box-shadow: var(--gep-shadow-1);
+	transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.gear-engine-program__btn:hover {
+	background: var(--ge-navy-800, #143154);
+	color: #FFFFFF;
+	transform: translateY(-1px);
+	box-shadow: var(--gep-shadow-2);
+}
+
+.gear-engine-program__btn--secondary {
+	background: var(--gep-surface);
+	border-color: var(--gep-border);
+	color: var(--gep-navy);
+}
+
+.gear-engine-program__btn--secondary:hover {
+	background: var(--gep-navy-container);
+	border-color: var(--gep-navy-border);
+	color: var(--gep-navy);
+}
+
+.gear-engine-program__credit {
+	margin: 8px 0 0;
+	font-size: 0.78rem;
+	color: var(--gep-muted);
+}
+
+.gear-engine-program__credit a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+/* =========================================================
+   6. Disclaimer & Footer Actions
+   ========================================================= */
+.gear-engine-program__disclaimer {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 36px 0 20px;
+	padding: 16px 20px;
+	border-radius: var(--gep-radius-md);
+	background: var(--gep-bg);
+	border: 1px solid var(--gep-border);
+	color: var(--gep-muted);
+	font-size: 0.88rem;
+	line-height: 1.5;
+}
+
+.gear-engine-program__disclaimer p {
+	margin: 0;
+}
+
+.gear-engine-program__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.gear-engine-program__empty {
+	padding: 36px 24px;
+	border: 1px dashed var(--gep-border);
+	border-radius: var(--gep-radius-lg);
+	text-align: center;
+	color: var(--gep-muted);
+	background: var(--gep-surface);
+	font-size: 0.95rem;
+}
+
+/* =========================================================
+   7. Protocol Index View
+   ========================================================= */
+.gear-engine-program__index {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.gear-engine-program__card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 22px 24px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--gep-radius-lg);
+	background: var(--gep-surface);
+	color: inherit;
+	text-decoration: none;
+	box-shadow: var(--gep-shadow-1);
+	transition: border-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gear-engine-program__card:hover {
+	border-color: var(--ge-navy-200, #CBD7E6);
+	box-shadow: var(--gep-shadow-2);
+	transform: translateY(-2px);
+}
+
+.gear-engine-program__card-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.gear-engine-program__card-pill {
+	display: inline-block;
+	padding: 3px 10px;
+	margin-bottom: 8px;
+	background: var(--gep-navy-container);
+	border: 1px solid var(--gep-navy-border);
+	border-radius: var(--gep-radius-full);
+	color: var(--gep-navy);
+	font-size: 0.72rem;
+	font-weight: 600;
+}
+
+.gear-engine-program__card-title {
+	display: block;
+	color: var(--gep-heading);
+	font-weight: 700;
+	font-size: 1.15rem;
+	line-height: 1.3;
+}
+
+.gear-engine-program__card-summary {
+	display: block;
+	margin-top: 6px;
+	color: var(--gep-muted);
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
+
+.gear-engine-program__card-arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: var(--gep-bg);
+	color: var(--gep-navy);
+	flex-shrink: 0;
+	transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.gear-engine-program__card:hover .gear-engine-program__card-arrow {
+	background: var(--gep-navy);
+	color: #FFFFFF;
+	transform: translateX(2px);
+}
+
+/* =========================================================
+   8. Phase Questions (Interactive Triage Adaptor)
+   ========================================================= */
+.gear-engine-program__questions {
+	display: grid;
+	gap: 20px;
+}
+
+.gear-engine-program__question {
+	border: 1px solid var(--gep-border);
+	border-radius: var(--gep-radius-lg);
+	padding: 20px 24px;
+	margin: 0;
+	background: var(--gep-surface);
+	box-shadow: var(--gep-shadow-1);
+}
+
+.gear-engine-program__question-legend {
+	font-weight: 700;
+	color: var(--gep-heading);
+	font-size: 1.05rem;
+	padding: 0 4px;
+	margin-bottom: 12px;
+}
+
+.gear-engine-program__options {
+	display: grid;
+	gap: 10px;
+}
+
+.gear-engine-program__option {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	border: 1.5px solid var(--gep-border);
+	border-radius: var(--gep-radius-md);
+	background: var(--gep-surface);
+	cursor: pointer;
+	transition: border-color 0.18s ease, background 0.18s ease;
+	user-select: none;
+}
+
+.gear-engine-program__option:hover {
+	border-color: var(--ge-navy-200, #CBD7E6);
+	background: var(--ge-grey-25, #FAFBFC);
+}
+
+.gear-engine-program__option:has(input:checked),
+.gear-engine-program__option--selected {
+	border-color: var(--gep-navy);
+	background: var(--gep-navy-selected-bg);
+}
+
+.gear-engine-program__radio {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid #CBD5E1;
+	border-radius: 50%;
+	outline: none;
+	margin: 0;
+	cursor: pointer;
+	position: relative;
+	transition: border-color 0.15s ease;
+	flex-shrink: 0;
+}
+
+.gear-engine-program__radio:checked {
+	border-color: var(--gep-navy);
+}
+
+.gear-engine-program__radio:checked::after {
+	content: '';
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--gep-navy);
+}
+
+.gear-engine-program__option-label {
+	font-size: 0.95rem;
+	font-weight: 500;
+	color: var(--gep-text);
+}
+
+.gear-engine-program__option:has(input:checked) .gear-engine-program__option-label,
+.gear-engine-program__option--selected .gear-engine-program__option-label {
+	color: var(--gep-navy);
+	font-weight: 600;
+}
+
+.gear-engine-program__submit-wrap {
+	margin-top: 12px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* =========================================================
+   9. Responsive & Print Styles
+   ========================================================= */
+@media (max-width: 640px) {
+	.gear-engine-program {
+		padding: 0 12px 36px;
+	}
+
+	.gear-engine-program__head {
+		padding: 20px 18px;
+		border-radius: var(--gep-radius-lg);
+	}
+
+	.gear-engine-program__title {
+		font-size: 1.45rem;
+	}
+
+	.gear-engine-program__exercise {
+		padding: 18px 16px;
+	}
+
+	.gear-engine-program__index {
+		grid-template-columns: 1fr;
+	}
+
+	.gear-engine-program__actions {
+		flex-direction: column;
+	}
+
+	.gear-engine-program__btn {
+		width: 100%;
+	}
+}
+
+@media print {
+	.gear-engine-program__noprint {
+		display: none !important;
+	}
+
+	.gear-engine-program {
+		max-width: none;
+		padding: 0;
+	}
+
+	.gear-engine-program__exercise {
+		box-shadow: none;
+		border: 1px solid #ccc;
+		page-break-inside: avoid;
+	}
+}

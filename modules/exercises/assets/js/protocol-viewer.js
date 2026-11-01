@@ -1,5 +1,7 @@
 /**
- * Gear Engine protocol page: lazy video embeds and print. No globals, no dependencies.
+ * Gear Engine protocol page: lazy video embeds, radio selection sync, and print. No globals, no dependencies.
+ *
+ * @package GearEngine
  */
 ( function () {
 	'use strict';
@@ -21,6 +23,23 @@
 		box.appendChild( frame );
 	}
 
+	function syncRadioSelection( radio ) {
+		if ( ! radio || ! radio.name ) {
+			return;
+		}
+		var form = radio.closest( '.gear-engine-program__questions' );
+		if ( ! form ) {
+			return;
+		}
+		var radios = form.querySelectorAll( 'input[type="radio"][name="' + CSS.escape( radio.name ) + '"]' );
+		radios.forEach( function ( r ) {
+			var opt = r.closest( '.gear-engine-program__option' );
+			if ( opt ) {
+				opt.classList.toggle( 'gear-engine-program__option--selected', r.checked );
+			}
+		} );
+	}
+
 	document.addEventListener( 'click', function ( event ) {
 		var target = event.target;
 		if ( ! ( target instanceof Element ) ) {
@@ -37,5 +56,19 @@
 		if ( target.closest( '.gear-engine-program [data-action="print"]' ) ) {
 			window.print();
 		}
+	} );
+
+	document.addEventListener( 'change', function ( event ) {
+		var target = event.target;
+		if ( target instanceof HTMLInputElement && target.type === 'radio' && target.closest( '.gear-engine-program' ) ) {
+			syncRadioSelection( target );
+		}
+	} );
+
+	document.addEventListener( 'DOMContentLoaded', function () {
+		var checked = document.querySelectorAll( '.gear-engine-program input[type="radio"]:checked' );
+		checked.forEach( function ( r ) {
+			syncRadioSelection( r );
+		} );
 	} );
 }() );
