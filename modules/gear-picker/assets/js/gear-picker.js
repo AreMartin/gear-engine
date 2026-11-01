@@ -199,6 +199,63 @@
 			presetApplied: false
 		};
 
+		var STORAGE_KEY = 'gear_engine_picker_' + ( config.id || 'default' );
+
+		function saveSession() {
+			try {
+				if ( ! window.sessionStorage ) {
+					return;
+				}
+				if ( state.step === 0 && state.view === 'quiz' ) {
+					window.sessionStorage.removeItem( STORAGE_KEY );
+				} else {
+					window.sessionStorage.setItem( STORAGE_KEY, JSON.stringify( {
+						filters: filters,
+						step: state.step,
+						view: state.view,
+						presetApplied: !! state.presetApplied
+					} ) );
+				}
+			} catch ( e ) {}
+		}
+
+		function loadSession() {
+			try {
+				if ( ! window.sessionStorage ) {
+					return false;
+				}
+				var raw = window.sessionStorage.getItem( STORAGE_KEY );
+				if ( ! raw ) {
+					return false;
+				}
+				var saved = JSON.parse( raw );
+				if ( saved && typeof saved === 'object' ) {
+					if ( saved.filters && typeof saved.filters === 'object' ) {
+						Object.assign( filters, saved.filters );
+					}
+					if ( typeof saved.step === 'number' ) {
+						state.step = saved.step;
+					}
+					if ( saved.view ) {
+						state.view = saved.view;
+					}
+					if ( saved.presetApplied != null ) {
+						state.presetApplied = saved.presetApplied;
+					}
+					return true;
+				}
+			} catch ( e ) {}
+			return false;
+		}
+
+		function clearSession() {
+			try {
+				if ( window.sessionStorage ) {
+					window.sessionStorage.removeItem( STORAGE_KEY );
+				}
+			} catch ( e ) {}
+		}
+
 		// Helper to fetch all discounted products sorted by discount % and savings
 		function getDeals() {
 			return items.filter( function ( p ) {
@@ -244,6 +301,7 @@
 			state.dir = dir || ( next < state.step ? 'backward' : 'forward' );
 			state.step = next;
 			state.sheet = null;
+			saveSession();
 			render();
 			var stage = app.querySelector( '.gear-engine-picker__stage' );
 			if ( stage ) { stage.focus(); }
@@ -268,6 +326,7 @@
 			state.view = 'deals';
 			state.dir = 'forward';
 			state.sheet = null;
+			saveSession();
 			render();
 			var stage = app.querySelector( '.gear-engine-picker__stage' );
 			if ( stage ) { stage.focus(); }
@@ -930,6 +989,7 @@
 					filters = Scoring.defaults( config );
 					state.view = 'quiz';
 					state.presetApplied = false;
+					clearSession();
 					go( 0, 'backward' );
 				} else if ( act === 'quick' ) {
 					var presetKey = target.getAttribute( 'data-preset' );
@@ -951,6 +1011,7 @@
 				} else if ( act === 'bpreset' ) {
 					var val = parseInt( target.getAttribute( 'data-val' ), 10 );
 					filters.b = val;
+					saveSession();
 					var slider = stage.querySelector( '.slider' );
 					if ( slider ) {
 						slider.value = val;
@@ -1023,6 +1084,7 @@
 					}
 
 					updateLiveElements();
+					saveSession();
 				} );
 			}
 		}
@@ -1072,6 +1134,7 @@
 			renderSheetOverlay();
 		}
 
+		loadSession();
 		render();
 	}
 

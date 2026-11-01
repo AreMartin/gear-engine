@@ -75,7 +75,7 @@ t( 'icon falls back', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'nope'
 $triage = new Gear_Engine_Triage();
 $picker = $triage->render_picker();
 t( 'picker links to region page', false !== strpos( $picker, 'href="http://example.com/smertesjekk/rygg/"' ) );
-t( 'picker renders icon', false !== strpos( $picker, '<svg class="gear-engine-triage-picker__icon"' ) );
+t( 'picker renders action icon', false !== strpos( $picker, 'class="rc-action"' ) );
 t( 'picker enqueues style', in_array( 'gear-engine-triage', $GLOBALS['enqueued'], true ) );
 
 $quiz = $triage->render( array( 'region' => 'rygg' ) );
@@ -83,5 +83,10 @@ t( 'quiz renders container and back link', false !== strpos( $quiz, 'data-region
 t( 'quiz config cannot break out of script tag', 1 === substr_count( $quiz, '</script>' ) );
 t( 'back link can be disabled', false === strpos( $triage->render( array( 'region' => 'rygg', 'back_link' => 'false' ) ), 'gear-engine-triage__back' ) );
 t( 'unknown region renders nothing for visitors', '' === $triage->render( array( 'region' => 'nope' ) ) );
+
+$status = Gear_Engine_Triage::get_pages_status();
+t( 'pages status detects missing pages initially', true === $status['has_missing'] );
+t( 'pages status includes all regions', count( $status['regions'] ) === count( Gear_Engine_Triage::get_regions() ) );
+t( 'pages status parent path matches base path', $status['parent']['path'] === Gear_Engine_Triage::get_base_path() );
 
 exit( $failures ? 1 : 0 );

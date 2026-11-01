@@ -58,6 +58,7 @@ class Gear_Engine_Triage {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_post_gear_engine_create_triage_pages', array( $this, 'handle_create_pages' ) );
 	}
 
 	/**
@@ -236,6 +237,134 @@ class Gear_Engine_Triage {
 	}
 
 	/**
+	 * Get status of required triage pages.
+	 *
+	 * @return array{parent: array{title: string, path: string, page_id: int|null, exists: bool}, regions: array<string, array{title: string, label: string, path: string, page_id: int|null, exists: bool}>, all_exist: bool, has_missing: bool}
+	 */
+	public static function get_pages_status(): array {
+		$base_path   = self::get_base_path();
+		$parent_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $base_path ) : null;
+		$parent_id   = ( $parent_page && ! empty( $parent_page->ID ) ) ? (int) $parent_page->ID : null;
+
+		$status = array(
+			'parent'      => array(
+				'title'   => __( 'Smertesjekk (Hovedside / Velger)', 'gear-engine' ),
+				'path'    => $base_path,
+				'page_id' => $parent_id,
+				'exists'  => ( null !== $parent_id ),
+			),
+			'regions'     => array(),
+			'all_exist'   => true,
+			'has_missing' => false,
+		);
+
+		if ( ! $status['parent']['exists'] ) {
+			$status['all_exist']   = false;
+			$status['has_missing'] = true;
+		}
+
+		foreach ( self::get_regions() as $region ) {
+			$config     = self::get_config( $region );
+			$label      = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
+			$child_path = $base_path . '/' . $region;
+			$child_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $child_path ) : null;
+			$child_id   = ( $child_page && ! empty( $child_page->ID ) ) ? (int) $child_page->ID : null;
+
+			$exists = ( null !== $child_id );
+			if ( ! $exists ) {
+				$status['all_exist']   = false;
+				$status['has_missing'] = true;
+			}
+
+			$status['regions'][ $region ] = array(
+				'title'   => sprintf(
+					/* translators: %s: Region label */
+					__( 'Smertesjekk %s', 'gear-engine' ),
+					$label
+				),
+				'label'   => $label,
+				'path'    => $child_path,
+				'page_id' => $child_id,
+				'exists'  => $exists,
+			);
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Handle admin request to automatically create missing triage pages.
+	 *
+	 * @return void
+	 */
+	public function handle_create_pages(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'gear-engine' ), '', array( 'response' => 403 ) );
+		}
+
+		check_admin_referer( 'gear_engine_create_triage_pages', 'gear_engine_nonce' );
+
+		$base_path   = self::get_base_path();
+		$parent_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $base_path ) : null;
+
+		if ( ! $parent_page && function_exists( 'wp_insert_post' ) ) {
+			$parent_id = wp_insert_post(
+				array(
+					'post_title'   => __( 'Smertesjekk', 'gear-engine' ),
+					'post_name'    => $base_path,
+					'post_content' => '<!-- wp:shortcode -->[' . self::PICKER_SHORTCODE_TAG . ']<!-- /wp:shortcode -->',
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+				)
+			);
+		} else {
+			$parent_id = $parent_page ? (int) $parent_page->ID : 0;
+		}
+
+		if ( $parent_id && ! is_wp_error( $parent_id ) && function_exists( 'wp_insert_post' ) ) {
+			foreach ( self::get_regions() as $region ) {
+				$child_path = $base_path . '/' . $region;
+				$child_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $child_path ) : null;
+				if ( ! $child_page ) {
+					$config = self::get_config( $region );
+					$label  = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
+					$title  = sprintf(
+						/* translators: %s: Region label, e.g. Rygg */
+						__( 'Smertesjekk %s', 'gear-engine' ),
+						$label
+					);
+					$content = '<!-- wp:paragraph -->' . "\n" .
+						'<p>' . esc_html( sprintf( __( 'Rask, digital vurdering for %s. Svar på spørsmålene for å få råd og veiledning.', 'gear-engine' ), strtolower( $label ) ) ) . '</p>' . "\n" .
+						'<!-- /wp:paragraph -->' . "\n\n" .
+						'<!-- wp:shortcode -->[' . self::SHORTCODE_TAG . ' region="' . esc_attr( $region ) . '"]<!-- /wp:shortcode -->';
+
+					wp_insert_post(
+						array(
+							'post_title'   => $title,
+							'post_name'    => $region,
+							'post_parent'  => $parent_id,
+							'post_content' => $content,
+							'post_status'  => 'publish',
+							'post_type'    => 'page',
+						)
+					);
+				}
+			}
+		}
+
+		$redirect_url = add_query_arg(
+			array(
+				'page'                      => 'gear-engine-triage',
+				'gear_engine_pages_created' => '1',
+			),
+			admin_url( 'options-general.php' )
+		);
+
+		wp_safe_redirect( $redirect_url );
+		exit;
+	}
+
+	/**
 	 * Render the settings page.
 	 *
 	 * @return void
@@ -247,6 +376,11 @@ class Gear_Engine_Triage {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Smertesjekk', 'gear-engine' ); ?></h1>
+			<?php if ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php esc_html_e( 'Smertesjekk-sidene ble opprettet!', 'gear-engine' ); ?></p>
+				</div>
+			<?php endif; ?>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'gear_engine_triage' ); ?>
 				<table class="form-table" role="presentation">
@@ -269,6 +403,87 @@ class Gear_Engine_Triage {
 				</table>
 				<?php submit_button(); ?>
 			</form>
+
+			<hr style="margin: 32px 0 24px;">
+
+			<h2><?php esc_html_e( 'Sidestatus og SEO-snarveier', 'gear-engine' ); ?></h2>
+			<p class="description">
+				<?php esc_html_e( 'Hver region har sin egen unike side for optimal SEO og synlighet i Google. Her kan du se status og åpne WordPress-editoren for å tilpasse innholdet.', 'gear-engine' ); ?>
+			</p>
+
+			<?php
+			$pages_status = self::get_pages_status();
+			?>
+			<table class="widefat striped" style="max-width: 880px; margin-top: 14px;">
+				<thead>
+					<tr>
+						<th style="font-weight: 600;"><?php esc_html_e( 'Side', 'gear-engine' ); ?></th>
+						<th style="font-weight: 600;"><?php esc_html_e( 'URL-sti', 'gear-engine' ); ?></th>
+						<th style="font-weight: 600; width: 120px;"><?php esc_html_e( 'Status', 'gear-engine' ); ?></th>
+						<th style="font-weight: 600; width: 170px;"><?php esc_html_e( 'Handlinger', 'gear-engine' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$all_rows = array_merge(
+						array( $pages_status['parent'] ),
+						array_values( $pages_status['regions'] )
+					);
+					foreach ( $all_rows as $row ) :
+						?>
+						<tr>
+							<td><strong><?php echo esc_html( $row['title'] ); ?></strong></td>
+							<td><code>/<?php echo esc_html( $row['path'] ); ?>/</code></td>
+							<td>
+								<?php if ( $row['exists'] ) : ?>
+									<span style="display:inline-block; padding: 2px 8px; border-radius: 4px; background: #e7f7ed; color: #127038; font-weight: 600; font-size: 12px;">
+										✓ <?php esc_html_e( 'Publisert', 'gear-engine' ); ?>
+									</span>
+								<?php else : ?>
+									<span style="display:inline-block; padding: 2px 8px; border-radius: 4px; background: #fff3cd; color: #856404; font-weight: 600; font-size: 12px;">
+										⚠ <?php esc_html_e( 'Mangler', 'gear-engine' ); ?>
+									</span>
+								<?php endif; ?>
+							</td>
+							<td>
+								<?php if ( $row['exists'] && ! empty( $row['page_id'] ) ) : ?>
+									<?php if ( function_exists( 'get_permalink' ) ) : ?>
+										<a href="<?php echo esc_url( get_permalink( $row['page_id'] ) ); ?>" class="button button-small" target="_blank" rel="noopener noreferrer">
+											<?php esc_html_e( 'Vis side', 'gear-engine' ); ?>
+										</a>
+									<?php endif; ?>
+									<?php if ( function_exists( 'get_edit_post_link' ) ) : ?>
+										<a href="<?php echo esc_url( (string) get_edit_post_link( $row['page_id'] ) ); ?>" class="button button-small">
+											<?php esc_html_e( 'Rediger', 'gear-engine' ); ?>
+										</a>
+									<?php endif; ?>
+								<?php else : ?>
+									<span class="description">—</span>
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+
+			<?php if ( $pages_status['has_missing'] ) : ?>
+				<div style="margin-top: 18px;">
+					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+						<input type="hidden" name="action" value="gear_engine_create_triage_pages">
+						<?php wp_nonce_field( 'gear_engine_create_triage_pages', 'gear_engine_nonce' ); ?>
+						<button type="submit" class="button button-primary button-hero">
+							<?php esc_html_e( 'Opprett manglende Smertesjekk-sider automatisk', 'gear-engine' ); ?>
+						</button>
+					</form>
+				</div>
+			<?php else : ?>
+				<div class="notice notice-success inline" style="max-width: 880px; margin-top: 18px; padding: 10px 14px;">
+					<p style="margin: 0; font-size: 13px;">
+						<strong>✓ <?php esc_html_e( 'Alle Smertesjekk-sider er operative!', 'gear-engine' ); ?></strong>
+						<?php esc_html_e( 'Du kan trykke "Rediger" over for å tilpasse introtekst og SEO-innhold for hver enkelt side.', 'gear-engine' ); ?>
+					</p>
+				</div>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
