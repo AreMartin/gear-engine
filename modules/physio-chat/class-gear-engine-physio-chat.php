@@ -130,6 +130,7 @@ class Gear_Engine_Physio_Chat {
 		add_shortcode( self::SHORTCODE_TAG, array( $this, 'render_chat_shortcode' ) );
 		// Alias [digital_fysio_chat] for compatibility.
 		add_shortcode( 'digital_fysio_chat', array( $this, 'render_chat_shortcode' ) );
+		add_shortcode( 'gear_engine_physio_chat', array( $this, 'render_chat_shortcode' ) );
 	}
 
 	/**
