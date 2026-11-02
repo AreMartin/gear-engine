@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 ?>
-<div class="gear-engine-triage-picker" aria-label="<?php esc_attr_e( 'Velg område for smertesjekk', 'gear-engine' ); ?>">
+<div class="gear-engine-triage-picker" aria-label="<?php esc_attr_e( 'Velg område for symptomsjekk', 'gear-engine' ); ?>">
 	<div class="gear-engine-triage-picker__header">
 		<div class="overline"><?php esc_html_e( 'Digital triage · ca. 2 minutter', 'gear-engine' ); ?></div>
 		<h1 class="headline-l" style="margin-top:4px"><?php esc_html_e( 'Hvor har du vondt?', 'gear-engine' ); ?></h1>

@@ -40,7 +40,7 @@ class Gear_Engine_Triage {
 	/**
 	 * Default section path.
 	 */
-	public const DEFAULT_BASE_PATH = 'smertesjekk';
+	public const DEFAULT_BASE_PATH = 'symptomsjekker';
 
 	/**
 	 * Decoded configs cache, keyed by region.
@@ -75,7 +75,7 @@ class Gear_Engine_Triage {
 	}
 
 	/**
-	 * Section base path, e.g. "smertesjekk".
+	 * Section base path, e.g. "symptomsjekker".
 	 *
 	 * @return string
 	 */
@@ -211,8 +211,8 @@ class Gear_Engine_Triage {
 	 */
 	public function register_settings_page(): void {
 		add_options_page(
-			__( 'Smertesjekk', 'gear-engine' ),
-			__( 'Smertesjekk', 'gear-engine' ),
+			__( 'Symptomsjekker', 'gear-engine' ),
+			__( 'Symptomsjekker', 'gear-engine' ),
 			'manage_options',
 			'gear-engine-triage',
 			array( $this, 'render_settings_page' )
@@ -248,7 +248,7 @@ class Gear_Engine_Triage {
 
 		$status = array(
 			'parent'      => array(
-				'title'   => __( 'Smertesjekk (Hovedside / Velger)', 'gear-engine' ),
+				'title'   => __( 'Symptomsjekker (Hovedside / Velger)', 'gear-engine' ),
 				'path'    => $base_path,
 				'page_id' => $parent_id,
 				'exists'  => ( null !== $parent_id ),
@@ -279,7 +279,7 @@ class Gear_Engine_Triage {
 			$status['regions'][ $region ] = array(
 				'title'   => sprintf(
 					/* translators: %s: Region label */
-					__( 'Smertesjekk %s', 'gear-engine' ),
+					__( 'Symptomsjekk: %s', 'gear-engine' ),
 					$label
 				),
 				'label'   => $label,
@@ -310,7 +310,7 @@ class Gear_Engine_Triage {
 		if ( ! $parent_page && function_exists( 'wp_insert_post' ) ) {
 			$parent_id = wp_insert_post(
 				array(
-					'post_title'   => __( 'Smertesjekk', 'gear-engine' ),
+					'post_title'   => __( 'Symptomsjekker', 'gear-engine' ),
 					'post_name'    => $base_path,
 					'post_content' => '<!-- wp:shortcode -->[' . self::PICKER_SHORTCODE_TAG . ']<!-- /wp:shortcode -->',
 					'post_status'  => 'publish',
@@ -330,7 +330,7 @@ class Gear_Engine_Triage {
 					$label  = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
 					$title  = sprintf(
 						/* translators: %s: Region label, e.g. Rygg */
-						__( 'Smertesjekk %s', 'gear-engine' ),
+						__( 'Symptomsjekk: %s', 'gear-engine' ),
 						$label
 					);
 					$content = '<!-- wp:paragraph -->' . "\n" .
@@ -375,10 +375,10 @@ class Gear_Engine_Triage {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Smertesjekk', 'gear-engine' ); ?></h1>
+			<h1><?php esc_html_e( 'Symptomsjekker', 'gear-engine' ); ?></h1>
 			<?php if ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
 				<div class="notice notice-success is-dismissible">
-					<p><?php esc_html_e( 'Smertesjekk-sidene ble opprettet!', 'gear-engine' ); ?></p>
+					<p><?php esc_html_e( 'Symptomsjekker-sidene ble opprettet!', 'gear-engine' ); ?></p>
 				</div>
 			<?php endif; ?>
 			<form method="post" action="options.php">
@@ -389,7 +389,7 @@ class Gear_Engine_Triage {
 						<td>
 							<code><?php echo esc_html( trailingslashit( home_url() ) ); ?></code>
 							<input type="text" id="gear-engine-triage-base-path" name="<?php echo esc_attr( self::OPTION_BASE_PATH ); ?>" value="<?php echo esc_attr( self::get_base_path() ); ?>" class="regular-text">
-							<p class="description"><?php esc_html_e( 'The page holding [gear_engine_triage_picker]. Each region card links to this path plus the region slug (for example /smertesjekk/rygg/), so create a page for each region with that slug.', 'gear-engine' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The page holding [gear_engine_triage_picker]. Each region card links to this path plus the region slug (for example /symptomsjekker/rygg/), so create a page for each region with that slug.', 'gear-engine' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -472,14 +472,14 @@ class Gear_Engine_Triage {
 						<input type="hidden" name="action" value="gear_engine_create_triage_pages">
 						<?php wp_nonce_field( 'gear_engine_create_triage_pages', 'gear_engine_nonce' ); ?>
 						<button type="submit" class="button button-primary button-hero">
-							<?php esc_html_e( 'Opprett manglende Smertesjekk-sider automatisk', 'gear-engine' ); ?>
+							<?php esc_html_e( 'Opprett manglende Symptomsjekker-sider automatisk', 'gear-engine' ); ?>
 						</button>
 					</form>
 				</div>
 			<?php else : ?>
 				<div class="notice notice-success inline" style="max-width: 880px; margin-top: 18px; padding: 10px 14px;">
 					<p style="margin: 0; font-size: 13px;">
-						<strong>✓ <?php esc_html_e( 'Alle Smertesjekk-sider er operative!', 'gear-engine' ); ?></strong>
+						<strong>✓ <?php esc_html_e( 'Alle Symptomsjekker-sider er operative!', 'gear-engine' ); ?></strong>
 						<?php esc_html_e( 'Du kan trykke "Rediger" over for å tilpasse introtekst og SEO-innhold for hver enkelt side.', 'gear-engine' ); ?>
 					</p>
 				</div>

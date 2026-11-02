@@ -5,7 +5,7 @@
   "icon": "neck",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
-  "title": "Nakkesjekk",
+  "title": "Symptomsjekk: Nakke",
   "description": "Svar på noen spørsmål om nakken din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
   "defaultAnswers": {
     "age": null,
@@ -21,9 +21,21 @@
       "title": "Hvor gammel er du?",
       "type": "single",
       "options": [
-        { "id": "under30", "icon": "User", "title": "Under 30 år" },
-        { "id": "30-50", "icon": "Activity", "title": "30 til 50 år" },
-        { "id": "over50", "icon": "Clock", "title": "Over 50 år" }
+        {
+          "id": "under30",
+          "icon": "User",
+          "title": "Under 30 år"
+        },
+        {
+          "id": "30-50",
+          "icon": "Activity",
+          "title": "30 til 50 år"
+        },
+        {
+          "id": "over50",
+          "icon": "Clock",
+          "title": "Over 50 år"
+        }
       ]
     },
     {
@@ -31,9 +43,24 @@
       "title": "Hvordan startet plagene?",
       "type": "single",
       "options": [
-        { "id": "acute_trauma", "icon": "Zap", "title": "Etter en ulykke, et fall eller et kraftig rykk i nakken", "subtitle": "For eksempel en bilulykke eller en tackling" },
-        { "id": "acute_wakeup", "icon": "Clock", "title": "Brått, uten ulykke", "subtitle": "For eksempel at jeg våknet med nakkelås" },
-        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Snikende over dager eller uker" }
+        {
+          "id": "acute_trauma",
+          "icon": "Zap",
+          "title": "Etter en ulykke, et fall eller et kraftig rykk i nakken",
+          "subtitle": "For eksempel en bilulykke eller en tackling"
+        },
+        {
+          "id": "acute_wakeup",
+          "icon": "Clock",
+          "title": "Brått, uten ulykke",
+          "subtitle": "For eksempel at jeg våknet med nakkelås"
+        },
+        {
+          "id": "gradual",
+          "icon": "Activity",
+          "title": "Kom gradvis",
+          "subtitle": "Snikende over dager eller uker"
+        }
       ]
     },
     {
@@ -41,9 +68,24 @@
       "title": "Stråler smerten ut fra nakken?",
       "type": "single",
       "options": [
-        { "id": "none", "icon": "Check", "title": "Nei, kun i nakken", "subtitle": "Evt. litt opp mot bakhodet eller mot skulderen" },
-        { "id": "arm", "icon": "MapPin", "title": "Ja, ned i armen", "subtitle": "Som regel ikke lenger enn til albuen" },
-        { "id": "hand", "icon": "Zap", "title": "Ja, helt ut i hånden eller fingrene", "subtitle": "Gjerne med iling eller nummenhet" }
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, kun i nakken",
+          "subtitle": "Evt. litt opp mot bakhodet eller mot skulderen"
+        },
+        {
+          "id": "arm",
+          "icon": "MapPin",
+          "title": "Ja, ned i armen",
+          "subtitle": "Som regel ikke lenger enn til albuen"
+        },
+        {
+          "id": "hand",
+          "icon": "Zap",
+          "title": "Ja, helt ut i hånden eller fingrene",
+          "subtitle": "Gjerne med iling eller nummenhet"
+        }
       ]
     },
     {
@@ -52,11 +94,31 @@
       "description": "Velg alle som passer.",
       "type": "multiple",
       "options": [
-        { "id": "stiffness", "icon": "Lock", "title": "Jeg klarer ikke å vri eller bøye hodet normalt" },
-        { "id": "headache", "icon": "Zap", "title": "Jeg har hodepine som starter i nakken eller bak i hodet" },
-        { "id": "arm_weakness", "icon": "ArrowDown", "title": "Jeg har merkbart nedsatt kraft i armen eller hånden" },
-        { "id": "screen", "icon": "Clock", "title": "Verst etter lange dager ved skjerm eller i stillesittende arbeid" },
-        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+        {
+          "id": "stiffness",
+          "icon": "Lock",
+          "title": "Jeg klarer ikke å vri eller bøye hodet normalt"
+        },
+        {
+          "id": "headache",
+          "icon": "Zap",
+          "title": "Jeg har hodepine som starter i nakken eller bak i hodet"
+        },
+        {
+          "id": "arm_weakness",
+          "icon": "ArrowDown",
+          "title": "Jeg har merkbart nedsatt kraft i armen eller hånden"
+        },
+        {
+          "id": "screen",
+          "icon": "Clock",
+          "title": "Verst etter lange dager ved skjerm eller i stillesittende arbeid"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Ingen av disse"
+        }
       ]
     },
     {
@@ -70,72 +132,179 @@
       "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
       "type": "multiple",
       "options": [
-        { "id": "thunderclap", "icon": "AlertTriangle", "title": "Plutselig, voldsom hodepine, som den verste jeg har hatt" },
-        { "id": "meningitis", "icon": "AlertTriangle", "title": "Feber sammen med stiv nakke, lysskyhet eller sykdomsfølelse" },
-        { "id": "neuro", "icon": "ShieldAlert", "title": "Svekket balanse, tale- eller synsforstyrrelser, nummenhet i begge armer eller bein, eller tap av blære-/tarmkontroll" },
-        { "id": "cancer", "icon": "AlertTriangle", "title": "Tidligere kreft, uforklarlig vekttap eller konstante nattesmerter" },
-        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+        {
+          "id": "thunderclap",
+          "icon": "AlertTriangle",
+          "title": "Plutselig, voldsom hodepine, som den verste jeg har hatt"
+        },
+        {
+          "id": "meningitis",
+          "icon": "AlertTriangle",
+          "title": "Feber sammen med stiv nakke, lysskyhet eller sykdomsfølelse"
+        },
+        {
+          "id": "neuro",
+          "icon": "ShieldAlert",
+          "title": "Svekket balanse, tale- eller synsforstyrrelser, nummenhet i begge armer eller bein, eller tap av blære-/tarmkontroll"
+        },
+        {
+          "id": "cancer",
+          "icon": "AlertTriangle",
+          "title": "Tidligere kreft, uforklarlig vekttap eller konstante nattesmerter"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, ingen av delene"
+        }
       ]
     }
   ],
   "rules": [
     {
       "diagnosis": "medical_referral",
-      "when": { "all": [
-        { "field": "red_flags", "op": "notEmpty" },
-        { "field": "red_flags", "op": "notIncludes", "value": "none" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "red_flags",
+            "op": "notEmpty"
+          },
+          {
+            "field": "red_flags",
+            "op": "notIncludes",
+            "value": "none"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "neck_trauma_referral",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute_trauma" },
-        { "any": [
-          { "field": "symptoms", "op": "includes", "value": "arm_weakness" },
-          { "field": "radiation", "op": "eq", "value": "hand" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute_trauma"
+          },
+          {
+            "any": [
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "arm_weakness"
+              },
+              {
+                "field": "radiation",
+                "op": "eq",
+                "value": "hand"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "whiplash",
-      "when": { "field": "onset", "op": "eq", "value": "acute_trauma" }
+      "when": {
+        "field": "onset",
+        "op": "eq",
+        "value": "acute_trauma"
+      }
     },
     {
       "diagnosis": "radiculopathy_deficit",
-      "when": { "all": [
-        { "field": "radiation", "op": "in", "value": ["arm", "hand"] },
-        { "field": "symptoms", "op": "includes", "value": "arm_weakness" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "radiation",
+            "op": "in",
+            "value": [
+              "arm",
+              "hand"
+            ]
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "arm_weakness"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "radiculopathy",
-      "when": { "field": "radiation", "op": "in", "value": ["arm", "hand"] }
+      "when": {
+        "field": "radiation",
+        "op": "in",
+        "value": [
+          "arm",
+          "hand"
+        ]
+      }
     },
     {
       "diagnosis": "torticollis",
-      "when": { "field": "onset", "op": "eq", "value": "acute_wakeup" }
+      "when": {
+        "field": "onset",
+        "op": "eq",
+        "value": "acute_wakeup"
+      }
     },
     {
       "diagnosis": "cervical_osteoarthritis",
-      "when": { "all": [
-        { "field": "age", "op": "eq", "value": "over50" },
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "symptoms", "op": "includes", "value": "stiffness" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "age",
+            "op": "eq",
+            "value": "over50"
+          },
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "stiffness"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "cervicogenic_headache",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "symptoms", "op": "includes", "value": "headache" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "headache"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "postural_neck",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "symptoms", "op": "includes", "value": "screen" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "screen"
+          }
+        ]
+      }
     }
   ],
   "defaultDiagnosis": "non_specific",

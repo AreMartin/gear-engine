@@ -4,7 +4,7 @@
   "order": 20,
   "icon": "shoulder",
   "version": "1.0.0",
-  "title": "Skuldersjekk",
+  "title": "Symptomsjekk: Skulder",
   "description": "Svar på noen raske spørsmål under for å få et skreddersydd opplegg for din skulder, basert på anerkjent forskning.",
   "defaultAnswers": {
     "age": null,
@@ -24,9 +24,24 @@
       "description": "Skuldre forandrer seg naturlig gjennom livet. Alderen din gir oss viktige hint om hva som er den mest sannsynlige årsaken til plagene dine.",
       "type": "single",
       "options": [
-        { "id": "under30", "icon": "User", "title": "Under 30 år", "subtitle": "Høyere sjanse for idrettsskader og ustabilitet" },
-        { "id": "30-55", "icon": "Activity", "title": "30 til 55 år", "subtitle": "Høyere sjanse for seneirritasjon og stivhet" },
-        { "id": "over55", "icon": "Clock", "title": "Over 55 år", "subtitle": "Høyere sjanse for naturlig slitasje i sener og ledd" }
+        {
+          "id": "under30",
+          "icon": "User",
+          "title": "Under 30 år",
+          "subtitle": "Høyere sjanse for idrettsskader og ustabilitet"
+        },
+        {
+          "id": "30-55",
+          "icon": "Activity",
+          "title": "30 til 55 år",
+          "subtitle": "Høyere sjanse for seneirritasjon og stivhet"
+        },
+        {
+          "id": "over55",
+          "icon": "Clock",
+          "title": "Over 55 år",
+          "subtitle": "Høyere sjanse for naturlig slitasje i sener og ledd"
+        }
       ]
     },
     {
@@ -36,22 +51,56 @@
       "type": "single",
       "helpText": "Akutt betyr at det skjedde på et helt bestemt tidspunkt (for eksempel et fall eller et rykk). Gradvis betyr at du ikke kan peke på nøyaktig når det begynte.",
       "options": [
-        { "id": "acute", "icon": "Zap", "title": "Akutt skade (Traume)", "subtitle": "Smerter fra et bestemt uhell, fall eller vridning" },
-        { "id": "gradual", "icon": "Activity", "title": "Kom snikende over tid", "subtitle": "Startet gradvis, gjerne etter perioder med mye bruk" }
+        {
+          "id": "acute",
+          "icon": "Zap",
+          "title": "Akutt skade (Traume)",
+          "subtitle": "Smerter fra et bestemt uhell, fall eller vridning"
+        },
+        {
+          "id": "gradual",
+          "icon": "Activity",
+          "title": "Kom snikende over tid",
+          "subtitle": "Startet gradvis, gjerne etter perioder med mye bruk"
+        }
       ]
     },
     {
       "id": "trauma_details",
       "title": "Hva skjedde da du skadet deg?",
       "description": "Måten du skadet deg på hjelper oss å finne ut nøyaktig hvilke deler av skulderen som kan ha fått seg en trøkk.",
-      "visibleIf": { "field": "onset", "op": "eq", "value": "acute" },
+      "visibleIf": {
+        "field": "onset",
+        "op": "eq",
+        "value": "acute"
+      },
       "type": "multiple",
       "options": [
-        { "id": "fall_arm", "icon": "ArrowDown", "title": "Falt og tok imot med strak arm" },
-        { "id": "out_of_socket", "icon": "RotateCcw", "title": "Skulderen var ute av ledd" },
-        { "id": "heavy_jerk", "icon": "Zap", "title": "Fikk et kraftig rykk eller strekk i armen" },
-        { "id": "direct_blow", "icon": "Target", "title": "Fikk et direkte slag mot utsiden av skulderen" },
-        { "id": "none", "icon": "Check", "title": "Ingen av disse / Husker ikke helt" }
+        {
+          "id": "fall_arm",
+          "icon": "ArrowDown",
+          "title": "Falt og tok imot med strak arm"
+        },
+        {
+          "id": "out_of_socket",
+          "icon": "RotateCcw",
+          "title": "Skulderen var ute av ledd"
+        },
+        {
+          "id": "heavy_jerk",
+          "icon": "Zap",
+          "title": "Fikk et kraftig rykk eller strekk i armen"
+        },
+        {
+          "id": "direct_blow",
+          "icon": "Target",
+          "title": "Fikk et direkte slag mot utsiden av skulderen"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Ingen av disse / Husker ikke helt"
+        }
       ]
     },
     {
@@ -60,9 +109,24 @@
       "description": "Hvor lenge det har vart bestemmer om vi bør fokusere mest på å dempe akutte smerter nå, eller begynne å bygge opp styrken din igjen.",
       "type": "single",
       "options": [
-        { "id": "ultra_acute", "icon": "Clock", "title": "Under 1 uke (Nylig)", "subtitle": "Fokus på å lindre smerte og holde i gang blodsirkulasjon" },
-        { "id": "sub_acute", "icon": "Clock", "title": "2 til 6 uker (En liten stund)", "subtitle": "Fokus på gradvis og trygg oppbygging" },
-        { "id": "chronic", "icon": "Clock", "title": "Over 3 måneder (Langvarig)", "subtitle": "Krever ofte litt mer tålmodig styrketrening" }
+        {
+          "id": "ultra_acute",
+          "icon": "Clock",
+          "title": "Under 1 uke (Nylig)",
+          "subtitle": "Fokus på å lindre smerte og holde i gang blodsirkulasjon"
+        },
+        {
+          "id": "sub_acute",
+          "icon": "Clock",
+          "title": "2 til 6 uker (En liten stund)",
+          "subtitle": "Fokus på gradvis og trygg oppbygging"
+        },
+        {
+          "id": "chronic",
+          "icon": "Clock",
+          "title": "Over 3 måneder (Langvarig)",
+          "subtitle": "Krever ofte litt mer tålmodig styrketrening"
+        }
       ]
     },
     {
@@ -72,11 +136,31 @@
       "type": "multiple",
       "helpText": "Trøbbel med sener kjennes ofte ut som verk som trekker nedover utsiden av overarmen. Trøbbel med selve leddet kjennes oftere ut som stikking dypt inni eller på toppen.",
       "options": [
-        { "id": "lateral", "icon": "MapPin", "title": "Utsiden av overarmen (nedover mot albuen)" },
-        { "id": "superior", "icon": "MapPin", "title": "Helt på toppen av skulderen (ved kragebeinet)" },
-        { "id": "deep_front", "icon": "MapPin", "title": "Dypt inni fronten av skulderen" },
-        { "id": "radiating", "icon": "Zap", "title": "Stikkende smerte som skyter forbi albuen og helt ut i fingrene" },
-        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett spesifikt sted" }
+        {
+          "id": "lateral",
+          "icon": "MapPin",
+          "title": "Utsiden av overarmen (nedover mot albuen)"
+        },
+        {
+          "id": "superior",
+          "icon": "MapPin",
+          "title": "Helt på toppen av skulderen (ved kragebeinet)"
+        },
+        {
+          "id": "deep_front",
+          "icon": "MapPin",
+          "title": "Dypt inni fronten av skulderen"
+        },
+        {
+          "id": "radiating",
+          "icon": "Zap",
+          "title": "Stikkende smerte som skyter forbi albuen og helt ut i fingrene"
+        },
+        {
+          "id": "none",
+          "icon": "Activity",
+          "title": "Vanskelig å peke på ett spesifikt sted"
+        }
       ]
     },
     {
@@ -85,11 +169,31 @@
       "description": "De forskjellige musklene i skulderen har ulike oppgaver. Ved å vite hvilke bevegelser som er vonde, kan vi snevre inn akkurat hvor problemet sitter.",
       "type": "multiple",
       "options": [
-        { "id": "arc", "icon": "ArrowUp", "title": "Å løfte armen ut til siden (særlig midtveis i løftet)" },
-        { "id": "behind_back", "icon": "RotateCcw", "title": "Å ta armen bak på ryggen (f.eks. for å ta på en jakke)" },
-        { "id": "cross_body", "icon": "ArrowRight", "title": "Å føre armen tvers over brystet mot motsatt skulder" },
-        { "id": "overhead", "icon": "ArrowUp", "title": "Å jobbe med armene over hodehøyde (f.eks. vaske vinduer)" },
-        { "id": "none", "icon": "Check", "title": "Smerten endrer seg lite uansett hva jeg gjør" }
+        {
+          "id": "arc",
+          "icon": "ArrowUp",
+          "title": "Å løfte armen ut til siden (særlig midtveis i løftet)"
+        },
+        {
+          "id": "behind_back",
+          "icon": "RotateCcw",
+          "title": "Å ta armen bak på ryggen (f.eks. for å ta på en jakke)"
+        },
+        {
+          "id": "cross_body",
+          "icon": "ArrowRight",
+          "title": "Å føre armen tvers over brystet mot motsatt skulder"
+        },
+        {
+          "id": "overhead",
+          "icon": "ArrowUp",
+          "title": "Å jobbe med armene over hodehøyde (f.eks. vaske vinduer)"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Smerten endrer seg lite uansett hva jeg gjør"
+        }
       ]
     },
     {
@@ -99,10 +203,26 @@
       "type": "multiple",
       "helpText": "Viktig: Skulderen føles gjerne svak når det gjør vondt. Men velg 'helt kraftløs' KUN hvis du faktisk ikke har muskelkraft til å løfte armen, selv når du prøver å ignorere smerten.",
       "options": [
-        { "id": "weakness", "icon": "ArrowDown", "title": "Kraftløs: Jeg klarer rett og slett ikke å løfte armen" },
-        { "id": "stiffness", "icon": "Lock", "title": "Helt stiv: Armen er helt låst og umulig å bevege særlig på" },
-        { "id": "instability", "icon": "RotateCcw", "title": "Ustabil: Jeg føler at skulderen glipper eller vil hoppe ut av ledd" },
-        { "id": "none", "icon": "Check", "title": "Jeg klarer å bruke den fint, det gjør bare vondt" }
+        {
+          "id": "weakness",
+          "icon": "ArrowDown",
+          "title": "Kraftløs: Jeg klarer rett og slett ikke å løfte armen"
+        },
+        {
+          "id": "stiffness",
+          "icon": "Lock",
+          "title": "Helt stiv: Armen er helt låst og umulig å bevege særlig på"
+        },
+        {
+          "id": "instability",
+          "icon": "RotateCcw",
+          "title": "Ustabil: Jeg føler at skulderen glipper eller vil hoppe ut av ledd"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Jeg klarer å bruke den fint, det gjør bare vondt"
+        }
       ]
     },
     {
@@ -112,11 +232,31 @@
       "type": "multiple",
       "helpText": "Disse symptomene hjelper oss å utelukke feber, infeksjoner eller andre mer uvanlige årsaker til skuldersmerter.",
       "options": [
-        { "id": "fever", "icon": "AlertTriangle", "title": "Generell sykdomsfølelse, feber eller frysninger" },
-        { "id": "weight_loss", "icon": "AlertTriangle", "title": "Uforklarlig vekttap i det siste" },
-        { "id": "constant_pain", "icon": "AlertTriangle", "title": "Konstant, uutholdelig smerte som ikke blir bedre av å hvile" },
-        { "id": "deformity", "icon": "AlertTriangle", "title": "Skulderen min har en veldig tydelig, unaturlig feilstilling" },
-        { "id": "none", "icon": "Check", "title": "Nei, ingen av disse gjelder for meg" }
+        {
+          "id": "fever",
+          "icon": "AlertTriangle",
+          "title": "Generell sykdomsfølelse, feber eller frysninger"
+        },
+        {
+          "id": "weight_loss",
+          "icon": "AlertTriangle",
+          "title": "Uforklarlig vekttap i det siste"
+        },
+        {
+          "id": "constant_pain",
+          "icon": "AlertTriangle",
+          "title": "Konstant, uutholdelig smerte som ikke blir bedre av å hvile"
+        },
+        {
+          "id": "deformity",
+          "icon": "AlertTriangle",
+          "title": "Skulderen min har en veldig tydelig, unaturlig feilstilling"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, ingen av disse gjelder for meg"
+        }
       ]
     },
     {
@@ -129,67 +269,166 @@
   "rules": [
     {
       "diagnosis": "medical_referral",
-      "when": { "all": [
-        { "field": "red_flags", "op": "notEmpty" },
-        { "field": "red_flags", "op": "notIncludes", "value": "none" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "red_flags",
+            "op": "notEmpty"
+          },
+          {
+            "field": "red_flags",
+            "op": "notIncludes",
+            "value": "none"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "instability",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute" },
-        { "any": [
-          { "field": "trauma_details", "op": "includes", "value": "out_of_socket" },
-          { "field": "functional_loss", "op": "includes", "value": "instability" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute"
+          },
+          {
+            "any": [
+              {
+                "field": "trauma_details",
+                "op": "includes",
+                "value": "out_of_socket"
+              },
+              {
+                "field": "functional_loss",
+                "op": "includes",
+                "value": "instability"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "acute_cuff_tear",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute" },
-        { "field": "functional_loss", "op": "includes", "value": "weakness" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute"
+          },
+          {
+            "field": "functional_loss",
+            "op": "includes",
+            "value": "weakness"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "ac_joint_trauma",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute" },
-        { "field": "trauma_details", "op": "includes", "value": "direct_blow" },
-        { "field": "location", "op": "includes", "value": "superior" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute"
+          },
+          {
+            "field": "trauma_details",
+            "op": "includes",
+            "value": "direct_blow"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "superior"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "osteoarthritis",
-      "when": { "all": [
-        { "field": "functional_loss", "op": "includes", "value": "stiffness" },
-        { "field": "age", "op": "eq", "value": "over55" },
-        { "field": "onset", "op": "eq", "value": "gradual" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "functional_loss",
+            "op": "includes",
+            "value": "stiffness"
+          },
+          {
+            "field": "age",
+            "op": "eq",
+            "value": "over55"
+          },
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "frozen_shoulder",
-      "when": { "field": "functional_loss", "op": "includes", "value": "stiffness" }
+      "when": {
+        "field": "functional_loss",
+        "op": "includes",
+        "value": "stiffness"
+      }
     },
     {
       "diagnosis": "cervical_referred",
-      "when": { "field": "location", "op": "includes", "value": "radiating" }
+      "when": {
+        "field": "location",
+        "op": "includes",
+        "value": "radiating"
+      }
     },
     {
       "diagnosis": "ac_joint_degeneration",
-      "when": { "all": [
-        { "field": "location", "op": "includes", "value": "superior" },
-        { "field": "pain_pattern", "op": "includes", "value": "cross_body" },
-        { "field": "onset", "op": "eq", "value": "gradual" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "superior"
+          },
+          {
+            "field": "pain_pattern",
+            "op": "includes",
+            "value": "cross_body"
+          },
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "saps",
-      "when": { "any": [
-        { "field": "location", "op": "includes", "value": "lateral" },
-        { "field": "pain_pattern", "op": "includes", "value": "arc" },
-        { "field": "pain_pattern", "op": "includes", "value": "overhead" }
-      ] }
+      "when": {
+        "any": [
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "lateral"
+          },
+          {
+            "field": "pain_pattern",
+            "op": "includes",
+            "value": "arc"
+          },
+          {
+            "field": "pain_pattern",
+            "op": "includes",
+            "value": "overhead"
+          }
+        ]
+      }
     }
   ],
   "defaultDiagnosis": "non_specific",
@@ -234,7 +473,9 @@
         "Spenne musklene i skulderen uten at selve armen beveger seg.",
         "Rolig oppbygging av støttemuskulaturen rundt skulderbladet."
       ],
-      "trainingProgram": { "title": "Program for skulderustabilitet" },
+      "trainingProgram": {
+        "title": "Program for skulderustabilitet"
+      },
       "clinicalHypothesis": "Glenohumeral instabilitet / tilstand etter luksasjon.",
       "icpc2": "L92",
       "icd10": "S43.4"
@@ -251,7 +492,9 @@
         "Sving armen rolig i sirkler (som en pendel) for å holde blodsirkulasjonen i gang.",
         "Legg puter under armen for å finne en god og støttende sovestilling."
       ],
-      "trainingProgram": { "title": "Gode råd for frossen skulder" },
+      "trainingProgram": {
+        "title": "Gode råd for frossen skulder"
+      },
       "clinicalHypothesis": "Adhesiv kapsulitt (Frozen Shoulder) i fryse- eller stivhetsfase.",
       "icpc2": "L92",
       "icd10": "M75.0"
@@ -268,7 +511,9 @@
         "Øvelser for å styrke opp ryggen og musklene rundt skulderbladene.",
         "Unngå total hvile – beveg armen i de retningene som ikke gjør vondt."
       ],
-      "trainingProgram": { "title": "Start opptrening for SAPS" },
+      "trainingProgram": {
+        "title": "Start opptrening for SAPS"
+      },
       "clinicalHypothesis": "Subakromialt smertesyndrom (SAPS) / Rotatorcuff tendinopati.",
       "icpc2": "L92",
       "icd10": "M75.4"
@@ -299,7 +544,9 @@
         "Bytt ut tunge press-øvelser med ro-øvelser hvis du trener styrke.",
         "Myk opp brystryggen og skuldrene med lette bevegelser i hverdagen."
       ],
-      "trainingProgram": { "title": "Tilpasset trening for AC-leddet" },
+      "trainingProgram": {
+        "title": "Tilpasset trening for AC-leddet"
+      },
       "clinicalHypothesis": "Symptomatisk AC-leddsartrose eller mekanisk irritasjon.",
       "icpc2": "L92",
       "icd10": "M19.9"
@@ -315,7 +562,9 @@
         "Myke og rolige bevegelsesøvelser for nakken.",
         "Øvelser for å styrke brystryggen for å gi nakken din en bedre plattform."
       ],
-      "trainingProgram": { "title": "Kom i gang med nakkeprogram" },
+      "trainingProgram": {
+        "title": "Kom i gang med nakkeprogram"
+      },
       "clinicalHypothesis": "Cervikal radikulopati / cervikobrakialgi med referert smerte til skulder/arm.",
       "icpc2": "L83",
       "icd10": "M53.1"
@@ -331,7 +580,9 @@
         "Generell og variert styrketrening for overkroppen er supert for deg.",
         "Spesifikk trening for de små musklene i skulderen (rotatorcuffen) for å stabilisere leddet."
       ],
-      "trainingProgram": { "title": "Styrketrening for skulderartrose" },
+      "trainingProgram": {
+        "title": "Styrketrening for skulderartrose"
+      },
       "clinicalHypothesis": "Symptomatisk glenohumeral artrose.",
       "icpc2": "L90",
       "icd10": "M19.0"
@@ -348,7 +599,9 @@
         "Gå turer i skog og mark der du svinger naturlig på armene.",
         "Varm opp brystryggen og nakken for å gi skuldrene bedre plass."
       ],
-      "trainingProgram": { "title": "Mobilitetsprogram for overkropp" },
+      "trainingProgram": {
+        "title": "Mobilitetsprogram for overkropp"
+      },
       "clinicalHypothesis": "Uspesifikk myalgi i skulderbue/nakke-overgang.",
       "icpc2": "L08",
       "icd10": "M25.5"

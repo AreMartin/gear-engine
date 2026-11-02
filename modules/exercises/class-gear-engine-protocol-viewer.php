@@ -275,7 +275,7 @@ class Gear_Engine_Protocol_Viewer {
 	}
 
 	/**
-	 * Register the program page path setting (shown on the Smertesjekk settings page).
+	 * Register the program page path setting (shown on the Symptomsjekker settings page).
 	 *
 	 * @return void
 	 */

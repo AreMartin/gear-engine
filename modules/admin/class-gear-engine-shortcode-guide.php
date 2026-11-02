@@ -69,14 +69,14 @@ class Gear_Engine_Shortcode_Guide {
 				'note'        => __( 'Alias: [digital_fysio_chat]. Put it on the page the "Digital fysio" card links to.', 'gear-engine' ),
 			),
 			array(
-				'group'       => __( 'Smertesjekk (quiz)', 'gear-engine' ),
+				'group'       => __( 'Symptomsjekker (quiz)', 'gear-engine' ),
 				'tag'         => Gear_Engine_Triage::PICKER_SHORTCODE_TAG,
 				'example'     => '[' . Gear_Engine_Triage::PICKER_SHORTCODE_TAG . ']',
 				'description' => __( 'Region picker with one card per body region. Each card links to the region page.', 'gear-engine' ),
-				'note'        => __( 'Goes on the page the "Smertesjekk" card links to.', 'gear-engine' ),
+				'note'        => __( 'Goes on the page the "Symptomsjekker" card links to.', 'gear-engine' ),
 			),
 			array(
-				'group'       => __( 'Smertesjekk (quiz)', 'gear-engine' ),
+				'group'       => __( 'Symptomsjekker (quiz)', 'gear-engine' ),
 				'tag'         => Gear_Engine_Triage::SHORTCODE_TAG,
 				'example'     => '[' . Gear_Engine_Triage::SHORTCODE_TAG . ' region="rygg"]',
 				'description' => __( 'One quiz for one region. Options: region, back_link="true|false".', 'gear-engine' ),
@@ -208,18 +208,18 @@ class Gear_Engine_Shortcode_Guide {
 		);
 		$map[] = array(
 			'level'   => 0,
-			'title'   => __( 'Smertesjekk (picker)', 'gear-engine' ),
+			'title'   => __( 'Symptomsjekker (Hub / Velger)', 'gear-engine' ),
 			'path'    => $base,
 			'tag'     => $picker,
 			'example' => '[' . $picker . ']',
-			'hint'    => __( 'Linked from the front page "Smertesjekk" card. Shows the region cards.', 'gear-engine' ),
+			'hint'    => __( 'Linked from the front page "Symptomsjekker" card. Shows the region cards.', 'gear-engine' ),
 		);
 		foreach ( self::get_region_shortcodes() as $row ) {
 			$map[] = array(
 				'level'   => 1,
 				'title'   => sprintf(
 					/* translators: %s: region name */
-					__( 'Smertesjekk: %s', 'gear-engine' ),
+					__( 'Symptomsjekk: %s', 'gear-engine' ),
 					$row['label']
 				),
 				'path'    => $row['path'],
@@ -461,7 +461,7 @@ class Gear_Engine_Shortcode_Guide {
 						$label  = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
 						$title  = sprintf(
 							/* translators: %s: Region label */
-							__( 'Smertesjekk %s', 'gear-engine' ),
+							__( 'Symptomsjekk: %s', 'gear-engine' ),
 							$label
 						);
 						$content = '<!-- wp:paragraph -->' . "\n" .

@@ -5,7 +5,7 @@
   "icon": "knee",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
-  "title": "Knesjekk",
+  "title": "Symptomsjekk: Kne",
   "description": "Svar på noen spørsmål om kneet ditt, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
   "defaultAnswers": {
     "age": null,
@@ -22,9 +22,21 @@
       "title": "Hvor gammel er du?",
       "type": "single",
       "options": [
-        { "id": "under25", "icon": "User", "title": "Under 25 år" },
-        { "id": "25-50", "icon": "Activity", "title": "25 til 50 år" },
-        { "id": "over50", "icon": "Clock", "title": "Over 50 år" }
+        {
+          "id": "under25",
+          "icon": "User",
+          "title": "Under 25 år"
+        },
+        {
+          "id": "25-50",
+          "icon": "Activity",
+          "title": "25 til 50 år"
+        },
+        {
+          "id": "over50",
+          "icon": "Clock",
+          "title": "Over 50 år"
+        }
       ]
     },
     {
@@ -32,9 +44,23 @@
       "title": "Hvordan startet plagene?",
       "type": "single",
       "options": [
-        { "id": "acute_twist", "icon": "RotateCcw", "title": "Vridning eller stopp i fart", "subtitle": "For eksempel i fotball, håndball eller ski" },
-        { "id": "acute_impact", "icon": "Zap", "title": "Slag, fall eller støt mot kneet" },
-        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+        {
+          "id": "acute_twist",
+          "icon": "RotateCcw",
+          "title": "Vridning eller stopp i fart",
+          "subtitle": "For eksempel i fotball, håndball eller ski"
+        },
+        {
+          "id": "acute_impact",
+          "icon": "Zap",
+          "title": "Slag, fall eller støt mot kneet"
+        },
+        {
+          "id": "gradual",
+          "icon": "Activity",
+          "title": "Kom gradvis",
+          "subtitle": "Ingen enkelt hendelse du kan peke på"
+        }
       ]
     },
     {
@@ -43,11 +69,31 @@
       "description": "Velg alle steder som passer.",
       "type": "multiple",
       "options": [
-        { "id": "front", "icon": "MapPin", "title": "Foran, rundt eller under kneskålen" },
-        { "id": "inner", "icon": "MapPin", "title": "På innsiden av kneet" },
-        { "id": "outer", "icon": "MapPin", "title": "På utsiden av kneet" },
-        { "id": "back", "icon": "MapPin", "title": "I knehasen (baksiden)" },
-        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+        {
+          "id": "front",
+          "icon": "MapPin",
+          "title": "Foran, rundt eller under kneskålen"
+        },
+        {
+          "id": "inner",
+          "icon": "MapPin",
+          "title": "På innsiden av kneet"
+        },
+        {
+          "id": "outer",
+          "icon": "MapPin",
+          "title": "På utsiden av kneet"
+        },
+        {
+          "id": "back",
+          "icon": "MapPin",
+          "title": "I knehasen (baksiden)"
+        },
+        {
+          "id": "none",
+          "icon": "Activity",
+          "title": "Vanskelig å peke på ett sted"
+        }
       ]
     },
     {
@@ -56,14 +102,46 @@
       "description": "Velg alle som passer.",
       "type": "multiple",
       "options": [
-        { "id": "pop", "icon": "Zap", "title": "Jeg hørte eller kjente et smell da det skjedde" },
-        { "id": "swelling_fast", "icon": "Flame", "title": "Kneet svulmet kraftig opp i løpet av noen timer" },
-        { "id": "giving_way", "icon": "RotateCcw", "title": "Kneet svikter eller glipper under meg" },
-        { "id": "locking", "icon": "Lock", "title": "Kneet låser seg, eller jeg får ikke strukket det helt ut" },
-        { "id": "stairs", "icon": "ArrowDown", "title": "Verst i trapper, knebøy eller etter lang tid med bøyd kne" },
-        { "id": "jumping", "icon": "ArrowUp", "title": "Verst ved hopping eller løping, med ømt punkt rett under kneskålen" },
-        { "id": "morning_stiff", "icon": "Clock", "title": "Stivt og støl når jeg starter opp, bedre når kneet blir varmt" },
-        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+        {
+          "id": "pop",
+          "icon": "Zap",
+          "title": "Jeg hørte eller kjente et smell da det skjedde"
+        },
+        {
+          "id": "swelling_fast",
+          "icon": "Flame",
+          "title": "Kneet svulmet kraftig opp i løpet av noen timer"
+        },
+        {
+          "id": "giving_way",
+          "icon": "RotateCcw",
+          "title": "Kneet svikter eller glipper under meg"
+        },
+        {
+          "id": "locking",
+          "icon": "Lock",
+          "title": "Kneet låser seg, eller jeg får ikke strukket det helt ut"
+        },
+        {
+          "id": "stairs",
+          "icon": "ArrowDown",
+          "title": "Verst i trapper, knebøy eller etter lang tid med bøyd kne"
+        },
+        {
+          "id": "jumping",
+          "icon": "ArrowUp",
+          "title": "Verst ved hopping eller løping, med ømt punkt rett under kneskålen"
+        },
+        {
+          "id": "morning_stiff",
+          "icon": "Clock",
+          "title": "Stivt og støl når jeg starter opp, bedre når kneet blir varmt"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Ingen av disse"
+        }
       ]
     },
     {
@@ -71,9 +149,21 @@
       "title": "Klarer du å legge vekt på kneet?",
       "type": "single",
       "options": [
-        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
-        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
-        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å gå fire skritt" }
+        {
+          "id": "normal",
+          "icon": "Check",
+          "title": "Ja, jeg går normalt"
+        },
+        {
+          "id": "limp",
+          "icon": "Activity",
+          "title": "Ja, men jeg halter"
+        },
+        {
+          "id": "cannot",
+          "icon": "AlertTriangle",
+          "title": "Nei, jeg klarer ikke å gå fire skritt"
+        }
       ]
     },
     {
@@ -87,79 +177,202 @@
       "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
       "type": "multiple",
       "options": [
-        { "id": "hot_swollen", "icon": "AlertTriangle", "title": "Kneet er varmt, rødt og hovent, og jeg har feber eller føler meg syk" },
-        { "id": "calf_swelling", "icon": "AlertTriangle", "title": "Jeg har smerte og hevelse i leggen, for eksempel etter lang reise eller sengeleie" },
-        { "id": "numb_foot", "icon": "ShieldAlert", "title": "Foten er kald, blek eller nummen" },
-        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+        {
+          "id": "hot_swollen",
+          "icon": "AlertTriangle",
+          "title": "Kneet er varmt, rødt og hovent, og jeg har feber eller føler meg syk"
+        },
+        {
+          "id": "calf_swelling",
+          "icon": "AlertTriangle",
+          "title": "Jeg har smerte og hevelse i leggen, for eksempel etter lang reise eller sengeleie"
+        },
+        {
+          "id": "numb_foot",
+          "icon": "ShieldAlert",
+          "title": "Foten er kald, blek eller nummen"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, ingen av delene"
+        }
       ]
     }
   ],
   "rules": [
     {
       "diagnosis": "medical_referral",
-      "when": { "all": [
-        { "field": "red_flags", "op": "notEmpty" },
-        { "field": "red_flags", "op": "notIncludes", "value": "none" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "red_flags",
+            "op": "notEmpty"
+          },
+          {
+            "field": "red_flags",
+            "op": "notIncludes",
+            "value": "none"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "fracture_suspected",
-      "when": { "all": [
-        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
-        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "in",
+            "value": [
+              "acute_twist",
+              "acute_impact"
+            ]
+          },
+          {
+            "field": "weight_bearing",
+            "op": "eq",
+            "value": "cannot"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "acl_injury",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute_twist" },
-        { "field": "symptoms", "op": "includes", "value": "swelling_fast" },
-        { "any": [
-          { "field": "symptoms", "op": "includes", "value": "pop" },
-          { "field": "symptoms", "op": "includes", "value": "giving_way" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute_twist"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "swelling_fast"
+          },
+          {
+            "any": [
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "pop"
+              },
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "giving_way"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "meniscus_injury",
-      "when": { "field": "symptoms", "op": "includes", "value": "locking" }
+      "when": {
+        "field": "symptoms",
+        "op": "includes",
+        "value": "locking"
+      }
     },
     {
       "diagnosis": "knee_sprain",
-      "when": { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] }
+      "when": {
+        "field": "onset",
+        "op": "in",
+        "value": [
+          "acute_twist",
+          "acute_impact"
+        ]
+      }
     },
     {
       "diagnosis": "osteoarthritis",
-      "when": { "all": [
-        { "field": "age", "op": "eq", "value": "over50" },
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "symptoms", "op": "includes", "value": "morning_stiff" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "age",
+            "op": "eq",
+            "value": "over50"
+          },
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "morning_stiff"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "patellar_tendinopathy",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "symptoms", "op": "includes", "value": "jumping" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "jumping"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "itbs",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "location", "op": "includes", "value": "outer" },
-        { "field": "location", "op": "notIncludes", "value": "front" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "outer"
+          },
+          {
+            "field": "location",
+            "op": "notIncludes",
+            "value": "front"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "pfps",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "any": [
-          { "field": "symptoms", "op": "includes", "value": "stairs" },
-          { "field": "location", "op": "includes", "value": "front" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "any": [
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "stairs"
+              },
+              {
+                "field": "location",
+                "op": "includes",
+                "value": "front"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "defaultDiagnosis": "non_specific",

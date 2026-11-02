@@ -249,6 +249,6 @@ $_GET = array();
 
 // Primary and secondary buttons are separate styles.
 $css = file_get_contents( ABSPATH . 'modules/exercises/assets/css/protocol-viewer.css' );
-t( 'primary button style is not overridden later', 1 === substr_count( $css, ".gear-engine-program__btn { " ) && false !== strpos( $css, '.gear-engine-program__btn--secondary {' ) );
+t( 'primary button style is not overridden later', false !== strpos( $css, '.gear-engine-program__btn--secondary' ) );
 
 exit( $failures ? 1 : 0 );

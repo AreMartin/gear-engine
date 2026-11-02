@@ -52,9 +52,9 @@ function t( $name, $ok ) {
 	}
 }
 
-t( 'base path default', Gear_Engine_Triage::get_base_path() === 'smertesjekk' );
+t( 'base path default', Gear_Engine_Triage::get_base_path() === 'symptomsjekker' );
 t( 'base path sanitised', Gear_Engine_Triage::sanitize_base_path( '/Digital Fysio//Tester/' ) === 'digital-fysio/tester' );
-t( 'base path empty falls back', Gear_Engine_Triage::sanitize_base_path( ' // ' ) === 'smertesjekk' );
+t( 'base path empty falls back', Gear_Engine_Triage::sanitize_base_path( ' // ' ) === 'symptomsjekker' );
 t( 'base path rejects traversal chars', Gear_Engine_Triage::sanitize_base_path( '../x"><script>' ) === 'x-script' );
 
 $GLOBALS['opts'][ Gear_Engine_Triage::OPTION_BASE_PATH ] = 'helse/tester';
@@ -67,19 +67,19 @@ t( 'unknown region is error', is_wp_error( Gear_Engine_Triage::get_config( '../.
 t( 'invalid config rejected', ! Gear_Engine_Triage::validate_config( array( 'title' => 'x' ) ) );
 
 $cards = Gear_Engine_Triage::get_region_cards();
-t( 'cards have label and url', isset( $cards[0] ) && 'Rygg' === $cards[0]['label'] && 'http://example.com/smertesjekk/rygg/' === $cards[0]['url'] );
+t( 'cards have label and url', isset( $cards[0] ) && 'Rygg' === $cards[0]['label'] && 'http://example.com/symptomsjekker/rygg/' === $cards[0]['url'] );
 
 t( 'icon svg for known key', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'knee' ), '<circle cx="11" cy="12.5"' ) );
 t( 'icon falls back', false !== strpos( Gear_Engine_Triage::get_icon_svg( 'nope' ), 'points="22 12 18 12' ) );
 
 $triage = new Gear_Engine_Triage();
 $picker = $triage->render_picker();
-t( 'picker links to region page', false !== strpos( $picker, 'href="http://example.com/smertesjekk/rygg/"' ) );
+t( 'picker links to region page', false !== strpos( $picker, 'href="http://example.com/symptomsjekker/rygg/"' ) );
 t( 'picker renders action icon', false !== strpos( $picker, 'class="rc-action"' ) );
 t( 'picker enqueues style', in_array( 'gear-engine-triage', $GLOBALS['enqueued'], true ) );
 
 $quiz = $triage->render( array( 'region' => 'rygg' ) );
-t( 'quiz renders container and back link', false !== strpos( $quiz, 'data-region="rygg"' ) && false !== strpos( $quiz, 'href="http://example.com/smertesjekk/"' ) );
+t( 'quiz renders container and back link', false !== strpos( $quiz, 'data-region="rygg"' ) && false !== strpos( $quiz, 'href="http://example.com/symptomsjekker/"' ) );
 t( 'quiz config cannot break out of script tag', 1 === substr_count( $quiz, '</script>' ) );
 t( 'back link can be disabled', false === strpos( $triage->render( array( 'region' => 'rygg', 'back_link' => 'false' ) ), 'gear-engine-triage__back' ) );
 t( 'unknown region renders nothing for visitors', '' === $triage->render( array( 'region' => 'nope' ) ) );

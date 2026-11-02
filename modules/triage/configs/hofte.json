@@ -5,7 +5,7 @@
   "icon": "hip",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
-  "title": "Hoftesjekk",
+  "title": "Symptomsjekk: Hofte",
   "description": "Svar på noen spørsmål om hoften din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
   "defaultAnswers": {
     "age": null,
@@ -22,9 +22,21 @@
       "title": "Hvor gammel er du?",
       "type": "single",
       "options": [
-        { "id": "under40", "icon": "User", "title": "Under 40 år" },
-        { "id": "40-60", "icon": "Activity", "title": "40 til 60 år" },
-        { "id": "over60", "icon": "Clock", "title": "Over 60 år" }
+        {
+          "id": "under40",
+          "icon": "User",
+          "title": "Under 40 år"
+        },
+        {
+          "id": "40-60",
+          "icon": "Activity",
+          "title": "40 til 60 år"
+        },
+        {
+          "id": "over60",
+          "icon": "Clock",
+          "title": "Over 60 år"
+        }
       ]
     },
     {
@@ -32,9 +44,23 @@
       "title": "Hvordan startet plagene?",
       "type": "single",
       "options": [
-        { "id": "acute_fall", "icon": "ArrowDown", "title": "Fall eller slag mot hoften" },
-        { "id": "acute_sport", "icon": "Zap", "title": "Brå bevegelse eller strekk", "subtitle": "For eksempel spark, sprint eller spagat" },
-        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+        {
+          "id": "acute_fall",
+          "icon": "ArrowDown",
+          "title": "Fall eller slag mot hoften"
+        },
+        {
+          "id": "acute_sport",
+          "icon": "Zap",
+          "title": "Brå bevegelse eller strekk",
+          "subtitle": "For eksempel spark, sprint eller spagat"
+        },
+        {
+          "id": "gradual",
+          "icon": "Activity",
+          "title": "Kom gradvis",
+          "subtitle": "Ingen enkelt hendelse du kan peke på"
+        }
       ]
     },
     {
@@ -43,10 +69,26 @@
       "description": "Velg alle steder som passer.",
       "type": "multiple",
       "options": [
-        { "id": "groin", "icon": "MapPin", "title": "I lysken eller foran i hoften" },
-        { "id": "lateral", "icon": "MapPin", "title": "På utsiden av hoften (det benete punktet)" },
-        { "id": "buttock", "icon": "MapPin", "title": "Bak i setet eller bekkenet" },
-        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+        {
+          "id": "groin",
+          "icon": "MapPin",
+          "title": "I lysken eller foran i hoften"
+        },
+        {
+          "id": "lateral",
+          "icon": "MapPin",
+          "title": "På utsiden av hoften (det benete punktet)"
+        },
+        {
+          "id": "buttock",
+          "icon": "MapPin",
+          "title": "Bak i setet eller bekkenet"
+        },
+        {
+          "id": "none",
+          "icon": "Activity",
+          "title": "Vanskelig å peke på ett sted"
+        }
       ]
     },
     {
@@ -55,11 +97,31 @@
       "description": "Velg alle som passer.",
       "type": "multiple",
       "options": [
-        { "id": "lateral_lying", "icon": "Clock", "title": "Det gjør vondt å ligge på den siden om natten" },
-        { "id": "stairs_walk", "icon": "ArrowUp", "title": "Verst ved gange, trapper eller når jeg står på ett bein" },
-        { "id": "stiff", "icon": "Lock", "title": "Stiv hofte, vanskelig å ta på sokker og sko" },
-        { "id": "clicking", "icon": "Zap", "title": "Hakking, klikking eller låsning i lysken ved dyp bøy" },
-        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+        {
+          "id": "lateral_lying",
+          "icon": "Clock",
+          "title": "Det gjør vondt å ligge på den siden om natten"
+        },
+        {
+          "id": "stairs_walk",
+          "icon": "ArrowUp",
+          "title": "Verst ved gange, trapper eller når jeg står på ett bein"
+        },
+        {
+          "id": "stiff",
+          "icon": "Lock",
+          "title": "Stiv hofte, vanskelig å ta på sokker og sko"
+        },
+        {
+          "id": "clicking",
+          "icon": "Zap",
+          "title": "Hakking, klikking eller låsning i lysken ved dyp bøy"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Ingen av disse"
+        }
       ]
     },
     {
@@ -67,9 +129,21 @@
       "title": "Klarer du å legge vekt på beinet?",
       "type": "single",
       "options": [
-        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
-        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
-        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å belaste beinet" }
+        {
+          "id": "normal",
+          "icon": "Check",
+          "title": "Ja, jeg går normalt"
+        },
+        {
+          "id": "limp",
+          "icon": "Activity",
+          "title": "Ja, men jeg halter"
+        },
+        {
+          "id": "cannot",
+          "icon": "AlertTriangle",
+          "title": "Nei, jeg klarer ikke å belaste beinet"
+        }
       ]
     },
     {
@@ -83,70 +157,184 @@
       "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
       "type": "multiple",
       "options": [
-        { "id": "fever", "icon": "AlertTriangle", "title": "Feber, frysninger eller en generell sykdomsfølelse" },
-        { "id": "cancer", "icon": "AlertTriangle", "title": "Tidligere kreft, uforklarlig vekttap, eller konstante smerter som også plager meg i hvile og om natten" },
-        { "id": "saddle", "icon": "ShieldAlert", "title": "Nummenhet i skrittet eller tap av kontroll over blære eller tarm" },
-        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+        {
+          "id": "fever",
+          "icon": "AlertTriangle",
+          "title": "Feber, frysninger eller en generell sykdomsfølelse"
+        },
+        {
+          "id": "cancer",
+          "icon": "AlertTriangle",
+          "title": "Tidligere kreft, uforklarlig vekttap, eller konstante smerter som også plager meg i hvile og om natten"
+        },
+        {
+          "id": "saddle",
+          "icon": "ShieldAlert",
+          "title": "Nummenhet i skrittet eller tap av kontroll over blære eller tarm"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, ingen av delene"
+        }
       ]
     }
   ],
   "rules": [
     {
       "diagnosis": "medical_referral",
-      "when": { "all": [
-        { "field": "red_flags", "op": "notEmpty" },
-        { "field": "red_flags", "op": "notIncludes", "value": "none" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "red_flags",
+            "op": "notEmpty"
+          },
+          {
+            "field": "red_flags",
+            "op": "notIncludes",
+            "value": "none"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "fracture_suspected",
-      "when": { "all": [
-        { "field": "onset", "op": "in", "value": ["acute_fall", "acute_sport"] },
-        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "in",
+            "value": [
+              "acute_fall",
+              "acute_sport"
+            ]
+          },
+          {
+            "field": "weight_bearing",
+            "op": "eq",
+            "value": "cannot"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "muscle_strain",
-      "when": { "field": "onset", "op": "eq", "value": "acute_sport" }
+      "when": {
+        "field": "onset",
+        "op": "eq",
+        "value": "acute_sport"
+      }
     },
     {
       "diagnosis": "hip_contusion",
-      "when": { "field": "onset", "op": "eq", "value": "acute_fall" }
+      "when": {
+        "field": "onset",
+        "op": "eq",
+        "value": "acute_fall"
+      }
     },
     {
       "diagnosis": "hip_osteoarthritis",
-      "when": { "all": [
-        { "field": "age", "op": "in", "value": ["40-60", "over60"] },
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "location", "op": "includes", "value": "groin" },
-        { "field": "symptoms", "op": "includes", "value": "stiff" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "age",
+            "op": "in",
+            "value": [
+              "40-60",
+              "over60"
+            ]
+          },
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "groin"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "stiff"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "fai",
-      "when": { "all": [
-        { "field": "age", "op": "in", "value": ["under40", "40-60"] },
-        { "field": "location", "op": "includes", "value": "groin" },
-        { "field": "symptoms", "op": "includes", "value": "clicking" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "age",
+            "op": "in",
+            "value": [
+              "under40",
+              "40-60"
+            ]
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "groin"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "clicking"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "gtps",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "location", "op": "includes", "value": "lateral" },
-        { "any": [
-          { "field": "symptoms", "op": "includes", "value": "lateral_lying" },
-          { "field": "symptoms", "op": "includes", "value": "stairs_walk" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "lateral"
+          },
+          {
+            "any": [
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "lateral_lying"
+              },
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "stairs_walk"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "buttock_referred",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "location", "op": "includes", "value": "buttock" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "buttock"
+          }
+        ]
+      }
     }
   ],
   "defaultDiagnosis": "non_specific",

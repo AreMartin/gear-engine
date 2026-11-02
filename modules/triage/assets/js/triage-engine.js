@@ -411,7 +411,7 @@
 		var self = this;
 		var res = this.getDiagnosis();
 		if (!res) { return; }
-		var text = 'Fysionett Smertesjekk: ' + (this.config.label || this.config.title) + '\n' +
+		var text = 'Fysionett Symptomsjekker: ' + (this.config.title || this.config.label || 'Symptomsjekker') + '\n' +
 			'Vurdering: ' + res.title + '\n' +
 			'Kategori: ' + res.category + ' (Alvorlighetsgrad: ' + res.severity + ')\n' +
 			'Tiltak nå: ' + (res.phase1 || '') + '\n' +
@@ -564,7 +564,7 @@
 			'<button type="button" class="ibtn sl" data-action="back" title="Forrige steg" aria-label="Forrige steg">' +
 			icon('ChevronLeft', 22) +
 			'</button>' +
-			'<span class="title-l">' + esc(this.config.label || this.config.title || 'Smertesjekk') + '</span>' +
+			'<span class="title-l">' + esc(this.config.title || this.config.label || 'Symptomsjekker') + '</span>' +
 			'<span class="body-s muted num" style="font-weight:600">' + this.stepIndex + ' / ' + n + '</span>' +
 			'</div>' +
 			'<div class="steps-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '">' +

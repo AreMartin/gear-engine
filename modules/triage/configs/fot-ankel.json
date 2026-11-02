@@ -5,7 +5,7 @@
   "icon": "foot",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
-  "title": "Fot- og anklesjekk",
+  "title": "Symptomsjekk: Fot og ankel",
   "description": "Svar på noen spørsmål om foten eller ankelen din, så får du en vurdering av hva som er mest sannsynlig og hva du kan gjøre nå.",
   "defaultAnswers": {
     "onset": null,
@@ -21,9 +21,23 @@
       "title": "Hvordan startet plagene?",
       "type": "single",
       "options": [
-        { "id": "acute_twist", "icon": "RotateCcw", "title": "Vrikking eller feiltrinn", "subtitle": "Foten vred seg under deg" },
-        { "id": "acute_impact", "icon": "Zap", "title": "Slag, fall eller noe tungt over foten" },
-        { "id": "gradual", "icon": "Activity", "title": "Kom gradvis", "subtitle": "Ingen enkelt hendelse du kan peke på" }
+        {
+          "id": "acute_twist",
+          "icon": "RotateCcw",
+          "title": "Vrikking eller feiltrinn",
+          "subtitle": "Foten vred seg under deg"
+        },
+        {
+          "id": "acute_impact",
+          "icon": "Zap",
+          "title": "Slag, fall eller noe tungt over foten"
+        },
+        {
+          "id": "gradual",
+          "icon": "Activity",
+          "title": "Kom gradvis",
+          "subtitle": "Ingen enkelt hendelse du kan peke på"
+        }
       ]
     },
     {
@@ -32,12 +46,36 @@
       "description": "Velg alle steder som passer.",
       "type": "multiple",
       "options": [
-        { "id": "ankle_outer", "icon": "MapPin", "title": "Utsiden av ankelen" },
-        { "id": "ankle_inner", "icon": "MapPin", "title": "Innsiden av ankelen" },
-        { "id": "achilles", "icon": "MapPin", "title": "Akillessenen (baksiden av ankelen, over hælen)" },
-        { "id": "heel", "icon": "MapPin", "title": "Under hælen eller i fotbuen" },
-        { "id": "forefoot", "icon": "MapPin", "title": "Fremre del av foten eller tærne" },
-        { "id": "none", "icon": "Activity", "title": "Vanskelig å peke på ett sted" }
+        {
+          "id": "ankle_outer",
+          "icon": "MapPin",
+          "title": "Utsiden av ankelen"
+        },
+        {
+          "id": "ankle_inner",
+          "icon": "MapPin",
+          "title": "Innsiden av ankelen"
+        },
+        {
+          "id": "achilles",
+          "icon": "MapPin",
+          "title": "Akillessenen (baksiden av ankelen, over hælen)"
+        },
+        {
+          "id": "heel",
+          "icon": "MapPin",
+          "title": "Under hælen eller i fotbuen"
+        },
+        {
+          "id": "forefoot",
+          "icon": "MapPin",
+          "title": "Fremre del av foten eller tærne"
+        },
+        {
+          "id": "none",
+          "icon": "Activity",
+          "title": "Vanskelig å peke på ett sted"
+        }
       ]
     },
     {
@@ -46,13 +84,41 @@
       "description": "Velg alle som passer.",
       "type": "multiple",
       "options": [
-        { "id": "pop", "icon": "Zap", "title": "Jeg hørte eller kjente et smell, som et spark mot akillessenen" },
-        { "id": "swelling_bruise", "icon": "Flame", "title": "Rask hevelse og blåmerke etter skaden" },
-        { "id": "first_steps", "icon": "ArrowDown", "title": "Verst de første skrittene om morgenen eller etter hvile" },
-        { "id": "tendon_morning", "icon": "Clock", "title": "Stiv og øm akillessene ved oppstart, bedre når jeg blir varm" },
-        { "id": "tingling", "icon": "Zap", "title": "Isende, brennende eller «småstein under foten»-følelse i fremfoten" },
-        { "id": "big_toe_attack", "icon": "AlertTriangle", "title": "Plutselig, intens smerte, rødhet og hevelse i stortåleddet" },
-        { "id": "none", "icon": "Check", "title": "Ingen av disse" }
+        {
+          "id": "pop",
+          "icon": "Zap",
+          "title": "Jeg hørte eller kjente et smell, som et spark mot akillessenen"
+        },
+        {
+          "id": "swelling_bruise",
+          "icon": "Flame",
+          "title": "Rask hevelse og blåmerke etter skaden"
+        },
+        {
+          "id": "first_steps",
+          "icon": "ArrowDown",
+          "title": "Verst de første skrittene om morgenen eller etter hvile"
+        },
+        {
+          "id": "tendon_morning",
+          "icon": "Clock",
+          "title": "Stiv og øm akillessene ved oppstart, bedre når jeg blir varm"
+        },
+        {
+          "id": "tingling",
+          "icon": "Zap",
+          "title": "Isende, brennende eller «småstein under foten»-følelse i fremfoten"
+        },
+        {
+          "id": "big_toe_attack",
+          "icon": "AlertTriangle",
+          "title": "Plutselig, intens smerte, rødhet og hevelse i stortåleddet"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Ingen av disse"
+        }
       ]
     },
     {
@@ -60,9 +126,21 @@
       "title": "Klarer du å legge vekt på foten?",
       "type": "single",
       "options": [
-        { "id": "normal", "icon": "Check", "title": "Ja, jeg går normalt" },
-        { "id": "limp", "icon": "Activity", "title": "Ja, men jeg halter" },
-        { "id": "cannot", "icon": "AlertTriangle", "title": "Nei, jeg klarer ikke å gå fire skritt" }
+        {
+          "id": "normal",
+          "icon": "Check",
+          "title": "Ja, jeg går normalt"
+        },
+        {
+          "id": "limp",
+          "icon": "Activity",
+          "title": "Ja, men jeg halter"
+        },
+        {
+          "id": "cannot",
+          "icon": "AlertTriangle",
+          "title": "Nei, jeg klarer ikke å gå fire skritt"
+        }
       ]
     },
     {
@@ -76,81 +154,209 @@
       "description": "Dette spør vi alle om, for å utelukke sjeldne, men alvorlige tilstander.",
       "type": "multiple",
       "options": [
-        { "id": "hot_swollen", "icon": "AlertTriangle", "title": "Foten eller ankelen er varm, rød og hoven, og jeg har feber eller føler meg syk" },
-        { "id": "calf_swelling", "icon": "AlertTriangle", "title": "Jeg har smerte og hevelse i leggen" },
-        { "id": "cold_numb", "icon": "ShieldAlert", "title": "Foten er kald, blek eller nummen" },
-        { "id": "wound", "icon": "AlertTriangle", "title": "Jeg har et sår på foten som ikke gror, og har diabetes eller dårlig sirkulasjon" },
-        { "id": "none", "icon": "Check", "title": "Nei, ingen av delene" }
+        {
+          "id": "hot_swollen",
+          "icon": "AlertTriangle",
+          "title": "Foten eller ankelen er varm, rød og hoven, og jeg har feber eller føler meg syk"
+        },
+        {
+          "id": "calf_swelling",
+          "icon": "AlertTriangle",
+          "title": "Jeg har smerte og hevelse i leggen"
+        },
+        {
+          "id": "cold_numb",
+          "icon": "ShieldAlert",
+          "title": "Foten er kald, blek eller nummen"
+        },
+        {
+          "id": "wound",
+          "icon": "AlertTriangle",
+          "title": "Jeg har et sår på foten som ikke gror, og har diabetes eller dårlig sirkulasjon"
+        },
+        {
+          "id": "none",
+          "icon": "Check",
+          "title": "Nei, ingen av delene"
+        }
       ]
     }
   ],
   "rules": [
     {
       "diagnosis": "medical_referral",
-      "when": { "all": [
-        { "field": "red_flags", "op": "notEmpty" },
-        { "field": "red_flags", "op": "notIncludes", "value": "none" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "red_flags",
+            "op": "notEmpty"
+          },
+          {
+            "field": "red_flags",
+            "op": "notIncludes",
+            "value": "none"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "achilles_rupture",
-      "when": { "all": [
-        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
-        { "field": "symptoms", "op": "includes", "value": "pop" },
-        { "field": "location", "op": "includes", "value": "achilles" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "in",
+            "value": [
+              "acute_twist",
+              "acute_impact"
+            ]
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "pop"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "achilles"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "fracture_suspected",
-      "when": { "all": [
-        { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] },
-        { "field": "weight_bearing", "op": "eq", "value": "cannot" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "in",
+            "value": [
+              "acute_twist",
+              "acute_impact"
+            ]
+          },
+          {
+            "field": "weight_bearing",
+            "op": "eq",
+            "value": "cannot"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "ankle_sprain",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "acute_twist" },
-        { "any": [
-          { "field": "location", "op": "includes", "value": "ankle_outer" },
-          { "field": "location", "op": "includes", "value": "ankle_inner" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "acute_twist"
+          },
+          {
+            "any": [
+              {
+                "field": "location",
+                "op": "includes",
+                "value": "ankle_outer"
+              },
+              {
+                "field": "location",
+                "op": "includes",
+                "value": "ankle_inner"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "foot_injury",
-      "when": { "field": "onset", "op": "in", "value": ["acute_twist", "acute_impact"] }
+      "when": {
+        "field": "onset",
+        "op": "in",
+        "value": [
+          "acute_twist",
+          "acute_impact"
+        ]
+      }
     },
     {
       "diagnosis": "gout_suspected",
-      "when": { "all": [
-        { "field": "symptoms", "op": "includes", "value": "big_toe_attack" },
-        { "field": "location", "op": "includes", "value": "forefoot" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "big_toe_attack"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "forefoot"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "achilles_tendinopathy",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "field": "location", "op": "includes", "value": "achilles" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "achilles"
+          }
+        ]
+      }
     },
     {
       "diagnosis": "plantar_fasciitis",
-      "when": { "all": [
-        { "field": "onset", "op": "eq", "value": "gradual" },
-        { "any": [
-          { "field": "location", "op": "includes", "value": "heel" },
-          { "field": "symptoms", "op": "includes", "value": "first_steps" }
-        ] }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "onset",
+            "op": "eq",
+            "value": "gradual"
+          },
+          {
+            "any": [
+              {
+                "field": "location",
+                "op": "includes",
+                "value": "heel"
+              },
+              {
+                "field": "symptoms",
+                "op": "includes",
+                "value": "first_steps"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "diagnosis": "mortons_neuroma",
-      "when": { "all": [
-        { "field": "location", "op": "includes", "value": "forefoot" },
-        { "field": "symptoms", "op": "includes", "value": "tingling" }
-      ] }
+      "when": {
+        "all": [
+          {
+            "field": "location",
+            "op": "includes",
+            "value": "forefoot"
+          },
+          {
+            "field": "symptoms",
+            "op": "includes",
+            "value": "tingling"
+          }
+        ]
+      }
     }
   ],
   "defaultDiagnosis": "non_specific",

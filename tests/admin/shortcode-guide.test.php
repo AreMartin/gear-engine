@@ -96,28 +96,28 @@ t( 'every example starts with its own tag', ! array_filter( $list, function ( $r
 $regions = Gear_Engine_Shortcode_Guide::get_region_shortcodes();
 t( 'one region shortcode per config', count( $regions ) === count( Gear_Engine_Triage::get_regions() ) && count( $regions ) >= 6 );
 $examples = array_column( $regions, 'example', 'path' );
-t( 'region shortcode and path', ( $examples['smertesjekk/rygg'] ?? '' ) === '[gear_engine_triage region="rygg"]' );
+t( 'region shortcode and path', ( $examples['symptomsjekker/rygg'] ?? '' ) === '[gear_engine_triage region="rygg"]' );
 
 // Page status.
-t( 'missing page', 'missing' === Gear_Engine_Shortcode_Guide::get_page_status( 'smertesjekk', 'gear_engine_triage_picker' )['state'] );
-$GLOBALS['pages']['smertesjekk'] = page( 5, 'Hei [gear_engine_triage_picker]' );
-t( 'page with shortcode is ok', 'ok' === Gear_Engine_Shortcode_Guide::get_page_status( '/smertesjekk/', 'gear_engine_triage_picker' )['state'] );
-$GLOBALS['pages']['smertesjekk'] = page( 5, 'tomt' );
-t( 'page without shortcode is flagged', 'no_shortcode' === Gear_Engine_Shortcode_Guide::get_page_status( 'smertesjekk', 'gear_engine_triage_picker' )['state'] );
-$GLOBALS['pages']['smertesjekk'] = page( 5, '[gear_engine_triage_picker]', 'draft' );
-t( 'draft page is flagged', 'unpublished' === Gear_Engine_Shortcode_Guide::get_page_status( 'smertesjekk', 'gear_engine_triage_picker' )['state'] );
+t( 'missing page', 'missing' === Gear_Engine_Shortcode_Guide::get_page_status( 'symptomsjekker', 'gear_engine_triage_picker' )['state'] );
+$GLOBALS['pages']['symptomsjekker'] = page( 5, 'Hei [gear_engine_triage_picker]' );
+t( 'page with shortcode is ok', 'ok' === Gear_Engine_Shortcode_Guide::get_page_status( '/symptomsjekker/', 'gear_engine_triage_picker' )['state'] );
+$GLOBALS['pages']['symptomsjekker'] = page( 5, 'tomt' );
+t( 'page without shortcode is flagged', 'no_shortcode' === Gear_Engine_Shortcode_Guide::get_page_status( 'symptomsjekker', 'gear_engine_triage_picker' )['state'] );
+$GLOBALS['pages']['symptomsjekker'] = page( 5, '[gear_engine_triage_picker]', 'draft' );
+t( 'draft page is flagged', 'unpublished' === Gear_Engine_Shortcode_Guide::get_page_status( 'symptomsjekker', 'gear_engine_triage_picker' )['state'] );
 
 // Page map.
-$GLOBALS['pages']['smertesjekk']      = page( 5, '[gear_engine_triage_picker]' );
-$GLOBALS['pages']['smertesjekk/rygg'] = page( 6, '[gear_engine_triage region="rygg"]' );
+$GLOBALS['pages']['symptomsjekker']      = page( 5, '[gear_engine_triage_picker]' );
+$GLOBALS['pages']['symptomsjekker/rygg'] = page( 6, '[gear_engine_triage region="rygg"]' );
 $map = Gear_Engine_Shortcode_Guide::get_page_map();
 $by  = array();
 foreach ( $map as $row ) {
 	$by[ $row['path'] ?: $row['tag'] ] = $row;
 }
-t( 'picker row ok', 'ok' === $by['smertesjekk']['state'] );
-t( 'rygg row ok', 'ok' === $by['smertesjekk/rygg']['state'] );
-t( 'other region page missing', 'missing' === $by['smertesjekk/kne']['state'] );
+t( 'picker row ok', 'ok' === $by['symptomsjekker']['state'] );
+t( 'rygg row ok', 'ok' === $by['symptomsjekker/rygg']['state'] );
+t( 'other region page missing', 'missing' === $by['symptomsjekker/kne']['state'] );
 t( 'program page row uses configured path', isset( $by['treningsprogram'] ) && 'missing' === $by['treningsprogram']['state'] );
 t( 'chat row missing when no page uses it', 'missing' === $by['gae_physio_chat']['state'] );
 $GLOBALS['posts'] = array( page( 9, 'Chat: [gae_physio_chat height="80vh"]' ) );
@@ -158,7 +158,7 @@ t( 'dedicated subpage links to edit', false !== strpos( $ded_link_url, 'post=202
 // Links and rendering.
 list( $url, $label ) = Gear_Engine_Shortcode_Guide::get_action_link( array( 'post_id' => 6, 'title' => 'x', 'example' => 'y' ) );
 t( 'existing page links to edit', false !== strpos( $url, 'post=6' ) && 'Edit page' === $label );
-list( $url, $label ) = Gear_Engine_Shortcode_Guide::get_action_link( array( 'post_id' => 0, 'title' => 'Smertesjekk: Kne', 'example' => '[gear_engine_triage region="kne"]' ) );
+list( $url, $label ) = Gear_Engine_Shortcode_Guide::get_action_link( array( 'post_id' => 0, 'title' => 'Symptomsjekk: Kne', 'example' => '[gear_engine_triage region="kne"]' ) );
 t( 'missing page links to create with content', false !== strpos( $url, 'post-new.php' ) && false !== strpos( $url, 'post_type=page' ) && false !== strpos( $url, 'post_content=' ) && 'Create page' === $label );
 
 $shortcodes = $list;

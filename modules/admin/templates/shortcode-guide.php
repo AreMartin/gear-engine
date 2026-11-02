@@ -115,9 +115,9 @@ $gear_engine_group = '';
 	<p class="description">
 		<?php
 		printf(
-			/* translators: %s: link to the Smertesjekk settings page */
-			esc_html__( 'Paths are set under %s. When you create a page, set its slug to match the path (region pages sit below the Smertesjekk page).', 'gear-engine' ),
-			'<a href="' . esc_url( admin_url( 'options-general.php?page=gear-engine-triage' ) ) . '">' . esc_html__( 'Settings → Smertesjekk', 'gear-engine' ) . '</a>'
+			/* translators: %s: link to the Symptomsjekker settings page */
+			esc_html__( 'Paths are set under %s. When you create a page, set its slug to match the path (region pages sit below the Symptomsjekker page).', 'gear-engine' ),
+			'<a href="' . esc_url( admin_url( 'options-general.php?page=gear-engine-triage' ) ) . '">' . esc_html__( 'Settings → Symptomsjekker', 'gear-engine' ) . '</a>'
 		);
 		?>
 	</p>
