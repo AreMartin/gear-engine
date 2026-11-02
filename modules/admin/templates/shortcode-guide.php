@@ -15,6 +15,11 @@ $gear_engine_group = '';
 ?>
 <div class="wrap gear-engine-guide">
 	<h1><?php esc_html_e( 'Shortcodes & Pages', 'gear-engine' ); ?></h1>
+	<?php if ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
+		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
+			<p><strong>✓ <?php esc_html_e( 'Kjernesidene ble opprettet!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Sidene for Kjøpsveiledere, Treningsprogram, Symptomsjekker og Digital Fysio er nå klare.', 'gear-engine' ); ?></p>
+		</div>
+	<?php endif; ?>
 
 	<h2><?php esc_html_e( 'Shortcodes', 'gear-engine' ); ?></h2>
 	<table class="widefat striped">
@@ -42,6 +47,30 @@ $gear_engine_group = '';
 			<?php endforeach; ?>
 		</tbody>
 	</table>
+
+	<div class="gear-engine-guide__hero-action" style="background: #FFFFFF; border: 1px solid #CBD7E6; border-left: 4px solid #1A2A3A; padding: 18px 22px; border-radius: 8px; margin: 28px 0 20px;">
+		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+			<div style="max-width: 600px;">
+				<h3 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #1A2A3A;">
+					<?php esc_html_e( 'Hurtigoppsett av kjernesider', 'gear-engine' ); ?>
+				</h3>
+				<p style="margin: 0; font-size: 13px; color: #4A5A6A; line-height: 1.5;">
+					<?php esc_html_e( 'Trykk på knappen for å opprette alle manglende sider automatisk (/kjopsveiledere/, /treningsprogram/, /symptomsjekker/ og /fysio-chat/) med riktige kortkoder ferdig satt inn.', 'gear-engine' ); ?>
+				</p>
+			</div>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin: 0;">
+				<input type="hidden" name="action" value="gear_engine_create_core_pages">
+				<?php
+				if ( function_exists( 'wp_nonce_field' ) ) {
+					wp_nonce_field( 'gear_engine_create_core_pages', 'gear_engine_nonce' );
+				}
+				?>
+				<button type="submit" class="button button-primary button-hero" style="background-color: #1A2A3A; border-color: #1A2A3A; color: #FFFFFF; font-weight: 700;">
+					<?php esc_html_e( 'Opprett manglende kjernesider automatisk (1 klikk)', 'gear-engine' ); ?>
+				</button>
+			</form>
+		</div>
+	</div>
 
 	<h2><?php esc_html_e( 'Page structure', 'gear-engine' ); ?></h2>
 	<p class="description"><?php esc_html_e( 'Front page cards (built in the block editor) link to the top pages. Indented pages are opened from the page above. Status is checked live.', 'gear-engine' ); ?></p>

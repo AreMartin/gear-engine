@@ -22,6 +22,7 @@ class Gear_Engine_Shortcode_Guide {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_post_gear_engine_create_core_pages', array( $this, 'handle_create_core_pages' ) );
 	}
 
 	/**
@@ -294,5 +295,114 @@ class Gear_Engine_Shortcode_Guide {
 		$shortcodes = self::get_shortcodes();
 		$page_map   = self::get_page_map();
 		include GEAR_ENGINE_PATH . 'modules/admin/templates/shortcode-guide.php';
+	}
+
+	/**
+	 * Handle admin request to automatically create missing core pages.
+	 *
+	 * @return void
+	 */
+	public function handle_create_core_pages(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'gear-engine' ), '', array( 'response' => 403 ) );
+		}
+
+		check_admin_referer( 'gear_engine_create_core_pages', 'gear_engine_nonce' );
+
+		$base_triage  = class_exists( 'Gear_Engine_Triage' ) ? trim( Gear_Engine_Triage::get_base_path(), '/' ) : 'symptomsjekker';
+		$base_triage  = '' !== $base_triage ? $base_triage : 'symptomsjekker';
+		$program_path = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? trim( Gear_Engine_Protocol_Viewer::get_page_path(), '/' ) : 'treningsprogram';
+		$program_path = '' !== $program_path ? $program_path : 'treningsprogram';
+		$hub_tag      = class_exists( 'Gear_Engine_Gear_Picker' ) ? Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG : 'gear_engine_gear_picker_hub';
+		$triage_tag   = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::PICKER_SHORTCODE_TAG : 'gear_engine_triage_picker';
+		$viewer_tag   = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::SHORTCODE_TAG : 'gear_engine_protocol';
+
+		$core_pages = array(
+			array(
+				'slug'    => 'kjopsveiledere',
+				'title'   => __( 'Kjøpsveiledere', 'gear-engine' ),
+				'content' => '<!-- wp:shortcode -->[' . $hub_tag . ']<!-- /wp:shortcode -->',
+			),
+			array(
+				'slug'    => $program_path,
+				'title'   => __( 'Treningsprogram', 'gear-engine' ),
+				'content' => '<!-- wp:shortcode -->[' . $viewer_tag . ']<!-- /wp:shortcode -->',
+			),
+			array(
+				'slug'    => $base_triage,
+				'title'   => __( 'Symptomsjekker', 'gear-engine' ),
+				'content' => '<!-- wp:shortcode -->[' . $triage_tag . ']<!-- /wp:shortcode -->',
+			),
+			array(
+				'slug'    => 'fysio-chat',
+				'title'   => __( 'Digital Fysio', 'gear-engine' ),
+				'content' => '<!-- wp:shortcode -->[gear_engine_physio_chat]<!-- /wp:shortcode -->',
+			),
+		);
+
+		foreach ( $core_pages as $page_def ) {
+			$existing = function_exists( 'get_page_by_path' ) ? get_page_by_path( $page_def['slug'] ) : null;
+			if ( ! $existing && function_exists( 'wp_insert_post' ) ) {
+				wp_insert_post(
+					array(
+						'post_title'   => $page_def['title'],
+						'post_name'    => $page_def['slug'],
+						'post_content' => $page_def['content'],
+						'post_status'  => 'publish',
+						'post_type'    => 'page',
+					)
+				);
+			}
+		}
+
+		// Also ensure triage subpages are created if triage module exists.
+		if ( class_exists( 'Gear_Engine_Triage' ) && function_exists( 'wp_insert_post' ) && function_exists( 'get_page_by_path' ) ) {
+			$parent_page = get_page_by_path( $base_triage );
+			if ( $parent_page ) {
+				foreach ( Gear_Engine_Triage::get_regions() as $region ) {
+					$child_path = $base_triage . '/' . $region;
+					$child_page = get_page_by_path( $child_path );
+					if ( ! $child_page ) {
+						$config = Gear_Engine_Triage::get_config( $region );
+						$label  = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
+						$title  = sprintf(
+							/* translators: %s: Region label */
+							__( 'Smertesjekk %s', 'gear-engine' ),
+							$label
+						);
+						$content = '<!-- wp:paragraph -->' . "\n" .
+							'<p>' . esc_html( sprintf( __( 'Rask, digital vurdering for %s. Svar på spørsmålene for å få råd og veiledning.', 'gear-engine' ), strtolower( $label ) ) ) . '</p>' . "\n" .
+							'<!-- /wp:paragraph -->' . "\n\n" .
+							'<!-- wp:shortcode -->[' . Gear_Engine_Triage::SHORTCODE_TAG . ' region="' . esc_attr( $region ) . '"]<!-- /wp:shortcode -->';
+
+						wp_insert_post(
+							array(
+								'post_title'   => $title,
+								'post_name'    => $region,
+								'post_parent'  => $parent_page->ID,
+								'post_content' => $content,
+								'post_status'  => 'publish',
+								'post_type'    => 'page',
+							)
+						);
+					}
+				}
+			}
+		}
+
+		$redirect_url = add_query_arg(
+			array(
+				'page'                      => self::PAGE_SLUG,
+				'gear_engine_pages_created' => '1',
+			),
+			admin_url( 'options-general.php' )
+		);
+
+		if ( function_exists( 'wp_safe_redirect' ) ) {
+			wp_safe_redirect( $redirect_url );
+			if ( ! defined( 'GEAR_ENGINE_TESTING' ) ) {
+				exit;
+			}
+		}
 	}
 }

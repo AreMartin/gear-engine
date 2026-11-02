@@ -7,6 +7,7 @@ define( 'ABSPATH', __DIR__ . '/../../' );
 define( 'GEAR_ENGINE_PATH', ABSPATH );
 define( 'GEAR_ENGINE_URL', 'http://example.com/wp-content/plugins/gear-engine/' );
 define( 'GEAR_ENGINE_VERSION', '1.0.0' );
+define( 'GEAR_ENGINE_TESTING', true );
 
 $GLOBALS['opts']  = array();
 $GLOBALS['pages'] = array();
@@ -36,6 +37,18 @@ function has_shortcode( $content, $tag ) { return false !== strpos( $content, '[
 function get_posts( $args ) { return $GLOBALS['posts']; }
 function get_edit_post_link( $id ) { return 'http://example.com/wp-admin/post.php?post=' . $id . '&action=edit'; }
 function add_query_arg( $args, $url ) { return $url . '?' . http_build_query( $args ); }
+function check_admin_referer() { return true; }
+$GLOBALS['inserted_posts'] = array();
+function wp_insert_post( $args ) {
+	$id = count( $GLOBALS['inserted_posts'] ) + 100;
+	$GLOBALS['inserted_posts'][] = $args;
+	$GLOBALS['pages'][ $args['post_name'] ] = page( $id, $args['post_content'] );
+	return $id;
+}
+$GLOBALS['redirected_to'] = '';
+function wp_safe_redirect( $url ) {
+	$GLOBALS['redirected_to'] = $url;
+}
 class WP_Error {
 	public function get_error_message() { return ''; }
 }
@@ -120,5 +133,13 @@ $html = ob_get_clean();
 t( 'template renders copy buttons', substr_count( $html, 'gear-engine-guide__copy' ) >= count( $list ) + count( $page_map ) );
 t( 'template escapes shortcode quotes', false !== strpos( $html, '[gear_engine_triage region=&quot;rygg&quot;]' ) );
 t( 'template shows status labels', false !== strpos( $html, 'Page missing' ) && false !== strpos( $html, 'gear-engine-guide__state--ok' ) );
+
+// Core pages creation action test.
+$inserted_before = count( $GLOBALS['inserted_posts'] );
+$guide = new Gear_Engine_Shortcode_Guide();
+$guide->handle_create_core_pages();
+t( 'handle_create_core_pages inserts core pages', count( $GLOBALS['inserted_posts'] ) > $inserted_before );
+t( 'handle_create_core_pages creates kjopsveiledere', isset( $GLOBALS['pages']['kjopsveiledere'] ) );
+t( 'handle_create_core_pages redirects with success flag', false !== strpos( $GLOBALS['redirected_to'], 'gear_engine_pages_created=1' ) );
 
 exit( $failures ? 1 : 0 );

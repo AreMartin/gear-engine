@@ -229,3 +229,4 @@ Du kan lime inn blokk-koden under direkte i WordPress-editoren ved å bytte visn
 - [ ] Lim inn GenerateBlocks-koden på forsiden via WordPress Code Editor.
 - [ ] Test responsivitet på mobil og nettbrett (Griden bryter automatisk til 2 kolonner på nettbrett og 1 på mobil).
 - [ ] Test at knappen «Start Digital Fysio» peker til chatten, og at «Finn treningsutstyr» åpner Huben på `/kjopsveiledere/`.
+
