@@ -143,7 +143,7 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 
 ### Fase 3: Strukturere Rehabprotokoller (`exercises`)
 - [x] Etablere mal for visning av protokoller (faseinndelt, øvelseskort med video/GIF, dosering og fullt Material 3-design).
-- [ ] Legge inn et diskret felt for «Påkrevd / Anbefalt utstyr» per øvelse som automatisk genererer tilknyttede produktlenker.
+- [x] Legge inn et diskret felt for «Påkrevd / Anbefalt utstyr» per øvelse som automatisk genererer tilknyttede produktlenker og gratis hverdagsalternativer.
 
 ### Fase 4: Integrere AI-chatten som universell rådgiver (`physio-chat`)
 - [ ] Knytte den blå hero-knappen til åpning av chat-grensesnittet.

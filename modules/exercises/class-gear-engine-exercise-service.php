@@ -166,7 +166,10 @@ class Gear_Engine_Exercise_Service {
 		}
 
 		$area      = self::get_term_names( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_AREA_TAXONOMY );
-		$equipment = self::get_term_names( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_EQUIPMENT_TAXONOMY );
+		$equipment         = self::get_term_names( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_EQUIPMENT_TAXONOMY );
+		$equipment_details = class_exists( 'Gear_Engine_Equipment_Registry' )
+			? array_values( Gear_Engine_Equipment_Registry::resolve_equipment_list( $equipment ) )
+			: array();
 
 		return array(
 			'id'               => (int) $post->ID,
@@ -175,7 +178,8 @@ class Gear_Engine_Exercise_Service {
 			'summary'          => wp_strip_all_tags( (string) $post->post_excerpt ),
 			'dosage'           => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_DOSAGE, true ),
 			'area'             => $area,
-			'equipment'        => $equipment,
+			'equipment'         => $equipment,
+			'equipment_details' => $equipment_details,
 			'role'             => Gear_Engine_Exercises_CPT::get_first_role( $post->ID ),
 			'risk'             => Gear_Engine_Exercises_CPT::sanitize_risk( get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_RISK, true ) ),
 			'good_for'         => (string) get_post_meta( $post->ID, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_GOOD_FOR, true ),

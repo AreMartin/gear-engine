@@ -323,6 +323,99 @@
 }
 
 /* =========================================================
+   4b. Contextual Equipment Box (M3 Outlined Tone)
+   ========================================================= */
+.gear-engine-program__gear-section {
+	margin-top: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.gear-engine-program__gear-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 14px;
+	border-radius: var(--gep-radius-md, 12px);
+	background: var(--ge-offwhite, #F8FAFC);
+	border: 1px solid var(--gep-border, #E2E8F0);
+	transition: border-color 0.15s ease;
+}
+
+.gear-engine-program__gear-item:hover {
+	border-color: var(--ge-navy-200, #CBD7E6);
+}
+
+.gear-engine-program__gear-details {
+	flex: 1;
+	min-width: 220px;
+}
+
+.gear-engine-program__gear-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--gep-heading, #1A2A3A);
+	font-size: 0.88rem;
+}
+
+.gear-engine-program__gear-header svg {
+	color: var(--ge-navy-500, #2C4257);
+	flex-shrink: 0;
+}
+
+.gear-engine-program__gear-free {
+	margin: 4px 0 0;
+	font-size: 0.82rem;
+	color: var(--gep-text-muted, #4A5A6A);
+	line-height: 1.45;
+}
+
+.gear-engine-program__gear-free-label {
+	font-weight: 600;
+	color: var(--ge-green-800, #046A38);
+	margin-right: 4px;
+}
+
+.gear-engine-program__gear-action {
+	flex-shrink: 0;
+}
+
+.gear-engine-program__gear-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: var(--gep-radius-full, 9999px);
+	background: var(--ge-surface, #FFFFFF);
+	border: 1px solid var(--ge-navy-200, #CBD7E6);
+	color: var(--ge-navy-700, #1A2A3A);
+	font-size: 0.78rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+
+.gear-engine-program__gear-btn:hover {
+	background: var(--ge-navy-900, #1A2A3A);
+	color: #FFFFFF;
+	border-color: var(--ge-navy-900, #1A2A3A);
+	text-decoration: none;
+}
+
+@media print {
+	.gear-engine-program__gear-section {
+		break-inside: avoid;
+	}
+	.gear-engine-program__gear-btn {
+		display: none !important;
+	}
+}
+
+/* =========================================================
    5. Video Embed & Actions
    ========================================================= */
 .gear-engine-program__video {

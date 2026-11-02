@@ -296,7 +296,13 @@ class Gear_Engine_Exercise_Selection {
 					'area'       => $exercise['area'],
 					'equipment'  => $exercise['equipment'],
 					'dosage'     => $exercise['dosage'],
-					'god_for'    => $exercise['good_for'] ?? '',
+					'god_for'         => $exercise['good_for'] ?? '',
+					'utstyr_detaljer' => ! empty( $exercise['equipment_details'] ) ? array_map( static function( $eq ) {
+						return array(
+							'navn'       => $eq['title'] ?? '',
+							'gratis_alt' => $eq['free_alt'] ?? '',
+						);
+					}, $exercise['equipment_details'] ) : array(),
 				);
 			},
 			$selection['candidates']
@@ -323,6 +329,7 @@ class Gear_Engine_Exercise_Selection {
 			$text .= "4. Er du usikker, velg færre øvelser eller ingen, og forklar hvorfor.\n";
 			$text .= "5. Ikke påstå at programmet er evidensbasert eller spesifikt for en diagnose, og ikke still diagnose.\n";
 			$text .= "6. Gi en kort begrunnelse per øvelse i feltet \"begrunnelse\".\n";
+			$text .= "7. Hvis en øvelse krever utstyr, nevn alltid gratisalternativet fra utstyr_detaljer slik at brukeren kan trene hjemme uten kostnad.\n";
 		}
 
 		return $text . "\nCPT_EXERCISE_LIBRARY (velg kun relevante øvelser og returner library_id):\n" . wp_json_encode( $compact );

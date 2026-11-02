@@ -775,7 +775,8 @@ EOT;
 						'exorlive_id'     => $record['exorlive_id'],
 						'video_culture'   => $record['video_culture'],
 						'video_url'       => $record['video_url'],
-						'attribution_url' => $record['attribution_url'],
+						'attribution_url'   => $record['attribution_url'],
+						'equipment_details' => $record['equipment_details'] ?? array(),
 					);
 					$selected_ids[ $library_id ] = true;
 				}

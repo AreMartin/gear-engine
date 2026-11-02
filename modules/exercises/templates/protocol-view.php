@@ -90,6 +90,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php endif; ?>
 						</div>
 
+						<?php
+						$non_bodyweight_gear = array();
+						if ( ! empty( $exercise['equipment_details'] ) && is_array( $exercise['equipment_details'] ) ) {
+							foreach ( $exercise['equipment_details'] as $gear_item ) {
+								if ( empty( $gear_item['is_bodyweight'] ) ) {
+									$non_bodyweight_gear[] = $gear_item;
+								}
+							}
+						}
+						?>
+						<?php if ( ! empty( $non_bodyweight_gear ) ) : ?>
+							<div class="gear-engine-program__gear-section">
+								<?php foreach ( $non_bodyweight_gear as $gear ) : ?>
+									<div class="gear-engine-program__gear-item">
+										<div class="gear-engine-program__gear-details">
+											<div class="gear-engine-program__gear-header">
+												<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+												<strong><?php echo esc_html( $gear['title'] ); ?></strong>
+											</div>
+											<?php if ( ! empty( $gear['free_alt'] ) ) : ?>
+												<p class="gear-engine-program__gear-free">
+													<span class="gear-engine-program__gear-free-label"><?php esc_html_e( 'Gratis hjemme:', 'gear-engine' ); ?></span>
+													<?php echo esc_html( $gear['free_alt'] ); ?>
+												</p>
+											<?php endif; ?>
+										</div>
+										<?php if ( ! empty( $gear['picker_url'] ) ) : ?>
+											<div class="gear-engine-program__gear-action gear-engine-program__noprint">
+												<a href="<?php echo esc_url( $gear['picker_url'] ); ?>" class="gear-engine-program__gear-btn" target="_blank" rel="noopener">
+													<span><?php echo esc_html( ! empty( $gear['picker_label'] ) ? $gear['picker_label'] : __( 'Se veileder', 'gear-engine' ) ); ?></span>
+													<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+												</a>
+											</div>
+										<?php endif; ?>
+									</div>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+
 						<?php if ( '' !== $embed ) : ?>
 							<div class="gear-engine-program__video" data-embed="<?php echo esc_url( $embed ); ?>" data-title="<?php echo esc_attr( $exercise['title'] ); ?>">
 								<button type="button" class="gear-engine-program__play gear-engine-program__noprint">
