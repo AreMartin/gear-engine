@@ -1,0 +1,557 @@
+{
+	"id": "ergometersykkel",
+	"label": "Ergometer- & Treningssykler",
+	"match": {
+		"include": [
+			"ergometersykkel",
+			"spinningsykkel",
+			"treningssykkel",
+			"trimsykkel",
+			"sittesykkel",
+			"spinning",
+			"recumbent",
+			"exercise bike",
+			"motionscykel",
+			"spinningcykel",
+			"indoor bike"
+		],
+		"include_category": [
+			"treningssykkel",
+			"ergometersykkel",
+			"spinningsykkel",
+			"trimsykkel",
+			"sykkel",
+			"kondisjon"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"ellipse",
+			"crosstrainer",
+			"landeveissykkel",
+			"elsykkel",
+			"el-sykkel",
+			"terrengsykkel",
+			"hybridsykkel",
+			"barnesykkel",
+			"bysykkel",
+			"landevei",
+			"gravel",
+			"matte",
+			"underlag",
+			"beskyttelse",
+			"spray",
+			"smøre",
+			"silikon",
+			"håndkle",
+			"pulsbelte",
+			"sykkelcomputer",
+			"veggfeste",
+			"pedal",
+			"pedaler",
+			"sete",
+			"sadel",
+			"bremsekloss",
+			"slange",
+			"dekk",
+			"sykkelhjelm",
+			"drikkeflaske",
+			"sykkelbukse",
+			"sykkelsko",
+			"sykkelrulle",
+			"sykkelstativ",
+			"pumpe"
+		],
+		"exclude_patterns": [
+			"/(sete|sadel|pedal|pedaler|håndtak|reim|rem|skjerm|display|kloss|bremsekloss|adapter|dekk|slange|computer)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 1500
+	},
+	"specs": {
+		"weight": {
+			"type": "number",
+			"min": 50,
+			"max": 250,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu",
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt)[^0-9]{0,25}?(\\d{2,3})/iu"
+			],
+			"estimate": [
+				{
+					"gt": 12000,
+					"value": 150
+				},
+				{
+					"gt": 7000,
+					"value": 130
+				},
+				{
+					"value": 110
+				}
+			]
+		},
+		"flywheel": {
+			"type": "number",
+			"min": 2,
+			"max": 35,
+			"patterns": [
+				"/(?:svinghjul|flywheel|svingvekt)[^0-9]{0,25}?(\\d{1,2}(?:[.,]\\d+)?)\\s*kg/iu",
+				"/(?:svinghjul|flywheel)[^0-9]{0,25}?(\\d{1,2}(?:[.,]\\d+)?)/iu"
+			],
+			"estimate": [
+				{
+					"gt": 14000,
+					"value": 14
+				},
+				{
+					"gt": 8000,
+					"value": 9
+				},
+				{
+					"value": 6
+				}
+			]
+		},
+		"low_step": {
+			"type": "flag",
+			"keywords": [
+				"lavt innsteg",
+				"lav innstigning",
+				"enkel innstigning",
+				"enkel påstigning",
+				"lav påstigning",
+				"lett påstigning",
+				"åpen ramme",
+				"lav ramme",
+				"step-through",
+				"step through",
+				"walk-through",
+				"walk through",
+				"gjennomsteg",
+				"gjennomstigning",
+				"sittesykkel",
+				"recumbent",
+				"seniorvennlig",
+				"rehabiliteringssykkel",
+				"lav inngang",
+				"lett å gå på",
+				"lett å stige på"
+			],
+			"patterns": [
+				"/(?:lav(?:t)?|enkel|lett)\\s*(?:innsteg|innstigning|påstigning|inngang)/iu",
+				"/(?:åpen|lav)\\s*ramme/iu",
+				"/(?:step|walk)[-\\s]through/iu",
+				"/(?:lett|enkel)\\s*å\\s*(?:stige|gå|sette\\s*seg)\\s*på/iu"
+			]
+		},
+		"spinning": {
+			"type": "flag",
+			"keywords": [
+				"spinningsykkel",
+				"spinning",
+				"bukkestyre",
+				"racing",
+				"spd-pedal",
+				"spd"
+			]
+		},
+		"recumbent": {
+			"type": "flag",
+			"keywords": [
+				"sittesykkel",
+				"recumbent",
+				"ryggstøtte",
+				"liggesykkel",
+				"sittende sykkel"
+			]
+		},
+		"magnetic": {
+			"type": "flag",
+			"keywords": [
+				"magnetisk",
+				"magnetmotstand",
+				"elektromagnetisk",
+				"servomagnetisk",
+				"induksjon",
+				"magnet"
+			],
+			"estimate": [
+				{
+					"gte": 6000,
+					"value": true
+				}
+			]
+		},
+		"quiet": {
+			"type": "flag",
+			"keywords": [
+				"stillegående",
+				"lydløs",
+				"stille",
+				"støysvak"
+			],
+			"estimate": [
+				{
+					"gte": 7000,
+					"value": true
+				}
+			]
+		},
+		"app": {
+			"type": "flag",
+			"keywords": [
+				"bluetooth",
+				"zwift",
+				"kinomap",
+				"ifit",
+				"blåtann",
+				" app"
+			],
+			"estimate": [
+				{
+					"gte": 10000,
+					"value": true
+				}
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "low_step",
+			"text": "Lavt innsteg"
+		},
+		{
+			"field": "flywheel",
+			"text": "Svinghjul: {v} kg"
+		},
+		{
+			"field": "weight",
+			"text": "Maks brukervekt: {v} kg"
+		},
+		{
+			"field": "spinning",
+			"text": "Spinningsykkel"
+		},
+		{
+			"field": "recumbent",
+			"text": "Sittesykkel med ryggstøtte"
+		},
+		{
+			"field": "magnetic",
+			"text": "Magnetisk motstand"
+		},
+		{
+			"field": "quiet",
+			"text": "Stillegående"
+		},
+		{
+			"field": "app",
+			"text": "App / Bluetooth"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig ergometersykkel.",
+		"desc": "Svar på noen raske spørsmål. Vi finner optimal sittestilling, innstigningshøyde, svinghjul og beste dagspris fra ledende butikker.",
+		"benefits": [
+			"Vurderer sittestilling og innsteg (lavt innsteg, klassisk eller spinning)",
+			"Tilpasser svinghjul og stabilitet til din brukervekt",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "bike_type",
+			"type": "choice",
+			"title": "Hva slags type sykkel og sittestilling foretrekker du?",
+			"options": [
+				{
+					"val": "upright",
+					"title": "Klassisk oppreist trimsykkel",
+					"desc": "Behagelig, oppreist sittestilling for generell kondisjon og hverdagsmosjon."
+				},
+				{
+					"val": "spinning",
+					"title": "Spinningsykkel",
+					"desc": "Sporty og fremoverlent sittestilling for høy puls, svette og intervaller.",
+					"require": [
+						{
+							"field": "spinning",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "recumbent",
+					"title": "Sittesykkel med ryggstøtte",
+					"desc": "Maksimal avlastning for korsrygg, bekken og knær.",
+					"require": [
+						{
+							"field": "recumbent",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alle typer",
+					"desc": "Vis meg de beste uavhengig av sittestilling."
+				}
+			]
+		},
+		{
+			"id": "access",
+			"type": "choice",
+			"title": "Er lavt innsteg (enkel påstigning) viktig for deg?",
+			"options": [
+				{
+					"val": "low",
+					"title": "Ja, lavt innsteg er viktig",
+					"desc": "Må være enkelt å gå på/av uten å løfte benet høyt – ideelt ved stive ledd, opptrening eller balanse.",
+					"require": [
+						{
+							"field": "low_step",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Ikke viktig",
+					"desc": "Jeg kan fint løfte benet over en standard ramme."
+				}
+			]
+		},
+		{
+			"id": "w",
+			"type": "slider",
+			"title": "Hva er din omtrentlige vekt?",
+			"min": 50,
+			"max": 180,
+			"step": 5,
+			"default": 80,
+			"unit": "kg",
+			"rules": [
+				{
+					"field": "weight",
+					"op": "gte",
+					"ref": "w"
+				}
+			]
+		},
+		{
+			"id": "use",
+			"type": "choice",
+			"title": "Hvor ofte og hardt planlegger du å trene?",
+			"options": [
+				{
+					"val": "gentle",
+					"title": "Rolig mosjon & opptrening (1–2 økter/uke)",
+					"desc": "Fokus på myk bevegelse, leddsirkulasjon og enkel betjening."
+				},
+				{
+					"val": "active",
+					"title": "Regelmessig trening (3–4 økter/uke)",
+					"desc": "God svinghjulvekt for jevn tråkkfølelse og god stabilitet."
+				},
+				{
+					"val": "heavy",
+					"title": "Mye og hard trening (4+ økter/uke)",
+					"desc": "Tungt svinghjul, høy motstandskapasitet og maksimal stabilitet."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 2500,
+			"max": 35000,
+			"step": 500,
+			"default": 10000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				},
+				{
+					"field": "price",
+					"op": "gte",
+					"ref": "b",
+					"mul": 0.3,
+					"if": {
+						"step": "b",
+						"op": "gt",
+						"value": 10000
+					}
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		},
+		{
+			"field": "weight",
+			"op": "gte",
+			"ref": "w"
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "weight",
+				"from": {
+					"ref": "w"
+				},
+				"per": 0.1,
+				"cap": 4
+			},
+			{
+				"field": "flywheel",
+				"from": {
+					"value": 6
+				},
+				"per": 0.5,
+				"cap": 5
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling basert på dine kriterier. Optimal balanse mellom sittestilling, motstand og pris.",
+		"best_offer": "Stort priskutt akkurat nå. Mye sykkel for pengene innenfor ditt budsjett.",
+		"pool": [
+			{
+				"when": {
+					"field": "low_step",
+					"op": "is",
+					"value": true
+				},
+				"text": "Lavt innsteg gjør det trygt og uanstrengt å sette seg på sykkelen uten å løfte benet høyt."
+			},
+			{
+				"when": {
+					"field": "spinning",
+					"op": "is",
+					"value": true
+				},
+				"text": "Stabil spinningsykkel bygget for tøffe intervaller og høy intensitet."
+			},
+			{
+				"when": {
+					"field": "recumbent",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sittestilling med støttende rygglene gir skånsom avlastning for korsrygg og knær."
+			},
+			{
+				"when": {
+					"field": "magnetic",
+					"op": "is",
+					"value": true
+				},
+				"text": "Magnetisk motstand gir en jevn og stillegående tråkkfølelse med minimalt vedlikehold."
+			},
+			{
+				"when": {
+					"field": "quiet",
+					"op": "is",
+					"value": true
+				},
+				"text": "Stillegående konstruksjon som lar deg sykle foran TV-en eller når andre sover."
+			},
+			{
+				"when": {
+					"field": "app",
+					"op": "is",
+					"value": true
+				},
+				"text": "Tilkobling for treningsapper gir varierte løyper og virtuell motivasjon."
+			},
+			{
+				"when": {
+					"field": "weight",
+					"op": "gte",
+					"ref": "w",
+					"add": 25
+				},
+				"text": "Solid ramme med god margin til din vekt for trygg og stabil sykling."
+			}
+		],
+		"generic": [
+			"Et utmerket alternativ som gir deg skikkelig valuta for pengene.",
+			"En driftssikker og robust treningssykkel bygget for lang levetid.",
+			"Et meget sterkt valg som matcher dine viktigste kriterier."
+		]
+	},
+	"presets": [
+		{
+			"key": "comfort",
+			"label": "Leddvennlig med lavt innsteg",
+			"icon": "shield",
+			"lead": "Sykler med åpen ramme og enkel påstigning for trygg og skånsom mosjon.",
+			"badge": "Leddvennlig",
+			"answers": {
+				"bike_type": "upright",
+				"access": "low",
+				"w": 80,
+				"use": "gentle",
+				"b": 8000
+			}
+		},
+		{
+			"key": "popular",
+			"label": "Mest populære trimsykkel",
+			"icon": "zap",
+			"lead": "Allsidig og pålitelig treningssykkel for god kondisjon hjemme.",
+			"badge": "Mest populær",
+			"answers": {
+				"bike_type": "upright",
+				"access": "any",
+				"w": 80,
+				"use": "active",
+				"b": 10000
+			}
+		},
+		{
+			"key": "spinning",
+			"label": "Intens spinning",
+			"icon": "flame",
+			"lead": "Tungt svinghjul og bukkestyre for harde intervaller og svetteøkter.",
+			"badge": "Høy intensitet",
+			"answers": {
+				"bike_type": "spinning",
+				"access": "any",
+				"w": 85,
+				"use": "heavy",
+				"b": 15000
+			}
+		}
+	]
+}
