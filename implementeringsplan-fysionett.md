@@ -137,9 +137,9 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 - [x] Opprette dedikert landingsside for Kjøpsveiledere (`/kjopsveiledere/`) med tab-kategorier (Kondisjon, Styrke, Rehab) via `[gear_engine_gear_picker_hub]`.
 - [ ] Oppdatere forsidens 4 bokser: Endre første boks til **«Symptomsjekker»** og koble den blå knappen til **AI Fysio-Chat**.
 
-### Fase 2: Forbinde Triage med Treningsprogrammer
-- [ ] Sikre at fullført Triage for en kroppsdel (f.eks. kne) sender brukeren direkte til riktig fase i `/treningsprogram/?region=kne&dx=artrose`.
-- [ ] Legge inn 2–3 diskrete hjelpemidler i bunnen av ikke-kritiske Triage-resultater (strikk, balansepute, ispose) med gratisalternativer.
+### Fase 2: Forbinde Triage med Treningsprogrammer og Utstyrsveiledere
+- [x] Sikre at fullført Triage for en kroppsdel (f.eks. kne) sender brukeren direkte til riktig fase i `/treningsprogram/?region=kne&dx=artrose`.
+- [x] Legge inn 2–3 diskrete hjelpemidler i bunnen av ikke-kritiske Triage-resultater (strikk, balansepute, ispose) med gratisalternativer og bro til Kjøpsveiledere (`/kjopsveiledere/?kategori=rehab`).
 
 ### Fase 3: Strukturere Rehabprotokoller (`exercises`)
 - [x] Etablere mal for visning av protokoller (faseinndelt, øvelseskort med video/GIF, dosering og fullt Material 3-design).

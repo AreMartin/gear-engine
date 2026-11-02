@@ -688,6 +688,8 @@ class Gear_Engine_Triage {
 		if ( class_exists( 'Gear_Engine_Protocol_Viewer' ) ) {
 			$config['programPageUrl'] = trailingslashit( home_url( Gear_Engine_Protocol_Viewer::get_page_path() ) );
 		}
+		$hub_path = (string) apply_filters( 'gear_engine_picker_hub_path', 'kjopsveiledere' );
+		$config['pickerHubUrl'] = trailingslashit( home_url( $hub_path ) );
 
 		wp_enqueue_style( 'gear-engine-triage' );
 		wp_enqueue_script( 'gear-engine-triage' );

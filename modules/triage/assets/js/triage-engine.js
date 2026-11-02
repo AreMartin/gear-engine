@@ -822,6 +822,11 @@
 				'</div></div>';
 		}
 
+		// Ethical aids & conditioning gear bridge (strictly non-critical only: 0 sales pressure on red flags)
+		if (!isHigh && flagCount === 0) {
+			html += this.renderAids(res);
+		}
+
 		// Actions bar (Del / skriv ut triggers share sheet; Helsepersonell toggles clinical note)
 		html += '<div class="get-noprint" style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
 			'<button type="button" class="btn outlined sl" data-action="open-share" style="height:44px;font-size:14px">' +
@@ -888,6 +893,150 @@
 		html += step('Veien videre', '<p style="margin-top:4px">Når de akutte smertene legger seg, bygger du opp styrken igjen med gradert trening for å forhindre tilbakefall.</p>');
 		html += '</ol></div>';
 
+		return html;
+	};
+
+	TriageApp.prototype.renderAids = function (res) {
+		var AIDS_MAP = {
+			kne: [
+				{
+					title: 'Minibands / Treningsstrikk',
+					desc: 'For aktivering av støttemuskulatur og setemuskler som avlaster kneleddet.',
+					free: 'Øvelsene kan utføres med kroppsvekt uten ytre motstand i starten.'
+				},
+				{
+					title: 'Balansepute / Stabilitetstrener',
+					desc: 'Stimulerer leddbånd og koordinasjon for trygg knefunksjon.',
+					free: 'Brett et stort badehåndkle i fire lag og stå på ett ben på det.'
+				},
+				{
+					title: 'Ispose / Kuldepakning',
+					desc: 'Smertelindring og hevelsesdemping etter aktivitet eller opptrening.',
+					free: 'En pose frosne erter pakket godt inn i et kjøkkenhåndkle.'
+				}
+			],
+			hofte: [
+				{
+					title: 'Minibands (lett/moderat motstand)',
+					desc: 'Styrker bekkenstabilisatorer som gluteus medius for bedre gange.',
+					free: 'Sideliggende benløft kan gjøres rolig på matten uten motstand.'
+				},
+				{
+					title: 'Balansepute',
+					desc: 'Gir dyp koordinasjon og sansing for musklene rundt hofteleddet.',
+					free: 'Stå på ett ben på en sofapute eller et brettet håndkle.'
+				},
+				{
+					title: 'Massasjeball / Triggerball',
+					desc: 'For skånsom egenmassasje av stram setemuskulatur.',
+					free: 'En vanlig tennisball rullet forsiktig mot en vegg.'
+				}
+			],
+			rygg: [
+				{
+					title: 'Korsryggstøtte / Lumbalpute',
+					desc: 'Sikrer naturlig svai og avlaster mellomvirvelskivene ved sitting.',
+					free: 'Rull et lite badehåndkle stramt og plasser det i korsryggsvaien.'
+				},
+				{
+					title: 'Treningsstrikk (Loop band)',
+					desc: 'Aktiverer kjerne og sete uten tunge vekter eller aksialt trykk.',
+					free: 'Bekkenløft og diagonalløft kan gjøres rolig på stuegulvet.'
+				},
+				{
+					title: 'Varmepute / Varmeflaske',
+					desc: 'Øker blodsirkulasjonen og demper muskulære spenninger.',
+					free: 'En varm dusj mot korsryggen eller en oppvarmet hvetepute.'
+				}
+			],
+			skulder: [
+				{
+					title: 'Lang treningsstrikk (Flat strikk / Theraband)',
+					desc: 'Nøkkelverktøyet for opptrening av rotatormansjett og skulderblad.',
+					free: 'Bruk en lett vannflaske (0,5 L) eller armens egen tyngde.'
+				},
+				{
+					title: 'Triggerpunktball / Massasjeball',
+					desc: 'Løser opp spenninger rundt trapezius og mellom skulderbladene.',
+					free: 'En vanlig tennisball mot dørkarm eller vegg.'
+				}
+			],
+			nakke: [
+				{
+					title: 'Liten massasjeball / Dobbelball',
+					desc: 'For forsiktig avspenning av suboccipitale muskler i øvre nakke.',
+					free: 'Bruk tommelfingrene og gi forsiktig sirkulært trykk i hårfestet.'
+				},
+				{
+					title: 'Varmekrage / Varmepute',
+					desc: 'Skånsom varmebehandling som senker muskeltonus ved stressnakke.',
+					free: 'Et oppvarmet fuktig håndkle over skuldrene.'
+				}
+			],
+			'fot-ankel': [
+				{
+					title: 'Balansebrett eller Balansepute',
+					desc: 'Gjenoppretter leddbåndskontroll og stabilitet etter overtråkk.',
+					free: 'Stå på ett ben mens du pusser tenner, eller på en myk matte.'
+				},
+				{
+					title: 'Kuldepakning / Ispose',
+					desc: 'Smertelindring ved hevelse eller overbelastning.',
+					free: 'Frossen grønnsakspose i kjøkkenhåndkle (maks 15 min).'
+				},
+				{
+					title: 'Massasjeball under fotsåle',
+					desc: 'For stimulering og avlastning av plantarfascien under foten.',
+					free: 'Rull fotsålen over en kjevle eller en frossen vannflaske.'
+				}
+			]
+		};
+
+		var reg = (this.region || '').toLowerCase();
+		var aids = AIDS_MAP[reg] || AIDS_MAP.kne;
+		var hubUrl = (this.config.pickerHubUrl || '/kjopsveiledere/') + '?kategori=rehab';
+
+		var html = '<div class="get-aids-box get-noprint" style="margin-top:18px;background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);box-shadow:var(--md-sys-elevation-1);border-radius:24px;padding:24px">' +
+			'<span class="pill" style="background:var(--md-sys-color-primary-container,#EAF0F6);color:var(--md-sys-color-primary,#0C2340);border:1px solid var(--ge-navy-border,#D5E1ED);font-weight:600;gap:6px">' +
+			'<span style="width:6px;height:6px;border-radius:50%;background:var(--ge-green-800,#005236);display:inline-block"></span>' +
+			'Faglige råd · Hjelpemidler' +
+			'</span>' +
+			'<h3 class="headline-s" style="margin:14px 0 6px;color:var(--md-sys-color-primary,#0C2340)">Nyttige hjelpemidler for opptreningen</h3>' +
+			'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px;margin-bottom:16px">' +
+			'Disse enkle hjelpemidlene kan gjøre øvelsene mer skånsomme og effektive. Du kan også fint starte med gratis hverdagsting du har hjemme.' +
+			'</p>' +
+			'<div style="display:grid;gap:12px">';
+
+		aids.forEach(function (aid) {
+			html += '<div style="padding:16px;border-radius:16px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);background:var(--ge-grey-25,#FAFBFC)">' +
+				'<div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--md-sys-color-primary,#0C2340);font-size:15px">' +
+				'<span style="color:var(--ge-green-800,#005236)">' + icon('Check', 16) + '</span>' +
+				'<span>' + esc(aid.title) + '</span>' +
+				'</div>' +
+				'<p class="body-s" style="color:var(--md-sys-color-on-surface-variant,#475467);margin:6px 0 10px;line-height:20px">' + esc(aid.desc) + '</p>' +
+				'<div style="display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #D5E1ED;font-size:12.5px;color:var(--ge-grey-700,#344054)">' +
+				'<b style="color:var(--ge-green-800,#005236)">Gratis-alternativ:</b> ' + esc(aid.free) +
+				'</div>' +
+				'</div>';
+		});
+
+		html += '</div>';
+
+		// Bridge to Gear Picker for gentle conditioning equipment
+		html += '<div style="margin-top:16px;padding:18px 20px;border-radius:16px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid var(--ge-navy-border,#D5E1ED);display:flex;flex-direction:column;gap:12px">' +
+			'<div style="display:flex;align-items:center;gap:8px;color:var(--md-sys-color-primary,#0C2340);font-weight:700;font-size:15px">' +
+			icon('Activity', 18) + ' Trenger du et skånsomt apparat for kondisjonstrening?' +
+			'</div>' +
+			'<p class="body-m" style="margin:0;color:var(--md-sys-color-on-surface-variant,#475467);line-height:20px;font-size:13.5px">' +
+			'For leddplager i knær, hofter eller rygg anbefales sykkel eller romaskin med jevn motstand for å bygge utholdenhet og sirkulasjon uten støtbelastning.' +
+			'</p>' +
+			'<div style="display:flex;justify-content:flex-end">' +
+			'<a href="' + esc(hubUrl) + '" class="btn filled primary sl" style="height:40px;font-size:13.5px;font-weight:600;padding:0 18px;text-decoration:none">' +
+			'Finn leddskånsomt utstyr i kjøpsveilederen ' + icon('ArrowRight', 16) +
+			'</a>' +
+			'</div></div>';
+
+		html += '</div>';
 		return html;
 	};
 
