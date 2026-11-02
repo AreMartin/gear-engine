@@ -221,3 +221,4 @@ class Gear_Engine_Equipment_Registry {
 		return $resolved;
 	}
 }
+

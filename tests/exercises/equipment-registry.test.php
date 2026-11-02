@@ -84,3 +84,4 @@ $resolved_gear_only = Gear_Engine_Equipment_Registry::resolve_equipment_list( $t
 t( 'list: excludes bodyweight when flag is true', 2 === count( $resolved_gear_only ) && ! isset( $resolved_gear_only['egenvekt'] ) );
 
 exit( $failures ? 1 : 0 );
+
