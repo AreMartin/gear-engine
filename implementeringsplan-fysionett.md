@@ -135,7 +135,7 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 - [x] Kategori-agnostisk frontend for `gear-picker` (tredemølle, romaskin, etc.).
 - [x] Dagens tilbud med prosent vs. kroneavslag og fjernet dobbel badge.
 - [x] Opprette dedikert landingsside for Kjøpsveiledere (`/kjopsveiledere/`) med tab-kategorier (Kondisjon, Styrke, Rehab) via `[gear_engine_gear_picker_hub]`.
-- [ ] Oppdatere forsidens 4 bokser: Endre første boks til **«Symptomsjekker»** og koble den blå knappen til **AI Fysio-Chat**.
+- [x] Oppdatere forsidens 4 bokser: Endre første boks til **«Symptomsjekker»** og koble den blå knappen til **AI Fysio-Chat** (Se `oppskrift-forside-generateblocks.md`).
 
 ### Fase 2: Forbinde Triage med Treningsprogrammer og Utstyrsveiledere
 - [x] Sikre at fullført Triage for en kroppsdel (f.eks. kne) sender brukeren direkte til riktig fase i `/treningsprogram/?region=kne&dx=artrose`.
