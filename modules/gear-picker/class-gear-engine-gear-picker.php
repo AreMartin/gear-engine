@@ -613,6 +613,17 @@ class Gear_Engine_Gear_Picker {
 
 			// 3. Rehab & Helse
 			array(
+				'slug'          => 'rehab-guide',
+				'category'      => 'rehab',
+				'category_name' => __( 'Rehab & Helse', 'gear-engine' ),
+				'title'         => __( 'Rehab-guiden: Hjelpemidler & Leddavlastning', 'gear-engine' ),
+				'desc'          => __( 'Begynn her hvis du er usikker: Svar på 3 spørsmål og finn riktig støtte, sirkulasjon eller avlastning for dine ledd.', 'gear-engine' ),
+				'badge'         => __( 'Anbefalt start', 'gear-engine' ),
+				'time'          => __( '1 min test', 'gear-engine' ),
+				'icon'          => 'shield',
+				'available'     => in_array( 'rehab-guide', $available_types, true ),
+			),
+			array(
 				'slug'          => 'skaansom-kondisjon',
 				'category'      => 'rehab',
 				'category_name' => __( 'Rehab & Helse', 'gear-engine' ),

@@ -1,0 +1,478 @@
+{
+	"id": "rehab-guide",
+	"label": "Rehab & Hjelpemidler",
+	"match": {
+		"include": [
+			"knestøtte",
+			"knebandasje",
+			"patellastropp",
+			"patella",
+			"ryggstøtte",
+			"ryggbelte",
+			"korsryggstøtte",
+			"holdningsvest",
+			"ankelstøtte",
+			"ankelbandasje",
+			"balansepute",
+			"balansebrett",
+			"pedaltrener",
+			"sirkulasjonstrener",
+			"massasjepistol",
+			"massasjeball",
+			"triggerball",
+			"skumrulle",
+			"foam roller",
+			"kuldepakning",
+			"ispose",
+			"varmepute",
+			"treningsstrikk",
+			"minibands",
+			"ortose"
+		],
+		"include_category": [
+			"rehab",
+			"støttebandasjer",
+			"hjelpemidler",
+			"rehabilitering",
+			"massasje",
+			"balanse",
+			"strikker",
+			"skånsom"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"spinningsykkel",
+			"knebøystativ",
+			"vektstang",
+			"vektskive",
+			"vektbenk",
+			"multigym",
+			"boksesekk",
+			"manualer 30kg",
+			"manualer 40kg"
+		],
+		"exclude_patterns": [
+			"/(reim|stropp|lader|adapter|kabel|koffert|veske)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 99
+	},
+	"specs": {
+		"weight": {
+			"type": "number",
+			"min": 40,
+			"max": 250,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 2000,
+					"value": 130
+				},
+				{
+					"value": 110
+				}
+			]
+		},
+		"support": {
+			"type": "flag",
+			"keywords": [
+				"knestøtte",
+				"knebandasje",
+				"ryggstøtte",
+				"ryggbelte",
+				"ankelstøtte",
+				"ankelbandasje",
+				"leddstøtte",
+				"støttebandasje",
+				"ortose",
+				"kompresjon"
+			]
+		},
+		"pedal": {
+			"type": "flag",
+			"keywords": [
+				"pedaltrener",
+				"sirkulasjonstrener",
+				"minisykkel",
+				"seniorsykkel",
+				"stol-sykkel"
+			]
+		},
+		"balance": {
+			"type": "flag",
+			"keywords": [
+				"balansepute",
+				"balansebrett",
+				"stabilitetspute",
+				"vippebrett",
+				"balansetrener"
+			]
+		},
+		"massage": {
+			"type": "flag",
+			"keywords": [
+				"massasjepistol",
+				"massasjeball",
+				"triggerball",
+				"skumrulle",
+				"foam roller",
+				"massasjerulle"
+			]
+		},
+		"cushion": {
+			"type": "flag",
+			"keywords": [
+				"støtdemping",
+				"dempende",
+				"gel",
+				"silikonpute",
+				"avlastende såle",
+				"myk såle"
+			]
+		},
+		"area_knee": {
+			"type": "flag",
+			"keywords": [
+				"kne",
+				"kneledd",
+				"patella",
+				"menisk",
+				"kneartrose"
+			]
+		},
+		"area_back": {
+			"type": "flag",
+			"keywords": [
+				"rygg",
+				"korsrygg",
+				"lumbal",
+				"ryggvirvel",
+				"holdning"
+			]
+		},
+		"area_ankle": {
+			"type": "flag",
+			"keywords": [
+				"ankel",
+				"fot",
+				"hæl",
+				"plantar",
+				"overtråkk",
+				"akilles"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "support",
+			"text": "Leddavlastning"
+		},
+		{
+			"field": "pedal",
+			"text": "Sittende trim"
+		},
+		{
+			"field": "balance",
+			"text": "Balanse & Stabilitet"
+		},
+		{
+			"field": "massage",
+			"text": "Egenbehandling"
+		},
+		{
+			"field": "cushion",
+			"text": "Demping & Avlastning"
+		},
+		{
+			"field": "area_knee",
+			"text": "For knær"
+		},
+		{
+			"field": "area_back",
+			"text": "For rygg"
+		},
+		{
+			"field": "area_ankle",
+			"text": "For ankel/fot"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Rehab & Hjelpemidler",
+		"title": "Finn riktig utstyr for dine ledd og smerter.",
+		"desc": "Svar på 3 korte spørsmål om hvor du har plager og hva slags hjelp du trenger, så finner vi de best tilpassede hjelpemidlene for deg.",
+		"benefits": [
+			"Sorterer etter kroppsdel og type støtte",
+			"Fokuserer på leddvennlig avlastning og trygghet",
+			"Viser dagspriser og tilgjengelige modeller"
+		],
+		"start": "Finn riktig hjelpemiddel"
+	},
+	"steps": [
+		{
+			"id": "goal",
+			"type": "choice",
+			"title": "Hva slags hjelpemiddel eller løsning leter du etter?",
+			"options": [
+				{
+					"val": "support",
+					"title": "Leddavlastning & Støttebandasje",
+					"desc": "Støtte for kne, rygg eller ankel ved artrose, overtråkk eller belastningssmerter.",
+					"require": [
+						{
+							"field": "support",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "movement",
+					"title": "Skånsom sirkulasjon & Sittende mosjon",
+					"desc": "Pedaltrener eller lette apparater for å smøre leddene uten fallrisiko eller støt.",
+					"require": [
+						{
+							"field": "pedal",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "balance",
+					"title": "Balanse & Koordinasjon",
+					"desc": "Balansepute eller brett for å trene opp dype støttemuskler og stabilitet.",
+					"require": [
+						{
+							"field": "balance",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "massage",
+					"title": "Muskelavspenning & Massasje",
+					"desc": "Massasjepistol, triggerball eller skumrulle for å løse opp stive muskler.",
+					"require": [
+						{
+							"field": "massage",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for flere typer",
+					"desc": "Vis meg de beste hjelpemidlene uavhengig av type."
+				}
+			]
+		},
+		{
+			"id": "area",
+			"type": "choice",
+			"title": "Hvilken kroppsdel gjelder det mest?",
+			"options": [
+				{
+					"val": "knee",
+					"title": "Kne",
+					"desc": "Plager rundt kneskål, menisk, artrose eller leddbånd."
+				},
+				{
+					"val": "back",
+					"title": "Korsrygg / Rygg",
+					"desc": "Stivhet, hekseskudd eller støtte ved sitting og løft."
+				},
+				{
+					"val": "ankle",
+					"title": "Ankel / Fot",
+					"desc": "Overtråkk, leddbånd, plantar fascitt eller hælsmerter."
+				},
+				{
+					"val": "general",
+					"title": "Generelt / Hele kroppen",
+					"desc": "Allsidig egentrening eller sirkulasjon for hele kroppen."
+				}
+			]
+		},
+		{
+			"id": "w",
+			"type": "slider",
+			"title": "Hva er din omtrentlige vekt?",
+			"min": 50,
+			"max": 180,
+			"step": 5,
+			"default": 80,
+			"unit": "kg",
+			"rules": [
+				{
+					"field": "weight",
+					"op": "gte",
+					"ref": "w"
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett for hjelpemiddelet?",
+			"min": 200,
+			"max": 6000,
+			"step": 100,
+			"default": 1200,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.25
+		}
+	],
+	"scoring": {
+		"base": 75,
+		"fallback_score": 65,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "weight",
+				"from": {
+					"ref": "w"
+				},
+				"per": 0.05,
+				"cap": 3
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling tilpasset ditt ledd og dine behov. Skånsom og dokumentert løsning.",
+		"best_offer": "Et svært godt tilbud på et anerkjent hjelpemiddel akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "support",
+					"op": "is",
+					"value": true
+				},
+				"text": "Gir målrettet støtte og avlastning for leddet ved bevegelse og belastning."
+			},
+			{
+				"when": {
+					"field": "pedal",
+					"op": "is",
+					"value": true
+				},
+				"text": "Tillater leddvennlig sirkulasjonstrening sittende i godstolen uten støt."
+			},
+			{
+				"when": {
+					"field": "balance",
+					"op": "is",
+					"value": true
+				},
+				"text": "Trener opp dype støttemuskler og leddsans for bedre balanse og trygghet."
+			},
+			{
+				"when": {
+					"field": "massage",
+					"op": "is",
+					"value": true
+				},
+				"text": "Løser opp spenninger og øker blodsirkulasjonen i overarbeidet muskulatur."
+			},
+			{
+				"when": {
+					"field": "area_knee",
+					"op": "is",
+					"value": true
+				},
+				"text": "Spesielt godt egnet for avlastning og stabilitet rundt kneleddet."
+			},
+			{
+				"when": {
+					"field": "area_back",
+					"op": "is",
+					"value": true
+				},
+				"text": "Utviklet for å gi optimal støtte og holdning for korsryggen."
+			},
+			{
+				"when": {
+					"field": "area_ankle",
+					"op": "is",
+					"value": true
+				},
+				"text": "Gir god leddbåndsstøtte og stabilitet for ankel og fotbue."
+			}
+		],
+		"generic": [
+			"Et utmerket alternativ som gir deg skikkelig valuta for pengene.",
+			"Et solid og ergonomisk hjelpemiddel tilpasset hjemmebruk.",
+			"Et meget sterkt valg som matcher dine viktigste kriterier."
+		]
+	},
+	"presets": [
+		{
+			"key": "knee_support",
+			"label": "Kneleddsavlastning & Artrose",
+			"icon": "shield",
+			"lead": "Støttebandasje og avlastning for såre knær ved gange og aktivitet.",
+			"badge": "Mest etterspurt",
+			"answers": {
+				"goal": "support",
+				"area": "knee",
+				"w": 80,
+				"b": 1200
+			}
+		},
+		{
+			"key": "circulation",
+			"label": "Sittende sirkulasjonstrener",
+			"icon": "activity",
+			"lead": "Skånsom pedaltrener foran stol eller sofa for stive ledd.",
+			"badge": "Leddvennlig",
+			"answers": {
+				"goal": "movement",
+				"area": "general",
+				"w": 80,
+				"b": 2000
+			}
+		},
+		{
+			"key": "balance",
+			"label": "Balanse & Fallforebygging",
+			"icon": "target",
+			"lead": "Balansepute og koordinasjon for stabilitet i ankler og ben.",
+			"badge": "Opptrening",
+			"answers": {
+				"goal": "balance",
+				"area": "ankle",
+				"w": 75,
+				"b": 800
+			}
+		}
+	]
+}
