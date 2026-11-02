@@ -322,27 +322,32 @@ class Gear_Engine_Shortcode_Guide {
 				'slug'    => 'kjopsveiledere',
 				'title'   => __( 'Kjøpsveiledere', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[' . $hub_tag . ']<!-- /wp:shortcode -->',
+				'tag'     => $hub_tag,
 			),
 			array(
 				'slug'    => $program_path,
 				'title'   => __( 'Treningsprogram', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[' . $viewer_tag . ']<!-- /wp:shortcode -->',
+				'tag'     => $viewer_tag,
 			),
 			array(
 				'slug'    => $base_triage,
 				'title'   => __( 'Symptomsjekker', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[' . $triage_tag . ']<!-- /wp:shortcode -->',
+				'tag'     => $triage_tag,
 			),
 			array(
 				'slug'    => 'fysio-chat',
 				'title'   => __( 'Digital Fysio', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[gear_engine_physio_chat]<!-- /wp:shortcode -->',
+				'tag'     => 'gear_engine_physio_chat',
 			),
 		);
 
 		foreach ( $core_pages as $page_def ) {
 			$existing = function_exists( 'get_page_by_path' ) ? get_page_by_path( $page_def['slug'] ) : null;
 			if ( ! $existing && function_exists( 'wp_insert_post' ) ) {
+				// 1. Fresh install: Create page from scratch with the shortcode pre-inserted.
 				wp_insert_post(
 					array(
 						'post_title'   => $page_def['title'],
@@ -352,6 +357,21 @@ class Gear_Engine_Shortcode_Guide {
 						'post_type'    => 'page',
 					)
 				);
+			} elseif ( $existing && function_exists( 'wp_update_post' ) && function_exists( 'has_shortcode' ) ) {
+				// 2. Existing page: If page exists but lacks the shortcode, append/insert it!
+				if ( ! has_shortcode( (string) $existing->post_content, $page_def['tag'] ) ) {
+					$current = trim( (string) $existing->post_content );
+					$updated = '' !== $current
+						? $current . "\n\n" . $page_def['content']
+						: $page_def['content'];
+
+					wp_update_post(
+						array(
+							'ID'           => $existing->ID,
+							'post_content' => $updated,
+						)
+					);
+				}
 			}
 		}
 
@@ -385,6 +405,19 @@ class Gear_Engine_Shortcode_Guide {
 								'post_type'    => 'page',
 							)
 						);
+					} elseif ( function_exists( 'wp_update_post' ) && function_exists( 'has_shortcode' ) ) {
+						if ( ! has_shortcode( (string) $child_page->post_content, Gear_Engine_Triage::SHORTCODE_TAG ) ) {
+							$current         = trim( (string) $child_page->post_content );
+							$shortcode_block = '<!-- wp:shortcode -->[' . Gear_Engine_Triage::SHORTCODE_TAG . ' region="' . esc_attr( $region ) . '"]<!-- /wp:shortcode -->';
+							$updated         = '' !== $current ? $current . "\n\n" . $shortcode_block : $shortcode_block;
+
+							wp_update_post(
+								array(
+									'ID'           => $child_page->ID,
+									'post_content' => $updated,
+								)
+							);
+						}
 					}
 				}
 			}

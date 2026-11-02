@@ -45,6 +45,16 @@ function wp_insert_post( $args ) {
 	$GLOBALS['pages'][ $args['post_name'] ] = page( $id, $args['post_content'] );
 	return $id;
 }
+$GLOBALS['updated_posts'] = array();
+function wp_update_post( $args ) {
+	$GLOBALS['updated_posts'][] = $args;
+	foreach ( $GLOBALS['pages'] as $path => $p ) {
+		if ( $p->ID === $args['ID'] ) {
+			$p->post_content = $args['post_content'];
+		}
+	}
+	return $args['ID'];
+}
 $GLOBALS['redirected_to'] = '';
 function wp_safe_redirect( $url ) {
 	$GLOBALS['redirected_to'] = $url;
@@ -141,5 +151,12 @@ $guide->handle_create_core_pages();
 t( 'handle_create_core_pages inserts core pages', count( $GLOBALS['inserted_posts'] ) > $inserted_before );
 t( 'handle_create_core_pages creates kjopsveiledere', isset( $GLOBALS['pages']['kjopsveiledere'] ) );
 t( 'handle_create_core_pages redirects with success flag', false !== strpos( $GLOBALS['redirected_to'], 'gear_engine_pages_created=1' ) );
+
+// Existing page lacking shortcode test.
+$GLOBALS['pages']['kjopsveiledere'] = page( 101, 'Kun tekst, ingen kortkode' );
+$updated_before = count( $GLOBALS['updated_posts'] );
+$guide->handle_create_core_pages();
+t( 'handle_create_core_pages updates existing page lacking shortcode', count( $GLOBALS['updated_posts'] ) > $updated_before );
+t( 'existing page now has shortcode', false !== strpos( $GLOBALS['pages']['kjopsveiledere']->post_content, 'gear_engine_gear_picker_hub' ) );
 
 exit( $failures ? 1 : 0 );
