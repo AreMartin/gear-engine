@@ -91,6 +91,13 @@ class Gear_Engine_Shortcode_Guide {
 			),
 			array(
 				'group'       => __( 'Produkter', 'gear-engine' ),
+				'tag'         => Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG,
+				'example'     => '[' . Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG . ']',
+				'description' => __( 'Kjøpsveileder Hub med faneinndeling (Kondisjon, Styrke, Rehab & Helse) og dagsaktuelle tilbud.', 'gear-engine' ),
+				'note'        => __( 'Hovedveileder på /kjopsveiledere/ siden. Lenket fra forsiden og Hero-knappen.', 'gear-engine' ),
+			),
+			array(
+				'group'       => __( 'Kjøpsveiledere (Enkeltvelger)', 'gear-engine' ),
 				'tag'         => Gear_Engine_Gear_Picker::SHORTCODE_TAG,
 				'example'     => '[' . Gear_Engine_Gear_Picker::SHORTCODE_TAG . ' type="treadmill"]',
 				'description' => __( 'Guided gear picker built from the imported exercise gear. Options: type (config in modules/gear-picker/configs), category (gear_category slugs, comma separated).', 'gear-engine' ),
@@ -227,8 +234,57 @@ class Gear_Engine_Shortcode_Guide {
 			'path'    => $program,
 			'tag'     => $viewer,
 			'example' => '[' . $viewer . ']',
-			'hint'    => __( 'Opened from the quiz result button.', 'gear-engine' ),
+			'hint'    => __( 'Viser øvelser og protokoller med video, dosering og utstyrsveiledning.', 'gear-engine' ),
 		);
+
+		$hub_tag    = class_exists( 'Gear_Engine_Gear_Picker' ) ? Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG : 'gear_engine_gear_picker_hub';
+		$picker_tag = class_exists( 'Gear_Engine_Gear_Picker' ) ? Gear_Engine_Gear_Picker::SHORTCODE_TAG : 'gear_engine_gear_picker';
+
+		$map[] = array(
+			'level'   => 0,
+			'title'   => __( 'Kjøpsveiledere (Hub)', 'gear-engine' ),
+			'path'    => 'kjopsveiledere',
+			'tag'     => $hub_tag,
+			'example' => '[' . $hub_tag . ']',
+			'hint'    => __( 'Hovedsiden for alle utstyrsvelgere (Kondisjon, Styrke, Rehab). Lenket fra forsiden og Hero.', 'gear-engine' ),
+		);
+
+		$guides = array(
+			array(
+				'slug'  => 'treadmill',
+				'title' => __( 'Kjøpsveileder: Tredemølle', 'gear-engine' ),
+				'hint'  => __( 'Løpebånd, motorstyrke og demping. Inkludert i Huben (?type=treadmill).', 'gear-engine' ),
+			),
+			array(
+				'slug'  => 'romaskin',
+				'title' => __( 'Kjøpsveileder: Romaskin', 'gear-engine' ),
+				'hint'  => __( 'Vann-, luft- og magnetmotstand for helkropp. Inkludert i Huben (?type=romaskin).', 'gear-engine' ),
+			),
+			array(
+				'slug'  => 'ergometersykkel',
+				'title' => __( 'Kjøpsveileder: Ergometersykkel', 'gear-engine' ),
+				'hint'  => __( 'Leddvennlig tråkk, lavt innsteg og spinning. Inkludert i Huben (?type=ergometersykkel).', 'gear-engine' ),
+			),
+			array(
+				'slug'  => 'rehab-guide',
+				'title' => __( 'Kjøpsveileder: Rehab & Hjelpemidler', 'gear-engine' ),
+				'hint'  => __( 'Bred guide for leddavlastning, balanse og pedaltrener. Inkludert i Huben (?type=rehab-guide).', 'gear-engine' ),
+			),
+		);
+
+		foreach ( $guides as $guide ) {
+			$map[] = array(
+				'level'    => 1,
+				'title'    => $guide['title'],
+				'path'     => 'kjopsveiledere/' . $guide['slug'],
+				'tag'      => $picker_tag,
+				'example'  => '[' . $picker_tag . ' type="' . $guide['slug'] . '"]',
+				'hint'     => $guide['hint'],
+				'hub_type' => $guide['slug'],
+			);
+		}
+
+		$hub_status = self::get_page_status( 'kjopsveiledere', $hub_tag );
 
 		foreach ( $map as $index => $row ) {
 			if ( '' !== $row['path'] ) {
@@ -240,6 +296,16 @@ class Gear_Engine_Shortcode_Guide {
 					'post_id' => $found ? $found[0] : 0,
 				);
 			}
+
+			// If this is an individual guide whose dedicated subpage is missing, but the Hub page is active,
+			// mark it as 'in_hub' so it displays as active inside the Hub.
+			if ( ! empty( $row['hub_type'] ) && 'ok' !== $status['state'] && 'ok' === $hub_status['state'] ) {
+				$status = array(
+					'state'   => 'in_hub',
+					'post_id' => $hub_status['post_id'],
+				);
+			}
+
 			$map[ $index ] += $status;
 		}
 		return $map;
@@ -254,6 +320,7 @@ class Gear_Engine_Shortcode_Guide {
 	public static function describe_state( string $state ): array {
 		$states = array(
 			'ok'           => array( __( 'OK', 'gear-engine' ), 'ok' ),
+			'in_hub'       => array( __( 'Aktiv i Hub', 'gear-engine' ), 'ok' ),
 			'missing'      => array( __( 'Page missing', 'gear-engine' ), 'bad' ),
 			'unpublished'  => array( __( 'Not published', 'gear-engine' ), 'warn' ),
 			'no_shortcode' => array( __( 'Shortcode missing on page', 'gear-engine' ), 'warn' ),
@@ -268,6 +335,13 @@ class Gear_Engine_Shortcode_Guide {
 	 * @return array{0:string,1:string} URL and link label.
 	 */
 	public static function get_action_link( array $row ): array {
+		if ( 'in_hub' === ( $row['state'] ?? '' ) && ! empty( $row['hub_type'] ) ) {
+			return array(
+				home_url( '/kjopsveiledere/?type=' . rawurlencode( (string) $row['hub_type'] ) ),
+				__( 'Åpne i Hub', 'gear-engine' ),
+			);
+		}
+
 		if ( ! empty( $row['post_id'] ) ) {
 			return array( (string) get_edit_post_link( (int) $row['post_id'], 'raw' ), __( 'Edit page', 'gear-engine' ) );
 		}

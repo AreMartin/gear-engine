@@ -129,6 +129,32 @@ $GLOBALS['opts']['gear_engine_program_page_path'] = 'programs';
 $paths = array_column( Gear_Engine_Shortcode_Guide::get_page_map(), 'path' );
 t( 'map follows configured paths', in_array( 'pain', $paths, true ) && in_array( 'pain/rygg', $paths, true ) && in_array( 'programs', $paths, true ) );
 
+// Kjøpsveiledere Hub and sub-guides page map test.
+$GLOBALS['pages']['kjopsveiledere'] = page( 201, '[gear_engine_gear_picker_hub]' );
+unset( $GLOBALS['pages']['kjopsveiledere/treadmill'] );
+$map_hub = Gear_Engine_Shortcode_Guide::get_page_map();
+$by_hub  = array();
+foreach ( $map_hub as $row ) {
+	$by_hub[ $row['path'] ?: $row['tag'] ] = $row;
+}
+t( 'hub row ok when page published with shortcode', 'ok' === ( $by_hub['kjopsveiledere']['state'] ?? '' ) );
+t( 'sub-guide row is in_hub when hub is active', 'in_hub' === ( $by_hub['kjopsveiledere/treadmill']['state'] ?? '' ) );
+list( $hub_state_label, $hub_state_class ) = Gear_Engine_Shortcode_Guide::describe_state( 'in_hub' );
+t( 'in_hub describes as Aktiv i Hub with ok class', 'Aktiv i Hub' === $hub_state_label && 'ok' === $hub_state_class );
+list( $hub_link_url, $hub_link_label ) = Gear_Engine_Shortcode_Guide::get_action_link( $by_hub['kjopsveiledere/treadmill'] );
+t( 'in_hub links to hub with type parameter', false !== strpos( $hub_link_url, '/kjopsveiledere/?type=treadmill' ) && 'Åpne i Hub' === $hub_link_label );
+
+// Dedicated subpage test.
+$GLOBALS['pages']['kjopsveiledere/treadmill'] = page( 202, '[gear_engine_gear_picker type="treadmill"]' );
+$map_dedicated = Gear_Engine_Shortcode_Guide::get_page_map();
+$by_dedicated  = array();
+foreach ( $map_dedicated as $row ) {
+	$by_dedicated[ $row['path'] ?: $row['tag'] ] = $row;
+}
+t( 'dedicated subpage overrides in_hub to ok', 'ok' === ( $by_dedicated['kjopsveiledere/treadmill']['state'] ?? '' ) );
+list( $ded_link_url, $ded_link_label ) = Gear_Engine_Shortcode_Guide::get_action_link( $by_dedicated['kjopsveiledere/treadmill'] );
+t( 'dedicated subpage links to edit', false !== strpos( $ded_link_url, 'post=202' ) && 'Edit page' === $ded_link_label );
+
 // Links and rendering.
 list( $url, $label ) = Gear_Engine_Shortcode_Guide::get_action_link( array( 'post_id' => 6, 'title' => 'x', 'example' => 'y' ) );
 t( 'existing page links to edit', false !== strpos( $url, 'post=6' ) && 'Edit page' === $label );
