@@ -67,7 +67,7 @@ class Gear_Engine_Product_Upscaler {
 			}
 
 			// Update taxonomy if category given.
-			$this->assign_category( $post_id, (string) ( $item['category'] ?? '' ) );
+			$this->assign_category( $post_id, (string) ( $item['category'] ?? '' ), (string) ( $item['title'] ?? '' ) );
 
 			return 'updated';
 		}
@@ -103,7 +103,7 @@ class Gear_Engine_Product_Upscaler {
 		update_post_meta( $new_post_id, Gear_Engine_CPT::META_LAST_SYNCED, $now );
 
 		// Assign taxonomy term.
-		$this->assign_category( $new_post_id, (string) ( $item['category'] ?? '' ) );
+		$this->assign_category( $new_post_id, (string) ( $item['category'] ?? '' ), (string) ( $item['title'] ?? '' ) );
 
 		return 'inserted';
 	}
@@ -111,38 +111,111 @@ class Gear_Engine_Product_Upscaler {
 	/**
 	 * Assign category term to the exercise gear post.
 	 *
+	 * Implements backward-compatible multi-tagging and manual lock (A + C):
+	 * - Manual lock: Checks '_gear_engine_lock_categories' meta. If locked, terms are not touched.
+	 * - Keyword mapping: Maps keywords in title/category to standardized categories.
+	 * - Non-destructive fallback: Uses leaf category from feed if no keywords match.
+	 *
 	 * @param int    $post_id  Post ID.
 	 * @param string $category Raw category string from feed.
+	 * @param string $title    Product title.
 	 * @return void
 	 */
-	protected function assign_category( int $post_id, string $category ): void {
-		if ( empty( $category ) ) {
+	protected function assign_category( int $post_id, string $category, string $title = '' ): void {
+		// 1. Manual Lock check (Rule C).
+		$is_locked = (bool) get_post_meta( $post_id, Gear_Engine_CPT::META_LOCK_CATEGORIES, true );
+		if ( $is_locked ) {
+			return;
+		}
+
+		if ( empty( $category ) && empty( $title ) ) {
 			return;
 		}
 
 		static $term_cache = array();
 
-		// Clean up category string (e.g. take final segment if breadcrumb like "Sport > Gym > Tredemølle").
-		$parts     = explode( '>', $category );
-		$leaf_name = sanitize_text_field( trim( end( $parts ) ) );
+		$target_categories = array();
+		$search_text       = mb_strtolower( $category . ' ' . $title, 'UTF-8' );
 
-		if ( empty( $leaf_name ) ) {
+		// 2. Keyword Mapping (Rule A).
+		if ( preg_match( '/tredem[øo]lle|treadmill/ui', $search_text ) ) {
+			$target_categories[] = 'Tredemøller';
+		}
+		if ( preg_match( '/romaskin|rowing\s*machine|rowerg/ui', $search_text ) ) {
+			$target_categories[] = 'Romaskiner';
+		}
+		if ( preg_match( '/spinningsykkel|ergometersykkel|treningssykkel|motionscykel/ui', $search_text ) ) {
+			$target_categories[] = 'Treningssykler';
+		}
+		if ( preg_match( '/ellipsemaskin|crosstrainer/ui', $search_text ) ) {
+			$target_categories[] = 'Ellipsemaskiner';
+		}
+		if ( preg_match( '/manual|manualer|dumbbell|dumbell|hantel/ui', $search_text ) ) {
+			$target_categories[] = 'Manualer';
+		}
+		if ( preg_match( '/vektstang|vektstenger|barbell|olympiastang/ui', $search_text ) ) {
+			$target_categories[] = 'Vektstenger';
+		}
+		if ( preg_match( '/kettlebell/ui', $search_text ) ) {
+			$target_categories[] = 'Kettlebells';
+		}
+		if ( preg_match( '/power\s*rack|squat\s*rack|kneb[øo]ystativ|treningsstativ|vektstativ/ui', $search_text ) ) {
+			$target_categories[] = 'Racks og stativer';
+		}
+		if ( preg_match( '/knest[øo]tte|genutrain|kneskinne/ui', $search_text ) ) {
+			$target_categories[] = 'Knestøtter';
+		}
+		if ( preg_match( '/ankelst[øo]tte|malleotrain/ui', $search_text ) ) {
+			$target_categories[] = 'Ankelstøtter';
+		}
+		if ( preg_match( '/ryggbelte|l[øo]ftebelte|lumbal/ui', $search_text ) ) {
+			$target_categories[] = 'Ryggbelter';
+		}
+		if ( preg_match( '/treningsstrikk|strikk|powerband|miniband|resistance\s*band/ui', $search_text ) ) {
+			$target_categories[] = 'Treningsstrikker';
+		}
+		if ( preg_match( '/massasjepistol|theragun|hypervolt|massage\s*gun/ui', $search_text ) ) {
+			$target_categories[] = 'Massasjepistoler';
+		}
+		if ( preg_match( '/foam\s*roller|foamroller|massasjerulle/ui', $search_text ) ) {
+			$target_categories[] = 'Foam Rollers';
+		}
+		if ( preg_match( '/tens|elektrisk\s*stimulering/ui', $search_text ) ) {
+			$target_categories[] = 'TENS-apparater';
+		}
+
+		// 3. Non-destructive fallback if no keywords matched.
+		if ( empty( $target_categories ) && ! empty( $category ) ) {
+			$parts     = explode( '>', $category );
+			$leaf_name = sanitize_text_field( trim( end( $parts ) ) );
+			if ( ! empty( $leaf_name ) ) {
+				$target_categories[] = $leaf_name;
+			}
+		}
+
+		if ( empty( $target_categories ) ) {
 			return;
 		}
 
-		if ( isset( $term_cache[ $leaf_name ] ) ) {
-			$term_id = $term_cache[ $leaf_name ];
-		} else {
-			$term = term_exists( $leaf_name, Gear_Engine_CPT::TAXONOMY );
-			if ( ! $term ) {
-				$term = wp_insert_term( $leaf_name, Gear_Engine_CPT::TAXONOMY );
+		$term_ids = array();
+		foreach ( $target_categories as $cat_name ) {
+			if ( isset( $term_cache[ $cat_name ] ) ) {
+				$term_ids[] = $term_cache[ $cat_name ];
+			} else {
+				$term = term_exists( $cat_name, Gear_Engine_CPT::TAXONOMY );
+				if ( ! $term ) {
+					$term = wp_insert_term( $cat_name, Gear_Engine_CPT::TAXONOMY );
+				}
+				$term_id = ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) ? (int) $term['term_id'] : 0;
+				if ( $term_id > 0 ) {
+					$term_cache[ $cat_name ] = $term_id;
+					$term_ids[]              = $term_id;
+				}
 			}
-			$term_id = ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) ? (int) $term['term_id'] : 0;
-			$term_cache[ $leaf_name ] = $term_id;
 		}
 
-		if ( $term_id > 0 ) {
-			wp_set_object_terms( $post_id, $term_id, Gear_Engine_CPT::TAXONOMY, false );
+		if ( ! empty( $term_ids ) ) {
+			wp_set_object_terms( $post_id, $term_ids, Gear_Engine_CPT::TAXONOMY, false );
 		}
 	}
 }

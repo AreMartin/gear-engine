@@ -439,6 +439,46 @@ class Gear_Engine_Price_Comparison {
 			$raw_specs = get_post_meta( $post_id, '_gear_engine_specs', true );
 			$specs     = is_array( $raw_specs ) ? $raw_specs : array();
 
+			// Merge individual CPT spec overrides if not already set in _gear_engine_specs.
+			if ( empty( $specs['Toppfart'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'speed', true );
+				if ( '' !== $val && false !== $val && null !== $val ) {
+					$specs['Toppfart'] = $val . ' km/t';
+				}
+			}
+			if ( empty( $specs['Brukervekt'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'weight', true );
+				if ( '' !== $val && false !== $val && null !== $val ) {
+					$specs['Brukervekt'] = $val . ' kg';
+				}
+			}
+			if ( empty( $specs['Stigning'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'incline', true );
+				if ( '' !== $val && false !== $val && null !== $val ) {
+					$specs['Stigning'] = $val . ' %';
+				}
+			}
+			if ( empty( $specs['Motstand'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'levels', true );
+				if ( '' !== $val && false !== $val && null !== $val ) {
+					$specs['Motstand'] = $val . ' trinn';
+				}
+			}
+			if ( empty( $specs['Sammenleggbar'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'foldable', true );
+				if ( '1' === (string) $val ) {
+					$specs['Sammenleggbar'] = 'Ja';
+				} elseif ( '0' === (string) $val ) {
+					$specs['Sammenleggbar'] = 'Nei';
+				}
+			}
+			if ( empty( $specs['Rehabilitering'] ) ) {
+				$val = get_post_meta( $post_id, Gear_Engine_CPT::META_SPEC_PREFIX . 'rehab', true );
+				if ( '1' === (string) $val ) {
+					$specs['Rehabilitering'] = 'Ja';
+				}
+			}
+
 			// Resolve department.
 			$department = (string) get_post_meta( $post_id, '_gear_engine_department', true );
 			if ( empty( $department ) ) {

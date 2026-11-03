@@ -33,6 +33,46 @@ function absint( $n ) { return abs( (int) $n ); }
 function wp_json_encode( $d ) { return json_encode( $d ); }
 function shortcode_atts( $pairs, $atts ) { return array_merge( $pairs, (array) $atts ); }
 function is_wp_error( $e ) { return false; }
+function wp_strip_all_tags( $s ) { return strip_tags( (string) $s ); }
+function wp_kses_post( $s ) { return (string) $s; }
+function wp_trim_words( $s, $n = 55 ) { return (string) $s; }
+function sanitize_title( $s ) { return strtolower( preg_replace( '/[^a-z0-9]/i', '-', (string) $s ) ); }
+function current_time( $t ) { return '2026-11-04 12:00:00'; }
+
+global $mock_post_meta, $mock_terms;
+$mock_post_meta = array();
+$mock_terms     = array();
+
+function update_post_meta( $id, $k, $v ) {
+	global $mock_post_meta;
+	$mock_post_meta[ $id ][ $k ] = $v;
+	return true;
+}
+function get_post_meta( $id, $k, $s = false ) {
+	global $mock_post_meta;
+	return $mock_post_meta[ $id ][ $k ] ?? ( $s ? '' : array() );
+}
+function delete_post_meta( $id, $k ) {
+	global $mock_post_meta;
+	unset( $mock_post_meta[ $id ][ $k ] );
+	return true;
+}
+function wp_set_object_terms( $id, $terms, $taxonomy, $append = false ) {
+	global $mock_terms;
+	$terms = (array) $terms;
+	if ( $append && isset( $mock_terms[ $id ][ $taxonomy ] ) ) {
+		$mock_terms[ $id ][ $taxonomy ] = array_unique( array_merge( $mock_terms[ $id ][ $taxonomy ], $terms ) );
+	} else {
+		$mock_terms[ $id ][ $taxonomy ] = $terms;
+	}
+	return $terms;
+}
+function term_exists( $term, $tax = '' ) {
+	return array( 'term_id' => crc32( (string) $term ) );
+}
+function wp_insert_term( $term, $tax = '' ) {
+	return array( 'term_id' => crc32( (string) $term ) );
+}
 
 class WP_Error {}
 class WP_Query {
@@ -43,6 +83,7 @@ class WP_Query {
 require_once GEAR_ENGINE_PATH . 'includes/class-gear-engine-autoloader.php';
 require_once GEAR_ENGINE_PATH . 'includes/class-gear-engine-cpt.php';
 require_once GEAR_ENGINE_PATH . 'includes/class-gear-engine-product-service.php';
+require_once GEAR_ENGINE_PATH . 'includes/class-gear-engine-product-upscaler.php';
 require_once GEAR_ENGINE_PATH . 'modules/price-comparison/class-gear-engine-price-comparison.php';
 
 $passed = 0;
@@ -195,6 +236,50 @@ assert_test( strpos( $js_content, 'switchDepartment' ) !== false, 'JS contains s
 assert_test( strpos( $js_content, 'ge-dept-alert' ) !== false, 'JS manages cross-department alert #ge-dept-alert' );
 assert_test( strpos( $js_content, 'history.pushState' ) !== false, 'JS uses history.pushState for silent URL updates' );
 assert_test( strpos( $js_content, 'popstate' ) !== false, 'JS handles browser popstate navigation' );
+
+// 14. Del 4: Backend Dataflyt, CPT & Sikring av Eksisterende Moduler
+class Test_Gear_Engine_Product_Upscaler extends Gear_Engine_Product_Upscaler {
+	public function test_assign_category( int $post_id, string $category, string $title = '' ): void {
+		$this->assign_category( $post_id, $category, $title );
+	}
+}
+
+$test_upscaler = new Test_Gear_Engine_Product_Upscaler();
+
+// Test 14.1: CPT meta constants
+assert_test( Gear_Engine_CPT::META_SPECS === '_gear_engine_specs', 'Gear_Engine_CPT defines META_SPECS constant' );
+assert_test( Gear_Engine_CPT::META_LOCK_CATEGORIES === '_gear_engine_lock_categories', 'Gear_Engine_CPT defines META_LOCK_CATEGORIES constant' );
+assert_test( Gear_Engine_CPT::META_DEPARTMENT === '_gear_engine_department', 'Gear_Engine_CPT defines META_DEPARTMENT constant' );
+
+// Test 14.2: Manual category lock (_gear_engine_lock_categories) protects against feed overwrites
+$locked_post_id = 501;
+$mock_post_meta[ $locked_post_id ][ Gear_Engine_CPT::META_LOCK_CATEGORIES ] = 1;
+$mock_terms[ $locked_post_id ]['gear_category'] = array( 777 ); // existing custom category
+
+$test_upscaler->test_assign_category( $locked_post_id, 'Tredemøller', 'Sole F85 Tredemølle' );
+assert_test( $mock_terms[ $locked_post_id ]['gear_category'] === array( 777 ), 'Manual lock (_gear_engine_lock_categories) preserves custom terms from feed overwrites' );
+
+// Test 14.3: Keyword mapping (Rule A) maps exercise items to standardized categories
+$unlocked_post_id = 502;
+$test_upscaler->test_assign_category( $unlocked_post_id, 'Annet', 'Abilica Rubber Band Treningsstrikk 3-pk' );
+$strikk_term_id = crc32( 'Treningsstrikker' );
+assert_test( in_array( $strikk_term_id, $mock_terms[ $unlocked_post_id ]['gear_category'], true ), 'Keyword mapping assigns Treningsstrikker when strikk keyword is present' );
+
+$foam_post_id = 503;
+$test_upscaler->test_assign_category( $foam_post_id, 'Annet', 'TriggerPoint GRID Foam Roller 33cm' );
+$foam_term_id = crc32( 'Foam Rollers' );
+assert_test( in_array( $foam_term_id, $mock_terms[ $foam_post_id ]['gear_category'], true ), 'Keyword mapping assigns Foam Rollers when foam roller keyword is present' );
+
+// Test 14.4: Non-destructive fallback for items without keywords
+$generic_post_id = 504;
+$test_upscaler->test_assign_category( $generic_post_id, 'Sport > Tilbehør > Drikkeflaske Pro', 'Vannflaske 1L' );
+$bottle_term_id = crc32( 'Drikkeflaske Pro' );
+assert_test( in_array( $bottle_term_id, $mock_terms[ $generic_post_id ]['gear_category'], true ), 'Non-destructive fallback assigns leaf category when no keywords match' );
+
+// Test 14.5: Spec synthesis in CPT & feed
+$cpt_class_content = file_get_contents( GEAR_ENGINE_PATH . 'includes/class-gear-engine-cpt.php' );
+assert_test( strpos( $cpt_class_content, 'gae_lock_categories' ) !== false, 'CPT metabox renders gae_lock_categories field' );
+assert_test( strpos( $cpt_class_content, 'gae_department' ) !== false, 'CPT metabox renders gae_department select' );
 
 echo "========================================================\n";
 if ( $failed === 0 ) {

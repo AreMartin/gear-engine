@@ -38,7 +38,10 @@ class Gear_Engine_CPT {
 	public const META_IMAGE_URL     = '_product_image_url';
 	public const META_CURRENCY      = '_currency';
 	public const META_LAST_SYNCED   = '_last_synced';
-	public const META_SPEC_PREFIX   = '_gear_engine_spec_';
+	public const META_SPEC_PREFIX     = '_gear_engine_spec_';
+	public const META_LOCK_CATEGORIES = '_gear_engine_lock_categories';
+	public const META_DEPARTMENT      = '_gear_engine_department';
+	public const META_SPECS           = '_gear_engine_specs';
 
 	/**
 	 * Constructor.
@@ -303,6 +306,57 @@ class Gear_Engine_CPT {
 				)
 			);
 		}
+
+		// 12. _gear_engine_lock_categories
+		register_post_meta(
+			self::POST_TYPE,
+			self::META_LOCK_CATEGORIES,
+			array(
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'boolean',
+				'description'       => __( 'Lock categories against automatic feed updates.', 'gear-engine' ),
+				'sanitize_callback' => array( $this, 'sanitize_bool_meta' ),
+				'auth_callback'     => array( $this, 'meta_auth_callback' ),
+			)
+		);
+
+		// 13. _gear_engine_department
+		register_post_meta(
+			self::POST_TYPE,
+			self::META_DEPARTMENT,
+			array(
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'description'       => __( 'Main department slug.', 'gear-engine' ),
+				'sanitize_callback' => 'sanitize_key',
+				'auth_callback'     => array( $this, 'meta_auth_callback' ),
+			)
+		);
+
+		// 14. _gear_engine_specs
+		register_post_meta(
+			self::POST_TYPE,
+			self::META_SPECS,
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'object',
+				'description'   => __( 'Structured key-value specifications array.', 'gear-engine' ),
+				'auth_callback' => array( $this, 'meta_auth_callback' ),
+			)
+		);
+	}
+
+	/**
+	 * Sanitize boolean post meta value.
+	 *
+	 * @param mixed $value Input value.
+	 * @return int 1 or 0.
+	 */
+	public function sanitize_bool_meta( $value ): int {
+		return ! empty( $value ) && '0' !== $value && false !== $value ? 1 : 0;
 	}
 
 	/**
@@ -373,7 +427,9 @@ class Gear_Engine_CPT {
 		$merchant      = get_post_meta( $post->ID, self::META_MERCHANT, true );
 		$image_url     = get_post_meta( $post->ID, self::META_IMAGE_URL, true );
 		$currency      = get_post_meta( $post->ID, self::META_CURRENCY, true ) ?: 'kr';
-		$last_synced   = get_post_meta( $post->ID, self::META_LAST_SYNCED, true );
+		$last_synced     = get_post_meta( $post->ID, self::META_LAST_SYNCED, true );
+		$lock_categories = get_post_meta( $post->ID, self::META_LOCK_CATEGORIES, true );
+		$department      = get_post_meta( $post->ID, self::META_DEPARTMENT, true );
 		?>
 		<table class="form-table">
 			<tr>
@@ -435,6 +491,29 @@ class Gear_Engine_CPT {
 				</td>
 			</tr>
 			<?php endif; ?>
+			<tr>
+				<th><label for="gae_department"><?php esc_html_e( 'Hovedavdeling (Prissammenligning)', 'gear-engine' ); ?></label></th>
+				<td>
+					<select id="gae_department" name="gae_department">
+						<option value="" <?php selected( (string) $department, '' ); ?>><?php esc_html_e( 'Automatisk gjenkjenning', 'gear-engine' ); ?></option>
+						<option value="kondisjon" <?php selected( (string) $department, 'kondisjon' ); ?>><?php esc_html_e( 'Kondisjon', 'gear-engine' ); ?></option>
+						<option value="styrke" <?php selected( (string) $department, 'styrke' ); ?>><?php esc_html_e( 'Styrke', 'gear-engine' ); ?></option>
+						<option value="rehabilitering" <?php selected( (string) $department, 'rehabilitering' ); ?>><?php esc_html_e( 'Rehabilitering', 'gear-engine' ); ?></option>
+						<option value="restitusjon" <?php selected( (string) $department, 'restitusjon' ); ?>><?php esc_html_e( 'Restitusjon', 'gear-engine' ); ?></option>
+					</select>
+					<p class="description"><?php esc_html_e( 'Overstyrer automatisk avdelingsplassering i prissammenligningsmodulen.', 'gear-engine' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Kategorilås (Manuell lås)', 'gear-engine' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" id="gae_lock_categories" name="gae_lock_categories" value="1" <?php checked( (bool) $lock_categories ); ?> />
+						<?php esc_html_e( 'Lås kategorier mot automatisk overskriving fra partner-feed', 'gear-engine' ); ?>
+					</label>
+					<p class="description"><?php esc_html_e( 'Beskytter manuelt valgte kategorier under fremtidige automatiske feed-synkroniseringer.', 'gear-engine' ); ?></p>
+				</td>
+			</tr>
 		</table>
 
 		<h3 style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #c3c4c7;">
@@ -621,6 +700,23 @@ class Gear_Engine_CPT {
 				} else {
 					delete_post_meta( $post_id, self::META_SPEC_PREFIX . $key );
 				}
+			}
+		}
+
+		// Save lock categories.
+		if ( isset( $_POST['gae_lock_categories'] ) ) {
+			update_post_meta( $post_id, self::META_LOCK_CATEGORIES, 1 );
+		} else {
+			delete_post_meta( $post_id, self::META_LOCK_CATEGORIES );
+		}
+
+		// Save department.
+		if ( isset( $_POST['gae_department'] ) ) {
+			$dept = sanitize_key( wp_unslash( $_POST['gae_department'] ) );
+			if ( in_array( $dept, array( 'kondisjon', 'styrke', 'rehabilitering', 'restitusjon' ), true ) ) {
+				update_post_meta( $post_id, self::META_DEPARTMENT, $dept );
+			} elseif ( '' === $dept ) {
+				delete_post_meta( $post_id, self::META_DEPARTMENT );
 			}
 		}
 	}
