@@ -150,6 +150,6 @@ Her presenteres opptreningen på en strukturert og pedagogisk måte:
 - [ ] Sikre at AI-agenten har oppdaterte "tools" til å hente øvelser fra protokollene og produkter fra feedene.
 
 ### Fase 5: Den store prissammenligningsmodulen
-- [ ] Importere og tilpasse den fasetterte tabell-/katalogvisningen fra forrige versjon.
+- [x] Importere og tilpasse den fasetterte tabell-/katalogvisningen fra forrige versjon (`modules/price-comparison/` med Vanilla JS og design-tokens).
 - [ ] Etablere toveis lenking mellom kjøpsveilederne og prissammenligningskatalogen.
 

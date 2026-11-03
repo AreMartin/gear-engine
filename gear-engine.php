@@ -71,6 +71,7 @@ function gear_engine_default_modules(): array {
 		'Gear_Engine_Triage',
 		'Gear_Engine_Gear_Picker',
 		'Gear_Engine_Picker_Diagnostics',
+		'Gear_Engine_Price_Comparison',
 		'Gear_Engine_Shortcode_Guide',
 		'Gear_Engine_Exercise_Selection',
 	);
