@@ -176,9 +176,10 @@
 	};
 
 	TriageApp.prototype.scrollIntoView = function () {
-		var top = this.el.getBoundingClientRect().top + window.scrollY - 40;
-		if (window.scrollY > top + 50) {
-			window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+		var rect = this.el.getBoundingClientRect();
+		if (rect.top < -30) {
+			var targetTop = window.scrollY + rect.top - 24;
+			window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
 		}
 	};
 
@@ -242,7 +243,7 @@
 				}
 				break;
 			case 'single':
-				this.selectSingle(target.getAttribute('data-step'), target.getAttribute('data-option'));
+				this.selectSingle(target.getAttribute('data-step'), target.getAttribute('data-option'), target);
 				break;
 			case 'multi':
 				this.toggleMulti(target.getAttribute('data-step'), target.getAttribute('data-option'));
@@ -312,17 +313,31 @@
 		}
 	};
 
-	TriageApp.prototype.selectSingle = function (stepId, optionId) {
+	TriageApp.prototype.selectSingle = function (stepId, optionId, targetEl) {
 		var self = this;
 		if (this.busy) { return; }
-		this.answers[stepId] = optionId;
-		this.direction = 'none';
-		this.render();
 		this.busy = true;
+		this.answers[stepId] = optionId;
+		this.saveState();
+
+		// Immediate visual feedback without re-rendering or tearing down the DOM
+		if (targetEl) {
+			var stage = targetEl.closest('.get-stage') || this.el.querySelector('.get-stage');
+			if (stage) {
+				stage.querySelectorAll('[data-action="single"]').forEach(function (btn) {
+					btn.classList.remove('is-active');
+					btn.setAttribute('aria-pressed', 'false');
+				});
+				targetEl.classList.add('is-active');
+				targetEl.setAttribute('aria-pressed', 'true');
+			}
+		}
+
+		// Smooth, deliberate pacing (500ms allows user to see choice register before sliding)
 		this.later(function () {
 			self.busy = false;
 			self.advance();
-		}, 320);
+		}, 500);
 	};
 
 	TriageApp.prototype.toggleMulti = function (stepId, optionId) {

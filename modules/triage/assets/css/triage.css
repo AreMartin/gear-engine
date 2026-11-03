@@ -50,6 +50,9 @@
 .gear-engine-triage-picker a:focus:not(:focus-visible) {
 	outline: none;
 }
+.gear-engine-triage .get-stage {
+	min-height: 460px;
+}
 .gear-engine-triage .get-stage,
 .gear-engine-triage .get-stage:focus,
 .gear-engine-triage .get-stage:focus-visible,
@@ -682,17 +685,19 @@
    Step Motion: Material 3 Emphasized Directional Slide
    ========================================================= */
 .gear-engine-triage .get-anim-forward {
-	animation: ge-slide-forward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+	animation: ge-slide-forward 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+	will-change: transform, opacity;
 }
 .gear-engine-triage .get-anim-backward {
-	animation: ge-slide-backward 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+	animation: ge-slide-backward 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+	will-change: transform, opacity;
 }
 @keyframes ge-slide-forward {
-	from { opacity: 0; transform: translateX(24px); }
+	from { opacity: 0; transform: translateX(20px); }
 	to { opacity: 1; transform: translateX(0); }
 }
 @keyframes ge-slide-backward {
-	from { opacity: 0; transform: translateX(-24px); }
+	from { opacity: 0; transform: translateX(-20px); }
 	to { opacity: 1; transform: translateX(0); }
 }
 @media (prefers-reduced-motion: reduce) {

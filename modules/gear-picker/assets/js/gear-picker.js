@@ -362,11 +362,14 @@
 			saveSession();
 			render();
 			var stage = app.querySelector( '.gear-engine-picker__stage' );
-			if ( stage ) { stage.focus(); }
+			if ( stage && stage.focus ) {
+				stage.focus( { preventScroll: true } );
+			}
 			if ( root.scrollIntoView && state.step > 0 ) {
 				var rect = root.getBoundingClientRect();
-				if ( rect.top < 0 ) {
-					root.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				if ( rect.top < -30 ) {
+					var targetTop = window.scrollY + rect.top - 24;
+					window.scrollTo( { top: Math.max( 0, targetTop ), behavior: 'smooth' } );
 				}
 			}
 		}
@@ -1193,11 +1196,11 @@
 
 					updateLiveElements();
 
-					// 380ms smooth dwell time
+					// Smooth, deliberate pacing (500ms gives user time to see selection register)
 					window.setTimeout( function () {
 						state.busy = false;
 						go( state.step + 1, 'forward' );
-					}, 380 );
+					}, 500 );
 				}
 			} );
 
