@@ -177,14 +177,125 @@
 }
 
 /* =========================================================
-   3. CATEGORY PILLS HORIZONTAL BAR
+   3. 2-LEVEL DEPARTMENT & CATEGORY NAVIGATION
    ========================================================= */
+.ge-dept-section {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 18px;
+}
+
+/* Level 1: Segmented Department Track */
+.ge-dept-track {
+	display: inline-flex;
+	gap: 6px;
+	background: #EEF2F6;
+	padding: 5px;
+	border-radius: 9999px;
+	border: 1px solid #DCE3EC;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	max-width: 100%;
+	width: fit-content;
+}
+
+.ge-dept-track::-webkit-scrollbar {
+	display: none;
+}
+
+.ge-dept-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 18px;
+	border-radius: 9999px;
+	border: none;
+	background: transparent;
+	color: #475569;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+	text-decoration: none !important;
+	font-family: inherit;
+}
+
+.ge-dept-btn:hover {
+	color: #0C2340;
+	background: rgba(255, 255, 255, 0.6);
+}
+
+.ge-dept-btn.is-active {
+	background: #FFFFFF;
+	color: #0C2340;
+	box-shadow: 0 1px 4px rgba(12, 35, 64, 0.08);
+	font-weight: 700;
+}
+
+.ge-dept-badge {
+	display: inline-block;
+	padding: 1px 7px;
+	border-radius: 9999px;
+	font-size: 11px;
+	font-weight: 700;
+	background: #E2E8F0;
+	color: #334155;
+	transition: all 0.15s ease;
+}
+
+.ge-dept-btn.is-active .ge-dept-badge {
+	background: #E0F2FE;
+	color: #0369A1;
+}
+
+/* Cross-Department Search Alert Banner */
+.ge-dept-alert {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 16px;
+	background: #F0F9FF;
+	border: 1px solid #BAE6FD;
+	border-radius: 12px;
+	font-size: 13px;
+	color: #0369A1;
+	margin-bottom: 16px;
+	animation: ge-fadein 0.2s ease-out;
+}
+
+.ge-dept-switch-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 6px 14px;
+	background: #0284C7;
+	color: #FFFFFF !important;
+	border: none;
+	border-radius: 9999px;
+	font-size: 12px;
+	font-weight: 700;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.15s;
+	flex-shrink: 0;
+	text-decoration: none !important;
+}
+
+.ge-dept-switch-btn:hover {
+	background: #0369A1;
+}
+
+/* Level 2: Category Pills Horizontal Bar */
 .ge-comp-cats-bar {
 	display: flex;
-	gap: 10px;
+	gap: 8px;
 	overflow-x: auto;
-	padding-bottom: 12px;
-	margin-bottom: 20px;
+	padding-bottom: 4px;
+	margin-bottom: 0;
 	-webkit-overflow-scrolling: touch;
 	scrollbar-width: none;
 	-ms-overflow-style: none;

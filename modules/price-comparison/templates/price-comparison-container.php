@@ -4,11 +4,12 @@
  *
  * @package GearEngine
  *
- * @var string $encoded_feed     URI-encoded JSON product feed.
- * @var string $initial_category Default category tab.
- * @var string $initial_view     Default view mode (grid or list).
- * @var int    $initial_limit    Initial number of items visible.
- * @var bool   $show_guide_link  Whether to render the cross-link banner to Kjøpsveilederne.
+ * @var string $encoded_feed       URI-encoded JSON product feed.
+ * @var string $initial_department Default department tab.
+ * @var string $initial_category   Default category tab.
+ * @var string $initial_view       Default view mode (grid or list).
+ * @var int    $initial_limit      Initial number of items visible.
+ * @var bool   $show_guide_link    Whether to render the cross-link banner to Kjøpsveilederne.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,6 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div
 		id="fysionett-prissok-root"
 		data-feed="<?php echo esc_attr( $encoded_feed ); ?>"
+		data-initial-department="<?php echo esc_attr( $initial_department ); ?>"
 		data-initial-category="<?php echo esc_attr( $initial_category ); ?>"
 		data-initial-view="<?php echo esc_attr( $initial_view ); ?>"
 		data-initial-limit="<?php echo esc_attr( (string) $initial_limit ); ?>"

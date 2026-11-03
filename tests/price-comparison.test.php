@@ -28,6 +28,7 @@ function esc_attr_e( $s ) { echo esc_attr( $s ); }
 function __( $s ) { return $s; }
 function home_url( $p = '' ) { return 'http://example.com' . $p; }
 function sanitize_text_field( $s ) { return trim( strip_tags( (string) $s ) ); }
+function sanitize_key( $key ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) ); }
 function absint( $n ) { return abs( (int) $n ); }
 function wp_json_encode( $d ) { return json_encode( $d ); }
 function shortcode_atts( $pairs, $atts ) { return array_merge( $pairs, (array) $atts ); }
@@ -64,7 +65,7 @@ echo "========================================================\n";
 
 // 1. Fallback products
 $fallback = Gear_Engine_Price_Comparison::get_fallback_products();
-assert_test( is_array( $fallback ) && count( $fallback ) === 7, 'Fallback products returns exactly 7 sample items' );
+assert_test( is_array( $fallback ) && count( $fallback ) === 10, 'Fallback products returns exactly 10 sample items across 4 departments' );
 assert_test( $fallback[0]['brand'] === 'Concept2', 'First fallback product is Concept2' );
 assert_test( $fallback[0]['currentPrice'] === 12490, 'Concept2 price is 12490' );
 assert_test( $fallback[0]['discount'] === 20, 'Concept2 discount is 20%' );
@@ -148,6 +149,52 @@ assert_test( strpos( $js_content, 'window.GearEnginePriceComparison' ) !== false
 assert_test( strpos( $js_content, 'Høyest' ) !== false, 'JS generates Høyest winner tag on numeric specs' );
 assert_test( strpos( $js_content, 'Best pris' ) !== false, 'JS renders Best pris utheving in comparison matrix' );
 assert_test( strpos( $js_content, 'Vær obs på' ) !== false, 'JS renders Vær obs på anti-fit section in comparison matrix' );
+
+// 10. Del 3: 2-Level Departments in fallback data and infer_department helper
+$valid_departments = array( 'kondisjon', 'styrke', 'rehabilitering', 'restitusjon' );
+$all_have_valid_dept = true;
+foreach ( $fallback as $prod ) {
+	if ( empty( $prod['department'] ) || ! in_array( $prod['department'], $valid_departments, true ) ) {
+		$all_have_valid_dept = false;
+		break;
+	}
+}
+assert_test( $all_have_valid_dept, 'All 10 fallback products have valid department set' );
+assert_test( Gear_Engine_Price_Comparison::infer_department( 'Tredemøller' ) === 'kondisjon', 'infer_department maps Tredemøller to kondisjon' );
+assert_test( Gear_Engine_Price_Comparison::infer_department( 'Manualer' ) === 'styrke', 'infer_department maps Manualer to styrke' );
+assert_test( Gear_Engine_Price_Comparison::infer_department( 'Knestøtter' ) === 'rehabilitering', 'infer_department maps Knestøtter to rehabilitering' );
+assert_test( Gear_Engine_Price_Comparison::infer_department( 'Massasjepistoler' ) === 'restitusjon', 'infer_department maps Massasjepistoler to restitusjon' );
+assert_test( Gear_Engine_Price_Comparison::infer_department( 'Annet', 'Bauerfeind GenuTrain Knestøtte' ) === 'rehabilitering', 'infer_department detects rehabilitering from post title' );
+
+// 11. Del 3: Shortcode attribute mapping and container data attributes
+assert_test( strpos( $html, 'data-initial-department="kondisjon"' ) !== false, 'Default render sets data-initial-department="kondisjon"' );
+
+$html_styrke = $module->render( array( 'department' => 'styrke' ) );
+assert_test( strpos( $html_styrke, 'data-initial-department="styrke"' ) !== false, 'Shortcode department="styrke" sets data-initial-department="styrke"' );
+
+$html_group = $module->render( array( 'group' => 'rehabilitering' ) );
+assert_test( strpos( $html_group, 'data-initial-department="rehabilitering"' ) !== false, 'Shortcode group="rehabilitering" sets data-initial-department="rehabilitering"' );
+
+$html_cat_infer = $module->render( array( 'category' => 'Massasjepistoler' ) );
+assert_test( strpos( $html_cat_infer, 'data-initial-department="restitusjon"' ) !== false, 'Shortcode category="Massasjepistoler" automatically infers restitusjon department' );
+
+// 12. Del 3: CSS 2-Level Navigation and Search Alert styles
+assert_test( strpos( $css_content, '.ge-dept-section' ) !== false, 'CSS contains .ge-dept-section styling' );
+assert_test( strpos( $css_content, '.ge-dept-track' ) !== false, 'CSS contains Level 1 track .ge-dept-track styling' );
+assert_test( strpos( $css_content, '.ge-dept-btn' ) !== false, 'CSS contains Level 1 tab button .ge-dept-btn styling' );
+assert_test( strpos( $css_content, '.ge-dept-badge' ) !== false, 'CSS contains department counter badge .ge-dept-badge styling' );
+assert_test( strpos( $css_content, '.ge-dept-alert' ) !== false, 'CSS contains cross-department alert banner .ge-dept-alert styling' );
+assert_test( strpos( $css_content, '.ge-dept-switch-btn' ) !== false, 'CSS contains alert switch button .ge-dept-switch-btn styling' );
+
+// 13. Del 3: JS Navigation, Popstate and URL synchronization
+assert_test( strpos( $js_content, 'DEPARTMENTS' ) !== false, 'JS contains DEPARTMENTS definition' );
+assert_test( strpos( $js_content, 'inferDepartment' ) !== false, 'JS contains inferDepartment() function' );
+assert_test( strpos( $js_content, 'renderDepartmentTabs' ) !== false, 'JS contains renderDepartmentTabs() function' );
+assert_test( strpos( $js_content, 'renderCategoryChips' ) !== false, 'JS contains renderCategoryChips() function' );
+assert_test( strpos( $js_content, 'switchDepartment' ) !== false, 'JS contains switchDepartment() function' );
+assert_test( strpos( $js_content, 'ge-dept-alert' ) !== false, 'JS manages cross-department alert #ge-dept-alert' );
+assert_test( strpos( $js_content, 'history.pushState' ) !== false, 'JS uses history.pushState for silent URL updates' );
+assert_test( strpos( $js_content, 'popstate' ) !== false, 'JS handles browser popstate navigation' );
 
 echo "========================================================\n";
 if ( $failed === 0 ) {

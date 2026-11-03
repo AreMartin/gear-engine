@@ -14,6 +14,7 @@
 	var fallbackData = [
 		{
 			id: 1,
+			department: "kondisjon",
 			category: "Romaskiner",
 			brand: "Concept2",
 			name: "RowErg PM5 Romaskin Standard",
@@ -35,6 +36,7 @@
 		},
 		{
 			id: 2,
+			department: "kondisjon",
 			category: "Tredemøller",
 			brand: "Sole",
 			name: "F85 Tredemølle 2024-modell m/Bluetooth og touchskjerm",
@@ -57,6 +59,7 @@
 		},
 		{
 			id: 3,
+			department: "styrke",
 			category: "Kettlebells",
 			brand: "Abilica",
 			name: "Competition Kettlebell 16kg",
@@ -76,6 +79,7 @@
 		},
 		{
 			id: 4,
+			department: "styrke",
 			category: "Racks og stativer",
 			brand: "Titan Life",
 			name: "Squat Rack Pro Hjemmegym",
@@ -96,6 +100,7 @@
 		},
 		{
 			id: 5,
+			department: "styrke",
 			category: "Vektstenger",
 			brand: "Gymgrossisten",
 			name: "Olympisk Vektstang 20kg",
@@ -116,7 +121,8 @@
 		},
 		{
 			id: 7,
-			category: "Massasje",
+			department: "restitusjon",
+			category: "Massasjepistoler",
 			brand: "Therabody",
 			name: "Theragun Pro G5",
 			currentPrice: 4999,
@@ -136,6 +142,7 @@
 		},
 		{
 			id: 8,
+			department: "styrke",
 			category: "Manualer",
 			brand: "Bowflex",
 			name: "SelectTech 552i Justerbare Manualer",
@@ -152,8 +159,114 @@
 				"Antall trinn": "15",
 				"Plassbesparende": "Ja"
 			}
+		},
+		{
+			id: 9,
+			department: "rehabilitering",
+			category: "Knestøtter",
+			brand: "Bauerfeind",
+			name: "GenuTrain Knestøtte Aktiv V2",
+			currentPrice: 849,
+			originalPrice: 1099,
+			discount: 22,
+			shop: "Fjellsport",
+			otherShops: 1,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Type": "Aktiv støtte",
+				"Neopren": "Nei",
+				"Sideavstivere": "Ja"
+			}
+		},
+		{
+			id: 10,
+			department: "rehabilitering",
+			category: "Treningsstrikker",
+			brand: "Abilica",
+			name: "Rubber Band Treningsstrikk 3-pk",
+			currentPrice: 249,
+			originalPrice: 349,
+			discount: 28,
+			shop: "Treningspartner",
+			otherShops: 0,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Motstand": "Lett, Medium, Hard",
+				"Materiale": "Lateksfritt gummi",
+				"Lengde": "30 cm"
+			}
+		},
+		{
+			id: 11,
+			department: "restitusjon",
+			category: "Foam Rollers",
+			brand: "TriggerPoint",
+			name: "GRID Foam Roller 33cm",
+			currentPrice: 399,
+			originalPrice: 499,
+			discount: 20,
+			shop: "X-Life",
+			otherShops: 1,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Lengde": "33 cm",
+				"Diameter": "14 cm",
+				"Maksbelastning": "225 kg",
+				"Materiale": "EVA-skum"
+			}
 		}
 	];
+
+	// 4 Faglige Hovedavdelinger med underkategorier
+	var DEPARTMENTS = [
+		{
+			id: "kondisjon",
+			name: "Kondisjon",
+			categories: ["Alle", "Tredemøller", "Romaskiner", "Treningssykler", "Ellipsemaskiner"]
+		},
+		{
+			id: "styrke",
+			name: "Styrke",
+			categories: ["Alle", "Manualer", "Vektstenger", "Kettlebells", "Racks og stativer"]
+		},
+		{
+			id: "rehabilitering",
+			name: "Rehabilitering",
+			categories: ["Alle", "Knestøtter", "Ankelstøtter", "Ryggbelter", "Treningsstrikker"]
+		},
+		{
+			id: "restitusjon",
+			name: "Restitusjon",
+			categories: ["Alle", "Massasjepistoler", "Foam Rollers", "TENS-apparater"]
+		}
+	];
+
+	// Deterministisk mapping til avdeling for alle produkter
+	function inferDepartment(product) {
+		if (product && product.department) {
+			return String(product.department).toLowerCase();
+		}
+		var text = (((product && product.category) || '') + ' ' + ((product && product.name) || '')).toLowerCase();
+		if (/tredem[øo]lle|romaskin|sykkel|spinningsykkel|ellipse|ski/i.test(text)) {
+			return 'kondisjon';
+		}
+		if (/manual|dumbbell|vektstang|barbell|kettlebell|rack|stativ|vektplate|benk/i.test(text)) {
+			return 'styrke';
+		}
+		if (/knest[øo]tte|ankelst[øo]tte|ryggbelte|st[øo]tte|strikk|powerband|rehab/i.test(text)) {
+			return 'rehabilitering';
+		}
+		if (/massasje|theragun|foam|tens|restitusjon/i.test(text)) {
+			return 'restitusjon';
+		}
+		return 'kondisjon';
+	}
 
 	// Anti-Fit Rule Engine (Deterministic expert advice)
 	function getAntiFitNotes(p) {
@@ -270,11 +383,13 @@
 		{
 			id: 'in_stock',
 			label: 'Kun på lager',
+			department: 'all',
 			test: function (p) { return p.inStock === true; }
 		},
 		{
 			id: 'on_sale',
 			label: 'På tilbud',
+			department: 'all',
 			test: function (p) {
 				return (p.discount && p.discount > 0) || (p.originalPrice && p.originalPrice > p.currentPrice);
 			}
@@ -282,6 +397,7 @@
 		{
 			id: 'intervall',
 			label: '20+ km/t',
+			department: 'kondisjon',
 			test: function (p) {
 				return (p.specs && p.specs['Toppfart'] && parseFloat(p.specs['Toppfart']) >= 20) ||
 					(p.name && /2[0-9]\s*km/i.test(p.name)) ||
@@ -291,6 +407,7 @@
 		{
 			id: 'justerbar',
 			label: 'Justerbare',
+			department: 'styrke',
 			test: function (p) {
 				return (p.specs && p.specs['Plassbesparende'] === 'Ja') ||
 					(p.specs && p.specs['Type'] && p.specs['Type'].indexOf('Justerbar') !== -1) ||
@@ -300,6 +417,7 @@
 		{
 			id: 'neoprenfri',
 			label: 'Uten neopren',
+			department: 'rehabilitering',
 			test: function (p) {
 				return p.specs && p.specs['Neopren'] === 'Nei';
 			}
@@ -307,6 +425,7 @@
 		{
 			id: 'dypvev',
 			label: 'Dypvev',
+			department: 'restitusjon',
 			test: function (p) {
 				return (p.specs && p.specs['Slaglengde'] && parseFloat(p.specs['Slaglengde']) >= 14) ||
 					(p.name && /g5|theragun/i.test(p.name));
@@ -349,16 +468,43 @@
 			}
 		}
 
-		// 2. Initial state
-		var initialCat = root.getAttribute('data-initial-category') || 'Alle';
+		// 2. Initial state & URL Parameters
+		var urlParams = null;
+		try {
+			urlParams = new URLSearchParams(window.location.search);
+		} catch (e) {}
+
+		var initialDeptAttr = root.getAttribute('data-initial-department') || 'kondisjon';
+		var initialCatAttr = root.getAttribute('data-initial-category') || 'Alle';
+
+		var initialDept = (urlParams && urlParams.get('dept')) ? urlParams.get('dept') : initialDeptAttr;
+		var initialCat = (urlParams && urlParams.get('cat')) ? urlParams.get('cat') : initialCatAttr;
+		var initialQ = (urlParams && urlParams.get('q')) ? urlParams.get('q') : '';
+
+		// If category set without department, infer department from category
+		if (initialCat !== 'Alle' && (!urlParams || !urlParams.get('dept')) && !root.getAttribute('data-initial-department')) {
+			DEPARTMENTS.forEach(function (d) {
+				if (d.categories.indexOf(initialCat) !== -1) {
+					initialDept = d.id;
+				}
+			});
+		}
+
+		// Verify initialDept is valid
+		var deptExists = DEPARTMENTS.some(function (d) { return d.id === initialDept; });
+		if (!deptExists) {
+			initialDept = 'kondisjon';
+		}
+
 		var initialView = root.getAttribute('data-initial-view') || 'grid';
 		var initialLimit = parseInt(root.getAttribute('data-initial-limit'), 10) || 12;
 
 		var state = {
 			products: products,
 			viewMode: initialView === 'list' ? 'list' : 'grid',
-			searchQuery: '',
+			activeDepartment: initialDept,
 			activeCategory: initialCat,
+			searchQuery: initialQ,
 			activeShops: [],
 			activeBrands: [],
 			activeQuickFilters: {},
@@ -373,40 +519,105 @@
 			showFilters: false
 		};
 
-		// Compute absolute price boundaries
+		// Compute initial absolute price boundaries for active department
 		var validPrices = products
+			.filter(function (p) {
+				var d = p.department || inferDepartment(p);
+				return d === state.activeDepartment;
+			})
 			.map(function (p) { return p.currentPrice; })
 			.filter(function (p) { return !isNaN(p) && p > 0; });
+
+		if (validPrices.length === 0) {
+			validPrices = products
+				.map(function (p) { return p.currentPrice; })
+				.filter(function (p) { return !isNaN(p) && p > 0; });
+		}
 
 		if (validPrices.length > 0) {
 			state.absMinPrice = Math.floor(Math.min.apply(null, validPrices));
 			state.absMaxPrice = Math.ceil(Math.max.apply(null, validPrices));
 		}
 
-		// Extract categories
-		var catSet = {};
-		products.forEach(function (p) {
-			if (p.category && p.category !== 'Annet') {
-				catSet[p.category] = true;
-			}
-		});
-		var uniqueCategories = Object.keys(catSet).sort();
-		var categories = ['Alle'].concat(uniqueCategories);
+		// Render the initial static layout skeleton
+		renderSkeleton(root, state);
 
-		// If initialCategory not in categories, reset to Alle
-		if (categories.indexOf(state.activeCategory) === -1) {
-			state.activeCategory = 'Alle';
+		// Render Level 1: Main Department Tabs
+		function renderDepartmentTabs() {
+			var track = root.querySelector('#ge-dept-track');
+			if (!track) return;
+			track.innerHTML = '';
+			DEPARTMENTS.forEach(function (dept) {
+				var isActive = state.activeDepartment === dept.id;
+				var count = state.products.filter(function (p) {
+					var d = p.department || inferDepartment(p);
+					return d === dept.id;
+				}).length;
+
+				var btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'ge-dept-btn' + (isActive ? ' is-active' : '');
+				btn.setAttribute('data-department', dept.id);
+				btn.setAttribute('role', 'tab');
+				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				btn.innerHTML = '<span>' + escapeHtml(dept.name) + '</span>' +
+					'<span class="ge-dept-badge">' + count + '</span>';
+
+				btn.addEventListener('click', function () {
+					switchDepartment(dept.id);
+				});
+				track.appendChild(btn);
+			});
 		}
 
-		// Render the initial static layout skeleton
-		renderSkeleton(root, categories, state);
+		// Render Level 2: Sub-category Chips for Active Department
+		function renderCategoryChips() {
+			var bar = root.querySelector('#ge-comp-cats-bar');
+			if (!bar) return;
+			bar.innerHTML = '';
+
+			var currentDeptObj = DEPARTMENTS.filter(function (d) {
+				return d.id === state.activeDepartment;
+			})[0] || DEPARTMENTS[0];
+
+			var cats = currentDeptObj.categories.slice();
+
+			// Also append any extra product categories for this department from feed
+			state.products.forEach(function (p) {
+				var d = p.department || inferDepartment(p);
+				if (d === state.activeDepartment && p.category && p.category !== 'Annet' && cats.indexOf(p.category) === -1) {
+					cats.push(p.category);
+				}
+			});
+
+			cats.forEach(function (cat) {
+				var isActive = state.activeCategory === cat;
+				var btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'ge-cat-pill' + (isActive ? ' is-active' : '');
+				btn.setAttribute('data-category', cat);
+				btn.setAttribute('role', 'tab');
+				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				btn.textContent = cat;
+
+				btn.addEventListener('click', function () {
+					switchCategory(cat);
+				});
+				bar.appendChild(btn);
+			});
+		}
 
 		// Render Tier 1: Quick Filter Chips (Exposed on page)
 		function renderQuickFilters() {
 			var wrap = root.querySelector('#ge-comp-quick-filters');
 			if (!wrap) return;
 			wrap.innerHTML = '';
-			QUICK_FILTER_DEFS.forEach(function (def) {
+
+			var activeDefs = QUICK_FILTER_DEFS.filter(function (def) {
+				return def.department === 'all' || def.department === state.activeDepartment;
+			});
+
+			activeDefs.forEach(function (def) {
 				var isActive = !!state.activeQuickFilters[def.id];
 				var btn = document.createElement('button');
 				btn.type = 'button';
@@ -426,10 +637,110 @@
 			});
 		}
 
+		// Navigation action: Switch Department
+		function switchDepartment(deptId) {
+			if (state.activeDepartment === deptId) return;
+			state.activeDepartment = deptId;
+			state.activeCategory = 'Alle';
+			state.activeBrands = [];
+			state.activeShops = [];
+			state.activeQuickFilters = {};
+			state.minPrice = '';
+			state.maxPrice = '';
+			state.visibleCount = initialLimit;
+
+			// Recompute min/max prices for new department
+			var deptPrices = state.products
+				.filter(function (p) {
+					var d = p.department || inferDepartment(p);
+					return d === state.activeDepartment;
+				})
+				.map(function (p) { return p.currentPrice; })
+				.filter(function (p) { return !isNaN(p) && p > 0; });
+
+			if (deptPrices.length > 0) {
+				state.absMinPrice = Math.floor(Math.min.apply(null, deptPrices));
+				state.absMaxPrice = Math.ceil(Math.max.apply(null, deptPrices));
+				if (sliderMin && sliderMax) {
+					sliderMin.min = state.absMinPrice;
+					sliderMin.max = state.absMaxPrice;
+					sliderMax.min = state.absMinPrice;
+					sliderMax.max = state.absMaxPrice;
+				}
+			}
+
+			var deptAlert = root.querySelector('#ge-dept-alert');
+			if (deptAlert) {
+				deptAlert.style.display = 'none';
+				deptAlert.innerHTML = '';
+			}
+
+			renderDepartmentTabs();
+			renderCategoryChips();
+			renderQuickFilters();
+			updateUrlState();
+			updateUI();
+		}
+
+		// Navigation action: Switch Category
+		function switchCategory(cat) {
+			state.activeCategory = cat;
+			state.activeBrands = [];
+			state.activeShops = [];
+			state.activeQuickFilters = {};
+			state.visibleCount = initialLimit;
+
+			var deptAlert = root.querySelector('#ge-dept-alert');
+			if (deptAlert) deptAlert.style.display = 'none';
+
+			renderCategoryChips();
+			renderQuickFilters();
+			updateUrlState();
+			updateUI();
+		}
+
+		// Hybrid URL State Synchronization (history.pushState)
+		function updateUrlState() {
+			if (typeof window === 'undefined' || !window.history || !window.history.pushState) return;
+			try {
+				var url = new URL(window.location.href);
+				if (state.activeDepartment && state.activeDepartment !== 'kondisjon') {
+					url.searchParams.set('dept', state.activeDepartment);
+				} else {
+					url.searchParams.delete('dept');
+				}
+
+				if (state.activeCategory && state.activeCategory !== 'Alle') {
+					url.searchParams.set('cat', state.activeCategory);
+				} else {
+					url.searchParams.delete('cat');
+				}
+
+				if (state.searchQuery && state.searchQuery.trim() !== '') {
+					url.searchParams.set('q', state.searchQuery.trim());
+				} else {
+					url.searchParams.delete('q');
+				}
+
+				if (url.toString() !== window.location.href) {
+					window.history.pushState({
+						dept: state.activeDepartment,
+						cat: state.activeCategory,
+						q: state.searchQuery
+					}, '', url.toString());
+				}
+			} catch (e) {}
+		}
+
+		renderDepartmentTabs();
+		renderCategoryChips();
 		renderQuickFilters();
 
 		// Cache DOM nodes for smooth targeted updates
 		var searchInput = root.querySelector('.ge-comp-search-input');
+		if (searchInput && state.searchQuery) {
+			searchInput.value = state.searchQuery;
+		}
 		var sortSelect = root.querySelector('.ge-comp-sort-select');
 		var filterToggleBtn = root.querySelector('.ge-comp-filter-toggle');
 		var filterBadge = root.querySelector('#ge-comp-filter-badge');
@@ -818,15 +1129,72 @@
 		function updateUI(options) {
 			options = options || {};
 
-			// A. Filter logic
+			// Cross-Department Search Alert Check
+			var deptAlert = root.querySelector('#ge-dept-alert');
+			if (deptAlert) {
+				var trimmedQ = state.searchQuery.trim().toLowerCase();
+				if (trimmedQ.length >= 2) {
+					var otherDeptMatches = {};
+					state.products.forEach(function (p) {
+						var d = p.department || inferDepartment(p);
+						if (d !== state.activeDepartment) {
+							var sTarget = (p.name + ' ' + (p.brand || '') + ' ' + (p.category || '')).toLowerCase();
+							if (sTarget.indexOf(trimmedQ) !== -1) {
+								otherDeptMatches[d] = (otherDeptMatches[d] || 0) + 1;
+							}
+						}
+					});
+
+					// Check current department matches with search query
+					var currentDeptMatches = state.products.filter(function (p) {
+						var d = p.department || inferDepartment(p);
+						if (d !== state.activeDepartment) return false;
+						var sTarget = (p.name + ' ' + (p.brand || '') + ' ' + (p.category || '')).toLowerCase();
+						return sTarget.indexOf(trimmedQ) !== -1;
+					}).length;
+
+					var otherDepts = Object.keys(otherDeptMatches);
+					if (currentDeptMatches === 0 && otherDepts.length > 0) {
+						otherDepts.sort(function (a, b) { return otherDeptMatches[b] - otherDeptMatches[a]; });
+						var targetDeptId = otherDepts[0];
+						var targetDeptObj = DEPARTMENTS.filter(function (d) { return d.id === targetDeptId; })[0];
+						var targetDeptName = targetDeptObj ? targetDeptObj.name : targetDeptId;
+						var matchCount = otherDeptMatches[targetDeptId];
+
+						deptAlert.innerHTML = '<span>Fant <b>' + matchCount + ' treff</b> i <b>' + escapeHtml(targetDeptName) + '</b> for &laquo;' + escapeHtml(state.searchQuery.trim()) + '&raquo;</span>' +
+							'<button type="button" class="ge-dept-switch-btn" id="ge-dept-switch-btn">' +
+								'<span>Bytt til ' + escapeHtml(targetDeptName) + '</span>' +
+								'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+							'</button>';
+						deptAlert.style.display = 'flex';
+
+						var switchBtn = deptAlert.querySelector('#ge-dept-switch-btn');
+						if (switchBtn) {
+							switchBtn.addEventListener('click', function () {
+								switchDepartment(targetDeptId);
+							});
+						}
+					} else {
+						deptAlert.style.display = 'none';
+						deptAlert.innerHTML = '';
+					}
+				} else {
+					deptAlert.style.display = 'none';
+					deptAlert.innerHTML = '';
+				}
+			}
+
+			// A. Filter logic (Department, Category, Search, Brand, Shop, Price, Quick Filters)
 			var baseFiltered = state.products.filter(function (product) {
+				var prodDept = product.department || inferDepartment(product);
+				var matchesDept = prodDept === state.activeDepartment;
 				var searchTarget = (product.name + ' ' + (product.brand || '')).toLowerCase();
 				var matchesSearch = searchTarget.indexOf(state.searchQuery.toLowerCase()) !== -1;
 				var matchesCategory = state.activeCategory === 'Alle' || product.category === state.activeCategory;
-				return matchesSearch && matchesCategory;
+				return matchesDept && matchesSearch && matchesCategory;
 			});
 
-			// Dynamic brands & shops based on active category + search
+			// Dynamic brands & shops based on active department + category + search
 			var brandSet = {};
 			var shopSet = {};
 			baseFiltered.forEach(function (p) {
@@ -838,6 +1206,8 @@
 
 			// Full filtered products
 			var filtered = state.products.filter(function (product) {
+				var prodDept = product.department || inferDepartment(product);
+				var matchesDept = prodDept === state.activeDepartment;
 				var searchTarget = (product.name + ' ' + (product.brand || '')).toLowerCase();
 				var matchesSearch = searchTarget.indexOf(state.searchQuery.toLowerCase()) !== -1;
 				var matchesCategory = state.activeCategory === 'Alle' || product.category === state.activeCategory;
@@ -855,7 +1225,7 @@
 					return def ? def.test(product) : true;
 				});
 
-				return matchesSearch && matchesCategory && matchesShop && matchesBrand && matchesPrice && matchesQuick;
+				return matchesDept && matchesSearch && matchesCategory && matchesShop && matchesBrand && matchesPrice && matchesQuick;
 			});
 
 			// B. Sort logic
@@ -1029,51 +1399,31 @@
 			state.searchQuery = '';
 			state.activeCategory = 'Alle';
 			state.visibleCount = initialLimit;
-			searchInput.value = '';
+			if (searchInput) searchInput.value = '';
 
-			// Update category pill active class
-			var catPills = root.querySelectorAll('.ge-cat-pill');
-			catPills.forEach(function (pill) {
-				if (pill.getAttribute('data-category') === 'Alle') {
-					pill.classList.add('is-active');
-				} else {
-					pill.classList.remove('is-active');
-				}
-			});
+			var deptAlert = root.querySelector('#ge-dept-alert');
+			if (deptAlert) {
+				deptAlert.style.display = 'none';
+				deptAlert.innerHTML = '';
+			}
 
+			renderCategoryChips();
 			renderQuickFilters();
+			updateUrlState();
 			updateUI();
 		}
 
 		// 3. Attach Event Listeners
 
-		// Category pills
-		var catPills = root.querySelectorAll('.ge-cat-pill');
-		catPills.forEach(function (pill) {
-			pill.addEventListener('click', function () {
-				var cat = pill.getAttribute('data-category');
-				state.activeCategory = cat;
-				state.searchQuery = '';
-				state.activeBrands = [];
-				state.activeShops = [];
-				state.activeQuickFilters = {};
+		// Search input
+		if (searchInput) {
+			searchInput.addEventListener('input', function (e) {
+				state.searchQuery = e.target.value;
 				state.visibleCount = initialLimit;
-				searchInput.value = '';
-
-				catPills.forEach(function (p) { p.classList.remove('is-active'); });
-				pill.classList.add('is-active');
-
-				renderQuickFilters();
+				updateUrlState();
 				updateUI();
 			});
-		});
-
-		// Search input
-		searchInput.addEventListener('input', function (e) {
-			state.searchQuery = e.target.value;
-			state.visibleCount = initialLimit;
-			updateUI();
-		});
+		}
 
 		// Sort select
 		sortSelect.addEventListener('change', function (e) {
@@ -1216,6 +1566,54 @@
 				renderCompareMatrix();
 			});
 		}
+
+		// Popstate listener for browser Back/Forward navigation
+		window.addEventListener('popstate', function (e) {
+			var stateObj = e.state;
+			var urlP = null;
+			try {
+				urlP = new URLSearchParams(window.location.search);
+			} catch (err) {}
+
+			var newDept = (stateObj && stateObj.dept) || (urlP && urlP.get('dept')) || initialDeptAttr;
+			var newCat = (stateObj && stateObj.cat) || (urlP && urlP.get('cat')) || initialCatAttr;
+			var newQ = (stateObj && typeof stateObj.q === 'string') ? stateObj.q : ((urlP && urlP.get('q')) || '');
+
+			var deptValid = DEPARTMENTS.some(function (d) { return d.id === newDept; });
+			if (!deptValid) newDept = 'kondisjon';
+
+			var deptChanged = state.activeDepartment !== newDept;
+			state.activeDepartment = newDept;
+			state.activeCategory = newCat;
+			state.searchQuery = newQ;
+			if (searchInput) searchInput.value = newQ;
+
+			if (deptChanged) {
+				var deptPrices = state.products
+					.filter(function (p) {
+						var d = p.department || inferDepartment(p);
+						return d === state.activeDepartment;
+					})
+					.map(function (p) { return p.currentPrice; })
+					.filter(function (p) { return !isNaN(p) && p > 0; });
+
+				if (deptPrices.length > 0) {
+					state.absMinPrice = Math.floor(Math.min.apply(null, deptPrices));
+					state.absMaxPrice = Math.ceil(Math.max.apply(null, deptPrices));
+					if (sliderMin && sliderMax) {
+						sliderMin.min = state.absMinPrice;
+						sliderMin.max = state.absMaxPrice;
+						sliderMax.min = state.absMinPrice;
+						sliderMax.max = state.absMaxPrice;
+					}
+				}
+			}
+
+			renderDepartmentTabs();
+			renderCategoryChips();
+			renderQuickFilters();
+			updateUI();
+		});
 
 		// Initial render
 		updateUI();
@@ -1362,20 +1760,21 @@
 	}
 
 	// Initial DOM skeleton constructor
-	function renderSkeleton(root, categories, state) {
-		var catButtonsHtml = categories.map(function (cat) {
-			var isActive = state.activeCategory === cat;
-			return '<button type="button" class="ge-cat-pill' + (isActive ? ' is-active' : '') + '" data-category="' + escapeHtml(cat) + '">' + escapeHtml(cat) + '</button>';
-		}).join('');
-
+	function renderSkeleton(root, state) {
 		root.innerHTML = '' +
 		'<div class="mb-5" style="margin-bottom: 24px;">' +
 			'<h2 style="font-size: 28px; font-weight: 800; color: #1A2A3A; margin: 0 0 6px 0; letter-spacing: -0.02em;">Prissammenligning</h2>' +
 			'<p style="font-size: 15px; color: #64748b; margin: 0;">Sammenlign priser fra våre samarbeidspartnere.</p>' +
 		'</div>' +
 
-		// Category Pills Bar
-		'<div class="ge-comp-cats-bar">' + catButtonsHtml + '</div>' +
+		// Level 1 Department Tabs & Level 2 Category Chips
+		'<div class="ge-dept-section">' +
+			'<div class="ge-dept-track" id="ge-dept-track" role="tablist" aria-label="Hovedavdelinger"></div>' +
+			'<div class="ge-comp-cats-bar" id="ge-comp-cats-bar" role="tablist" aria-label="Kategorier"></div>' +
+		'</div>' +
+
+		// Cross-Department Search Alert Banner
+		'<div class="ge-dept-alert" id="ge-dept-alert" style="display: none;" role="alert"></div>' +
 
 		// Quick Filter Chips (Tier 1 Exposed Filters)
 		'<div class="ge-comp-quick-filters" id="ge-comp-quick-filters" role="group" aria-label="Hurtigfiltre"></div>' +
@@ -1486,6 +1885,8 @@
 
 	// Expose public API for integration and testing
 	window.GearEnginePriceComparison = {
+		DEPARTMENTS: DEPARTMENTS,
+		inferDepartment: inferDepartment,
 		getAntiFitNotes: getAntiFitNotes,
 		QUICK_FILTER_DEFS: QUICK_FILTER_DEFS,
 		init: initPriceComparison

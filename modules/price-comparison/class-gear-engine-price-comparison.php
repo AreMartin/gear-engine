@@ -87,6 +87,32 @@ class Gear_Engine_Price_Comparison {
 	}
 
 	/**
+	 * Infer department slug from category name and post title.
+	 *
+	 * @param string $category   Category name.
+	 * @param string $post_title Post title.
+	 * @return string Department slug (kondisjon, styrke, rehabilitering, restitusjon).
+	 */
+	public static function infer_department( string $category, string $post_title = '' ): string {
+		$text = mb_strtolower( $category . ' ' . $post_title, 'UTF-8' );
+
+		if ( preg_match( '/tredem[øo]lle|romaskin|sykkel|spinningsykkel|ellipse|ski/ui', $text ) ) {
+			return 'kondisjon';
+		}
+		if ( preg_match( '/manual|dumbbell|vektstang|barbell|kettlebell|rack|stativ|vektplate|benk/ui', $text ) ) {
+			return 'styrke';
+		}
+		if ( preg_match( '/knest[øo]tte|ankelst[øo]tte|ryggbelte|st[øo]tte|kne|ankel|rygg|strikk|powerband|rehab/ui', $text ) ) {
+			return 'rehabilitering';
+		}
+		if ( preg_match( '/massasje|theragun|foam|tens|restitusjon/ui', $text ) ) {
+			return 'restitusjon';
+		}
+
+		return 'kondisjon';
+	}
+
+	/**
 	 * Get fallback products matching the user's Unsplash reference dataset.
 	 *
 	 * @return array<int, array<string, mixed>>
@@ -95,6 +121,7 @@ class Gear_Engine_Price_Comparison {
 		return array(
 			array(
 				'id'            => 1,
+				'department'    => 'kondisjon',
 				'category'      => 'Romaskiner',
 				'brand'         => 'Concept2',
 				'name'          => 'RowErg PM5 Romaskin Standard',
@@ -116,6 +143,7 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 2,
+				'department'    => 'kondisjon',
 				'category'      => 'Tredemøller',
 				'brand'         => 'Sole',
 				'name'          => 'F85 Tredemølle 2024-modell m/Bluetooth og touchskjerm',
@@ -138,6 +166,7 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 3,
+				'department'    => 'styrke',
 				'category'      => 'Kettlebells',
 				'brand'         => 'Abilica',
 				'name'          => 'Competition Kettlebell 16kg',
@@ -157,6 +186,7 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 4,
+				'department'    => 'styrke',
 				'category'      => 'Racks og stativer',
 				'brand'         => 'Titan Life',
 				'name'          => 'Squat Rack Pro Hjemmegym',
@@ -177,6 +207,7 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 5,
+				'department'    => 'styrke',
 				'category'      => 'Vektstenger',
 				'brand'         => 'Gymgrossisten',
 				'name'          => 'Olympisk Vektstang 20kg',
@@ -197,7 +228,8 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 7,
-				'category'      => 'Massasje',
+				'department'    => 'restitusjon',
+				'category'      => 'Massasjepistoler',
 				'brand'         => 'Therabody',
 				'name'          => 'Theragun Pro G5',
 				'currentPrice'  => 4999,
@@ -217,6 +249,7 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'id'            => 8,
+				'department'    => 'styrke',
 				'category'      => 'Manualer',
 				'brand'         => 'Bowflex',
 				'name'          => 'SelectTech 552i Justerbare Manualer',
@@ -232,6 +265,67 @@ class Gear_Engine_Price_Comparison {
 					'Vektintervall'   => '2 - 24 kg',
 					'Antall trinn'    => '15',
 					'Plassbesparende' => 'Ja',
+				),
+			),
+			array(
+				'id'            => 9,
+				'department'    => 'rehabilitering',
+				'category'      => 'Knestøtter',
+				'brand'         => 'Bauerfeind',
+				'name'          => 'GenuTrain Knestøtte Aktiv V2',
+				'currentPrice'  => 849,
+				'originalPrice' => 1099,
+				'discount'      => 22,
+				'shop'          => 'Fjellsport',
+				'otherShops'    => 1,
+				'inStock'       => true,
+				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80',
+				'url'           => '#',
+				'specs'         => array(
+					'Type'          => 'Aktiv støtte',
+					'Neopren'       => 'Nei',
+					'Sideavstivere' => 'Ja',
+				),
+			),
+			array(
+				'id'            => 10,
+				'department'    => 'rehabilitering',
+				'category'      => 'Treningsstrikker',
+				'brand'         => 'Abilica',
+				'name'          => 'Rubber Band Treningsstrikk 3-pk',
+				'currentPrice'  => 249,
+				'originalPrice' => 349,
+				'discount'      => 28,
+				'shop'          => 'Treningspartner',
+				'otherShops'    => 0,
+				'inStock'       => true,
+				'image'         => 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=400&q=80',
+				'url'           => '#',
+				'specs'         => array(
+					'Motstand'  => 'Lett, Medium, Hard',
+					'Materiale' => 'Lateksfritt gummi',
+					'Lengde'    => '30 cm',
+				),
+			),
+			array(
+				'id'            => 11,
+				'department'    => 'restitusjon',
+				'category'      => 'Foam Rollers',
+				'brand'         => 'TriggerPoint',
+				'name'          => 'GRID Foam Roller 33cm',
+				'currentPrice'  => 399,
+				'originalPrice' => 499,
+				'discount'      => 20,
+				'shop'          => 'X-Life',
+				'otherShops'    => 1,
+				'inStock'       => true,
+				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80',
+				'url'           => '#',
+				'specs'         => array(
+					'Lengde'         => '33 cm',
+					'Diameter'       => '14 cm',
+					'Maksbelastning' => '225 kg',
+					'Materiale'      => 'EVA-skum',
 				),
 			),
 		);
@@ -345,8 +439,15 @@ class Gear_Engine_Price_Comparison {
 			$raw_specs = get_post_meta( $post_id, '_gear_engine_specs', true );
 			$specs     = is_array( $raw_specs ) ? $raw_specs : array();
 
+			// Resolve department.
+			$department = (string) get_post_meta( $post_id, '_gear_engine_department', true );
+			if ( empty( $department ) ) {
+				$department = self::infer_department( $category, $post->post_title );
+			}
+
 			$feed[] = array(
 				'id'            => $post_id,
+				'department'    => $department,
 				'category'      => $category,
 				'brand'         => $brand,
 				'name'          => $post->post_title,
@@ -379,6 +480,8 @@ class Gear_Engine_Price_Comparison {
 	public function render( $atts = array() ): string {
 		$atts = shortcode_atts(
 			array(
+				'department' => '',
+				'group'      => '',
 				'category'   => 'Alle',
 				'view'       => 'grid',
 				'limit'      => 12,
@@ -397,10 +500,30 @@ class Gear_Engine_Price_Comparison {
 		// Encode JSON safely for embedding in data attribute.
 		$encoded_feed = rawurlencode( (string) wp_json_encode( $feed_data ) );
 
-		$initial_category = sanitize_text_field( $atts['category'] );
-		$initial_view     = in_array( $atts['view'], array( 'grid', 'list' ), true ) ? $atts['view'] : 'grid';
-		$initial_limit    = max( 4, min( 48, absint( $atts['limit'] ) ) );
-		$show_guide_link  = 'false' !== strtolower( (string) $atts['show_guide'] );
+		$initial_category   = sanitize_text_field( $atts['category'] );
+		$initial_department = sanitize_key( $atts['department'] ?: $atts['group'] );
+
+		// Detect department from category if not explicitly provided
+		if ( empty( $initial_department ) && 'Alle' !== $initial_category ) {
+			$cat_lower = mb_strtolower( $initial_category, 'UTF-8' );
+			if ( in_array( $cat_lower, array( 'tredemøller', 'romaskiner', 'treningssykler', 'ellipsemaskiner' ), true ) ) {
+				$initial_department = 'kondisjon';
+			} elseif ( in_array( $cat_lower, array( 'manualer', 'vektstenger', 'kettlebells', 'racks og stativer' ), true ) ) {
+				$initial_department = 'styrke';
+			} elseif ( in_array( $cat_lower, array( 'knestøtter', 'ankelstøtter', 'ryggbelter', 'treningsstrikker' ), true ) ) {
+				$initial_department = 'rehabilitering';
+			} elseif ( in_array( $cat_lower, array( 'massasjepistoler', 'massasje', 'foam rollers', 'tens-apparater' ), true ) ) {
+				$initial_department = 'restitusjon';
+			}
+		}
+
+		if ( empty( $initial_department ) ) {
+			$initial_department = 'kondisjon';
+		}
+
+		$initial_view    = in_array( $atts['view'], array( 'grid', 'list' ), true ) ? $atts['view'] : 'grid';
+		$initial_limit   = max( 4, min( 48, absint( $atts['limit'] ) ) );
+		$show_guide_link = 'false' !== strtolower( (string) $atts['show_guide'] );
 
 		ob_start();
 		$template_path = GEAR_ENGINE_PATH . 'modules/price-comparison/templates/price-comparison-container.php';
