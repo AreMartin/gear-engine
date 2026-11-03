@@ -677,15 +677,25 @@
 			html += '</div>';
 		}
 
-		// Sticky bottom dock for all steps
-		html += '<div class="dock">' +
-			'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' +
-			icon('ChevronLeft', 18) + ' <span>Forrige</span>' +
-			'</button>' +
-			'<button type="button" class="btn filled primary sl" data-action="next"' + (hasAnswer ? '' : ' disabled') + '>' +
-			(isLast ? 'Fullfør vurdering' : 'Neste steg') + ' ' + icon('ChevronRight', 18) +
-			'</button>' +
-			'</div>';
+		// Bottom dock: Show 'Neste' button only on multiple choice or slider.
+		// On single-choice questions, tapping an option auto-advances (Løsning A).
+		var isAutoSingle = step.type !== 'multiple' && step.type !== 'slider';
+		if (isAutoSingle) {
+			html += '<div class="dock dock--auto">' +
+				'<button type="button" class="btn text btn-back sl" data-action="back" title="Forrige steg">' +
+				icon('ChevronLeft', 18) + ' <span>Forrige steg</span>' +
+				'</button>' +
+				'</div>';
+		} else {
+			html += '<div class="dock">' +
+				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' +
+				icon('ChevronLeft', 18) + ' <span>Forrige</span>' +
+				'</button>' +
+				'<button type="button" class="btn filled primary sl" data-action="next"' + (hasAnswer ? '' : ' disabled') + '>' +
+				(isLast ? 'Fullfør vurdering' : 'Neste steg') + ' ' + icon('ChevronRight', 18) +
+				'</button>' +
+				'</div>';
+		}
 
 		return html;
 	};

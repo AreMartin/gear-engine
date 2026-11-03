@@ -51,7 +51,9 @@
 	outline: none;
 }
 .gear-engine-triage .get-stage {
-	min-height: 460px;
+	display: flex;
+	flex-direction: column;
+	min-height: 500px;
 }
 .gear-engine-triage .get-stage,
 .gear-engine-triage .get-stage:focus,
@@ -171,17 +173,33 @@
 	cursor: not-allowed;
 }
 
-/* Sticky Bottom Dock */
+/* Bottom Navigation Dock */
 .gear-engine-triage .dock {
-	position: sticky;
-	bottom: 0;
-	z-index: 10;
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	padding: 16px 0 20px;
-	margin-top: 28px;
-	background: linear-gradient(to top, var(--md-sys-color-surface, #FFFFFF) 85%, transparent);
+	margin-top: auto;
+	padding-top: 18px;
+	border-top: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+}
+.gear-engine-triage .dock--auto {
+	justify-content: flex-start;
+	border-top: none;
+	padding-top: 8px;
+}
+.gear-engine-triage .dock--auto .btn-back {
+	width: auto;
+	height: 38px;
+	padding: 0 16px;
+	border-radius: 999px;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	font-weight: 500;
+	background: transparent;
+	border: none;
+}
+.gear-engine-triage .dock--auto .btn-back:hover {
+	background: var(--md-sys-color-surface-container-high, #EAEEF4);
+	color: var(--md-sys-color-primary, #0C2340);
 }
 .gear-engine-triage .dock .btn { flex: 1; height: 48px; font-size: 15px; font-weight: 600; }
 .gear-engine-triage .dock .btn-back { flex: 0 0 auto; width: auto; padding: 0 20px; }

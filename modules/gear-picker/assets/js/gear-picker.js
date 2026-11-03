@@ -584,11 +584,17 @@
 				h += renderLiveCard();
 			}
 
-			// Dock
-			h += '<div class="dock">' +
-				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
-				'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
-				'</div>';
+			// Dock: Show 'Neste steg' only on slider steps. On choice questions, selection auto-advances.
+			if ( s.type === 'choice' ) {
+				h += '<div class="dock dock--choice">' +
+					'<button type="button" class="btn text btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 18 ) + ' <span>Forrige steg</span></button>' +
+					'</div>';
+			} else {
+				h += '<div class="dock">' +
+					'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
+					'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
+					'</div>';
+			}
 
 			return h;
 		}
