@@ -84,6 +84,71 @@ assert_test( strpos( $html, 'data-feed="' ) !== false, 'Rendered HTML contains e
 assert_test( strpos( $html, 'ge-price-comp-guide-banner' ) !== false, 'Rendered HTML contains guide cross-link banner' );
 assert_test( strpos( $html, '/kjopsveiledere/' ) !== false, 'Rendered HTML guide banner links to /kjopsveiledere/' );
 
+// 4. Del 1: Sorting by savings_desc (størst kroneavslag)
+$sorted_by_savings = $fallback;
+usort(
+	$sorted_by_savings,
+	function ( $a, $b ) {
+		$sav_a = ( isset( $a['originalPrice'], $a['currentPrice'] ) && $a['originalPrice'] > $a['currentPrice'] ) ? ( $a['originalPrice'] - $a['currentPrice'] ) : 0;
+		$sav_b = ( isset( $b['originalPrice'], $b['currentPrice'] ) && $b['originalPrice'] > $b['currentPrice'] ) ? ( $b['originalPrice'] - $b['currentPrice'] ) : 0;
+		return ( $sav_b <=> $sav_a ) ?: ( $a['currentPrice'] <=> $b['currentPrice'] );
+	}
+);
+
+assert_test( $sorted_by_savings[0]['brand'] === 'Sole', 'Top savings product is Sole (4394 kr avslag)' );
+assert_test( $sorted_by_savings[1]['brand'] === 'Concept2', 'Second savings product is Concept2 (3110 kr avslag)' );
+$sole_savings = $sorted_by_savings[0]['originalPrice'] - $sorted_by_savings[0]['currentPrice'];
+assert_test( $sole_savings === 4394, 'Sole F85 savings calculated to exactly 4394,-' );
+
+// 5. Del 1: UI Assets & markup verification
+$css_content = file_get_contents( GEAR_ENGINE_PATH . 'modules/price-comparison/assets/css/price-comparison.css' );
+$js_content  = file_get_contents( GEAR_ENGINE_PATH . 'modules/price-comparison/assets/js/price-comparison.js' );
+
+assert_test( strpos( $css_content, 'ge-comp-view-toggle-wrap' ) !== false, 'CSS contains .ge-comp-view-toggle-wrap' );
+assert_test( strpos( $css_content, 'ge-savings-chip' ) !== false, 'CSS contains .ge-savings-chip styling' );
+assert_test( strpos( $css_content, 'ge-comp-quick-filters' ) !== false, 'CSS contains .ge-comp-quick-filters' );
+assert_test( strpos( $css_content, '@container ge-price-comp-root (min-width: 800px)' ) !== false, 'CSS contains 2-column container query at >=800px' );
+assert_test( strpos( $css_content, 'align-items: start' ) !== false, 'CSS list grid uses align-items: start' );
+
+assert_test( strpos( $js_content, 'QUICK_FILTER_DEFS' ) !== false, 'JS contains QUICK_FILTER_DEFS' );
+assert_test( strpos( $js_content, 'ge-savings-chip' ) !== false, 'JS conditionally renders ge-savings-chip' );
+assert_test( strpos( $js_content, 'Rutenett' ) !== false, 'JS contains labeled Rutenett view button' );
+assert_test( strpos( $js_content, 'Liste' ) !== false, 'JS contains labeled Liste view button' );
+
+// 6. Del 2: Specifications in fallback products
+assert_test( isset( $fallback[0]['specs'] ) && is_array( $fallback[0]['specs'] ), 'Concept2 fallback product has specs array' );
+assert_test( $fallback[0]['specs']['Motstand'] === 'Luftmotstand', 'Concept2 has Motstand = Luftmotstand' );
+assert_test( isset( $fallback[1]['specs'] ) && $fallback[1]['specs']['Toppfart'] === '22 km/t', 'Sole F85 has Toppfart = 22 km/t' );
+assert_test( isset( $fallback[5]['specs'] ) && $fallback[5]['specs']['Slaglengde'] === '16 mm', 'Theragun Pro has Slaglengde = 16 mm' );
+
+// 7. Del 2: Template markup for dock and comparison modal
+assert_test( strpos( $html, 'id="ge-floating-cmp-bar"' ) !== false, 'Container template contains #ge-floating-cmp-bar dock' );
+assert_test( strpos( $html, 'id="ge-cmp-modal"' ) !== false, 'Container template contains #ge-cmp-modal dialog' );
+assert_test( strpos( $html, 'id="ge-cmp-diff-only"' ) !== false, 'Container template contains diff-only toggle #ge-cmp-diff-only' );
+assert_test( strpos( $html, 'id="ge-cmp-open-modal-btn"' ) !== false, 'Container template contains open modal button #ge-cmp-open-modal-btn' );
+
+// 8. Del 2: CSS Comparison Matrix & Modal styling
+assert_test( strpos( $css_content, '.ge-comp-dock' ) !== false, 'CSS contains .ge-comp-dock styling' );
+assert_test( strpos( $css_content, '.ge-cmp-modal-scrim' ) !== false, 'CSS contains .ge-cmp-modal-scrim styling' );
+assert_test( strpos( $css_content, '.ge-cmp-modal-card' ) !== false, 'CSS contains .ge-cmp-modal-card styling' );
+assert_test( strpos( $css_content, '.ge-matrix-table' ) !== false, 'CSS contains .ge-matrix-table styling' );
+assert_test( strpos( $css_content, '.matrix-prod-col.is-best-col' ) !== false, 'CSS contains Best Price column highlight (.is-best-col)' );
+assert_test( strpos( $css_content, '.ge-matrix-best-tag' ) !== false, 'CSS contains .ge-matrix-best-tag badge' );
+assert_test( strpos( $css_content, '.ge-spec-win' ) !== false, 'CSS contains numeric winner tag .ge-spec-win' );
+assert_test( strpos( $css_content, '.ge-antifit-box' ) !== false, 'CSS contains anti-fit note box .ge-antifit-box' );
+assert_test( strpos( $css_content, '.ge-card-cmp-label' ) !== false, 'CSS contains card compare checkbox label .ge-card-cmp-label' );
+
+// 9. Del 2: JS Comparison Motor & Side-by-side Logic
+assert_test( strpos( $js_content, 'selectedForCompare' ) !== false, 'JS state manages selectedForCompare array' );
+assert_test( strpos( $js_content, 'showOnlyDiffs' ) !== false, 'JS state manages showOnlyDiffs boolean' );
+assert_test( strpos( $js_content, 'renderCompareMatrix' ) !== false, 'JS defines renderCompareMatrix() function' );
+assert_test( strpos( $js_content, 'updateDock' ) !== false, 'JS defines updateDock() function' );
+assert_test( strpos( $js_content, 'getAntiFitNotes' ) !== false, 'JS defines getAntiFitNotes() deterministic rule engine' );
+assert_test( strpos( $js_content, 'window.GearEnginePriceComparison' ) !== false, 'JS exports window.GearEnginePriceComparison API' );
+assert_test( strpos( $js_content, 'Høyest' ) !== false, 'JS generates Høyest winner tag on numeric specs' );
+assert_test( strpos( $js_content, 'Best pris' ) !== false, 'JS renders Best pris utheving in comparison matrix' );
+assert_test( strpos( $js_content, 'Vær obs på' ) !== false, 'JS renders Vær obs på anti-fit section in comparison matrix' );
+
 echo "========================================================\n";
 if ( $failed === 0 ) {
 	echo "ALL PRICE COMPARISON TESTS PASSED ($passed/$passed)\n";

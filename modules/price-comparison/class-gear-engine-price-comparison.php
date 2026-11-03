@@ -106,6 +106,13 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Motstand'        => 'Luftmotstand',
+					'Brukervekt'      => '227 kg',
+					'Skjerm'          => 'PM5',
+					'Plassbesparende' => 'Ja (delt i 2)',
+					'Setehøyde'       => '36 cm',
+				),
 			),
 			array(
 				'id'            => 2,
@@ -120,6 +127,14 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Toppfart'      => '22 km/t',
+					'Motor'         => '4.0 HK',
+					'Løpeflate'     => '56 x 152 cm',
+					'Maks stigning' => '15 %',
+					'Brukervekt'    => '165 kg',
+					'Vekt'          => '125 kg',
+				),
 			),
 			array(
 				'id'            => 3,
@@ -134,6 +149,11 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Vekt' => '16 kg',
+					'Type' => 'Konkurranse (stål)',
+					'Grep' => '33 mm',
+				),
 			),
 			array(
 				'id'            => 4,
@@ -148,6 +168,12 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Maksbelastning' => '300 kg',
+					'Høyde'          => '180 cm',
+					'Bredde'         => '120 cm',
+					'Vekt'           => '55 kg',
+				),
 			),
 			array(
 				'id'            => 5,
@@ -162,6 +188,12 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Vekt'           => '20 kg',
+					'Lengde'         => '220 cm',
+					'Grepsdiameter'  => '28 mm',
+					'Maksbelastning' => '680 kg',
+				),
 			),
 			array(
 				'id'            => 7,
@@ -176,6 +208,12 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Slaglengde' => '16 mm',
+					'Kraft'      => '27 kg motstandskraft',
+					'Batteri'    => '150 min',
+					'Hastighet'  => '5 trinn',
+				),
 			),
 			array(
 				'id'            => 8,
@@ -190,6 +228,11 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'specs'         => array(
+					'Vektintervall'   => '2 - 24 kg',
+					'Antall trinn'    => '15',
+					'Plassbesparende' => 'Ja',
+				),
 			),
 		);
 	}
@@ -298,6 +341,10 @@ class Gear_Engine_Price_Comparison {
 			$total_shops = $item_counts[ $group_key ] ?? 1;
 			$other_shops = max( 0, $total_shops - 1 );
 
+			// Resolve specs if set in meta.
+			$raw_specs = get_post_meta( $post_id, '_gear_engine_specs', true );
+			$specs     = is_array( $raw_specs ) ? $raw_specs : array();
+
 			$feed[] = array(
 				'id'            => $post_id,
 				'category'      => $category,
@@ -311,6 +358,7 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => $in_stock,
 				'image'         => esc_url_raw( $image_url ),
 				'url'           => esc_url_raw( $affiliate_url ?: '#' ),
+				'specs'         => $specs,
 			);
 		}
 

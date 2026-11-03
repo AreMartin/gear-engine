@@ -12,13 +12,306 @@
 
 	// Fallback dataset matching the Unsplash reference data.
 	var fallbackData = [
-		{ id: 1, category: "Romaskiner", brand: "Concept2", name: "RowErg PM5 Romaskin Standard", currentPrice: 12490, originalPrice: 15600, discount: 20, shop: "Fjellsport", otherShops: 3, inStock: true, image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 2, category: "Tredemøller", brand: "Sole", name: "F85 Tredemølle 2024-modell m/Bluetooth og touchskjerm", currentPrice: 24900, originalPrice: 29294, discount: 15, shop: "Treningspartner", otherShops: 0, inStock: true, image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 3, category: "Kettlebells", brand: "Abilica", name: "Competition Kettlebell 16kg", currentPrice: 899, originalPrice: 1199, discount: 25, shop: "X-Life", otherShops: 1, inStock: true, image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 4, category: "Racks og stativer", brand: "Titan Life", name: "Squat Rack Pro Hjemmegym", currentPrice: 3499, originalPrice: 4500, discount: 22, shop: "Treningspartner", otherShops: 0, inStock: true, image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 5, category: "Vektstenger", brand: "Gymgrossisten", name: "Olympisk Vektstang 20kg", currentPrice: 1999, originalPrice: 2499, discount: 20, shop: "Gymgrossisten", otherShops: 0, inStock: true, image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 7, category: "Massasje", brand: "Therabody", name: "Theragun Pro G5", currentPrice: 4999, originalPrice: 5999, discount: 16, shop: "Anton Sport", otherShops: 0, inStock: true, image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80", url: "#" },
-		{ id: 8, category: "Manualer", brand: "Bowflex", name: "SelectTech 552i Justerbare Manualer", currentPrice: 2999, originalPrice: null, discount: null, shop: "Fjellsport", otherShops: 2, inStock: true, image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80", url: "#" }
+		{
+			id: 1,
+			category: "Romaskiner",
+			brand: "Concept2",
+			name: "RowErg PM5 Romaskin Standard",
+			currentPrice: 12490,
+			originalPrice: 15600,
+			discount: 20,
+			shop: "Fjellsport",
+			otherShops: 3,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Motstand": "Luftmotstand",
+				"Brukervekt": "227 kg",
+				"Skjerm": "PM5",
+				"Plassbesparende": "Ja (delt i 2)",
+				"Setehøyde": "36 cm"
+			}
+		},
+		{
+			id: 2,
+			category: "Tredemøller",
+			brand: "Sole",
+			name: "F85 Tredemølle 2024-modell m/Bluetooth og touchskjerm",
+			currentPrice: 24900,
+			originalPrice: 29294,
+			discount: 15,
+			shop: "Treningspartner",
+			otherShops: 0,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Toppfart": "22 km/t",
+				"Motor": "4.0 HK",
+				"Løpeflate": "56 x 152 cm",
+				"Maks stigning": "15 %",
+				"Brukervekt": "165 kg",
+				"Vekt": "125 kg"
+			}
+		},
+		{
+			id: 3,
+			category: "Kettlebells",
+			brand: "Abilica",
+			name: "Competition Kettlebell 16kg",
+			currentPrice: 899,
+			originalPrice: 1199,
+			discount: 25,
+			shop: "X-Life",
+			otherShops: 1,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Vekt": "16 kg",
+				"Type": "Konkurranse (stål)",
+				"Grep": "33 mm"
+			}
+		},
+		{
+			id: 4,
+			category: "Racks og stativer",
+			brand: "Titan Life",
+			name: "Squat Rack Pro Hjemmegym",
+			currentPrice: 3499,
+			originalPrice: 4500,
+			discount: 22,
+			shop: "Treningspartner",
+			otherShops: 0,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Maksbelastning": "300 kg",
+				"Høyde": "180 cm",
+				"Bredde": "120 cm",
+				"Vekt": "55 kg"
+			}
+		},
+		{
+			id: 5,
+			category: "Vektstenger",
+			brand: "Gymgrossisten",
+			name: "Olympisk Vektstang 20kg",
+			currentPrice: 1999,
+			originalPrice: 2499,
+			discount: 20,
+			shop: "Gymgrossisten",
+			otherShops: 0,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Vekt": "20 kg",
+				"Lengde": "220 cm",
+				"Grepsdiameter": "28 mm",
+				"Maksbelastning": "680 kg"
+			}
+		},
+		{
+			id: 7,
+			category: "Massasje",
+			brand: "Therabody",
+			name: "Theragun Pro G5",
+			currentPrice: 4999,
+			originalPrice: 5999,
+			discount: 16,
+			shop: "Anton Sport",
+			otherShops: 0,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Slaglengde": "16 mm",
+				"Kraft": "27 kg motstandskraft",
+				"Batteri": "150 min",
+				"Hastighet": "5 trinn"
+			}
+		},
+		{
+			id: 8,
+			category: "Manualer",
+			brand: "Bowflex",
+			name: "SelectTech 552i Justerbare Manualer",
+			currentPrice: 2999,
+			originalPrice: null,
+			discount: null,
+			shop: "Fjellsport",
+			otherShops: 2,
+			inStock: true,
+			image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80",
+			url: "#",
+			specs: {
+				"Vektintervall": "2 - 24 kg",
+				"Antall trinn": "15",
+				"Plassbesparende": "Ja"
+			}
+		}
+	];
+
+	// Anti-Fit Rule Engine (Deterministic expert advice)
+	function getAntiFitNotes(p) {
+		var notes = [];
+		var cat = (p.category || '').toLowerCase();
+		var specs = p.specs || {};
+
+		// 1. Tredemøller
+		if (cat.indexOf('tredemølle') !== -1 || cat.indexOf('tredemolle') !== -1) {
+			if (specs['Løpeflate']) {
+				var m = specs['Løpeflate'].match(/(\d+)\s*[xX*]\s*(\d+)/);
+				if (m) {
+					var w = parseInt(m[1], 10);
+					var l = parseInt(m[2], 10);
+					if (l < 140 || w < 48) {
+						notes.push('Vurder lengre løpeflate (>140 cm) hvis du er over 185 cm og skal løpe i høyt tempo.');
+					}
+				}
+			}
+			if (specs['Toppfart']) {
+				var speed = parseFloat(specs['Toppfart']);
+				if (speed > 0 && speed < 18) {
+					notes.push('Maksfart under 18 km/t egner seg best for gange og rolig jogg, ikke raske intervaller.');
+				}
+			}
+			if (specs['Vekt']) {
+				var weight = parseFloat(specs['Vekt']);
+				if (weight >= 90) {
+					notes.push('Veier over 90 kg – krever ofte 2 personer ved innbæring og montering.');
+				}
+			} else if (p.name && p.name.indexOf('F85') !== -1) {
+				notes.push('Veier over 100 kg – krever bærehjelp ved mottak og montering.');
+			}
+		}
+
+		// 2. Romaskiner
+		if (cat.indexOf('romaskin') !== -1) {
+			if (specs['Motstand'] && specs['Motstand'].toLowerCase().indexOf('luft') !== -1) {
+				notes.push('Luftmotstand gir mest dynamisk rotak, men lager mer susing enn magnetbrems.');
+			}
+			if (specs['Brukervekt']) {
+				var maxW = parseFloat(specs['Brukervekt']);
+				if (maxW > 0 && maxW < 130) {
+					notes.push('Maks brukervekt kan være i snaueste laget for tyngre utøvere.');
+				}
+			}
+		}
+
+		// 3. Vektutstyr / Stativer
+		if (cat.indexOf('kettlebell') !== -1 || cat.indexOf('vektstang') !== -1 || cat.indexOf('manual') !== -1 || cat.indexOf('rack') !== -1) {
+			if (specs['Type'] && specs['Type'].toLowerCase().indexOf('konkurranse') !== -1) {
+				notes.push('Konkurranseformat har faste dimensjoner uansett vekt – ideelt for teknikk, men tar mer plass.');
+			} else if (specs['Maksbelastning']) {
+				var load = parseFloat(specs['Maksbelastning']);
+				if (load >= 300) {
+					notes.push('Kraftig stålkonstruksjon – sjekk underlag og gulvbeskyttelse ved tyngre løft.');
+				}
+			}
+		}
+
+		// 4. Skadestøtter: Knestøtter
+		if (cat.indexOf('knestøtte') !== -1 || cat.indexOf('knestotte') !== -1) {
+			if (specs['Neopren'] === 'Ja') {
+				notes.push('Inneholder neopren – vurder pustende strikk ved overfølsomhet eller eksem.');
+			}
+			if (specs['Støttenivå'] && specs['Støttenivå'].indexOf('Patella') !== -1) {
+				notes.push('Spesialutviklet for patellofemorale smerter og hopperkne, ikke egnet for leddbåndskader.');
+			}
+		}
+
+		// 5. Skadestøtter: Ankelstøtter
+		if (cat.indexOf('ankelstøtte') !== -1 || cat.indexOf('ankelstotte') !== -1) {
+			notes.push('Snøring og sidestropper bygger litt i bredden – sjekk at skoen har god plass.');
+		}
+
+		// 6. Skadestøtter: Ryggbelter
+		if (cat.indexOf('ryggbelte') !== -1) {
+			if (specs['Neopren'] === 'Ja') {
+				notes.push('Inneholder neopren for varmeeffekt – anbefales for kortere økter, ikke kontinuerlig hverdagsbruk.');
+			}
+			notes.push('Bør kombineres med aktive kjerneøvelser fremfor passiv heldagsbruk.');
+		}
+
+		// 7. Massasjepistoler
+		if (cat.indexOf('massasje') !== -1) {
+			if (specs['Slaglengde']) {
+				var stroke = parseFloat(specs['Slaglengde']);
+				if (stroke >= 16) {
+					notes.push('16 mm slaglengde gir svært dyp behandling – unngå direkte over beinfremspring.');
+				} else if (stroke > 0 && stroke < 12) {
+					notes.push('Mindre slaglengde gir lett vibrasjonsmassasje, men når ikke like dypt som 16 mm.');
+				}
+			}
+		}
+
+		// 8. Foam Rollers
+		if (cat.indexOf('foam') !== -1) {
+			notes.push('Fast multi-densitet EVA gir intens trykkbelastning – kan oppleves hard for nybegynnere.');
+		}
+
+		// 9. TENS
+		if (cat.indexOf('tens') !== -1) {
+			notes.push('Må ikke brukes ved pacemaker, metallimplantater i behandlingsområdet eller graviditet.');
+		}
+
+		if (notes.length === 0) {
+			notes.push('Ingen spesielle forbehold registrert for standard bruk.');
+		}
+
+		return notes;
+	}
+
+	var QUICK_FILTER_DEFS = [
+		{
+			id: 'in_stock',
+			label: 'Kun på lager',
+			test: function (p) { return p.inStock === true; }
+		},
+		{
+			id: 'on_sale',
+			label: 'På tilbud',
+			test: function (p) {
+				return (p.discount && p.discount > 0) || (p.originalPrice && p.originalPrice > p.currentPrice);
+			}
+		},
+		{
+			id: 'intervall',
+			label: '20+ km/t',
+			test: function (p) {
+				return (p.specs && p.specs['Toppfart'] && parseFloat(p.specs['Toppfart']) >= 20) ||
+					(p.name && /2[0-9]\s*km/i.test(p.name)) ||
+					(p.name && /f85/i.test(p.name));
+			}
+		},
+		{
+			id: 'justerbar',
+			label: 'Justerbare',
+			test: function (p) {
+				return (p.specs && p.specs['Plassbesparende'] === 'Ja') ||
+					(p.specs && p.specs['Type'] && p.specs['Type'].indexOf('Justerbar') !== -1) ||
+					(p.name && /justerbar/i.test(p.name));
+			}
+		},
+		{
+			id: 'neoprenfri',
+			label: 'Uten neopren',
+			test: function (p) {
+				return p.specs && p.specs['Neopren'] === 'Nei';
+			}
+		},
+		{
+			id: 'dypvev',
+			label: 'Dypvev',
+			test: function (p) {
+				return (p.specs && p.specs['Slaglengde'] && parseFloat(p.specs['Slaglengde']) >= 14) ||
+					(p.name && /g5|theragun/i.test(p.name));
+			}
+		}
 	];
 
 	function formatPrice(price) {
@@ -68,6 +361,9 @@
 			activeCategory: initialCat,
 			activeShops: [],
 			activeBrands: [],
+			activeQuickFilters: {},
+			selectedForCompare: [],
+			showOnlyDiffs: false,
 			minPrice: '',
 			maxPrice: '',
 			absMinPrice: 0,
@@ -105,6 +401,33 @@
 		// Render the initial static layout skeleton
 		renderSkeleton(root, categories, state);
 
+		// Render Tier 1: Quick Filter Chips (Exposed on page)
+		function renderQuickFilters() {
+			var wrap = root.querySelector('#ge-comp-quick-filters');
+			if (!wrap) return;
+			wrap.innerHTML = '';
+			QUICK_FILTER_DEFS.forEach(function (def) {
+				var isActive = !!state.activeQuickFilters[def.id];
+				var btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'ge-quick-chip' + (isActive ? ' is-active' : '');
+				btn.innerHTML = (isActive ? '<span class="ge-quick-chip-check">✓</span> ' : '') + '<span>' + escapeHtml(def.label) + '</span>';
+				btn.addEventListener('click', function () {
+					if (state.activeQuickFilters[def.id]) {
+						delete state.activeQuickFilters[def.id];
+					} else {
+						state.activeQuickFilters[def.id] = true;
+					}
+					renderQuickFilters();
+					state.visibleCount = initialLimit;
+					updateUI();
+				});
+				wrap.appendChild(btn);
+			});
+		}
+
+		renderQuickFilters();
+
 		// Cache DOM nodes for smooth targeted updates
 		var searchInput = root.querySelector('.ge-comp-search-input');
 		var sortSelect = root.querySelector('.ge-comp-sort-select');
@@ -125,6 +448,371 @@
 		var resultsCount = root.querySelector('#ge-comp-results-count');
 		var cardsContainer = root.querySelector('#ge-comp-cards-container');
 		var loadMoreWrap = root.querySelector('#ge-comp-load-more-wrap');
+
+		// Comparison Dock & Modal DOM nodes
+		var floatingDock = document.getElementById('ge-floating-cmp-bar');
+		var cmpModal = document.getElementById('ge-cmp-modal');
+
+		if (!floatingDock) {
+			var dockEl = document.createElement('aside');
+			dockEl.id = 'ge-floating-cmp-bar';
+			dockEl.className = 'ge-comp-dock';
+			dockEl.style.display = 'none';
+			dockEl.setAttribute('aria-label', 'Sammenligningsdokk');
+			dockEl.innerHTML = '<div class="ge-dock-info">' +
+				'<span class="ge-dock-count"><b id="ge-cmp-selected-count">0</b> modeller valgt (maks 3)</span>' +
+				'<div class="ge-dock-thumbs" id="ge-dock-thumbs"></div>' +
+			'</div>' +
+			'<div class="ge-dock-actions">' +
+				'<button type="button" id="ge-cmp-open-modal-btn" class="ge-dock-btn">Sammenlign nå (<span id="ge-dock-btn-count">0</span>)</button>' +
+				'<button type="button" id="ge-cmp-clear-btn" class="ge-dock-clear-btn">Nullstill</button>' +
+			'</div>';
+			root.appendChild(dockEl);
+			floatingDock = dockEl;
+		}
+
+		if (!cmpModal) {
+			var modalEl = document.createElement('div');
+			modalEl.id = 'ge-cmp-modal';
+			modalEl.className = 'ge-cmp-modal-scrim';
+			modalEl.style.display = 'none';
+			modalEl.setAttribute('role', 'dialog');
+			modalEl.setAttribute('aria-modal', 'true');
+			modalEl.setAttribute('aria-labelledby', 'ge-cmp-modal-title');
+			modalEl.innerHTML = '<div class="ge-cmp-modal-card">' +
+				'<div class="ge-cmp-modal-head">' +
+					'<div>' +
+						'<h3 id="ge-cmp-modal-title" class="ge-cmp-modal-title">Sammenlign modeller side-om-side</h3>' +
+						'<span class="ge-cmp-modal-subtitle">Strukturerte nøkkeltall og prissammenligning for de valgte modellene</span>' +
+					'</div>' +
+					'<div class="ge-cmp-modal-controls">' +
+						'<label class="ge-cmp-diff-toggle" title="Skjul spesifikasjoner der modellene har like verdier">' +
+							'<input type="checkbox" id="ge-cmp-diff-only" class="ge-cmp-diff-checkbox" />' +
+							'<span>Vis kun ulikheter</span>' +
+						'</label>' +
+						'<button type="button" id="ge-modal-close-btn" class="ge-cmp-modal-close" title="Lukk sammenligning" aria-label="Lukk">&times;</button>' +
+					'</div>' +
+				'</div>' +
+				'<div id="ge-cmp-modal-body" class="ge-cmp-modal-body"></div>' +
+			'</div>';
+			root.appendChild(modalEl);
+			cmpModal = modalEl;
+		}
+
+		var dockSelectedCount = document.getElementById('ge-cmp-selected-count');
+		var dockThumbs = document.getElementById('ge-dock-thumbs');
+		var dockBtnCount = document.getElementById('ge-dock-btn-count');
+		var dockOpenModalBtn = document.getElementById('ge-cmp-open-modal-btn');
+		var dockClearBtn = document.getElementById('ge-cmp-clear-btn');
+		var cmpModalBody = document.getElementById('ge-cmp-modal-body');
+		var modalCloseBtn = document.getElementById('ge-modal-close-btn');
+		var diffOnlyChk = document.getElementById('ge-cmp-diff-only');
+
+		function updateDock() {
+			if (!floatingDock) return;
+			var count = state.selectedForCompare.length;
+			if (count > 0) {
+				floatingDock.style.display = 'flex';
+				if (dockSelectedCount) dockSelectedCount.textContent = count;
+				if (dockBtnCount) dockBtnCount.textContent = count;
+				if (dockThumbs) {
+					dockThumbs.innerHTML = '';
+					state.selectedForCompare.forEach(function (id) {
+						var p = state.products.filter(function (item) { return item.id === id; })[0];
+						if (p && p.image) {
+							var span = document.createElement('span');
+							span.className = 'ge-dock-thumb';
+							span.title = p.name;
+							span.innerHTML = '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" onerror="this.style.display=\'none\';" />';
+							dockThumbs.appendChild(span);
+						}
+					});
+				}
+			} else {
+				floatingDock.style.display = 'none';
+			}
+		}
+
+		function renderCompareMatrix() {
+			if (!cmpModalBody) return;
+
+			var selected = state.products.filter(function (p) {
+				return state.selectedForCompare.indexOf(p.id) !== -1;
+			});
+
+			if (selected.length === 0) {
+				if (cmpModal) {
+					cmpModal.style.display = 'none';
+					document.body.style.overflow = '';
+				}
+				return;
+			}
+
+			var prices = selected.map(function (p) { return p.currentPrice; });
+			var minPrice = Math.min.apply(null, prices);
+			var maxPrice = Math.max.apply(null, prices);
+			var priceDiff = maxPrice - minPrice;
+			var onlyDiff = !!state.showOnlyDiffs;
+
+			// Sync checkbox state in modal header
+			if (diffOnlyChk) {
+				diffOnlyChk.checked = onlyDiff;
+				var toggleLabel = diffOnlyChk.closest('.ge-cmp-diff-toggle');
+				if (toggleLabel) {
+					if (onlyDiff) {
+						toggleLabel.classList.add('is-active');
+					} else {
+						toggleLabel.classList.remove('is-active');
+					}
+				}
+			}
+
+			// Collect unique spec keys across selected
+			var specKeys = [];
+			selected.forEach(function (p) {
+				if (p.specs) {
+					for (var k in p.specs) {
+						if (p.specs.hasOwnProperty(k) && specKeys.indexOf(k) === -1) {
+							specKeys.push(k);
+						}
+					}
+				}
+			});
+
+			var colWidth = selected.length <= 2 ? 'calc(' + (100 / selected.length) + '% - ' + (145 / selected.length) + 'px)' : '250px';
+
+			var h = '<div class="ge-matrix-wrap"><table class="ge-matrix-table">';
+			h += '<colgroup>';
+			h += '<col style="width:145px; min-width:145px;">';
+			selected.forEach(function () {
+				h += '<col style="width:' + colWidth + '; min-width:220px;">';
+			});
+			h += '</colgroup>';
+
+			// 1. Header row with cards
+			h += '<tr class="matrix-header-row"><th class="matrix-label-col"><span style="font-size:11px; color:#64748b;">Modeller (' + selected.length + ')</span></th>';
+			selected.forEach(function (p) {
+				var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+				h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+					'<div class="ge-matrix-card-top">' +
+						(isLowest ? '<span class="ge-matrix-best-tag">Best pris</span>' : '') +
+						'<button type="button" class="ge-matrix-remove-btn" data-remove-id="' + p.id + '" title="Fjern fra sammenligning" aria-label="Fjern">&times;</button>' +
+						'<div class="ge-matrix-thumb">' +
+							(p.image ? '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" onerror="this.style.display=\'none\';" />' : '') +
+						'</div>' +
+						'<span class="ge-matrix-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+						'<h4 class="ge-matrix-prod-title" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</h4>' +
+						'<div class="ge-matrix-price-row">' +
+							'<span class="ge-matrix-price">' + formatPrice(p.currentPrice) + '</span>' +
+							(p.discount ? '<span class="ge-matrix-spec-pill deal">-' + p.discount + '%</span>' : '') +
+						'</div>' +
+						'<a href="' + escapeHtml(p.url || '#') + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-matrix-cta">' +
+							'<span>Gå til ' + escapeHtml(p.shop || 'butikk') + '</span> ' + externalLinkIcon() +
+						'</a>' +
+					'</div>' +
+				'</td>';
+			});
+			h += '</tr>';
+
+			// 2. Dagspris / Prissammenligning
+			var isPriceIdentical = selected.every(function (p) { return p.currentPrice === selected[0].currentPrice; });
+			if (!onlyDiff || !isPriceIdentical) {
+				h += '<tr><th class="matrix-label-col">Beste dagspris</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+						'<b style="font-size:15px; color:#0C2340; font-variant-numeric:tabular-nums;">' + formatPrice(p.currentPrice) + '</b>' +
+						(isLowest ? ' <span class="ge-matrix-spec-pill tert" style="margin-left:4px;">Best pris</span>' : '') +
+					'</td>';
+				});
+				h += '</tr>';
+			}
+
+			// 3. Forhandler
+			var isShopIdentical = selected.every(function (p) {
+				return p.shop === selected[0].shop && (p.otherShops || 0) === (selected[0].otherShops || 0);
+			});
+			if (!onlyDiff || !isShopIdentical) {
+				h += '<tr><th class="matrix-label-col">Forhandler</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					var count = (p.otherShops || 0) + 1;
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+						'<span style="font-weight:600; color:#0C2340;">' + escapeHtml(p.shop || 'Ukjent') + '</span> ' +
+						(count > 1 ? '<span style="font-size:11px; color:#64748b;">(' + count + ' butikker)</span>' : '<span style="font-size:11px; color:#059669;">(Eneste forhandler)</span>') +
+					'</td>';
+				});
+				h += '</tr>';
+			}
+
+			// 4. Førpris / Tilbud
+			var isOrigIdentical = selected.every(function (p) { return (p.originalPrice || 0) === (selected[0].originalPrice || 0); });
+			if (!onlyDiff || !isOrigIdentical) {
+				h += '<tr><th class="matrix-label-col">Førpris / Tilbud</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					if (p.originalPrice && p.originalPrice > p.currentPrice) {
+						var save = p.originalPrice - p.currentPrice;
+						h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+							'<s style="color:#94a3b8; font-size:12px; margin-right:4px;">' + formatPrice(p.originalPrice) + '</s>' +
+							'<span class="ge-matrix-spec-pill deal">Spar ' + formatPrice(save) + '</span>' +
+						'</td>';
+					} else {
+						h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '"><span style="color:#94a3b8; font-size:12px;">Ordinær pris</span></td>';
+					}
+				});
+				h += '</tr>';
+			}
+
+			// 5. Lagerstatus
+			var isStockIdentical = selected.every(function (p) { return p.inStock === selected[0].inStock; });
+			if (!onlyDiff || !isStockIdentical) {
+				h += '<tr><th class="matrix-label-col">Lagerstatus</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+						'<span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;">' +
+							'<span class="ge-stock-dot ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '"></span>' +
+							(p.inStock ? 'På lager' : 'Utsolgt') +
+						'</span>' +
+					'</td>';
+				});
+				h += '</tr>';
+			}
+
+			// 6. Kategori
+			var isCatIdentical = selected.every(function (p) { return p.category === selected[0].category; });
+			if (!onlyDiff || !isCatIdentical) {
+				h += '<tr><th class="matrix-label-col">Kategori</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '"><span class="ge-matrix-spec-pill sec">' + escapeHtml(p.category || 'Annet') + '</span></td>';
+				});
+				h += '</tr>';
+			}
+
+			// 7. Vær obs på (Anti-Fit)
+			var allAntiFitNotes = selected.map(function (p) { return getAntiFitNotes(p).join(' | '); });
+			var isAntiFitIdentical = allAntiFitNotes.every(function (n) { return n === allAntiFitNotes[0]; });
+			if (!onlyDiff || !isAntiFitIdentical) {
+				h += '<tr><th class="matrix-label-col">' +
+					'<div style="display:flex; align-items:center; gap:6px; color:#0C2340; font-weight:700;">' +
+						'<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#f1f5f9; color:#475569; font-size:11px;">ℹ</span>' +
+						'<span>Vær obs på</span>' +
+					'</div>' +
+				'</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					var notes = getAntiFitNotes(p);
+					var hasRealNotes = notes.length > 0 && notes[0] !== 'Ingen spesielle forbehold registrert for standard bruk.';
+					var boxClass = 'ge-antifit-box' + (hasRealNotes ? '' : ' is-clean');
+					var headerHtml = hasRealNotes
+						? '<div class="ge-antifit-header"><span>ℹ</span> <span>Obs</span></div>'
+						: '<div class="ge-antifit-header"><span>✓</span> <span>Allround-modell</span></div>';
+					var noteHtml = notes.map(function (n) {
+						var bullet = hasRealNotes ? '•' : '✓';
+						return '<div class="ge-antifit-note">' +
+							'<span class="ge-antifit-bullet">' + bullet + '</span>' +
+							'<span>' + escapeHtml(n) + '</span>' +
+						'</div>';
+					}).join('');
+
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
+						'<div class="' + boxClass + '">' +
+							headerHtml +
+							noteHtml +
+						'</div>' +
+					'</td>';
+				});
+				h += '</tr>';
+			}
+
+			// 8. Dynamic Specs (med vinner-merking for målbare numeriske verdier)
+			var higherBetterKeys = ['Toppfart', 'Motor', 'Brukervekt', 'Slaglengde', 'Maksbelastning', 'Batteri'];
+			specKeys.forEach(function (key) {
+				var isHigherBetter = higherBetterKeys.indexOf(key) !== -1;
+				var val0 = (selected[0].specs && selected[0].specs[key]) ? selected[0].specs[key] : '—';
+				var isSpecIdentical = selected.every(function (p) {
+					var v = (p.specs && p.specs[key]) ? p.specs[key] : '—';
+					return v === val0;
+				});
+
+				if (onlyDiff && isSpecIdentical) return;
+
+				var maxNum = -1;
+				if (isHigherBetter && selected.length > 1) {
+					selected.forEach(function (p) {
+						var v = (p.specs && p.specs[key]) ? p.specs[key] : null;
+						if (v) {
+							var num = parseFloat(v);
+							if (!isNaN(num) && num > maxNum) maxNum = num;
+						}
+					});
+					// Only award if there is actual variation
+					var hasDiff = selected.some(function (p) {
+						var v = (p.specs && p.specs[key]) ? p.specs[key] : null;
+						return v && parseFloat(v) !== maxNum;
+					});
+					if (!hasDiff) maxNum = -1;
+				}
+
+				h += '<tr><th class="matrix-label-col">' + escapeHtml(key) + '</th>';
+				selected.forEach(function (p) {
+					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+					var rawVal = (p.specs && p.specs[key]) ? escapeHtml(p.specs[key]) : '<span style="color:#94a3b8; font-weight:normal;">—</span>';
+					var isWin = false;
+					if (maxNum > -1 && p.specs && p.specs[key]) {
+						var parsed = parseFloat(p.specs[key]);
+						if (!isNaN(parsed) && parsed === maxNum) isWin = true;
+					}
+
+					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '" style="font-weight:600; color:#0C2340;">' +
+						rawVal + (isWin ? ' <span class="ge-spec-win">Høyest</span>' : '') +
+					'</td>';
+				});
+				h += '</tr>';
+			});
+
+			// 9. Bunnrad med handlingsknapp
+			h += '<tr style="background:#f8fafc;"><th class="matrix-label-col" style="background:#f8fafc;">Handling</th>';
+			selected.forEach(function (p) {
+				var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+				h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '" style="' + (isLowest ? 'background:#F1F8F4;' : 'background:#f8fafc;') + '">' +
+					'<a href="' + escapeHtml(p.url || '#') + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-matrix-cta" style="height:34px; font-size:12px;">' +
+						'<span>Se tilbud</span> ' + externalLinkIcon() +
+					'</a>' +
+				'</td>';
+			});
+			h += '</tr>';
+
+			h += '</table></div>';
+
+			// Summary footer
+			if (selected.length > 1 && priceDiff > 0) {
+				h += '<div style="margin-top:14px; padding:10px 14px; background:#f8fafc; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:12.5px; border:1px solid #e2e8f0;">' +
+					'<span>Prisspenn i sammenligningen: <b>' + formatPrice(minPrice) + '</b> – <b>' + formatPrice(maxPrice) + '</b></span>' +
+					'<span style="color:#059669; font-weight:700;">Prisforskjell: ' + formatPrice(priceDiff) + '</span>' +
+				'</div>';
+			}
+
+			cmpModalBody.innerHTML = h;
+
+			// Attach remove button listeners
+			cmpModalBody.querySelectorAll('.ge-matrix-remove-btn').forEach(function (btn) {
+				btn.addEventListener('click', function (e) {
+					e.stopPropagation();
+					var id = parseInt(btn.getAttribute('data-remove-id'), 10);
+					var idx = state.selectedForCompare.indexOf(id);
+					if (idx !== -1) {
+						state.selectedForCompare.splice(idx, 1);
+					}
+					var chk = root.querySelector('.ge-comp-chk[data-id="' + id + '"]');
+					if (chk) chk.checked = false;
+					updateDock();
+					renderCompareMatrix();
+				});
+			});
+		}
 
 		// Main update function
 		function updateUI(options) {
@@ -161,14 +849,25 @@
 				var maxP = state.maxPrice === '' ? Infinity : parseInt(state.maxPrice, 10);
 				var matchesPrice = price >= minP && price <= maxP;
 
-				return matchesSearch && matchesCategory && matchesShop && matchesBrand && matchesPrice;
+				var matchesQuick = Object.keys(state.activeQuickFilters).every(function (qId) {
+					if (!state.activeQuickFilters[qId]) return true;
+					var def = QUICK_FILTER_DEFS.filter(function (d) { return d.id === qId; })[0];
+					return def ? def.test(product) : true;
+				});
+
+				return matchesSearch && matchesCategory && matchesShop && matchesBrand && matchesPrice && matchesQuick;
 			});
 
 			// B. Sort logic
 			var sorted = filtered.slice().sort(function (a, b) {
 				if (state.sortBy === 'price_asc') return a.currentPrice - b.currentPrice;
 				if (state.sortBy === 'price_desc') return b.currentPrice - a.currentPrice;
-				if (state.sortBy === 'discount_desc') return (b.discount || 0) - (a.discount || 0);
+				if (state.sortBy === 'discount_desc') return ((b.discount || 0) - (a.discount || 0)) || (a.currentPrice - b.currentPrice);
+				if (state.sortBy === 'savings_desc') {
+					var savA = (a.originalPrice && a.originalPrice > a.currentPrice) ? (a.originalPrice - a.currentPrice) : 0;
+					var savB = (b.originalPrice && b.originalPrice > b.currentPrice) ? (b.originalPrice - b.currentPrice) : 0;
+					return (savB - savA) || (a.currentPrice - b.currentPrice);
+				}
 				return 0;
 			});
 
@@ -177,7 +876,8 @@
 			// C. Filter badge count
 			var isPriceChanged = (state.minPrice !== '' && Number(state.minPrice) > state.absMinPrice) ||
 				(state.maxPrice !== '' && Number(state.maxPrice) < state.absMaxPrice);
-			var activeFilterCount = state.activeShops.length + state.activeBrands.length + (isPriceChanged ? 1 : 0);
+			var quickCount = Object.keys(state.activeQuickFilters).length;
+			var activeFilterCount = state.activeShops.length + state.activeBrands.length + (isPriceChanged ? 1 : 0) + quickCount;
 
 			if (activeFilterCount > 0) {
 				filterBadge.style.display = 'inline-flex';
@@ -254,9 +954,36 @@
 
 			if (visibleProducts.length > 0) {
 				var cardsHtml = visibleProducts.map(function (prod) {
-					return state.viewMode === 'list' ? renderListCard(prod) : renderGridCard(prod);
+					return state.viewMode === 'list' ? renderListCard(prod, state) : renderGridCard(prod, state);
 				}).join('');
 				cardsContainer.innerHTML = cardsHtml;
+
+				// Attach compare checkbox listeners
+				cardsContainer.querySelectorAll('.ge-comp-chk').forEach(function (chk) {
+					chk.addEventListener('change', function (e) {
+						e.stopPropagation();
+						var id = parseInt(chk.getAttribute('data-id'), 10);
+						if (chk.checked) {
+							if (state.selectedForCompare.length >= 3) {
+								alert('Du kan sammenligne maksimalt 3 produkter samtidig.');
+								chk.checked = false;
+								return;
+							}
+							if (state.selectedForCompare.indexOf(id) === -1) {
+								state.selectedForCompare.push(id);
+							}
+						} else {
+							var idx = state.selectedForCompare.indexOf(id);
+							if (idx !== -1) {
+								state.selectedForCompare.splice(idx, 1);
+							}
+						}
+						updateDock();
+						if (cmpModal && cmpModal.style.display === 'flex') {
+							renderCompareMatrix();
+						}
+					});
+				});
 			} else {
 				cardsContainer.innerHTML =
 					'<div class="ge-comp-empty">' +
@@ -288,11 +1015,15 @@
 				loadMoreWrap.style.display = 'none';
 				loadMoreWrap.innerHTML = '';
 			}
+
+			// Sync comparison dock state
+			updateDock();
 		}
 
 		function resetAllFilters() {
 			state.activeShops = [];
 			state.activeBrands = [];
+			state.activeQuickFilters = {};
 			state.minPrice = '';
 			state.maxPrice = '';
 			state.searchQuery = '';
@@ -310,6 +1041,7 @@
 				}
 			});
 
+			renderQuickFilters();
 			updateUI();
 		}
 
@@ -324,12 +1056,14 @@
 				state.searchQuery = '';
 				state.activeBrands = [];
 				state.activeShops = [];
+				state.activeQuickFilters = {};
 				state.visibleCount = initialLimit;
 				searchInput.value = '';
 
 				catPills.forEach(function (p) { p.classList.remove('is-active'); });
 				pill.classList.add('is-active');
 
+				renderQuickFilters();
 				updateUI();
 			});
 		});
@@ -400,9 +1134,11 @@
 		filterResetBtn.addEventListener('click', function () {
 			state.activeShops = [];
 			state.activeBrands = [];
+			state.activeQuickFilters = {};
 			state.minPrice = '';
 			state.maxPrice = '';
 			state.visibleCount = initialLimit;
+			renderQuickFilters();
 			updateUI();
 		});
 
@@ -417,6 +1153,69 @@
 				}
 			}, 50);
 		});
+
+		// Comparison Dock & Modal Events
+		if (dockOpenModalBtn) {
+			dockOpenModalBtn.addEventListener('click', function () {
+				renderCompareMatrix();
+				if (cmpModal) {
+					cmpModal.style.display = 'flex';
+					document.body.style.overflow = 'hidden';
+				}
+			});
+		}
+
+		if (modalCloseBtn) {
+			modalCloseBtn.addEventListener('click', function () {
+				if (cmpModal) {
+					cmpModal.style.display = 'none';
+					document.body.style.overflow = '';
+				}
+			});
+		}
+
+		if (cmpModal) {
+			cmpModal.addEventListener('click', function (e) {
+				if (e.target === cmpModal) {
+					cmpModal.style.display = 'none';
+					document.body.style.overflow = '';
+				}
+			});
+		}
+
+		document.addEventListener('keydown', function (e) {
+			if ((e.key === 'Escape' || e.keyCode === 27) && cmpModal && cmpModal.style.display === 'flex') {
+				cmpModal.style.display = 'none';
+				document.body.style.overflow = '';
+			}
+		});
+
+		if (dockClearBtn) {
+			dockClearBtn.addEventListener('click', function () {
+				state.selectedForCompare = [];
+				root.querySelectorAll('.ge-comp-chk').forEach(function (c) { c.checked = false; });
+				updateDock();
+				if (cmpModal && cmpModal.style.display === 'flex') {
+					cmpModal.style.display = 'none';
+					document.body.style.overflow = '';
+				}
+			});
+		}
+
+		if (diffOnlyChk) {
+			diffOnlyChk.addEventListener('change', function (e) {
+				state.showOnlyDiffs = e.target.checked;
+				var toggleLabel = diffOnlyChk.closest('.ge-cmp-diff-toggle');
+				if (toggleLabel) {
+					if (state.showOnlyDiffs) {
+						toggleLabel.classList.add('is-active');
+					} else {
+						toggleLabel.classList.remove('is-active');
+					}
+				}
+				renderCompareMatrix();
+			});
+		}
 
 		// Initial render
 		updateUI();
@@ -455,14 +1254,18 @@
 		'</svg>';
 	}
 
-	// Layout 1: List Card
-	function renderListCard(product) {
+	// Layout 1: List Card (2-Column Responsive Card Layout)
+	function renderListCard(product, state) {
 		var hasDiscount = product.discount && product.discount > 0;
 		var safeUrl = product.url || '#';
 		var safeImg = product.image && product.image.length > 5 ? product.image : '';
+		var stockClass = product.inStock ? 'is-in-stock' : 'is-out-of-stock';
+		var save = (product.originalPrice && product.originalPrice > product.currentPrice) ? (product.originalPrice - product.currentPrice) : 0;
+		var showSavings = state && state.sortBy === 'savings_desc' && save > 0;
+		var isChecked = state && state.selectedForCompare && state.selectedForCompare.indexOf(product.id) !== -1;
 
 		return '' +
-		'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-list">' +
+		'<div class="ge-card-list">' +
 			'<div class="ge-card-list-img-wrap">' +
 				(hasDiscount ? '<div class="ge-discount-badge">-' + product.discount + '%</div>' : '') +
 				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(product.name) + '" class="ge-card-img" onerror="this.style.display=\'none\';" />' : '') +
@@ -471,46 +1274,74 @@
 				'<div>' +
 					'<div class="ge-list-top-row">' +
 						'<span class="ge-card-brand">' + escapeHtml(product.brand || 'UTSTYR') + '</span>' +
-						'<div class="ge-list-shop-badge">' + escapeHtml(product.shop || 'Nettbutikk') + '</div>' +
+						'<div style="display: flex; align-items: center; gap: 8px;">' +
+							'<label class="ge-card-cmp-label" title="Legg til i sammenligning">' +
+								'<input type="checkbox" class="ge-comp-chk" data-id="' + product.id + '"' + (isChecked ? ' checked' : '') + ' />' +
+								'<span>Sammenlign</span>' +
+							'</label>' +
+							'<div class="ge-list-shop-badge">' +
+								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
+								escapeHtml(product.shop || 'Nettbutikk') +
+								(product.otherShops > 0 ? ' <span class="ge-other-shops-badge">(+' + product.otherShops + ')</span>' : '') +
+							'</div>' +
+						'</div>' +
 					'</div>' +
-					'<h3 class="ge-card-title">' + escapeHtml(product.name) + '</h3>' +
+					'<h3 class="ge-card-title">' +
+						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-title-link">' + escapeHtml(product.name) + '</a>' +
+					'</h3>' +
 				'</div>' +
 				'<div class="ge-list-bottom-row">' +
-					'<div>' +
+					'<div class="ge-list-price-block">' +
 						'<div class="ge-price-row">' +
 							'<span class="ge-price-current">' + formatPrice(product.currentPrice) + '</span>' +
 							(product.originalPrice ? '<span class="ge-price-original">' + formatPrice(product.originalPrice) + '</span>' : '') +
+							(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 						'</div>' +
-						'<div class="ge-mobile-shop-label">' + escapeHtml(product.shop || '') + '</div>' +
+						'<div class="ge-mobile-shop-label">' +
+							'<span class="ge-stock-dot ' + stockClass + '"></span>' +
+							escapeHtml(product.shop || '') +
+						'</div>' +
 					'</div>' +
-					'<button type="button" class="ge-cta-btn">' +
+					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
 						'Til butikk ' + externalLinkIcon() +
-					'</button>' +
+					'</a>' +
 				'</div>' +
 			'</div>' +
-		'</a>';
+		'</div>';
 	}
 
 	// Layout 2: Grid Card
-	function renderGridCard(product) {
+	function renderGridCard(product, state) {
 		var hasDiscount = product.discount && product.discount > 0;
 		var safeUrl = product.url || '#';
 		var safeImg = product.image && product.image.length > 5 ? product.image : '';
 		var stockClass = product.inStock ? 'is-in-stock' : 'is-out-of-stock';
+		var save = (product.originalPrice && product.originalPrice > product.currentPrice) ? (product.originalPrice - product.currentPrice) : 0;
+		var showSavings = state && state.sortBy === 'savings_desc' && save > 0;
+		var isChecked = state && state.selectedForCompare && state.selectedForCompare.indexOf(product.id) !== -1;
 
 		return '' +
-		'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-grid">' +
+		'<div class="ge-card-grid">' +
+			'<div class="ge-card-cmp-wrap">' +
+				'<label class="ge-card-cmp-label" title="Legg til i sammenligning">' +
+					'<input type="checkbox" class="ge-comp-chk" data-id="' + product.id + '"' + (isChecked ? ' checked' : '') + ' />' +
+					'<span>Sammenlign</span>' +
+				'</label>' +
+			'</div>' +
 			'<div class="ge-card-grid-img-wrap">' +
 				(hasDiscount ? '<div class="ge-discount-badge">-' + product.discount + '%</div>' : '') +
 				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(product.name) + '" class="ge-card-img" onerror="this.style.display=\'none\';" />' : '') +
 			'</div>' +
 			'<div class="ge-card-content">' +
 				'<span class="ge-card-brand">' + escapeHtml(product.brand || 'UTSTYR') + '</span>' +
-				'<h3 class="ge-card-title">' + escapeHtml(product.name) + '</h3>' +
+				'<h3 class="ge-card-title">' +
+					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-title-link">' + escapeHtml(product.name) + '</a>' +
+				'</h3>' +
 				'<div class="ge-card-bottom">' +
 					'<div class="ge-price-row">' +
 						'<span class="ge-price-current">' + formatPrice(product.currentPrice) + '</span>' +
 						(product.originalPrice ? '<span class="ge-price-original">' + formatPrice(product.originalPrice) + '</span>' : '') +
+						(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 					'</div>' +
 					'<div class="ge-shop-strip">' +
 						'<div class="ge-shop-name-wrap">' +
@@ -522,12 +1353,12 @@
 							(product.otherShops > 0 ? '<span class="ge-other-shops-badge">+ ' + product.otherShops + '</span>' : '') +
 						'</div>' +
 					'</div>' +
-					'<button type="button" class="ge-cta-btn">' +
+					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
 						'Til butikk ' + externalLinkIcon() +
-					'</button>' +
+					'</a>' +
 				'</div>' +
 			'</div>' +
-		'</a>';
+		'</div>';
 	}
 
 	// Initial DOM skeleton constructor
@@ -546,6 +1377,9 @@
 		// Category Pills Bar
 		'<div class="ge-comp-cats-bar">' + catButtonsHtml + '</div>' +
 
+		// Quick Filter Chips (Tier 1 Exposed Filters)
+		'<div class="ge-comp-quick-filters" id="ge-comp-quick-filters" role="group" aria-label="Hurtigfiltre"></div>' +
+
 		// Controls Bar: Search, Sort, Filter Toggle, View Toggle
 		'<div class="ge-comp-controls">' +
 			'<div class="ge-comp-search-box">' +
@@ -561,7 +1395,8 @@
 						'<option value="relevant">Mest relevant</option>' +
 						'<option value="price_asc">Laveste pris</option>' +
 						'<option value="price_desc">Høyeste pris</option>' +
-						'<option value="discount_desc">Størst rabatt</option>' +
+						'<option value="discount_desc">Størst rabatt (%)</option>' +
+						'<option value="savings_desc">Størst kroneavslag</option>' +
 					'</select>' +
 					'<div class="ge-comp-sort-arrow">' +
 						'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
@@ -580,13 +1415,18 @@
 					'<span id="ge-comp-filter-badge" class="ge-comp-filter-badge" style="display: none;">0</span>' +
 				'</button>' +
 
-				'<div class="ge-comp-view-toggle">' +
-					'<button type="button" id="ge-view-grid-btn" class="ge-view-btn' + (state.viewMode === 'grid' ? ' is-active' : '') + '" title="Rutenett">' +
-						'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
-					'</button>' +
-					'<button type="button" id="ge-view-list-btn" class="ge-view-btn' + (state.viewMode === 'list' ? ' is-active' : '') + '" title="Liste">' +
-						'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>' +
-					'</button>' +
+				'<div class="ge-comp-view-toggle-wrap">' +
+					'<span class="ge-comp-view-label">Visning:</span>' +
+					'<div class="ge-comp-view-toggle" role="group" aria-label="Velg visning">' +
+						'<button type="button" id="ge-view-grid-btn" class="ge-view-btn' + (state.viewMode === 'grid' ? ' is-active' : '') + '" title="Vis som rutenett">' +
+							'<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
+							'<span class="ge-view-btn-text">Rutenett</span>' +
+						'</button>' +
+						'<button type="button" id="ge-view-list-btn" class="ge-view-btn' + (state.viewMode === 'list' ? ' is-active' : '') + '" title="Vis som liste">' +
+							'<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>' +
+							'<span class="ge-view-btn-text">Liste</span>' +
+						'</button>' +
+					'</div>' +
 				'</div>' +
 			'</div>' +
 		'</div>' +
@@ -643,6 +1483,13 @@
 		// Load More Wrap
 		'<div id="ge-comp-load-more-wrap" class="ge-comp-load-more-wrap" style="display: none;"></div>';
 	}
+
+	// Expose public API for integration and testing
+	window.GearEnginePriceComparison = {
+		getAntiFitNotes: getAntiFitNotes,
+		QUICK_FILTER_DEFS: QUICK_FILTER_DEFS,
+		init: initPriceComparison
+	};
 
 	// Auto-initialize when DOM is ready
 	if (document.readyState === 'loading') {

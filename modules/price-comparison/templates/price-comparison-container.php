@@ -54,6 +54,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p style="margin-top: 12px; font-weight: 500; font-size: 14px;"><?php esc_html_e( 'Laster priser og produkter...', 'gear-engine' ); ?></p>
 		</div>
 	</div>
+
+	<!-- Flytende dokk for side-om-side sammenligning -->
+	<aside id="ge-floating-cmp-bar" class="ge-comp-dock" style="display: none;" aria-label="<?php esc_attr_e( 'Sammenligningsdokk', 'gear-engine' ); ?>">
+		<div class="ge-dock-info">
+			<span class="ge-dock-count"><b id="ge-cmp-selected-count">0</b> <?php esc_html_e( 'modeller valgt (maks 3)', 'gear-engine' ); ?></span>
+			<div class="ge-dock-thumbs" id="ge-dock-thumbs"></div>
+		</div>
+		<div class="ge-dock-actions">
+			<button type="button" id="ge-cmp-open-modal-btn" class="ge-dock-btn">
+				<?php esc_html_e( 'Sammenlign nå', 'gear-engine' ); ?> (<span id="ge-dock-btn-count">0</span>)
+			</button>
+			<button type="button" id="ge-cmp-clear-btn" class="ge-dock-clear-btn">
+				<?php esc_html_e( 'Nullstill', 'gear-engine' ); ?>
+			</button>
+		</div>
+	</aside>
+
+	<!-- Side-om-side sammenligningsmodal (Material 3 Surface) -->
+	<div id="ge-cmp-modal" class="ge-cmp-modal-scrim" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ge-cmp-modal-title">
+		<div class="ge-cmp-modal-card">
+			<div class="ge-cmp-modal-head">
+				<div>
+					<h3 id="ge-cmp-modal-title" class="ge-cmp-modal-title"><?php esc_html_e( 'Sammenlign modeller side-om-side', 'gear-engine' ); ?></h3>
+					<span class="ge-cmp-modal-subtitle"><?php esc_html_e( 'Strukturerte nøkkeltall og prissammenligning for de valgte modellene', 'gear-engine' ); ?></span>
+				</div>
+				<div class="ge-cmp-modal-controls">
+					<label class="ge-cmp-diff-toggle" title="<?php esc_attr_e( 'Skjul spesifikasjoner der modellene har like verdier', 'gear-engine' ); ?>">
+						<input type="checkbox" id="ge-cmp-diff-only" class="ge-cmp-diff-checkbox" />
+						<span><?php esc_html_e( 'Vis kun ulikheter', 'gear-engine' ); ?></span>
+					</label>
+					<button type="button" id="ge-modal-close-btn" class="ge-cmp-modal-close" title="<?php esc_attr_e( 'Lukk sammenligning', 'gear-engine' ); ?>" aria-label="<?php esc_attr_e( 'Lukk', 'gear-engine' ); ?>">&times;</button>
+				</div>
+			</div>
+			<div id="ge-cmp-modal-body" class="ge-cmp-modal-body"></div>
+		</div>
+	</div>
 </div>
 <style>
 @keyframes ge-spin {
