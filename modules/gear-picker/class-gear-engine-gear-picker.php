@@ -426,7 +426,7 @@ class Gear_Engine_Gear_Picker {
 			}
 		}
 
-		set_transient( $cache_key, $items, (int) apply_filters( 'gear_engine_gear_picker_cache_ttl', HOUR_IN_SECONDS ) );
+		set_transient( $cache_key, $items, (int) apply_filters( 'gear_engine_gear_picker_cache_ttl', defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600 ) );
 		return $items;
 	}
 
@@ -481,6 +481,42 @@ class Gear_Engine_Gear_Picker {
 		ob_start();
 		include GEAR_ENGINE_PATH . 'modules/gear-picker/templates/picker-container.php';
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Return an inline SVG icon for a hub card.
+	 *
+	 * @param string $icon Icon key.
+	 * @return string SVG markup.
+	 */
+	public static function get_hub_icon( string $icon ): string {
+		$stroke = 'stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+		switch ( $icon ) {
+			case 'treadmill':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="17" cy="4" r="2"/><path d="M4 17l6-3 3 2 5-6"/><path d="M10 14l-2 5-5-2"/><path d="M21 21H3"/></svg>';
+			case 'rower':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="18" cy="5" r="2"/><path d="M4 19l4-3 5 2 7-6"/><path d="M2 12h5l3 4"/><path d="M7 21h14"/></svg>';
+			case 'bike':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h2l3 6.5-1.5.5"/><path d="M12 17.5V14l-3-3 4-3 3 3"/><circle cx="12" cy="5" r="1"/></svg>';
+			case 'ellipse':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="12" cy="4" r="2"/><path d="M8 9l8 2-2 9-4-1"/><path d="M6 19l4-1 2-6"/><ellipse cx="12" cy="19" rx="8" ry="3"/></svg>';
+			case 'dumbbell':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>';
+			case 'multigym':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>';
+			case 'rack':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><line x1="4" y1="3" x2="4" y2="21"/><line x1="20" y1="3" x2="20" y2="21"/><line x1="4" y1="7" x2="20" y2="7"/><circle cx="8" cy="7" r="1.5"/><circle cx="16" cy="7" r="1.5"/><line x1="2" y1="21" x2="22" y2="21"/></svg>';
+			case 'bench':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><line x1="2" y1="10" x2="22" y2="10"/><path d="M4 10v7M20 10v7M12 10v7"/><line x1="2" y1="17" x2="6" y2="17"/><line x1="18" y1="17" x2="22" y2="17"/></svg>';
+			case 'shield':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>';
+			case 'target':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+			case 'activity':
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
+			default:
+				return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' . $stroke . '><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>';
+		}
 	}
 
 	/**

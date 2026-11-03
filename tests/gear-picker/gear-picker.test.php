@@ -35,6 +35,18 @@ function get_post_meta( $id, $key, $single = false ) {
 }
 function wp_get_post_terms( $id, $tax, $args = array() ) { return array(); }
 
+function shortcode_atts( $pairs, $atts ) { return array_merge( $pairs, (array) $atts ); }
+function wp_unslash( $v ) { return $v; }
+function add_query_arg( $a, $u = '' ) { return 'http://example.com/?' . http_build_query( (array) $a ); }
+function remove_query_arg( $k, $u = '' ) { return 'http://example.com/'; }
+function wp_enqueue_style( $h ) {}
+function wp_enqueue_script( $h ) {}
+function esc_html( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES ); }
+function esc_attr( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES ); }
+function esc_url( $s ) { return (string) $s; }
+function esc_html_e( $s ) { echo esc_html( $s ); }
+function esc_attr_e( $s ) { echo esc_attr( $s ); }
+
 class WP_Error {}
 function is_wp_error( $thing ) { return $thing instanceof WP_Error; }
 class WP_Post {
@@ -221,5 +233,11 @@ t( 'hub: treadmill and romaskin in items', in_array( 'treadmill', $hub_slugs, tr
 $items_by_slug = array_column( $hub_data['items'], null, 'slug' );
 t( 'hub: bundled configs are available', true === $items_by_slug['treadmill']['available'] && true === $items_by_slug['romaskin']['available'] && true === $items_by_slug['ergometersykkel']['available'] && true === $items_by_slug['rehab-guide']['available'] );
 t( 'hub: future configs marked upcoming', false === $items_by_slug['ellipsetrener']['available'] && false === $items_by_slug['manualer']['available'] );
+
+$picker_instance = new Gear_Engine_Gear_Picker();
+$hub_html_first  = $picker_instance->render_hub();
+$hub_html_second = $picker_instance->render_hub();
+t( 'hub: renders successfully without redeclaration error', false !== strpos( $hub_html_first, 'gear-engine-hub' ) );
+t( 'hub: idempotent multiple renders work cleanly', false !== strpos( $hub_html_second, 'gear-engine-hub' ) );
 
 exit( $failures ? 1 : 0 );
