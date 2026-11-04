@@ -262,6 +262,11 @@ t( 'yoast canonical points to protocol url', 'http://example.com/treningsprogram
 $doc_parts = $viewer->filter_document_title_parts( array( 'title' => 'Default' ) );
 t( 'document title parts contains protocol name', false !== strpos( $doc_parts['title'], 'SAPS-program' ) );
 
+ob_start();
+$viewer->render_fallback_head_meta();
+$meta_head = ob_get_clean();
+t( 'fallback head contains canonical and meta description', false !== strpos( $meta_head, 'rel="canonical"' ) && false !== strpos( $meta_head, 'name="description"' ) );
+
 $_GET = array();
 t( 'current protocol is null when no query param', null === Gear_Engine_Protocol_Viewer::get_current_requested_protocol() );
 t( 'yoast title passes through when no protocol requested', 'Default Page Title' === $viewer->filter_yoast_title( 'Default Page Title' ) );

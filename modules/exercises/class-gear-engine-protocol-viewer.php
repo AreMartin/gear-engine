@@ -128,6 +128,11 @@ class Gear_Engine_Protocol_Viewer {
 		// WordPress Core document title fallback.
 		add_filter( 'document_title_parts', array( $this, 'filter_document_title_parts' ), 20 );
 
+		// Fallback canonical and meta description if no SEO plugin (like Yoast) is active.
+		if ( ! defined( 'WPSEO_VERSION' ) ) {
+			add_action( 'wp_head', array( $this, 'render_fallback_head_meta' ), 1 );
+		}
+
 		// Yoast SEO integration.
 		add_filter( 'wpseo_title', array( $this, 'filter_yoast_title' ), 20 );
 		add_filter( 'wpseo_metadesc', array( $this, 'filter_yoast_metadesc' ), 20 );
@@ -155,6 +160,28 @@ class Gear_Engine_Protocol_Viewer {
 			);
 		}
 		return $parts;
+	}
+
+	/**
+	 * Output fallback canonical link and meta description in head if no SEO plugin is active.
+	 *
+	 * @return void
+	 */
+	public function render_fallback_head_meta(): void {
+		$protocol = self::get_current_requested_protocol();
+		if ( ! $protocol ) {
+			return;
+		}
+
+		$canonical = $this->filter_yoast_canonical( '' );
+		if ( '' !== $canonical ) {
+			echo '<link rel="canonical" href="' . esc_url( $canonical ) . "\" />\n";
+		}
+
+		$desc = $this->filter_yoast_metadesc( '' );
+		if ( '' !== $desc ) {
+			echo '<meta name="description" content="' . esc_attr( $desc ) . "\" />\n";
+		}
 	}
 
 	/**
