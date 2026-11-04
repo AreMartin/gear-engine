@@ -1162,16 +1162,13 @@
 		/* In-card store overlay for Grid View to prevent stretching other cards */
 		.ge-m3-stores-table.ge-m3-stores-popover {
 			position: absolute;
-			top: -4px;
-			bottom: -4px;
-			left: -8px;
-			right: -8px;
+			inset: 0;
 			z-index: 30;
 			background: var(--md-sys-color-surface, #FFFFFF);
 			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
 			border-radius: var(--ge-r-md, 16px);
-			padding: 12px 10px;
-			box-shadow: 0 16px 40px rgba(12, 35, 64, 0.28);
+			padding: 16px;
+			box-shadow: 0 14px 36px rgba(12, 35, 64, 0.22);
 			display: flex;
 			flex-direction: column;
 			gap: 8px;
@@ -1215,8 +1212,8 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			gap: 6px;
-			padding: 7px 8px;
+			gap: 8px;
+			padding: 7px 10px;
 			border-radius: 8px;
 			border-bottom: 1px solid var(--md-sys-color-surface-container, #F5F7FA);
 			font-size: 12px;
