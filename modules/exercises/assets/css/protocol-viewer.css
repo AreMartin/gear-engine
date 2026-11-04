@@ -927,12 +927,86 @@
 	line-height: 1.5;
 }
 
+/* App-style Workout Card Container (Aligned 1:1 with AI Chat Modal) */
+.gear-engine-program__workout-card {
+	max-width: 500px;
+	margin: 0 auto 32px;
+	background: #FFFFFF;
+	border-radius: 28px;
+	border: 1px solid #E5E7EB;
+	box-shadow: 0 12px 36px -4px rgba(12, 35, 64, 0.08), 0 4px 14px rgba(12, 35, 64, 0.03);
+	overflow: hidden;
+	position: relative;
+	transition: all 0.25s ease;
+}
+
+/* Card Top Header */
+.gear-engine-program__card-header {
+	padding: 22px 24px 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	border-bottom: 1px solid #F1F5F9;
+	background: #FFFFFF;
+}
+
+.gear-engine-program__card-header-main {
+	flex: 1;
+	min-width: 0;
+}
+
+.gear-engine-program__card-badge {
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: #00A878;
+	display: block;
+	margin-bottom: 4px;
+}
+
+.gear-engine-program__card-title {
+	font-size: 19px;
+	font-weight: 700;
+	color: #1A2A3A;
+	margin: 0;
+	line-height: 1.25;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gear-engine-program__card-print-btn {
+	width: 36px;
+	height: 36px;
+	min-width: 36px;
+	border-radius: 50%;
+	background: #FFFFFF;
+	border: 1px solid #E2E8F0;
+	color: #1A2A3A;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: all 0.15s ease;
+}
+
+.gear-engine-program__card-print-btn:hover {
+	background: #F8FAFC;
+	border-color: #CBD5E1;
+	transform: scale(1.04);
+}
+
+/* Stepper Tabs (Exercise Pills Row) */
 .gear-engine-program__stepper-tabs {
 	display: flex;
 	gap: 8px;
 	overflow-x: auto;
-	padding: 2px 2px 10px;
-	margin-bottom: 16px;
+	padding: 12px 20px;
+	background: #FFFFFF;
+	border-bottom: 1px solid #F1F5F9;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
@@ -944,43 +1018,43 @@
 .gear-engine-program__stepper-tab {
 	display: inline-flex;
 	align-items: center;
-	padding: 8px 18px;
+	padding: 7px 16px;
 	border-radius: var(--gep-radius-full);
-	border: 1px solid var(--gep-border);
-	background: #F1F5F9;
-	color: var(--gep-muted);
+	border: none;
+	background: #F3F4F6;
+	color: #4B5563;
 	font-size: 13px;
-	font-weight: 700;
+	font-weight: 600;
 	cursor: pointer;
 	white-space: nowrap;
-	transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+	transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .gear-engine-program__stepper-tab:hover {
-	background: #E2E8F0;
-	color: var(--gep-navy);
+	background: #E5E7EB;
+	color: #1A2A3A;
 }
 
 .gear-engine-program__stepper-tab--active {
-	background: var(--gep-navy);
-	color: #ffffff;
-	border-color: var(--gep-navy);
-	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.15);
+	background: #1A2A3A !important;
+	color: #FFFFFF !important;
+	font-weight: 700;
+	box-shadow: 0 2px 6px rgba(26, 42, 58, 0.2);
 }
 
 .gear-engine-program__stepper-tab--active:hover {
-	background: #111c27;
-	color: #ffffff;
+	background: #111C27 !important;
+	color: #FFFFFF !important;
 }
 
+/* Step Card (Active Item inside Workout Card) */
 .gear-engine-program__step-card {
-	background: var(--gep-surface);
-	border: 1px solid var(--gep-border);
-	border-radius: var(--gep-radius-xl);
-	padding: 24px 28px;
-	box-shadow: var(--gep-shadow-2);
+	background: #F9FAFB;
+	padding: 20px 24px 16px;
+	border: none;
+	box-shadow: none;
 	position: relative;
-	margin-bottom: 20px;
+	margin: 0;
 	animation: gepFadeIn 0.25s ease-out;
 }
 
@@ -989,34 +1063,32 @@
 	to   { opacity: 1; transform: translateY(0); }
 }
 
-.gear-engine-program__step-header-meta {
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	margin-bottom: 12px;
-}
-
-.gear-engine-program__step-badge {
-	font-size: 11px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--gep-muted);
-	background: #F8FAFC;
-	border: 1px solid var(--gep-border);
-	padding: 4px 10px;
-	border-radius: 6px;
-}
-
 .gear-engine-program__stepper-media {
 	width: 100%;
 	aspect-ratio: 16 / 9;
-	border-radius: var(--gep-radius-md);
+	border-radius: 14px;
 	overflow: hidden;
 	background: #000000;
-	margin-bottom: 20px;
+	margin-bottom: 16px;
 	position: relative;
-	box-shadow: 0 2px 8px rgba(12, 35, 64, 0.08);
+	border: 1px solid #E5E7EB;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.gear-engine-program__step-counter-tag {
+	position: absolute;
+	top: 10px;
+	right: 12px;
+	font-size: 11px;
+	font-weight: 700;
+	color: #64748B;
+	background: rgba(255, 255, 255, 0.9);
+	backdrop-filter: blur(4px);
+	padding: 3px 8px;
+	border-radius: 6px;
+	z-index: 10;
+	letter-spacing: 0.05em;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .gear-engine-program__video-wrapper {
@@ -1060,9 +1132,9 @@
 }
 
 .gear-engine-program__step-title {
-	margin: 0 0 12px;
-	color: var(--gep-heading);
-	font-size: 1.45rem;
+	margin: 0 0 10px;
+	color: #1A2A3A;
+	font-size: 20px;
 	font-weight: 700;
 	line-height: 1.25;
 }
@@ -1071,14 +1143,27 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	margin-bottom: 20px;
+	margin-bottom: 16px;
 	align-items: center;
+}
+
+.gear-engine-program__reps-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #E8F5E9;
+	color: #00A878;
+	font-size: 13px;
+	font-weight: 700;
+	padding: 6px 14px;
+	border-radius: 8px;
+	border: 1px solid #C8E6C9;
 }
 
 .gear-engine-program__role-pill {
 	display: inline-flex;
 	align-items: center;
-	height: 26px;
+	height: 28px;
 	padding: 0 10px;
 	border-radius: var(--gep-radius-full);
 	background: var(--gep-navy-selected-bg);
@@ -1090,11 +1175,12 @@
 }
 
 .gear-engine-program__instructions-card {
-	background: #F8FAFC;
-	border: 1px solid #E2E8F0;
-	border-radius: var(--gep-radius-md);
-	padding: 18px 22px;
-	margin-bottom: 20px;
+	background: #FFFFFF;
+	border: 1px solid #E5E7EB;
+	border-radius: 16px;
+	padding: 16px 18px;
+	margin-bottom: 16px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .gear-engine-program__instructions-title {
@@ -1102,21 +1188,21 @@
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
-	color: var(--gep-muted);
-	margin: 0 0 10px;
+	color: #64748B;
+	margin: 0 0 8px;
 }
 
 .gear-engine-program__instructions-body p {
 	margin: 0;
 	font-size: 14px;
 	line-height: 1.6;
-	color: var(--gep-text);
+	color: #374151;
 }
 
 .gear-engine-program__instructions-list {
 	margin: 0;
 	padding-left: 18px;
-	color: var(--gep-text);
+	color: #374151;
 	font-size: 14px;
 	line-height: 1.65;
 }
@@ -1125,8 +1211,12 @@
 	margin-bottom: 6px;
 }
 
+/* Stepper Bottom Navigation Bar */
 .gear-engine-program__stepper-nav {
-	margin: 20px 0 28px;
+	padding: 14px 24px 20px;
+	border-top: 1px solid #F1F5F9;
+	background: #FFFFFF;
+	margin: 0;
 }
 
 .gear-engine-program__stepper-nav-inner {
@@ -1154,45 +1244,58 @@
 	min-width: 48px;
 	padding: 0;
 	border-radius: 50%;
-	background: #F1F5F9;
-	color: #475569;
+	background: #F3F4F6;
+	color: #1A2A3A;
+	border: none;
 }
 
 .gear-engine-program__nav-btn--prev:hover:not(:disabled) {
-	background: #E2E8F0;
-	color: var(--gep-navy);
+	background: #E5E7EB;
+	color: #1A2A3A;
 }
 
 .gear-engine-program__nav-btn--prev:disabled {
-	opacity: 0.35;
+	opacity: 0.3;
 	cursor: not-allowed;
 }
 
 .gear-engine-program__nav-btn--next {
 	flex: 1;
 	height: 48px;
-	background: var(--gep-navy);
-	color: #ffffff;
-	box-shadow: 0 2px 8px rgba(12, 35, 64, 0.15);
+	border-radius: 9999px;
+	background: #1A2A3A;
+	color: #FFFFFF;
+	border: none;
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	box-shadow: 0 2px 8px rgba(26, 42, 58, 0.18);
 }
 
 .gear-engine-program__nav-btn--next:hover {
-	background: #111c27;
-	box-shadow: 0 4px 12px rgba(12, 35, 64, 0.25);
+	background: #111C27;
+	box-shadow: 0 4px 12px rgba(26, 42, 58, 0.28);
 	transform: translateY(-1px);
 }
 
 .gear-engine-program__nav-btn--finish {
 	flex: 1;
 	height: 48px;
-	background: var(--ge-green-600, #00A878);
-	color: #ffffff;
+	border-radius: 9999px;
+	background: #00A878;
+	color: #FFFFFF;
+	border: none;
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
 	box-shadow: 0 2px 8px rgba(0, 168, 120, 0.25);
 }
 
 .gear-engine-program__nav-btn--finish:hover {
-	background: #008f66;
+	background: #008F66;
 	box-shadow: 0 4px 12px rgba(0, 168, 120, 0.35);
+	transform: translateY(-1px);
+}
 	transform: translateY(-1px);
 }
 

@@ -92,184 +92,195 @@ foreach ( $groups as $grp ) {
 					</div>
 				<?php endif; ?>
 
-				<!-- Horizontal Exercise Navigation Tabs -->
-				<div class="gear-engine-program__stepper-tabs no-scrollbar" role="tablist">
-					<?php foreach ( $group['exercises'] as $ex_idx => $exercise ) : ?>
-						<button type="button" class="gear-engine-program__stepper-tab <?php echo 0 === $ex_idx ? 'gear-engine-program__stepper-tab--active' : ''; ?>" data-step="<?php echo esc_attr( (string) $ex_idx ); ?>" role="tab" aria-selected="<?php echo 0 === $ex_idx ? 'true' : 'false'; ?>">
-							<span><?php echo esc_html( sprintf( __( 'Øvelse %d', 'gear-engine' ), $ex_idx + 1 ) ); ?></span>
+				<!-- App-style Workout Card Container (Identical to AI Chat Modal) -->
+				<div class="gear-engine-program__workout-card">
+					<!-- Card Top Header -->
+					<div class="gear-engine-program__card-header">
+						<div class="gear-engine-program__card-header-main">
+							<span class="gear-engine-program__card-badge"><?php esc_html_e( 'Kvalitetssikret treningsprogram', 'gear-engine' ); ?></span>
+							<h3 class="gear-engine-program__card-title"><?php echo esc_html( $protocol['name'] ); ?></h3>
+						</div>
+						<button type="button" onclick="window.print()" class="gear-engine-program__card-print-btn" title="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>" aria-label="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
 						</button>
-					<?php endforeach; ?>
-				</div>
+					</div>
 
-				<!-- Step Cards (One Active at a Time) -->
-				<div class="gear-engine-program__step-cards-container">
-					<?php foreach ( $group['exercises'] as $ex_idx => $exercise ) : ?>
-						<?php $embed = Gear_Engine_Protocol_Viewer::get_embed_url( $exercise ); ?>
-						<div class="gear-engine-program__step-card <?php echo 0 === $ex_idx ? 'gear-engine-program__step-card--active' : ''; ?>" data-step-card="<?php echo esc_attr( (string) $ex_idx ); ?>" <?php echo 0 !== $ex_idx ? 'style="display:none;"' : ''; ?>>
-							
-							<div class="gear-engine-program__step-header-meta">
-								<span class="gear-engine-program__step-badge">
-									<?php echo esc_html( sprintf( __( 'Øvelse %1$d av %2$d', 'gear-engine' ), $ex_idx + 1, count( $group['exercises'] ) ) ); ?>
-								</span>
-							</div>
+					<!-- Horizontal Exercise Navigation Tabs -->
+					<div class="gear-engine-program__stepper-tabs no-scrollbar" role="tablist">
+						<?php foreach ( $group['exercises'] as $ex_idx => $exercise ) : ?>
+							<button type="button" class="gear-engine-program__stepper-tab <?php echo 0 === $ex_idx ? 'gear-engine-program__stepper-tab--active' : ''; ?>" data-step="<?php echo esc_attr( (string) $ex_idx ); ?>" role="tab" aria-selected="<?php echo 0 === $ex_idx ? 'true' : 'false'; ?>">
+								<span><?php echo esc_html( sprintf( __( 'Øvelse %d', 'gear-engine' ), $ex_idx + 1 ) ); ?></span>
+							</button>
+						<?php endforeach; ?>
+					</div>
 
-							<!-- Video / Media Player Container -->
-							<div class="gear-engine-program__stepper-media">
-								<?php if ( '' !== $embed ) : ?>
-									<div class="gear-engine-program__video-wrapper gear-engine-program__video" data-embed="<?php echo esc_url( $embed ); ?>" data-title="<?php echo esc_attr( $exercise['title'] ); ?>">
-										<button type="button" class="gear-engine-program__play gear-engine-program__noprint">
-											<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-											<span><?php esc_html_e( 'Se video', 'gear-engine' ); ?></span>
-										</button>
+					<!-- Step Cards (One Active at a Time) -->
+					<div class="gear-engine-program__step-cards-container">
+						<?php foreach ( $group['exercises'] as $ex_idx => $exercise ) : ?>
+							<?php $embed = Gear_Engine_Protocol_Viewer::get_embed_url( $exercise ); ?>
+							<div class="gear-engine-program__step-card <?php echo 0 === $ex_idx ? 'gear-engine-program__step-card--active' : ''; ?>" data-step-card="<?php echo esc_attr( (string) $ex_idx ); ?>" <?php echo 0 !== $ex_idx ? 'style="display:none;"' : ''; ?>>
+								
+								<!-- Video / Media Player Container -->
+								<div class="gear-engine-program__stepper-media">
+									<div class="gear-engine-program__step-counter-tag">
+										<?php echo esc_html( sprintf( '%1$d/%2$d', $ex_idx + 1, count( $group['exercises'] ) ) ); ?>
 									</div>
-									<?php if ( '' !== $exercise['attribution_text'] && '' !== $exercise['attribution_url'] ) : ?>
-										<p class="gear-engine-program__credit gear-engine-program__noprint">
-											<a href="<?php echo esc_url( $exercise['attribution_url'] ); ?>" target="_blank" rel="noopener noreferrer">
-												<?php echo esc_html( $exercise['attribution_text'] ); ?>
-											</a>
-										</p>
-									<?php endif; ?>
-								<?php else : ?>
-									<div class="gear-engine-program__video-placeholder">
-										<div class="gear-engine-program__placeholder-icon">
-											<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+									<?php if ( '' !== $embed ) : ?>
+										<div class="gear-engine-program__video-wrapper gear-engine-program__video" data-embed="<?php echo esc_url( $embed ); ?>" data-title="<?php echo esc_attr( $exercise['title'] ); ?>">
+											<button type="button" class="gear-engine-program__play gear-engine-program__noprint">
+												<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+												<span><?php esc_html_e( 'Se video', 'gear-engine' ); ?></span>
+											</button>
 										</div>
-										<span class="gear-engine-program__placeholder-title"><?php echo esc_html( $exercise['title'] ); ?></span>
-									</div>
-								<?php endif; ?>
-							</div>
-
-							<!-- Exercise Title -->
-							<h3 class="gear-engine-program__step-title"><?php echo esc_html( $exercise['title'] ); ?></h3>
-
-							<!-- Dosage & Attribute Pills -->
-							<div class="gear-engine-program__step-pills">
-								<?php if ( '' !== $exercise['dosage'] ) : ?>
-									<span class="gear-engine-program__reps">
-										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-										<?php echo esc_html( $exercise['dosage'] ); ?>
-									</span>
-								<?php endif; ?>
-								<?php if ( ! empty( $exercise['equipment'] ) && is_array( $exercise['equipment'] ) ) : ?>
-									<?php foreach ( $exercise['equipment'] as $item ) : ?>
-										<span class="gear-engine-program__equip-pill">
-											<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
-											<?php echo esc_html( $item ); ?>
-										</span>
-									<?php endforeach; ?>
-								<?php endif; ?>
-								<?php if ( ! empty( $exercise['role'] ) ) : ?>
-									<span class="gear-engine-program__role-pill">
-										<?php echo esc_html( ucfirst( (string) $exercise['role'] ) ); ?>
-									</span>
-								<?php endif; ?>
-							</div>
-
-							<!-- Step-by-Step Instructions -->
-							<div class="gear-engine-program__instructions-card">
-								<h4 class="gear-engine-program__instructions-title"><?php esc_html_e( 'Slik gjør du:', 'gear-engine' ); ?></h4>
-								<div class="gear-engine-program__instructions-body">
-									<?php
-									$raw_desc = '' !== $exercise['description'] ? $exercise['description'] : $exercise['summary'];
-									$lines    = array_filter( array_map( 'trim', explode( "\n", $raw_desc ) ) );
-									if ( count( $lines ) > 1 ) :
-										?>
-										<ul class="gear-engine-program__instructions-list">
-											<?php foreach ( $lines as $line ) : ?>
-												<?php $clean_line = preg_replace( '/^[-*•\d\.]+\s*/', '', $line ); ?>
-												<li><?php echo esc_html( $clean_line ); ?></li>
-											<?php endforeach; ?>
-										</ul>
+										<?php if ( '' !== $exercise['attribution_text'] && '' !== $exercise['attribution_url'] ) : ?>
+											<p class="gear-engine-program__credit gear-engine-program__noprint">
+												<a href="<?php echo esc_url( $exercise['attribution_url'] ); ?>" target="_blank" rel="noopener noreferrer">
+													<?php echo esc_html( $exercise['attribution_text'] ); ?>
+												</a>
+											</p>
+										<?php endif; ?>
 									<?php else : ?>
-										<p><?php echo esc_html( $raw_desc ); ?></p>
+										<div class="gear-engine-program__video-placeholder">
+											<div class="gear-engine-program__placeholder-icon">
+												<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+											</div>
+											<span class="gear-engine-program__placeholder-title"><?php echo esc_html( $exercise['title'] ); ?></span>
+										</div>
 									<?php endif; ?>
 								</div>
-							</div>
 
-							<!-- Equipment Recommendation Box -->
-							<?php
-							$non_bodyweight_gear = array();
-							if ( ! empty( $exercise['equipment_details'] ) && is_array( $exercise['equipment_details'] ) ) {
-								foreach ( $exercise['equipment_details'] as $gear_item ) {
-									if ( empty( $gear_item['is_bodyweight'] ) ) {
-										$non_bodyweight_gear[] = $gear_item;
+								<!-- Exercise Title -->
+								<h3 class="gear-engine-program__step-title"><?php echo esc_html( $exercise['title'] ); ?></h3>
+
+								<!-- Dosage & Attribute Pills -->
+								<div class="gear-engine-program__step-pills">
+									<?php if ( '' !== $exercise['dosage'] ) : ?>
+										<span class="gear-engine-program__reps-pill">
+											<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+											<span><?php echo esc_html( $exercise['dosage'] ); ?></span>
+										</span>
+									<?php endif; ?>
+									<?php if ( ! empty( $exercise['equipment'] ) && is_array( $exercise['equipment'] ) ) : ?>
+										<?php foreach ( $exercise['equipment'] as $item ) : ?>
+											<span class="gear-engine-program__equip-pill">
+												<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+												<?php echo esc_html( $item ); ?>
+											</span>
+										<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( ! empty( $exercise['role'] ) ) : ?>
+										<span class="gear-engine-program__role-pill">
+											<?php echo esc_html( ucfirst( (string) $exercise['role'] ) ); ?>
+										</span>
+									<?php endif; ?>
+								</div>
+
+								<!-- Step-by-Step Instructions -->
+								<div class="gear-engine-program__instructions-card">
+									<h4 class="gear-engine-program__instructions-title"><?php esc_html_e( 'Slik gjør du:', 'gear-engine' ); ?></h4>
+									<div class="gear-engine-program__instructions-body">
+										<?php
+										$raw_desc = '' !== $exercise['description'] ? $exercise['description'] : $exercise['summary'];
+										$lines    = array_filter( array_map( 'trim', explode( "\n", $raw_desc ) ) );
+										if ( count( $lines ) > 1 ) :
+											?>
+											<ul class="gear-engine-program__instructions-list">
+												<?php foreach ( $lines as $line ) : ?>
+													<?php $clean_line = preg_replace( '/^[-*•\d\.]+\s*/', '', $line ); ?>
+													<li><?php echo esc_html( $clean_line ); ?></li>
+												<?php endforeach; ?>
+											</ul>
+										<?php else : ?>
+											<p><?php echo esc_html( $raw_desc ); ?></p>
+										<?php endif; ?>
+									</div>
+								</div>
+
+								<!-- Equipment Recommendation Box -->
+								<?php
+								$non_bodyweight_gear = array();
+								if ( ! empty( $exercise['equipment_details'] ) && is_array( $exercise['equipment_details'] ) ) {
+									foreach ( $exercise['equipment_details'] as $gear_item ) {
+										if ( empty( $gear_item['is_bodyweight'] ) ) {
+											$non_bodyweight_gear[] = $gear_item;
+										}
 									}
 								}
-							}
-							?>
-							<?php if ( ! empty( $non_bodyweight_gear ) ) : ?>
-								<div class="gear-engine-program__gear-section">
-									<?php foreach ( $non_bodyweight_gear as $gear ) : ?>
-										<div class="gear-engine-program__gear-item">
-											<div class="gear-engine-program__gear-details">
-												<div class="gear-engine-program__gear-header">
-													<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
-													<strong><?php echo esc_html( $gear['title'] ); ?></strong>
+								?>
+								<?php if ( ! empty( $non_bodyweight_gear ) ) : ?>
+									<div class="gear-engine-program__gear-section">
+										<?php foreach ( $non_bodyweight_gear as $gear ) : ?>
+											<div class="gear-engine-program__gear-item">
+												<div class="gear-engine-program__gear-details">
+													<div class="gear-engine-program__gear-header">
+														<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+														<strong><?php echo esc_html( $gear['title'] ); ?></strong>
+													</div>
+													<?php if ( ! empty( $gear['free_alt'] ) ) : ?>
+														<p class="gear-engine-program__gear-free">
+															<span class="gear-engine-program__gear-free-label"><?php esc_html_e( 'Gratis hjemme:', 'gear-engine' ); ?></span>
+															<?php echo esc_html( $gear['free_alt'] ); ?>
+														</p>
+													<?php endif; ?>
 												</div>
-												<?php if ( ! empty( $gear['free_alt'] ) ) : ?>
-													<p class="gear-engine-program__gear-free">
-														<span class="gear-engine-program__gear-free-label"><?php esc_html_e( 'Gratis hjemme:', 'gear-engine' ); ?></span>
-														<?php echo esc_html( $gear['free_alt'] ); ?>
-													</p>
+												<?php if ( ! empty( $gear['picker_url'] ) ) : ?>
+													<div class="gear-engine-program__gear-action gear-engine-program__noprint">
+														<a href="<?php echo esc_url( $gear['picker_url'] ); ?>" class="gear-engine-program__gear-btn" target="_blank" rel="noopener">
+															<span><?php echo esc_html( ! empty( $gear['picker_label'] ) ? $gear['picker_label'] : __( 'Se veileder', 'gear-engine' ) ); ?></span>
+															<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+														</a>
+													</div>
 												<?php endif; ?>
 											</div>
-											<?php if ( ! empty( $gear['picker_url'] ) ) : ?>
-												<div class="gear-engine-program__gear-action gear-engine-program__noprint">
-													<a href="<?php echo esc_url( $gear['picker_url'] ); ?>" class="gear-engine-program__gear-btn" target="_blank" rel="noopener">
-														<span><?php echo esc_html( ! empty( $gear['picker_label'] ) ? $gear['picker_label'] : __( 'Se veileder', 'gear-engine' ) ); ?></span>
-														<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-													</a>
-												</div>
-											<?php endif; ?>
-										</div>
-									<?php endforeach; ?>
-								</div>
-							<?php endif; ?>
+										<?php endforeach; ?>
+									</div>
+								<?php endif; ?>
 
-						</div>
-					<?php endforeach; ?>
-				</div>
-
-				<!-- Stepper Bottom Navigation Bar -->
-				<div class="gear-engine-program__stepper-nav gear-engine-program__noprint">
-					<div class="gear-engine-program__stepper-nav-inner">
-						<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--prev" data-nav="prev" disabled aria-label="<?php esc_attr_e( 'Forrige øvelse', 'gear-engine' ); ?>">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-							<span><?php esc_html_e( 'Forrige', 'gear-engine' ); ?></span>
-						</button>
-						<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--next" data-nav="next">
-							<span><?php esc_html_e( 'Neste øvelse', 'gear-engine' ); ?></span>
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-						</button>
-						<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--finish" data-nav="finish" style="display: none;">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-							<span><?php esc_html_e( 'Fullfør økten', 'gear-engine' ); ?></span>
-						</button>
+							</div>
+						<?php endforeach; ?>
 					</div>
-				</div>
 
-				<!-- Workout Completion Celebration Screen -->
-				<div class="gear-engine-program__completion-card" style="display: none;">
-					<div class="gear-engine-program__completion-circle">
-						<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00A878" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-					</div>
-					<h3 class="gear-engine-program__completion-title"><?php esc_html_e( 'Flott gjennomført!', 'gear-engine' ); ?></h3>
-					<p class="gear-engine-program__completion-desc">
-						<?php esc_html_e( 'Du har fullført alle øvelsene i denne økten. God rehabilitering bygger på jevn belastning over tid.', 'gear-engine' ); ?>
-					</p>
-					<div class="gear-engine-program__completion-actions">
-						<button type="button" class="gear-engine-program__btn gear-engine-program__btn--secondary" data-action="restart-workout">
-							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-							<span><?php esc_html_e( 'Start økten på nytt', 'gear-engine' ); ?></span>
-						</button>
-						<?php if ( $p_idx + 1 < count( $groups ) ) : ?>
-							<button type="button" class="gear-engine-program__btn gear-engine-program__btn--primary" data-action="next-phase" data-target-phase="<?php echo esc_attr( (string) ( $p_idx + 1 ) ); ?>">
-								<span><?php esc_html_e( 'Gå til neste fase', 'gear-engine' ); ?></span>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+					<!-- Stepper Bottom Navigation Bar -->
+					<div class="gear-engine-program__stepper-nav gear-engine-program__noprint">
+						<div class="gear-engine-program__stepper-nav-inner">
+							<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--prev" data-nav="prev" disabled aria-label="<?php esc_attr_e( 'Forrige øvelse', 'gear-engine' ); ?>">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
 							</button>
-						<?php endif; ?>
+							<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--next" data-nav="next">
+								<span><?php esc_html_e( 'Neste', 'gear-engine' ); ?></span>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+							</button>
+							<button type="button" class="gear-engine-program__nav-btn gear-engine-program__nav-btn--finish" data-nav="finish" style="display: none;">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+								<span><?php esc_html_e( 'Fullfør økten', 'gear-engine' ); ?></span>
+							</button>
+						</div>
 					</div>
-				</div>
+
+					<!-- Workout Completion Celebration Screen -->
+					<div class="gear-engine-program__completion-card" style="display: none;">
+						<div class="gear-engine-program__completion-circle">
+							<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00A878" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+						</div>
+						<h3 class="gear-engine-program__completion-title"><?php esc_html_e( 'Flott gjennomført!', 'gear-engine' ); ?></h3>
+						<p class="gear-engine-program__completion-desc">
+							<?php esc_html_e( 'Du har fullført alle øvelsene i denne økten. God rehabilitering bygger på jevn belastning over tid.', 'gear-engine' ); ?>
+						</p>
+						<div class="gear-engine-program__completion-actions">
+							<button type="button" class="gear-engine-program__btn gear-engine-program__btn--secondary" data-action="restart-workout">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+								<span><?php esc_html_e( 'Start økten på nytt', 'gear-engine' ); ?></span>
+							</button>
+							<?php if ( $p_idx + 1 < count( $groups ) ) : ?>
+								<button type="button" class="gear-engine-program__btn gear-engine-program__btn--primary" data-action="next-phase" data-target-phase="<?php echo esc_attr( (string) ( $p_idx + 1 ) ); ?>">
+									<span><?php esc_html_e( 'Gå til neste fase', 'gear-engine' ); ?></span>
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								</button>
+							<?php endif; ?>
+						</div>
+					</div>
+
+				</div><!-- .gear-engine-program__workout-card -->
 
 			</div>
 		<?php endforeach; ?>
