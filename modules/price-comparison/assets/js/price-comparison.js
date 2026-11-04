@@ -547,12 +547,6 @@
 			var track = root.querySelector('#ge-dept-track');
 			if (!track) return;
 			track.innerHTML = '';
-			var emojiMap = {
-				kondisjon: '🏃',
-				styrke: '🏋️',
-				rehabilitering: '🩺',
-				restitusjon: '🧘'
-			};
 
 			DEPARTMENTS.forEach(function (dept) {
 				var isActive = state.activeDepartment === dept.id;
@@ -560,7 +554,6 @@
 					var d = p.department || inferDepartment(p);
 					return d === dept.id;
 				}).length;
-				var emoji = emojiMap[dept.id] || '';
 
 				var btn = document.createElement('button');
 				btn.type = 'button';
@@ -568,8 +561,7 @@
 				btn.setAttribute('data-department', dept.id);
 				btn.setAttribute('role', 'tab');
 				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-				btn.innerHTML = (emoji ? '<span class="ge-dept-emoji">' + emoji + '</span>' : '') +
-					'<span>' + escapeHtml(dept.name) + '</span>' +
+				btn.innerHTML = '<span>' + escapeHtml(dept.name) + '</span>' +
 					'<span class="ge-dept-badge">' + count + '</span>';
 
 				btn.addEventListener('click', function () {
@@ -1772,7 +1764,7 @@
 	function renderSkeleton(root, state) {
 		root.innerHTML = '' +
 		'<div class="mb-5" style="margin-bottom: 24px;">' +
-			'<h2 style="font-size: 28px; font-weight: 800; color: #1A2A3A; margin: 0 0 6px 0; letter-spacing: -0.02em;">Prissammenligning</h2>' +
+			'<h2 style="font-size: 28px; font-weight: 800; color: #0C2340; margin: 0 0 6px 0; letter-spacing: -0.02em;">Prissammenligning</h2>' +
 			'<p style="font-size: 15px; color: #64748b; margin: 0;">Sammenlign priser fra våre samarbeidspartnere.</p>' +
 		'</div>' +
 

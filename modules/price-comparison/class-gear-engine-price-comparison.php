@@ -389,7 +389,7 @@ class Gear_Engine_Price_Comparison {
 				$image_url = (string) get_post_meta( $post_id, Gear_Engine_CPT::META_IMAGE_URL, true );
 			}
 			if ( empty( $image_url ) ) {
-				$image_url = 'https://placehold.co/400x400/f1f5f9/1A2A3A?text=' . rawurlencode( $post->post_title );
+				$image_url = 'https://placehold.co/400x400/f1f5f9/0C2340?text=' . rawurlencode( $post->post_title );
 			}
 
 			// Resolve category from taxonomy.

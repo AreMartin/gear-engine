@@ -52,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	>
 		<!-- Innhold rendres dynamisk via price-comparison.js -->
 		<div class="ge-price-comp-loading" style="padding: 40px 0; text-align: center; color: #667085;">
-			<div class="ge-price-comp-spinner" style="display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #1A2A3A; border-radius: 50%; animation: ge-spin 0.8s linear infinite;"></div>
+			<div class="ge-price-comp-spinner" style="display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #0C2340; border-radius: 50%; animation: ge-spin 0.8s linear infinite;"></div>
 			<p style="margin-top: 12px; font-weight: 500; font-size: 14px;"><?php esc_html_e( 'Laster priser og produkter...', 'gear-engine' ); ?></p>
 		</div>
 	</div>
