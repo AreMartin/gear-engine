@@ -32,6 +32,7 @@ class Gear_Engine_Protocol_Viewer {
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'wp', array( $this, 'register_seo_hooks' ) );
 	}
 
 	/**
@@ -81,6 +82,152 @@ class Gear_Engine_Protocol_Viewer {
 	 */
 	public static function get_auto_program_url( string $region, string $diagnosis ): string {
 		return trailingslashit( home_url( self::get_page_path() ) ) . '?region=' . rawurlencode( sanitize_key( $region ) ) . '&dx=' . rawurlencode( sanitize_key( $diagnosis ) );
+	}
+
+	/**
+	 * Resolves the currently requested protocol, if any, from URL query parameters.
+	 *
+	 * @return array<string, mixed>|null Protocol data array or null if not viewing a specific program.
+	 */
+	public static function get_current_requested_protocol(): ?array {
+		if ( ! empty( $_GET[ self::QUERY_VAR ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$slug     = sanitize_title( wp_unslash( $_GET[ self::QUERY_VAR ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$approved = self::get_approved_protocol( $slug );
+			if ( $approved ) {
+				return $approved;
+			}
+		}
+
+		if ( ! empty( $_GET['region'] ) && ! empty( $_GET['dx'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$region = sanitize_key( wp_unslash( $_GET['region'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$dx     = sanitize_key( wp_unslash( $_GET['dx'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$auto   = self::get_auto_program( $region, $dx, 1 );
+			if ( $auto && ! empty( $auto['protocol'] ) ) {
+				return $auto['protocol'];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Register dynamic SEO and Yoast hooks when viewing a protocol or program.
+	 *
+	 * @return void
+	 */
+	public function register_seo_hooks(): void {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$protocol = self::get_current_requested_protocol();
+		if ( ! $protocol ) {
+			return;
+		}
+
+		// WordPress Core document title fallback.
+		add_filter( 'document_title_parts', array( $this, 'filter_document_title_parts' ), 20 );
+
+		// Yoast SEO integration.
+		add_filter( 'wpseo_title', array( $this, 'filter_yoast_title' ), 20 );
+		add_filter( 'wpseo_metadesc', array( $this, 'filter_yoast_metadesc' ), 20 );
+		add_filter( 'wpseo_canonical', array( $this, 'filter_yoast_canonical' ), 20 );
+		add_filter( 'wpseo_opengraph_title', array( $this, 'filter_yoast_title' ), 20 );
+		add_filter( 'wpseo_opengraph_desc', array( $this, 'filter_yoast_metadesc' ), 20 );
+		add_filter( 'wpseo_opengraph_url', array( $this, 'filter_yoast_canonical' ), 20 );
+		add_filter( 'wpseo_twitter_title', array( $this, 'filter_yoast_title' ), 20 );
+		add_filter( 'wpseo_twitter_description', array( $this, 'filter_yoast_metadesc' ), 20 );
+	}
+
+	/**
+	 * Filter WordPress document title parts.
+	 *
+	 * @param array<string, string> $parts Current title parts.
+	 * @return array<string, string>
+	 */
+	public function filter_document_title_parts( array $parts ): array {
+		$protocol = self::get_current_requested_protocol();
+		if ( $protocol && ! empty( $protocol['name'] ) ) {
+			$parts['title'] = sprintf(
+				/* translators: %s: Protocol name */
+				__( '%s – Treningsprogram og øvelser', 'gear-engine' ),
+				$protocol['name']
+			);
+		}
+		return $parts;
+	}
+
+	/**
+	 * Filter Yoast SEO meta title.
+	 *
+	 * @param string $title Default or existing title.
+	 * @return string
+	 */
+	public function filter_yoast_title( string $title ): string {
+		$protocol = self::get_current_requested_protocol();
+		if ( ! $protocol || empty( $protocol['name'] ) ) {
+			return $title;
+		}
+
+		$site_name = get_bloginfo( 'name' );
+		if ( ! empty( $site_name ) ) {
+			return sprintf(
+				/* translators: 1: Protocol name, 2: Site name */
+				__( '%1$s – Treningsprogram og øvelser | %2$s', 'gear-engine' ),
+				$protocol['name'],
+				$site_name
+			);
+		}
+
+		return sprintf(
+			/* translators: %s: Protocol name */
+			__( '%s – Treningsprogram og øvelser', 'gear-engine' ),
+			$protocol['name']
+		);
+	}
+
+	/**
+	 * Filter Yoast SEO meta description.
+	 *
+	 * @param string $desc Default or existing description.
+	 * @return string
+	 */
+	public function filter_yoast_metadesc( string $desc ): string {
+		$protocol = self::get_current_requested_protocol();
+		if ( ! $protocol ) {
+			return $desc;
+		}
+
+		if ( ! empty( $protocol['summary'] ) ) {
+			return wp_strip_all_tags( (string) $protocol['summary'] );
+		}
+
+		return sprintf(
+			/* translators: %s: Protocol name */
+			__( 'Skreddersydd treningsprogram og øvelser for %s. Trinn-for-trinn veiledning.', 'gear-engine' ),
+			$protocol['name']
+		);
+	}
+
+	/**
+	 * Filter Yoast SEO canonical URL.
+	 *
+	 * @param string $canonical Default canonical URL.
+	 * @return string
+	 */
+	public function filter_yoast_canonical( string $canonical ): string {
+		if ( ! empty( $_GET[ self::QUERY_VAR ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$slug = sanitize_title( wp_unslash( $_GET[ self::QUERY_VAR ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( self::get_approved_protocol( $slug ) ) {
+				return self::get_program_url( $slug );
+			}
+		} elseif ( ! empty( $_GET['region'] ) && ! empty( $_GET['dx'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$region = sanitize_key( wp_unslash( $_GET['region'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$dx     = sanitize_key( wp_unslash( $_GET['dx'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return self::get_auto_program_url( $region, $dx );
+		}
+
+		return $canonical;
 	}
 
 	/**

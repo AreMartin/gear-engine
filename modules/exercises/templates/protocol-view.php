@@ -116,8 +116,11 @@ foreach ( $groups as $grp ) {
 							<!-- Video / Media Player Container -->
 							<div class="gear-engine-program__stepper-media">
 								<?php if ( '' !== $embed ) : ?>
-									<div class="gear-engine-program__video-wrapper" data-embed="<?php echo esc_url( $embed ); ?>" data-title="<?php echo esc_attr( $exercise['title'] ); ?>">
-										<iframe src="<?php echo esc_url( $embed ); ?>" title="<?php echo esc_attr( $exercise['title'] ); ?>" class="gear-engine-program__iframe" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+									<div class="gear-engine-program__video-wrapper gear-engine-program__video" data-embed="<?php echo esc_url( $embed ); ?>" data-title="<?php echo esc_attr( $exercise['title'] ); ?>">
+										<button type="button" class="gear-engine-program__play gear-engine-program__noprint">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+											<span><?php esc_html_e( 'Se video', 'gear-engine' ); ?></span>
+										</button>
 									</div>
 									<?php if ( '' !== $exercise['attribution_text'] && '' !== $exercise['attribution_url'] ) : ?>
 										<p class="gear-engine-program__credit gear-engine-program__noprint">

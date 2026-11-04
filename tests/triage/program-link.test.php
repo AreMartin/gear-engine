@@ -30,6 +30,10 @@ function esc_attr( $s ) { return esc_html( $s ); }
 function esc_url( $s ) { return esc_html( $s ); }
 function esc_html_e( $s ) { echo esc_html( $s ); }
 function esc_html__( $s ) { return esc_html( $s ); }
+function esc_attr_e( $s ) { echo esc_attr( $s ); }
+function esc_attr__( $s ) { return esc_attr( $s ); }
+function get_bloginfo( $show = 'name' ) { return 'Fysionett'; }
+function wp_strip_all_tags( $s ) { return strip_tags( (string) $s ); }
 function __( $s ) { return $s; }
 function wp_enqueue_style( $h ) {}
 function wp_enqueue_script( $h ) {}
@@ -246,6 +250,22 @@ $GLOBALS['area_exercises']['skulder'] = array();
 t( 'region without any exercises still unavailable', false !== strpos( $viewer->render(), 'ikke tilgjengelig' ) );
 $GLOBALS['area_exercises']['skulder'] = $saved;
 $_GET = array();
+
+// SEO and Yoast integration tests.
+$_GET = array( 'program' => 'saps-program' );
+$current_protocol = Gear_Engine_Protocol_Viewer::get_current_requested_protocol();
+t( 'current protocol detected from query var', is_array( $current_protocol ) && ( $current_protocol['slug'] ?? '' ) === 'saps-program' );
+$yoast_title = $viewer->filter_yoast_title( 'Default Page Title' );
+t( 'yoast title contains protocol name', false !== strpos( $yoast_title, 'SAPS-program' ) && false !== strpos( $yoast_title, 'Treningsprogram' ) );
+$yoast_canonical = $viewer->filter_yoast_canonical( 'http://example.com/treningsprogram/' );
+t( 'yoast canonical points to protocol url', 'http://example.com/treningsprogram/?program=saps-program' === $yoast_canonical );
+$doc_parts = $viewer->filter_document_title_parts( array( 'title' => 'Default' ) );
+t( 'document title parts contains protocol name', false !== strpos( $doc_parts['title'], 'SAPS-program' ) );
+
+$_GET = array();
+t( 'current protocol is null when no query param', null === Gear_Engine_Protocol_Viewer::get_current_requested_protocol() );
+t( 'yoast title passes through when no protocol requested', 'Default Page Title' === $viewer->filter_yoast_title( 'Default Page Title' ) );
+t( 'yoast canonical passes through when no protocol requested', 'http://example.com/treningsprogram/' === $viewer->filter_yoast_canonical( 'http://example.com/treningsprogram/' ) );
 
 // Primary and secondary buttons are separate styles.
 $css = file_get_contents( ABSPATH . 'modules/exercises/assets/css/protocol-viewer.css' );

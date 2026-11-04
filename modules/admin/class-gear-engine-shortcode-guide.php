@@ -86,9 +86,9 @@ class Gear_Engine_Shortcode_Guide {
 			array(
 				'group'       => __( 'Treningsprogram', 'gear-engine' ),
 				'tag'         => Gear_Engine_Protocol_Viewer::SHORTCODE_TAG,
-				'example'     => '[' . Gear_Engine_Protocol_Viewer::SHORTCODE_TAG . ']',
-				'description' => __( 'The program page. Quiz results open it with ?program=… or ?region=…&dx=…; without a parameter it lists approved programs.', 'gear-engine' ),
-				'note'        => __( 'One page only, at the program page path.', 'gear-engine' ),
+				'example'     => '[' . Gear_Engine_Protocol_Viewer::SHORTCODE_TAG . '] eller [' . Gear_Engine_Protocol_Viewer::SHORTCODE_TAG . ' slug="akutt-overtrakk"]',
+				'description' => __( 'Viser treningsprogrammer. Uten parameter vises oversikt/dynamisk program basert på URL (?program=...). Kan også låses til én spesifikk protokoll med slug="...", perfekt for dedikerte SEO-landingssider.', 'gear-engine' ),
+				'note'        => __( 'Hovedsiden ligger på /treningsprogram/. Slugen til hver protokoll finner du under Øvelser > Protokoller i WP-menyen.', 'gear-engine' ),
 			),
 			array(
 				'group'       => __( 'Produkter', 'gear-engine' ),
