@@ -1226,12 +1226,13 @@
 	height: 22px;
 	min-width: 22px;
 	border-radius: 50%;
-	background: var(--gep-navy-container, #EAF0F6);
-	color: var(--gep-navy, #0C2340);
+	background: #1A2A3A;
+	color: #FFFFFF;
 	font-size: 11px;
-	font-weight: 800;
+	font-weight: 700;
 	line-height: 1;
 	margin-top: 1px;
+	box-shadow: 0 1px 3px rgba(26, 42, 58, 0.2);
 }
 
 .gear-engine-program__m3-step-text {
