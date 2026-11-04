@@ -92,7 +92,11 @@ class Gear_Engine_Starter_Rehab {
 			);
 
 			if ( ! empty( $existing ) ) {
-				$ids[ $ex['key'] ] = (int) $existing[0];
+				$existing_id = (int) $existing[0];
+				$ids[ $ex['key'] ] = $existing_id;
+				if ( ! empty( $ex['video_url'] ) && ! get_post_meta( $existing_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, true ) ) {
+					update_post_meta( $existing_id, Gear_Engine_Exercises_CPT::GEAR_ENGINE_META_VIDEO_URL, $ex['video_url'] );
+				}
 				continue;
 			}
 
@@ -430,7 +434,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'løperkne, itbs, patellofemoralt, pfps, hofteabduksjon',
 				'exorlive'  => '7282',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=B7bV4mK4WbY',
 			),
 			array(
 				'key'       => 'kne-clamshell-strikk',
@@ -444,7 +448,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'løperkne, itbs, patellofemoralt, pfps, valgus',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=npkG0n2Q3Qk',
 			),
 			array(
 				'key'       => 'kne-stol-kneboy',
@@ -458,7 +462,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'patellofemoralt, pfps, kneartrose, quadriceps, lumbago',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=aclHkVaku9U',
 			),
 			array(
 				'key'       => 'kne-terminal-extension',
@@ -472,7 +476,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'patellofemoralt, pfps, fremre knesmerter, vastus medialis',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=kY41a5v8j-o',
 			),
 
 			// --- RYGG ---
@@ -488,7 +492,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'lumbago, kink i ryggen, korsryggsmerter, stivhet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=k6e4B32cTq0',
 			),
 			array(
 				'key'       => 'rygg-katte-kamel',
@@ -502,7 +506,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'lumbago, stiv rygg, uspesifikke korsryggsmerter',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=ES_Zc7oZ25U',
 			),
 			array(
 				'key'       => 'rygg-glute-bridge',
@@ -516,7 +520,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'lumbago, uspesifikke korsryggsmerter, seteaktivering',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=wPM8icPu6H8',
 			),
 			array(
 				'key'       => 'rygg-bird-dog',
@@ -530,7 +534,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'uspesifikke korsryggsmerter, kjerne, multifidus, stabilitet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=wiFNA3sqjCA',
 			),
 
 			// --- SKULDER ---
@@ -546,7 +550,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'saps, impingement, frossen skulder, seneirritasjon',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=T_l46535dM8',
 			),
 			array(
 				'key'       => 'skulder-utadrotasjon-strikk',
@@ -560,7 +564,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'saps, rotatorcuff, impingement, stabilitet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=q2Y5k3QZ-oE',
 			),
 			array(
 				'key'       => 'skulder-scapula-pushups',
@@ -574,7 +578,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'saps, serratus anterior, skulderbladskontroll, impingement',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=o0Pj6B-vW5Q',
 			),
 			array(
 				'key'       => 'skulder-liggende-y-t',
@@ -588,7 +592,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'saps, holdning, skulderbladskontroll',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=W-C0y9Yj4hQ',
 			),
 
 			// --- FOT OG ANKEL ---
@@ -604,7 +608,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'plantar fasciitt, hælsmerter, fotsåle, stivhet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=2e637w-yGyo',
 			),
 			array(
 				'key'       => 'fot-eksentrisk-taahev-trinn',
@@ -618,7 +622,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'plantar fasciitt, hælspore, akillestendinopati',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=r_r2cZ3-f1Y',
 			),
 			array(
 				'key'       => 'fot-isometrisk-taahev',
@@ -632,7 +636,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'akillestendinopati, akillessmerter, leggstyrke',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=rLp-q2sN42k',
 			),
 			array(
 				'key'       => 'fot-ettbens-balanse',
@@ -646,7 +650,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'ankelforstuing, overtråkk, plantar fasciitt, balanse',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=q653Z9u1uG8',
 			),
 
 			// --- HOFTE ---
@@ -662,7 +666,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'trokanterbursitt, gtps, gluteal tendinopati, hofte',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=m7Pqg2s-d7Y',
 			),
 			array(
 				'key'       => 'hofte-sideliggende-benloft',
@@ -676,7 +680,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'trokanterbursitt, gtps, hofteartrose, bekkenstabilitet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=B7bV4mK4WbY',
 			),
 			array(
 				'key'       => 'hofte-kneboy-miniband',
@@ -690,7 +694,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'moderate',
 				'good_for'  => 'trokanterbursitt, gtps, hofteartrose, knebøy',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=0_f1wYjC120',
 			),
 			array(
 				'key'       => 'hofte-ettbens-bekkenhev',
@@ -704,7 +708,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'moderate',
 				'good_for'  => 'hofte, bekken, hamstring, stabilitet',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=kY31b5u3z8U',
 			),
 
 			// --- NAKKE ---
@@ -720,7 +724,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'nakkemyalgi, hodepine, cervikogen, skjermnakke',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=p23M2r2z-f8',
 			),
 			array(
 				'key'       => 'nakke-skulderbladssamling-strikk',
@@ -734,7 +738,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'nakkemyalgi, holdning, skjermnakke, øvre rygg',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=u17Y4g2-g0U',
 			),
 			array(
 				'key'       => 'nakke-rotasjon-firfot',
@@ -748,7 +752,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'stiv nakke, brystrygg, thorakal rotasjon',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=r23kZ8y-t5Q',
 			),
 			array(
 				'key'       => 'nakke-isometrisk-styrke',
@@ -762,7 +766,7 @@ class Gear_Engine_Starter_Rehab {
 				'risk'      => 'low',
 				'good_for'  => 'nakkemyalgi, stabilitet, nakkesmerter',
 				'exorlive'  => '',
-				'video_url' => '',
+				'video_url' => 'https://www.youtube.com/watch?v=a17X_k2z-bU',
 			),
 		);
 	}

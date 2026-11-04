@@ -40,6 +40,7 @@ function get_current_user_id() { return 1; }
 function absint( $x ) { return abs( (int) $x ); }
 function wp_strip_all_tags( $s ) { return strip_tags( (string) $s ); }
 function wp_parse_url( $u ) { return parse_url( (string) $u ); }
+function wp_http_validate_url( $u ) { return filter_var( $u, FILTER_VALIDATE_URL ) ? (string) $u : false; }
 
 class WP_Post {
 	public $ID;
