@@ -23,6 +23,12 @@
 			discount: 20,
 			shop: "Fjellsport",
 			otherShops: 3,
+			stores: [
+				{ shop: "Fjellsport", price: 12490, inStock: true, isBest: true, url: "#deal-fjellsport" },
+				{ shop: "Treningspartner", price: 12990, inStock: true, isBest: false, url: "#deal-tp" },
+				{ shop: "X-Life", price: 13490, inStock: true, isBest: false, url: "#deal-xlife" },
+				{ shop: "Anton Sport", price: 13990, inStock: false, isBest: false, url: "#deal-anton" }
+			],
 			inStock: true,
 			image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80",
 			url: "#",
@@ -44,7 +50,12 @@
 			originalPrice: 29294,
 			discount: 15,
 			shop: "Treningspartner",
-			otherShops: 0,
+			otherShops: 2,
+			stores: [
+				{ shop: "Treningspartner", price: 24900, inStock: true, isBest: true, url: "#deal-tp" },
+				{ shop: "Gymgrossisten", price: 26490, inStock: true, isBest: false, url: "#deal-gg" },
+				{ shop: "Fjellsport", price: 27990, inStock: false, isBest: false, url: "#deal-fjellsport" }
+			],
 			inStock: true,
 			image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80",
 			url: "#",
@@ -68,6 +79,10 @@
 			discount: 25,
 			shop: "X-Life",
 			otherShops: 1,
+			stores: [
+				{ shop: "X-Life", price: 899, inStock: true, isBest: true, url: "#deal-xlife" },
+				{ shop: "Treningspartner", price: 999, inStock: true, isBest: false, url: "#deal-tp" }
+			],
 			inStock: true,
 			image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
 			url: "#",
@@ -151,6 +166,11 @@
 			discount: null,
 			shop: "Fjellsport",
 			otherShops: 2,
+			stores: [
+				{ shop: "Fjellsport", price: 2999, inStock: true, isBest: true, url: "#deal-fjellsport" },
+				{ shop: "Treningspartner", price: 3299, inStock: true, isBest: false, url: "#deal-tp" },
+				{ shop: "Gymgrossisten", price: 3499, inStock: true, isBest: false, url: "#deal-gg" }
+			],
 			inStock: true,
 			image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80",
 			url: "#",
@@ -211,6 +231,10 @@
 			discount: 20,
 			shop: "X-Life",
 			otherShops: 1,
+			stores: [
+				{ shop: "X-Life", price: 899, inStock: true, isBest: true, url: "#deal-xlife" },
+				{ shop: "Treningspartner", price: 999, inStock: true, isBest: false, url: "#deal-tp" }
+			],
 			inStock: true,
 			image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80",
 			url: "#",
@@ -510,6 +534,7 @@
 			activeQuickFilters: {},
 			selectedForCompare: [],
 			showOnlyDiffs: false,
+			openStores: {},
 			minPrice: '',
 			maxPrice: '',
 			absMinPrice: 0,
@@ -1355,6 +1380,28 @@
 						}
 					});
 				});
+
+				// Attach store compare trigger listeners
+				cardsContainer.querySelectorAll('.ge-shop-compare-trigger').forEach(function (el) {
+					el.addEventListener('click', function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						var id = parseInt(el.getAttribute('data-id'), 10);
+						state.openStores[id] = !state.openStores[id];
+						updateUI();
+					});
+				});
+
+				// Attach popover close clicks
+				cardsContainer.querySelectorAll('[data-close-id]').forEach(function (btn) {
+					btn.addEventListener('click', function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						var id = parseInt(btn.getAttribute('data-close-id'), 10);
+						state.openStores[id] = false;
+						updateUI();
+					});
+				});
 			} else {
 				cardsContainer.innerHTML =
 					'<div class="ge-comp-empty">' +
@@ -1395,6 +1442,7 @@
 			state.activeShops = [];
 			state.activeBrands = [];
 			state.activeQuickFilters = {};
+			state.openStores = {};
 			state.minPrice = '';
 			state.maxPrice = '';
 			state.searchQuery = '';
@@ -1725,6 +1773,54 @@
 		'</svg>';
 	}
 
+	// Store Comparison Table Renderer (with in-card popover support and M3 avatars)
+	function renderStoresDrawer(p, isOverlay) {
+		if (!p.stores || p.stores.length === 0) return '';
+		var lowestPrice = p.currentPrice;
+		var maxPrice = p.stores[p.stores.length - 1].price;
+
+		var h = '<div class="ge-stores-table' + (isOverlay ? ' ge-stores-popover' : '') + '">';
+		
+		// Header with Brand, Name, Store count, Price range, and Close button
+		h += '<div class="ge-popover-header">' +
+			'<div class="ge-popover-prod-info">' +
+				'<span class="ge-popover-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+				'<h4 class="ge-popover-title" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</h4>' +
+				'<div class="ge-popover-meta">' +
+					'<span>Prissammenligning (' + p.stores.length + ' butikker)</span>' +
+					'<span class="ge-popover-price-range">Fra ' + formatPrice(lowestPrice) + ' til ' + formatPrice(maxPrice) + '</span>' +
+				'</div>' +
+			'</div>' +
+			'<button type="button" class="ge-popover-close" data-close-id="' + p.id + '" title="Lukk forhandlerliste" aria-label="Lukk">' +
+				'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+			'</button>' +
+		'</div>';
+
+		p.stores.forEach(function(st) {
+			var isBest = st.price === lowestPrice;
+
+			h += '<div class="ge-store-row' + (isBest ? ' is-best-deal' : '') + '">' +
+				(isBest ? '<span class="ge-store-tag">Best pris</span>' : '') +
+				'<div class="ge-store-left">' +
+					'<span class="ge-stock-dot ' + (st.inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (st.inStock ? 'På lager' : 'Ikke på lager') + '"></span>' +
+					renderShopAvatarHtml(st.shop) +
+					'<b title="' + escapeHtml(st.shop) + '">' + escapeHtml(st.shop) + '</b>' +
+				'</div>' +
+				'<div class="ge-store-right">' +
+					'<span class="ge-store-price">' + formatPrice(st.price) + '</span>' +
+					'<a href="' + escapeHtml(st.url || '#') + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-store-btn">Kjøp</a>' +
+				'</div>' +
+			'</div>';
+		});
+
+		h += '<button type="button" class="ge-popover-close-btn" data-close-id="' + p.id + '">' +
+			'<span>Lukk forhandlerliste</span> <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' +
+		'</button>';
+
+		h += '</div>';
+		return h;
+	}
+
 	// Layout 1: List Card (2-Column Responsive Card Layout)
 	function renderListCard(product, state) {
 		var hasDiscount = product.discount && product.discount > 0;
@@ -1734,6 +1830,8 @@
 		var save = (product.originalPrice && product.originalPrice > product.currentPrice) ? (product.originalPrice - product.currentPrice) : 0;
 		var showSavings = state && state.sortBy === 'savings_desc' && save > 0;
 		var isChecked = state && state.selectedForCompare && state.selectedForCompare.indexOf(product.id) !== -1;
+		var storeCount = (product.stores && product.stores.length > 0) ? product.stores.length : ((product.otherShops || 0) + 1);
+		var isOpen = !!(state && state.openStores && state.openStores[product.id]);
 
 		return '' +
 		'<div class="ge-card-list">' +
@@ -1769,16 +1867,27 @@
 							(product.originalPrice ? '<span class="ge-price-original">' + formatPrice(product.originalPrice) + '</span>' : '') +
 							(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 						'</div>' +
-						'<div class="ge-mobile-shop-label">' +
-							renderShopAvatarHtml(product.shop) +
-							'<span class="ge-stock-dot ' + stockClass + '"></span>' +
-							escapeHtml(product.shop || '') +
-						'</div>' +
+						(storeCount > 1 && product.stores && product.stores.length > 1 ? (
+							'<div class="ge-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + product.id + '" style="margin:0;" title="Klikk for å sammenligne forhandlere">' +
+								'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
+									renderShopAvatarHtml(product.shop) +
+									'<span>Best pris: <b>' + escapeHtml(product.shop) + '</b></span>' +
+								'</div>' +
+								'<span class="ge-compare-badge">' + storeCount + ' butikker ' + (isOpen ? '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') + '</span>' +
+							'</div>'
+						) : (
+							'<div class="ge-mobile-shop-label">' +
+								renderShopAvatarHtml(product.shop) +
+								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
+								escapeHtml(product.shop || '') +
+							'</div>'
+						)) +
 					'</div>' +
 					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
 						'Gå til ' + escapeHtml(product.shop || 'butikk') + ' ' + externalLinkIcon() +
 					'</a>' +
 				'</div>' +
+				(isOpen && storeCount > 1 && product.stores ? '<div class="ge-list-drawer-wrap">' + renderStoresDrawer(product, false) + '</div>' : '') +
 			'</div>' +
 		'</div>';
 	}
@@ -1792,6 +1901,8 @@
 		var save = (product.originalPrice && product.originalPrice > product.currentPrice) ? (product.originalPrice - product.currentPrice) : 0;
 		var showSavings = state && state.sortBy === 'savings_desc' && save > 0;
 		var isChecked = state && state.selectedForCompare && state.selectedForCompare.indexOf(product.id) !== -1;
+		var storeCount = (product.stores && product.stores.length > 0) ? product.stores.length : ((product.otherShops || 0) + 1);
+		var isOpen = !!(state && state.openStores && state.openStores[product.id]);
 
 		return '' +
 		'<div class="ge-card-grid">' +
@@ -1816,16 +1927,27 @@
 						(product.originalPrice ? '<span class="ge-price-original">' + formatPrice(product.originalPrice) + '</span>' : '') +
 						(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 					'</div>' +
-					'<div class="ge-shop-strip">' +
-						'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
-							renderShopAvatarHtml(product.shop) +
-							'<span>' + escapeHtml(product.shop || 'Nettbutikk') + '</span>' +
+					(storeCount > 1 && product.stores && product.stores.length > 1 ? (
+						'<div class="ge-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + product.id + '" title="Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker">' +
+							'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
+								renderShopAvatarHtml(product.shop) +
+								'<span>Best pris: ' + escapeHtml(product.shop || 'Nettbutikk') + '</span>' +
+							'</div>' +
+							'<span class="ge-compare-badge">' + storeCount + ' butikker ' + (isOpen ? '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') + '</span>' +
 						'</div>' +
-						'<div class="ge-stock-meta">' +
-							'<span class="ge-stock-dot ' + stockClass + '"></span>' +
-							(product.otherShops > 0 ? '<span class="ge-other-shops-badge">+ ' + product.otherShops + '</span>' : '') +
-						'</div>' +
-					'</div>' +
+						(isOpen ? renderStoresDrawer(product, true) : '')
+					) : (
+						'<div class="ge-shop-strip">' +
+							'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
+								renderShopAvatarHtml(product.shop) +
+								'<span>' + escapeHtml(product.shop || 'Nettbutikk') + '</span>' +
+							'</div>' +
+							'<div class="ge-stock-meta">' +
+								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
+								(product.otherShops > 0 ? '<span class="ge-other-shops-badge">+ ' + product.otherShops + '</span>' : '') +
+							'</div>' +
+						'</div>'
+					)) +
 					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
 						'Gå til ' + escapeHtml(product.shop || 'butikk') + ' ' + externalLinkIcon() +
 					'</a>' +

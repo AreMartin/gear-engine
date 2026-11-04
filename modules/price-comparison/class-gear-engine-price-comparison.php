@@ -133,6 +133,12 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'stores'        => array(
+					array( 'shop' => 'Fjellsport', 'price' => 12490, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
+					array( 'shop' => 'Treningspartner', 'price' => 12990, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+					array( 'shop' => 'X-Life', 'price' => 13490, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+					array( 'shop' => 'Anton Sport', 'price' => 13990, 'inStock' => false, 'isBest' => false, 'url' => '#' ),
+				),
 				'specs'         => array(
 					'Motstand'        => 'Luftmotstand',
 					'Brukervekt'      => '227 kg',
@@ -151,10 +157,15 @@ class Gear_Engine_Price_Comparison {
 				'originalPrice' => 29294,
 				'discount'      => 15,
 				'shop'          => 'Treningspartner',
-				'otherShops'    => 0,
+				'otherShops'    => 2,
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'stores'        => array(
+					array( 'shop' => 'Treningspartner', 'price' => 24900, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
+					array( 'shop' => 'Gymgrossisten', 'price' => 26490, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+					array( 'shop' => 'Fjellsport', 'price' => 27990, 'inStock' => false, 'isBest' => false, 'url' => '#' ),
+				),
 				'specs'         => array(
 					'Toppfart'      => '22 km/t',
 					'Motor'         => '4.0 HK',
@@ -178,6 +189,10 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'stores'        => array(
+					array( 'shop' => 'X-Life', 'price' => 899, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
+					array( 'shop' => 'Treningspartner', 'price' => 999, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+				),
 				'specs'         => array(
 					'Vekt' => '16 kg',
 					'Type' => 'Konkurranse (stål)',
@@ -261,6 +276,11 @@ class Gear_Engine_Price_Comparison {
 				'inStock'       => true,
 				'image'         => 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80',
 				'url'           => '#',
+				'stores'        => array(
+					array( 'shop' => 'Fjellsport', 'price' => 2999, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
+					array( 'shop' => 'Treningspartner', 'price' => 3299, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+					array( 'shop' => 'Gymgrossisten', 'price' => 3499, 'inStock' => true, 'isBest' => false, 'url' => '#' ),
+				),
 				'specs'         => array(
 					'Vektintervall'   => '2 - 24 kg',
 					'Antall trinn'    => '15',
@@ -355,15 +375,32 @@ class Gear_Engine_Price_Comparison {
 			return self::get_fallback_products();
 		}
 
-		// First pass: count merchants per EAN/clean name to compute otherShops accurately.
-		$item_counts = array();
+		// First pass: collect merchant offers per EAN/clean name to build stores array and compute otherShops accurately.
+		$item_counts  = array();
+		$store_groups = array();
 		foreach ( $posts as $p ) {
 			$ean = (string) get_post_meta( $p->ID, Gear_Engine_CPT::META_EAN, true );
 			$key = ! empty( $ean ) ? 'ean_' . $ean : 'name_' . sanitize_title( $p->post_title );
 			if ( ! isset( $item_counts[ $key ] ) ) {
-				$item_counts[ $key ] = 0;
+				$item_counts[ $key ]  = 0;
+				$store_groups[ $key ] = array();
 			}
 			$item_counts[ $key ]++;
+
+			$p_price     = (float) get_post_meta( $p->ID, Gear_Engine_CPT::META_PRICE, true );
+			$p_url       = (string) get_post_meta( $p->ID, Gear_Engine_CPT::META_AFFILIATE_URL, true );
+			$p_raw_merch = (string) get_post_meta( $p->ID, Gear_Engine_CPT::META_MERCHANT, true );
+			$p_stock     = (bool) get_post_meta( $p->ID, Gear_Engine_CPT::META_IN_STOCK, true );
+			$p_shop      = $p_raw_merch;
+			if ( preg_match( '/^(.*?)\s*\(([^)]+)\)$/', $p_raw_merch, $m ) ) {
+				$p_shop = trim( $m[2] );
+			}
+			$store_groups[ $key ][] = array(
+				'shop'    => $p_shop ?: 'Nettbutikk',
+				'price'   => $p_price > 0 ? $p_price : 0,
+				'inStock' => $p_stock,
+				'url'     => esc_url_raw( $p_url ?: '#' ),
+			);
 		}
 
 		$feed = array();
@@ -485,6 +522,19 @@ class Gear_Engine_Price_Comparison {
 				$department = self::infer_department( $category, $post->post_title );
 			}
 
+			// Sort store offers by price ascending.
+			$stores = $store_groups[ $group_key ] ?? array();
+			if ( ! empty( $stores ) ) {
+				usort( $stores, function( $a, $b ) {
+					if ( $a['price'] === $b['price'] ) return 0;
+					return ( $a['price'] < $b['price'] ) ? -1 : 1;
+				} );
+				foreach ( $stores as $idx => &$st ) {
+					$st['isBest'] = ( 0 === $idx );
+				}
+				unset( $st );
+			}
+
 			$feed[] = array(
 				'id'            => $post_id,
 				'department'    => $department,
@@ -496,6 +546,7 @@ class Gear_Engine_Price_Comparison {
 				'discount'      => $discount,
 				'shop'          => $shop_name,
 				'otherShops'    => $other_shops,
+				'stores'        => $stores,
 				'inStock'       => $in_stock,
 				'image'         => esc_url_raw( $image_url ),
 				'url'           => esc_url_raw( $affiliate_url ?: '#' ),
