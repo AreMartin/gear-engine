@@ -175,24 +175,33 @@ foreach ( $groups as $grp ) {
 									<?php endif; ?>
 								</div>
 
-								<!-- Step-by-Step Instructions -->
+								<!-- Step-by-Step Instructions (M3 Styled Numbered List) -->
 								<div class="gear-engine-program__instructions-card">
 									<h4 class="gear-engine-program__instructions-title"><?php esc_html_e( 'Slik gjør du:', 'gear-engine' ); ?></h4>
 									<div class="gear-engine-program__instructions-body">
 										<?php
 										$raw_desc = '' !== $exercise['description'] ? $exercise['description'] : $exercise['summary'];
-										$lines    = array_filter( array_map( 'trim', explode( "\n", $raw_desc ) ) );
-										if ( count( $lines ) > 1 ) :
-											?>
-											<ul class="gear-engine-program__instructions-list">
-												<?php foreach ( $lines as $line ) : ?>
-													<?php $clean_line = preg_replace( '/^[-*•\d\.]+\s*/', '', $line ); ?>
-													<li><?php echo esc_html( $clean_line ); ?></li>
-												<?php endforeach; ?>
-											</ul>
-										<?php else : ?>
-											<p><?php echo esc_html( $raw_desc ); ?></p>
-										<?php endif; ?>
+										// Split lines by linebreaks or existing bullet prefixes.
+										$raw_lines = preg_split( '/(?:\r\n|\r|\n)+/', $raw_desc );
+										$lines     = array_filter( array_map( 'trim', is_array( $raw_lines ) ? $raw_lines : array( $raw_desc ) ) );
+
+										// If paragraph without newlines, split cleanly on sentences for M3 step readability.
+										if ( 1 === count( $lines ) && strlen( $lines[0] ) > 75 ) {
+											$sentences = preg_split( '/(?<=[.!?])\s+(?=[A-ZÆØÅ0-9])/', $lines[0] );
+											if ( is_array( $sentences ) && count( $sentences ) > 1 ) {
+												$lines = array_filter( array_map( 'trim', $sentences ) );
+											}
+										}
+										?>
+										<ol class="gear-engine-program__m3-steps">
+											<?php foreach ( array_values( $lines ) as $step_idx => $line ) : ?>
+												<?php $clean_line = preg_replace( '/^[-*•\d\.]+\s*/', '', $line ); ?>
+												<li class="gear-engine-program__m3-step">
+													<span class="gear-engine-program__m3-step-num"><?php echo esc_html( (string) ( $step_idx + 1 ) ); ?></span>
+													<span class="gear-engine-program__m3-step-text"><?php echo esc_html( $clean_line ); ?></span>
+												</li>
+											<?php endforeach; ?>
+										</ol>
 									</div>
 								</div>
 
