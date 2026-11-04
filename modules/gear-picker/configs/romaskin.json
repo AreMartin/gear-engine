@@ -188,6 +188,43 @@
 	},
 	"steps": [
 		{
+			"id": "goal",
+			"type": "choice",
+			"title": "Hva er hovedmålet med treningen?",
+			"options": [
+				{
+					"val": "cardio",
+					"title": "Generell kondisjon og forbrenning",
+					"desc": "Jevne økter for hjerte, lunge og helkropps utholdenhet."
+				},
+				{
+					"val": "intervals",
+					"title": "Intervaller, sprint og kraft",
+					"desc": "Tøff trening med maksimal intensitet og watt-måling.",
+					"require": [
+						{
+							"any": [
+								{ "field": "air", "op": "is", "value": true },
+								{ "field": "water", "op": "is", "value": true }
+							]
+						}
+					]
+				},
+				{
+					"val": "rehab",
+					"title": "Skånsom opptrening og leddavlastning",
+					"desc": "Behagelig bevegelse uten harde rykk eller støtbelastning.",
+					"require": [
+						{
+							"field": "magnetic",
+							"op": "is",
+							"value": true
+						}
+					]
+				}
+			]
+		},
+		{
 			"id": "resistance",
 			"type": "choice",
 			"title": "Hvilken type motstand foretrekker du?",

@@ -334,6 +334,90 @@
 			]
 		},
 		{
+			"id": "use",
+			"type": "choice",
+			"title": "Hvor ofte og hardt planlegger du å trene?",
+			"options": [
+				{
+					"val": "gentle",
+					"title": "Rolig mosjon & opptrening (1–2 økter/uke)",
+					"desc": "Fokus på myk bevegelse, leddsirkulasjon og enkel betjening."
+				},
+				{
+					"val": "active",
+					"title": "Regelmessig trening (3–4 økter/uke)",
+					"desc": "God svinghjulvekt for jevn tråkkfølelse og god stabilitet.",
+					"require": [
+						{
+							"field": "flywheel",
+							"op": "gte",
+							"value": 6
+						}
+					]
+				},
+				{
+					"val": "heavy",
+					"title": "Mye og hard trening (4+ økter/uke)",
+					"desc": "Tungt svinghjul, høy motstandskapasitet og maksimal stabilitet.",
+					"require": [
+						{
+							"field": "flywheel",
+							"op": "gte",
+							"value": 9
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "resistance",
+			"type": "choice",
+			"title": "Hvilket motstandssystem foretrekker du?",
+			"options": [
+				{
+					"val": "magnetic",
+					"title": "Magnetisk motstand (stillegående)",
+					"desc": "Elektronisk eller manuell magnetbrems med jevn og lydløs gange.",
+					"require": [
+						{
+							"field": "magnetic",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Standard / Spiller ingen rolle",
+					"desc": "Både magnetisk og mekanisk friksjonsbrems fungerer fint."
+				}
+			]
+		},
+		{
+			"id": "tech",
+			"type": "choice",
+			"title": "Hvor viktig er teknologi og app-tilkobling?",
+			"options": [
+				{
+					"val": "app",
+					"title": "Bluetooth / App-støtte",
+					"desc": "Vil kunne koble til Zwift, Kinomap eller treningsapper på telefon/nettbrett.",
+					"require": [
+						{
+							"field": "app",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "none",
+					"title": "Standard display holder",
+					"desc": "Trenger kun grunnleggende treningsdata (tid, distanse, watt, puls)."
+				}
+			]
+		},
+		{
 			"id": "w",
 			"type": "slider",
 			"title": "Hva er din omtrentlige vekt?",
@@ -347,28 +431,6 @@
 					"field": "weight",
 					"op": "gte",
 					"ref": "w"
-				}
-			]
-		},
-		{
-			"id": "use",
-			"type": "choice",
-			"title": "Hvor ofte og hardt planlegger du å trene?",
-			"options": [
-				{
-					"val": "gentle",
-					"title": "Rolig mosjon & opptrening (1–2 økter/uke)",
-					"desc": "Fokus på myk bevegelse, leddsirkulasjon og enkel betjening."
-				},
-				{
-					"val": "active",
-					"title": "Regelmessig trening (3–4 økter/uke)",
-					"desc": "God svinghjulvekt for jevn tråkkfølelse og god stabilitet."
-				},
-				{
-					"val": "heavy",
-					"title": "Mye og hard trening (4+ økter/uke)",
-					"desc": "Tungt svinghjul, høy motstandskapasitet og maksimal stabilitet."
 				}
 			]
 		},

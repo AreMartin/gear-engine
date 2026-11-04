@@ -547,12 +547,20 @@
 			var track = root.querySelector('#ge-dept-track');
 			if (!track) return;
 			track.innerHTML = '';
+			var emojiMap = {
+				kondisjon: '🏃',
+				styrke: '🏋️',
+				rehabilitering: '🩺',
+				restitusjon: '🧘'
+			};
+
 			DEPARTMENTS.forEach(function (dept) {
 				var isActive = state.activeDepartment === dept.id;
 				var count = state.products.filter(function (p) {
 					var d = p.department || inferDepartment(p);
 					return d === dept.id;
 				}).length;
+				var emoji = emojiMap[dept.id] || '';
 
 				var btn = document.createElement('button');
 				btn.type = 'button';
@@ -560,7 +568,8 @@
 				btn.setAttribute('data-department', dept.id);
 				btn.setAttribute('role', 'tab');
 				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-				btn.innerHTML = '<span>' + escapeHtml(dept.name) + '</span>' +
+				btn.innerHTML = (emoji ? '<span class="ge-dept-emoji">' + emoji + '</span>' : '') +
+					'<span>' + escapeHtml(dept.name) + '</span>' +
 					'<span class="ge-dept-badge">' + count + '</span>';
 
 				btn.addEventListener('click', function () {
@@ -1701,7 +1710,7 @@
 						'</div>' +
 					'</div>' +
 					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
-						'Til butikk ' + externalLinkIcon() +
+						'Gå til ' + escapeHtml(product.shop || 'butikk') + ' ' + externalLinkIcon() +
 					'</a>' +
 				'</div>' +
 			'</div>' +
@@ -1752,7 +1761,7 @@
 						'</div>' +
 					'</div>' +
 					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
-						'Til butikk ' + externalLinkIcon() +
+						'Gå til ' + escapeHtml(product.shop || 'butikk') + ' ' + externalLinkIcon() +
 					'</a>' +
 				'</div>' +
 			'</div>' +

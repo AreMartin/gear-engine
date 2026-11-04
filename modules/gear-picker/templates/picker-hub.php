@@ -115,7 +115,7 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 				<span><?php esc_html_e( 'Sammenlign dagspriser, tekniske spesifikasjoner og tilbud i vår komplette priskatalog.', 'gear-engine' ); ?></span>
 			</div>
 		</div>
-		<a href="<?php echo esc_url( home_url( '/priser/' ) ); ?>" class="gear-engine-hub__price-banner-btn">
+		<a href="<?php echo esc_url( function_exists( 'home_url' ) ? home_url( '/priser/' ) : '/priser/' ); ?>" class="gear-engine-hub__price-banner-btn">
 			<span><?php esc_html_e( 'Gå til Prissammenligning', 'gear-engine' ); ?></span>
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<line x1="5" y1="12" x2="19" y2="12"></line>

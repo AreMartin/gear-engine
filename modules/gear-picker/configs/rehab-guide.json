@@ -208,7 +208,7 @@
 	"intro": {
 		"eyebrow": "Rehab & Hjelpemidler",
 		"title": "Finn riktig utstyr for dine ledd og smerter.",
-		"desc": "Svar på 3 korte spørsmål om hvor du har plager og hva slags hjelp du trenger, så finner vi de best tilpassede hjelpemidlene for deg.",
+		"desc": "Svar på noen enkle spørsmål om hvor du har plager og hva slags hjelp du trenger, så finner vi de best tilpassede hjelpemidlene for deg.",
 		"benefits": [
 			"Sorterer etter kroppsdel og type støtte",
 			"Fokuserer på leddvennlig avlastning og trygghet",
@@ -301,6 +301,28 @@
 					"val": "general",
 					"title": "Generelt / Hele kroppen",
 					"desc": "Allsidig egentrening eller sirkulasjon for hele kroppen."
+				}
+			]
+		},
+		{
+			"id": "situation",
+			"type": "choice",
+			"title": "Når oppstår plagene eller behovet mest?",
+			"options": [
+				{
+					"val": "daily",
+					"title": "I hverdagen (gange, stå, sitte på jobb)",
+					"desc": "Trenger diskret støtte eller avlastning gjennom dagen."
+				},
+				{
+					"val": "activity",
+					"title": "Under trening, løping eller tyngre belastning",
+					"desc": "Trenger ekstra stabilitet og beskyttelse ved aktivitet."
+				},
+				{
+					"val": "rest",
+					"title": "I hvile og restitusjon etter aktivitet",
+					"desc": "Fokus på massasje, sirkulasjon og smertelindring."
 				}
 			]
 		},

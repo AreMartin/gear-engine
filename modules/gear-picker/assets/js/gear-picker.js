@@ -244,7 +244,8 @@
 			cmpId: null,
 			view: 'quiz', // 'quiz' | 'deals'
 			dealSort: 'pct', // 'pct' | 'amount'
-			presetApplied: false
+			presetApplied: false,
+			advanceTimer: null
 		};
 
 		var STORAGE_KEY = 'gear_engine_picker_' + ( config.id || 'default' );
@@ -375,12 +376,18 @@
 		}
 
 		function applyPreset( key ) {
+			if ( state.advanceTimer ) {
+				window.clearTimeout( state.advanceTimer );
+				state.advanceTimer = null;
+			}
 			state.view = 'quiz';
 			state.presetApplied = true;
 			filters = Scoring.defaults( config );
 			var p = PRESETS[ key ] || PRESETS.budget;
 			Object.assign( filters, p );
-			go( steps.length + 1, 'forward' );
+			saveSession();
+			// Walk into quiz at Step 1 with preset values pre-selected so all questions remain accessible and adjustable
+			go( 1, 'forward' );
 		}
 
 		function openDeals() {
@@ -584,17 +591,11 @@
 				h += renderLiveCard();
 			}
 
-			// Dock: Show 'Neste steg' only on slider steps. On choice questions, selection auto-advances.
-			if ( s.type === 'choice' ) {
-				h += '<div class="dock dock--choice">' +
-					'<button type="button" class="btn text btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 18 ) + ' <span>Forrige steg</span></button>' +
-					'</div>';
-			} else {
-				h += '<div class="dock">' +
-					'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
-					'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
-					'</div>';
-			}
+			// Dock: Material 3 anchored bottom dock with explicit 'Neste steg' and 'Forrige' controls
+			h += '<div class="dock">' +
+				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
+				'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
+				'</div>';
 
 			return h;
 		}
@@ -1116,10 +1117,20 @@
 				var act = target.getAttribute( 'data-action' );
 
 				if ( act === 'start' ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
+					filters = Scoring.defaults( config );
 					state.view = 'quiz';
 					state.presetApplied = false;
+					clearSession();
 					go( 1, 'forward' );
 				} else if ( act === 'deals' ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
 					openDeals();
 				} else if ( act === 'deal-sort' ) {
 					var sortType = target.getAttribute( 'data-sort' );
@@ -1129,17 +1140,29 @@
 						render();
 					}
 				} else if ( act === 'back' ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
 					if ( state.view === 'deals' ) {
 						state.view = 'quiz';
 						go( 0, 'backward' );
-					} else if ( ! state.busy && state.step > 0 ) {
+					} else if ( state.step > 0 ) {
 						go( state.step - 1, 'backward' );
 					}
 				} else if ( act === 'next' ) {
-					if ( ! state.busy && state.step <= steps.length ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
+					if ( state.step <= steps.length ) {
 						go( state.step + 1, 'forward' );
 					}
 				} else if ( act === 'reset' ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
 					filters = Scoring.defaults( config );
 					state.view = 'quiz';
 					state.presetApplied = false;
@@ -1149,6 +1172,10 @@
 					var presetKey = target.getAttribute( 'data-preset' );
 					applyPreset( presetKey );
 				} else if ( act === 'jump' ) {
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+						state.advanceTimer = null;
+					}
 					state.view = 'quiz';
 					var stepIdx = parseInt( target.getAttribute( 'data-step' ), 10 ) || 0;
 					go( stepIdx, 'backward' );
@@ -1180,15 +1207,13 @@
 					} );
 					updateLiveElements();
 				} else if ( act === 'choice' ) {
-					if ( state.busy ) { return; }
-					state.busy = true;
 					state.presetApplied = false;
 
 					var qId = target.getAttribute( 'data-id' );
 					var qVal = target.getAttribute( 'data-val' );
 					filters[ qId ] = qVal;
 
-					// Immediate Option A tactile feedback
+					// Immediate Option tactile feedback
 					stage.querySelectorAll( '.opt' ).forEach( function ( o ) {
 						o.classList.remove( 'is-active' );
 						o.setAttribute( 'aria-pressed', 'false' );
@@ -1200,13 +1225,25 @@
 					var ctl = target.querySelector( '.ctl' );
 					if ( ctl ) { ctl.innerHTML = ic( 'check', 14 ); }
 
-					updateLiveElements();
+					// Immediately enable next button in the dock
+					var nextBtn = stage.querySelector( '[data-action="next"]' );
+					if ( nextBtn ) {
+						nextBtn.removeAttribute( 'disabled' );
+					}
 
-					// Smooth, deliberate pacing (500ms gives user time to see selection register)
-					window.setTimeout( function () {
-						state.busy = false;
-						go( state.step + 1, 'forward' );
-					}, 500 );
+					updateLiveElements();
+					saveSession();
+
+					// Smooth, deliberate pacing (550ms gives user time to see selection register)
+					if ( state.advanceTimer ) {
+						window.clearTimeout( state.advanceTimer );
+					}
+					state.advanceTimer = window.setTimeout( function () {
+						state.advanceTimer = null;
+						if ( state.step <= steps.length ) {
+							go( state.step + 1, 'forward' );
+						}
+					}, 550 );
 				}
 			} );
 
