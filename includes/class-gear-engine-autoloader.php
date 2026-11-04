@@ -48,6 +48,7 @@ function gear_engine_class_map(): array {
 		'Gear_Engine_Picker_Diagnostics' => 'modules/gear-picker/class-gear-engine-picker-diagnostics.php',
 		'Gear_Engine_Shortcode_Guide'    => 'modules/admin/class-gear-engine-shortcode-guide.php',
 		'Gear_Engine_Price_Comparison'   => 'modules/price-comparison/class-gear-engine-price-comparison.php',
+		'Gear_Engine_Starter_Rehab'      => 'modules/exercises/class-gear-engine-starter-rehab.php',
 	);
 
 	// Legacy GAE_ aliases resolve to the same files; each class file creates

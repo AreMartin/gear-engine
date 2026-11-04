@@ -19,6 +19,14 @@ $gear_engine_group = '';
 		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
 			<p><strong>✓ <?php esc_html_e( 'Kjernesidene ble opprettet!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Sidene for Kjøpsveiledere, Treningsprogram, Symptomsjekker, Digital Fysio og Prissammenligning er nå klare.', 'gear-engine' ); ?></p>
 		</div>
+	<?php elseif ( isset( $_GET['gear_engine_samples_removed'] ) ) : ?>
+		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
+			<p><strong>✓ <?php esc_html_e( 'Testdata ble slettet!', 'gear-engine' ); ?></strong> <?php printf( esc_html__( 'Alle midlertidige testøvelser (%d) og testprotokoller (%d) ble fjernet. Databasen er nå ren.', 'gear-engine' ), absint( $_GET['deleted_ex'] ?? 0 ), absint( $_GET['deleted_proto'] ?? 0 ) ); ?></p>
+		</div>
+	<?php elseif ( isset( $_GET['gear_engine_samples_seeded'] ) ) : ?>
+		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
+			<p><strong>✓ <?php esc_html_e( 'Testdata ble lagt inn!', 'gear-engine' ); ?></strong> <?php printf( esc_html__( 'Lagt inn %d øvelser og %d godkjente protokoller for testing.', 'gear-engine' ), absint( $_GET['seeded_ex'] ?? 0 ), absint( $_GET['seeded_proto'] ?? 0 ) ); ?></p>
+		</div>
 	<?php endif; ?>
 
 	<h2><?php esc_html_e( 'Shortcodes', 'gear-engine' ); ?></h2>
@@ -69,6 +77,44 @@ $gear_engine_group = '';
 					<?php esc_html_e( 'Opprett manglende kjernesider automatisk (1 klikk)', 'gear-engine' ); ?>
 				</button>
 			</form>
+		</div>
+	</div>
+
+	<!-- Testdata for Treningsprotokoller og Øvelser -->
+	<div class="gear-engine-guide__hero-action" style="background: #FFFFFF; border: 1px solid #CBD7E6; border-left: 4px solid #00A878; padding: 18px 22px; border-radius: 8px; margin: 0 0 24px;">
+		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+			<div style="max-width: 600px;">
+				<h3 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #1A2A3A;">
+					<?php esc_html_e( 'Testdata for Treningsprotokoller og Øvelser', 'gear-engine' ); ?>
+				</h3>
+				<p style="margin: 0; font-size: 13px; color: #4A5A6A; line-height: 1.5;">
+					<?php esc_html_e( 'Systemet har lagt inn testprotokoller og øvelser for de 6 triage-områdene slik at hele flyten kan testes. Ved overgang til produksjon kan du fjerne alle testdata med ett klikk uten å berøre egne data.', 'gear-engine' ); ?>
+				</p>
+			</div>
+			<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin: 0;" onsubmit="return confirm('<?php echo esc_js( __( 'Er du sikker på at du vil slette alle testøvelser og testprotokoller?', 'gear-engine' ) ); ?>');">
+					<input type="hidden" name="action" value="gear_engine_remove_sample_data">
+					<?php
+					if ( function_exists( 'wp_nonce_field' ) ) {
+						wp_nonce_field( 'gear_engine_remove_sample_data', 'gear_engine_nonce' );
+					}
+					?>
+					<button type="submit" class="button button-secondary" style="color: #b32d2e; border-color: #b32d2e;">
+						<?php esc_html_e( 'Fjern alle testdata (produksjonsrensing)', 'gear-engine' ); ?>
+					</button>
+				</form>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin: 0;">
+					<input type="hidden" name="action" value="gear_engine_reseed_sample_data">
+					<?php
+					if ( function_exists( 'wp_nonce_field' ) ) {
+						wp_nonce_field( 'gear_engine_reseed_sample_data', 'gear_engine_nonce' );
+					}
+					?>
+					<button type="submit" class="button button-secondary">
+						<?php esc_html_e( 'Gjenopprett testdata', 'gear-engine' ); ?>
+					</button>
+				</form>
+			</div>
 		</div>
 	</div>
 

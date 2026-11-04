@@ -74,6 +74,7 @@ function gear_engine_default_modules(): array {
 		'Gear_Engine_Price_Comparison',
 		'Gear_Engine_Shortcode_Guide',
 		'Gear_Engine_Exercise_Selection',
+		'Gear_Engine_Starter_Rehab',
 	);
 }
 

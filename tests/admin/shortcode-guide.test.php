@@ -27,6 +27,7 @@ function sanitize_title( $t ) { return trim( preg_replace( '/[^a-z0-9]+/', '-', 
 function esc_html( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES ); }
 function esc_attr( $s ) { return esc_html( $s ); }
 function esc_url( $s ) { return esc_html( $s ); }
+function esc_js( $s ) { return addslashes( (string) $s ); }
 function esc_html_e( $s ) { echo esc_html( $s ); }
 function esc_html__( $s ) { return esc_html( $s ); }
 function __( $s ) { return $s; }
