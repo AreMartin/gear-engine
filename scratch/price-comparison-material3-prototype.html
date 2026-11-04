@@ -4,799 +4,528 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Material 3 Prototype: Full Prissammenligning - Fysionett / Gear Engine</title>
-	
-	<!-- Shared Design Tokens from Gear Engine -->
+
+	<!-- Shared Design Tokens from Gear Engine (brand scale, amber deal colours) -->
 	<link rel="stylesheet" href="../assets/css/gear-engine-tokens.css">
-	
-	<!-- Material Symbols Outlined (aligned with Kjøpsveilederne) -->
+
+	<!-- Inter (brand typeface, deliberate deviation from M3's Roboto) and Material Symbols Outlined (M3 icon set) -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 	<style>
-		/* Prototype Demo Shell */
-		body {
-			margin: 0;
-			padding: 24px 16px 100px;
-			background-color: var(--ge-grey-50, #F5F7FA);
-			font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
-			color: var(--md-sys-color-on-surface, #0C2340);
-			transition: background-color 0.25s ease, color 0.25s ease;
+		/* =========================================================
+		   1. MATERIAL 3 DESIGN TOKENS
+		   Colour roles are generated from the Fysionett brand with
+		   material-color-utilities (hue 260 navy, hue 164 sage).
+		   Brand anchors kept: primary #0C2340, tertiary #005236.
+		   ========================================================= */
+		:root {
+			color-scheme: light;
+
+			--md-sys-color-primary: #0C2340;
+			--md-sys-color-on-primary: #FFFFFF;
+			--md-sys-color-primary-container: #D5E1ED;
+			--md-sys-color-on-primary-container: #0C2340;
+			--md-sys-color-secondary: #585F6B;
+			--md-sys-color-on-secondary: #FFFFFF;
+			--md-sys-color-secondary-container: #DCE2F2;
+			--md-sys-color-on-secondary-container: #151C27;
+			--md-sys-color-tertiary: #005236;
+			--md-sys-color-on-tertiary: #FFFFFF;
+			--md-sys-color-tertiary-container: #DCF5E8;
+			--md-sys-color-on-tertiary-container: #002B1C;
+			--md-sys-color-error: #BA1A1A;
+			--md-sys-color-on-error: #FFFFFF;
+			--md-sys-color-error-container: #FFDAD6;
+			--md-sys-color-on-error-container: #410002;
+			--md-sys-color-surface: #F4F6F9;
+			--md-sys-color-on-surface: #191C20;
+			--md-sys-color-on-surface-variant: #424751;
+			--md-sys-color-surface-container-lowest: #FFFFFF;
+			--md-sys-color-surface-container-low: #F3F3FA;
+			--md-sys-color-surface-container: #EDEDF4;
+			--md-sys-color-surface-container-high: #E7E8EE;
+			--md-sys-color-surface-container-highest: #E1E2E9;
+			--md-sys-color-outline: #727782;
+			--md-sys-color-outline-variant: #C2C6D2;
+			--md-sys-color-inverse-surface: #2E3035;
+			--md-sys-color-inverse-on-surface: #F0F0F7;
+			--md-sys-color-inverse-primary: #AEC8F4;
+			--md-sys-color-scrim: #000000;
+			--md-sys-color-shadow: #000000;
+
+			/* Custom colour roles (brand amber), harmonised with the scheme */
+			--md-custom-color-deal-container: #FEF3C7;
+			--md-custom-color-on-deal-container: #92400E;
+			--md-custom-color-warning-container: #FDF0D5;
+			--md-custom-color-on-warning-container: #4A3300;
+			--md-custom-color-warning: #8A5A00;
+			--ge-media-bg: rgba(12, 35, 64, 0.045);
+			--ge-card-bg: #FFFFFF;
+			--ge-card-inset: #F4F6F9;
+			--ge-card-border: rgba(12, 35, 64, 0.1);
+			--ge-card-shadow: 0 1px 2px rgba(12, 35, 64, 0.05), 0 4px 12px rgba(12, 35, 64, 0.04);
+			--ge-text-muted: #667085;
+			--ge-drawer-bg: #FBFAFE;
+
+			/* Shape scale */
+			--md-sys-shape-corner-extra-small: 4px;
+			--md-sys-shape-corner-small: 8px;
+			--md-sys-shape-corner-medium: 12px;
+			--md-sys-shape-corner-large: 16px;
+			--md-sys-shape-corner-large-increased: 20px;
+			--md-sys-shape-corner-extra-large: 28px;
+			--md-sys-shape-corner-full: 9999px;
+
+			/* Elevation levels 1-3 */
+			--md-sys-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+			--md-sys-elevation-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+			--md-sys-elevation-3: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+
+			/* Motion */
+			--md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+			--md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+			--md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+			--md-sys-motion-spring-fast-spatial: linear(0, 0.36 4%, 0.8 9%, 1.06 14%, 1.1 18%, 1.05 24%, 1.01 32%, 0.995 42%, 1);
+			--md-sys-motion-duration-short2: 100ms;
+			--md-sys-motion-duration-short4: 200ms;
+			--md-sys-motion-duration-medium2: 300ms;
+			--md-sys-motion-duration-medium4: 400ms;
+
+			/* Typography (Inter instead of Roboto; M3 type scale kept) */
+			--md-ref-typeface: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+			--md-sys-typescale-headline-large: 500 32px/40px var(--md-ref-typeface);
+			--md-sys-typescale-headline-small: 400 24px/32px var(--md-ref-typeface);
+			--md-sys-typescale-title-large: 500 22px/28px var(--md-ref-typeface);
+			--md-sys-typescale-title-medium: 500 16px/24px var(--md-ref-typeface);
+			--md-sys-typescale-title-small: 500 14px/20px var(--md-ref-typeface);
+			--md-sys-typescale-body-large: 400 16px/24px var(--md-ref-typeface);
+			--md-sys-typescale-body-medium: 400 14px/20px var(--md-ref-typeface);
+			--md-sys-typescale-body-small: 400 12px/16px var(--md-ref-typeface);
+			--md-sys-typescale-label-large: 500 14px/20px var(--md-ref-typeface);
+			--md-sys-typescale-label-medium: 500 12px/16px var(--md-ref-typeface);
+			--md-sys-typescale-label-small: 500 11px/16px var(--md-ref-typeface);
 		}
 
+		[data-theme="dark"] {
+			color-scheme: dark;
+
+			--md-sys-color-primary: #AEC8F4;
+			--md-sys-color-on-primary: #153155;
+			--md-sys-color-primary-container: #2E476D;
+			--md-sys-color-on-primary-container: #D5E3FF;
+			--md-sys-color-secondary: #C0C6D5;
+			--md-sys-color-on-secondary: #2A313C;
+			--md-sys-color-secondary-container: #404753;
+			--md-sys-color-on-secondary-container: #DCE2F2;
+			--md-sys-color-tertiary: #A7D0B8;
+			--md-sys-color-on-tertiary: #103726;
+			--md-sys-color-tertiary-container: #284E3B;
+			--md-sys-color-on-tertiary-container: #C2ECD3;
+			--md-sys-color-error: #FFB4AB;
+			--md-sys-color-on-error: #690005;
+			--md-sys-color-error-container: #93000A;
+			--md-sys-color-on-error-container: #FFDAD6;
+			--md-sys-color-surface: #0E141C;
+			--md-sys-color-on-surface: #E1E2E9;
+			--md-sys-color-on-surface-variant: #C2C6D2;
+			--md-sys-color-surface-container-lowest: #090E17;
+			--md-sys-color-surface-container-low: #171C24;
+			--md-sys-color-surface-container: #1B2029;
+			--md-sys-color-surface-container-high: #252A33;
+			--md-sys-color-surface-container-highest: #30353E;
+			--md-sys-color-outline: #8C919C;
+			--md-sys-color-outline-variant: #424751;
+			--md-sys-color-inverse-surface: #E1E2E9;
+			--md-sys-color-inverse-on-surface: #2E3035;
+			--md-sys-color-inverse-primary: #465F86;
+
+			--md-custom-color-deal-container: #5A4300;
+			--md-custom-color-on-deal-container: #FFE08A;
+			--md-custom-color-warning-container: #3F2E00;
+			--md-custom-color-on-warning-container: #FFDDA8;
+			--md-custom-color-warning: #F2BE5C;
+			--ge-media-bg: #DEE2EF;
+			--ge-card-bg: #171C24;
+			--ge-card-inset: #252A33;
+			--ge-card-border: rgba(255, 255, 255, 0.1);
+			--ge-card-shadow: var(--md-sys-elevation-1);
+			--ge-text-muted: #9AA3B2;
+			--ge-drawer-bg: #1B2029;
+		}
+
+		/* =========================================================
+		   2. BASE, ICONS, STATE LAYERS, FOCUS
+		   ========================================================= */
+		*, *::before, *::after { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			padding: 16px 16px 112px;
+			background: var(--md-sys-color-surface);
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-body-large);
+			-webkit-font-smoothing: antialiased;
+			transition: background-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+		}
+
+		body.ge-m3-sheet-open { overflow: hidden; }
+
+		button, input, select { font: inherit; color: inherit; }
+
+		.material-symbols-outlined {
+			font-family: "Material Symbols Outlined";
+			font-weight: 400;
+			font-style: normal;
+			font-size: 24px;
+			line-height: 1;
+			letter-spacing: normal;
+			text-transform: none;
+			display: inline-block;
+			white-space: nowrap;
+			word-wrap: normal;
+			direction: ltr;
+			flex-shrink: 0;
+			user-select: none;
+			-webkit-font-smoothing: antialiased;
+			font-feature-settings: "liga";
+			font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+		}
+
+		/* State layer: hover 8%, focus 10%, pressed 10% */
+		.m3-sl { position: relative; }
+
+		.m3-sl::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			border-radius: inherit;
+			background: currentColor;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+		}
+
+		.m3-sl:hover::after { opacity: 0.08; }
+		.m3-sl:focus-visible::after { opacity: 0.1; }
+		.m3-sl:active::after { opacity: 0.1; }
+
+		:focus-visible {
+			outline: 3px solid var(--md-sys-color-secondary);
+			outline-offset: 2px;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after {
+				animation-duration: 0.01ms !important;
+				transition-duration: 0.01ms !important;
+			}
+		}
+
+		/* =========================================================
+		   3. BUTTONS (filled, tonal, outlined, text) AND ICON BUTTON
+		   ========================================================= */
+		.ge-m3-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			height: 40px;
+			padding: 0 24px;
+			border: 0;
+			border-radius: var(--md-sys-shape-corner-full);
+			font: var(--md-sys-typescale-label-large);
+			letter-spacing: 0.1px;
+			text-decoration: none;
+			white-space: nowrap;
+			cursor: pointer;
+			transition: border-radius 350ms var(--md-sys-motion-spring-fast-spatial),
+				box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		.ge-m3-btn:active { border-radius: var(--md-sys-shape-corner-medium); }
+		.ge-m3-btn .material-symbols-outlined { font-size: 18px; }
+
+		.ge-m3-btn--filled { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+		.ge-m3-btn--filled:hover { box-shadow: var(--md-sys-elevation-1); }
+		.ge-m3-btn--tonal { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+		.ge-m3-btn--tonal:hover { box-shadow: var(--md-sys-elevation-1); }
+		.ge-m3-btn--outlined { background: transparent; color: var(--md-sys-color-primary); box-shadow: inset 0 0 0 1px var(--md-sys-color-outline); }
+		.ge-m3-btn--text { background: transparent; color: var(--md-sys-color-primary); padding: 0 12px; }
+		.ge-m3-btn--xs { height: 32px; padding: 0 12px; }
+		.ge-m3-btn--m { height: 56px; padding: 0 24px; font: var(--md-sys-typescale-title-medium); letter-spacing: 0.15px; }
+		.ge-m3-btn--m .material-symbols-outlined { font-size: 24px; }
+		.ge-m3-btn--block { width: 100%; }
+
+		.ge-m3-icon-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			border: 0;
+			border-radius: var(--md-sys-shape-corner-full);
+			background: transparent;
+			color: var(--md-sys-color-on-surface-variant);
+			cursor: pointer;
+			flex-shrink: 0;
+		}
+
+		/* =========================================================
+		   4. PROTOTYPE SHELL (demo top app bar)
+		   ========================================================= */
 		.demo-topbar {
 			max-width: 1200px;
 			margin: 0 auto 24px;
+			min-height: 64px;
+			padding: 8px 8px 8px 24px;
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
 			justify-content: space-between;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 12px 20px;
-			box-shadow: var(--ge-shadow-1);
+			gap: 8px 16px;
+			background: var(--md-sys-color-surface-container);
+			border-radius: var(--md-sys-shape-corner-extra-large);
 		}
 
 		.demo-badge {
 			display: inline-flex;
 			align-items: center;
-			gap: 8px;
-			font-size: 13.5px;
-			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
+			gap: 12px;
+			font: var(--md-sys-typescale-title-medium);
+			color: var(--md-sys-color-on-surface);
 		}
 
 		.demo-badge-dot {
 			width: 8px;
 			height: 8px;
 			border-radius: 50%;
-			background: var(--ge-green-600, #00A86B);
-		}
-
-		.demo-topbar-actions {
-			display: flex;
-			align-items: center;
-			gap: 12px;
-		}
-
-		.theme-toggle-btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			font-size: 13px;
-			font-weight: 600;
-			padding: 8px 16px;
-			border-radius: 999px;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-primary, #0C2340);
-			cursor: pointer;
-			transition: var(--ge-transition);
-		}
-
-		.theme-toggle-btn:hover {
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
+			background: var(--md-sys-color-tertiary);
 		}
 
 		/* =========================================================
-		   MATERIAL DESIGN 3 STYLESHEET ALIGNED WITH GEAR PICKER
+		   5. PAGE WRAPPER AND HEADER
 		   ========================================================= */
 		.ge-m3-comp-wrapper {
 			max-width: 1200px;
 			margin: 0 auto;
-			box-sizing: border-box;
 			container-type: inline-size;
 			container-name: ge-m3-comp;
 		}
 
-		.ge-m3-comp-wrapper *,
-		.ge-m3-comp-wrapper *::before,
-		.ge-m3-comp-wrapper *::after {
-			box-sizing: border-box;
-		}
-
-		/* M3 State Layers */
-		.m3-sl {
-			position: relative;
-			overflow: hidden;
-		}
-
-		.m3-sl::after {
-			content: "";
-			position: absolute;
-			inset: 0;
-			background: currentColor;
-			opacity: 0;
-			transition: opacity 0.15s ease;
-			pointer-events: none;
-			border-radius: inherit;
-		}
-
-		.m3-sl:hover::after { opacity: 0.06; }
-		.m3-sl:active::after { opacity: 0.12; }
-
-		/* Guide Banner */
 		.ge-m3-guide-banner {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			gap: 16px;
-			background: var(--md-sys-color-primary-container, #EAF0F6);
-			border: 1px solid var(--ge-navy-border, #D5E1ED);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 16px 22px;
+			padding: 16px 16px 16px 20px;
 			margin-bottom: 24px;
-			box-shadow: var(--ge-shadow-1);
+			background: var(--md-sys-color-primary-container);
+			color: var(--md-sys-color-on-primary-container);
+			border-radius: var(--md-sys-shape-corner-large-increased);
 		}
 
-		.ge-m3-guide-content {
-			display: flex;
-			align-items: center;
-			gap: 14px;
-		}
+		.ge-m3-guide-content { display: flex; align-items: center; gap: 16px; min-width: 0; }
 
 		.ge-m3-guide-icon {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			width: 38px;
-			height: 38px;
-			border-radius: 50%;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-primary, #0C2340);
+			width: 40px;
+			height: 40px;
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-primary);
+			color: var(--md-sys-color-on-primary);
 			flex-shrink: 0;
-			box-shadow: var(--ge-shadow-1);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
 		}
 
-		.ge-m3-guide-text strong {
-			display: block;
-			font-size: 14.5px;
-			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
-			margin-bottom: 2px;
+		.ge-m3-guide-text strong { display: block; font: var(--md-sys-typescale-title-small); letter-spacing: 0.1px; }
+		.ge-m3-guide-text span { font: var(--md-sys-typescale-body-medium); letter-spacing: 0.25px; opacity: 0.85; }
+
+		@container ge-m3-comp (max-width: 639px) {
+			.ge-m3-guide-banner { flex-direction: column; align-items: stretch; }
+			.ge-m3-guide-btn { width: 100%; }
 		}
 
-		.ge-m3-guide-text span {
-			font-size: 13px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-		}
-
-		.ge-m3-guide-btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF !important;
-			font-size: 13.5px;
-			font-weight: 600;
-			padding: 10px 20px;
-			border-radius: 999px;
-			text-decoration: none !important;
-			white-space: nowrap;
-			flex-shrink: 0;
-			box-shadow: var(--ge-shadow-1);
-			transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-		}
-
-		.ge-m3-guide-btn:hover {
-			background: #143154;
-			transform: translateY(-1px);
-			box-shadow: var(--ge-shadow-2);
-		}
-
-		/* Header */
-		.ge-m3-header {
-			margin-bottom: 22px;
-		}
+		.ge-m3-header { margin-bottom: 24px; }
 
 		.ge-m3-title {
-			font-size: 30px;
-			line-height: 38px;
-			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
-			margin: 0 0 6px 0;
-			letter-spacing: -0.5px;
+			margin: 0 0 4px;
+			font: var(--md-sys-typescale-headline-large);
+			color: var(--md-sys-color-on-surface);
 		}
 
 		.ge-m3-subtitle {
-			font-size: 15px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
 			margin: 0;
+			font: var(--md-sys-typescale-body-large);
+			letter-spacing: 0.5px;
+			color: var(--md-sys-color-on-surface-variant);
 		}
 
-		/* 2-Level Department & Category Navigation */
-		.ge-m3-nav-section {
-			display: flex;
-			flex-direction: column;
-			gap: 12px;
-			margin-bottom: 22px;
-		}
+		/* =========================================================
+		   6. NAVIGATION: PRIMARY TABS, FILTER CHIPS
+		   ========================================================= */
+		.ge-m3-nav-section { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
 
-		/* Level 1: Segmented Department Control */
 		.ge-m3-dept-track {
-			display: inline-flex;
-			gap: 6px;
-			background: var(--md-sys-color-surface-container, #EEF2F6);
-			padding: 5px;
-			border-radius: 999px;
-			border: 1px solid var(--md-sys-color-outline-variant, #DCE3EC);
+			display: flex;
 			overflow-x: auto;
 			scrollbar-width: none;
-			max-width: 100%;
-			width: fit-content;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
 		}
 
-		.ge-m3-dept-track::-webkit-scrollbar {
-			display: none;
-		}
+		.ge-m3-dept-track::-webkit-scrollbar { display: none; }
 
 		.ge-m3-dept-btn {
+			position: relative;
 			display: inline-flex;
 			align-items: center;
+			justify-content: center;
 			gap: 8px;
-			padding: 8px 18px;
-			border-radius: 999px;
-			border: none;
+			flex: 0 0 auto;
+			height: 48px;
+			padding: 0 16px;
+			border: 0;
 			background: transparent;
-			color: var(--md-sys-color-on-surface-variant, #475569);
-			font-size: 14px;
-			font-weight: 600;
-			cursor: pointer;
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
 			white-space: nowrap;
-			transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+			cursor: pointer;
+			transition: color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
-		.ge-m3-dept-btn:hover {
-			color: var(--md-sys-color-on-surface, #0C2340);
-			background: rgba(255, 255, 255, 0.5);
+		.ge-m3-dept-btn::before {
+			content: "";
+			position: absolute;
+			left: 16px;
+			right: 16px;
+			bottom: 0;
+			height: 3px;
+			border-radius: 3px 3px 0 0;
+			background: var(--md-sys-color-primary);
+			transform: scaleX(0);
+			transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
 		}
 
-		.ge-m3-dept-btn.is-active {
-			background: #FFFFFF;
-			color: var(--md-sys-color-primary, #0C2340);
-			box-shadow: 0 1px 4px rgba(12, 35, 64, 0.08);
-			font-weight: 700;
-		}
-
-		.ge-m3-dept-icon {
-			font-size: 15px;
-			line-height: 1;
-		}
+		.ge-m3-dept-btn.is-active { color: var(--md-sys-color-primary); }
+		.ge-m3-dept-btn.is-active::before { transform: scaleX(1); }
 
 		.ge-m3-dept-badge {
-			display: inline-block;
-			padding: 1px 7px;
-			border-radius: 999px;
-			font-size: 11px;
-			font-weight: 700;
-			background: #E2E8F0;
-			color: #334155;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 20px;
+			height: 20px;
+			padding: 0 6px;
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
+			font: var(--md-sys-typescale-label-small);
 		}
 
 		.ge-m3-dept-btn.is-active .ge-m3-dept-badge {
-			background: #E0F2FE;
-			color: #0369A1;
+			background: var(--md-sys-color-primary);
+			color: var(--md-sys-color-on-primary);
 		}
 
-		/* Cross-Department Search Alert Banner */
 		.ge-m3-dept-alert {
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
 			gap: 12px;
-			padding: 10px 16px;
-			background: #F0F9FF;
-			border: 1px solid #BAE6FD;
-			border-radius: 10px;
-			font-size: 13px;
-			color: #0369A1;
+			padding: 8px 8px 8px 16px;
 			margin-bottom: 16px;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
+			border-radius: var(--md-sys-shape-corner-medium);
+			font: var(--md-sys-typescale-body-medium);
+			letter-spacing: 0.25px;
 		}
 
-		.ge-m3-dept-switch-btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 5px;
-			padding: 5px 12px;
-			background: #0284C7;
-			color: #FFFFFF;
-			border: none;
-			border-radius: 999px;
-			font-size: 12px;
-			font-weight: 600;
-			cursor: pointer;
-			white-space: nowrap;
-			transition: background 0.15s;
-		}
+		.ge-m3-dept-alert-text { flex: 1 1 auto; min-width: 0; }
 
-		.ge-m3-dept-switch-btn:hover {
-			background: #0369A1;
-		}
-
-		/* M3 Category Filter Chips */
-		.ge-m3-cats-bar {
-			display: flex;
-			gap: 8px;
-			overflow-x: auto;
-			padding-bottom: 4px;
-			margin-bottom: 0;
-			scrollbar-width: none;
-			-ms-overflow-style: none;
-		}
-
-		.ge-m3-cats-bar::-webkit-scrollbar {
-			display: none;
-		}
-
-		@media (min-width: 768px) {
-			.ge-m3-cats-bar {
-				flex-wrap: wrap;
-				overflow-x: visible;
-			}
-		}
-
-		.ge-m3-chip {
-			display: inline-flex;
-			align-items: center;
-			white-space: nowrap;
-			height: 36px;
-			padding: 0 16px;
-			border-radius: 999px;
-			font-size: 13.5px;
-			font-weight: 500;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-on-surface, #0C2340);
-			box-shadow: var(--ge-shadow-1);
-			cursor: pointer;
-			transition: all 0.2s;
-		}
-
-		.ge-m3-chip:hover {
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
-			border-color: var(--md-sys-color-primary, #0C2340);
-		}
-
-		.ge-m3-chip.is-active {
-			background: var(--md-sys-color-primary, #0C2340) !important;
-			color: #FFFFFF !important;
-			border-color: var(--md-sys-color-primary, #0C2340) !important;
-			font-weight: 600;
-		}
-
-		/* Quick Filter Chips (Tier 1 Exposed Filters) */
+		/* Filter chips: shared by categories, quick filters, brands and shops */
+		.ge-m3-cats-bar,
 		.ge-m3-quick-filters {
 			display: flex;
 			align-items: center;
-			gap: 6px;
+			gap: 8px;
 			overflow-x: auto;
-			padding-bottom: 2px;
+			padding: 2px 0;
 			scrollbar-width: none;
-			-ms-overflow-style: none;
 		}
 
-		.ge-m3-quick-filters::-webkit-scrollbar {
-			display: none;
+		.ge-m3-cats-bar::-webkit-scrollbar,
+		.ge-m3-quick-filters::-webkit-scrollbar { display: none; }
+
+		@container ge-m3-comp (min-width: 600px) {
+			.ge-m3-cats-bar,
+			.ge-m3-quick-filters { flex-wrap: wrap; overflow: visible; }
 		}
 
-		.ge-m3-qchip {
-			display: inline-flex;
-			align-items: center;
-			gap: 5px;
-			height: 30px;
-			padding: 0 12px;
-			border-radius: 999px;
-			font-size: 12px;
-			font-weight: 500;
-			border: 1px solid var(--md-sys-color-outline-variant, #CBD5E1);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-on-surface-variant, #475569);
-			cursor: pointer;
-			white-space: nowrap;
-			transition: all 0.15s ease;
-		}
-
-		.ge-m3-qchip:hover {
-			background: #F8FAFC;
-			border-color: #94A3B8;
-			color: #0F172A;
-		}
-
-		.ge-m3-qchip.is-active {
-			background: #0C2340 !important;
-			color: #FFFFFF !important;
-			border-color: #0C2340 !important;
-			font-weight: 600;
-		}
-
-		.ge-m3-qchip-check {
-			font-size: 11px;
-			line-height: 1;
-		}
-
-		/* Controls Bar */
-		.ge-m3-controls {
-			display: flex;
-			flex-direction: column;
-			gap: 12px;
-			margin-bottom: 20px;
-		}
-
-		@media (min-width: 1024px) {
-			.ge-m3-controls {
-				flex-direction: row;
-				align-items: center;
-			}
-		}
-
-		.ge-m3-search-box {
-			position: relative;
-			flex-grow: 1;
-		}
-
-		.ge-m3-search-icon {
-			position: absolute;
-			top: 50%;
-			left: 16px;
-			transform: translateY(-50%);
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			pointer-events: none;
-			display: flex;
-			align-items: center;
-		}
-
-		.ge-m3-input,
-		.ge-m3-select {
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC) !important;
-			background: var(--md-sys-color-surface, #FFFFFF) !important;
-			color: var(--md-sys-color-on-surface, #0C2340) !important;
-			border-radius: var(--ge-r-sm, 12px);
-			font-family: inherit;
-			box-shadow: var(--ge-shadow-1);
-			transition: var(--ge-transition);
-		}
-
-		.ge-m3-input:focus,
-		.ge-m3-select:focus {
-			border-color: var(--md-sys-color-primary, #0C2340) !important;
-			outline: 2.5px solid var(--md-sys-color-primary, #0C2340) !important;
-			outline-offset: 1px;
-		}
-
-		.ge-m3-search-input {
-			width: 100%;
-			padding: 12px 16px 12px 46px;
-			font-size: 16px;
-			font-weight: 500;
-		}
-
-		@media (min-width: 768px) {
-			.ge-m3-search-input {
-				font-size: 14px;
-			}
-		}
-
-		.ge-m3-actions-row {
-			display: flex;
-			gap: 8px;
-			flex-shrink: 0;
-		}
-
-		.ge-m3-sort-wrap {
-			position: relative;
-			flex-grow: 1;
-		}
-
-		.ge-m3-sort-select {
-			width: 100%;
-			appearance: none;
-			padding: 12px 36px 12px 14px;
-			font-size: 14px;
-			font-weight: 600;
-			cursor: pointer;
-		}
-
-		.ge-m3-sort-arrow {
-			position: absolute;
-			right: 12px;
-			top: 50%;
-			transform: translateY(-50%);
-			pointer-events: none;
-			color: var(--md-sys-color-primary, #0C2340);
-		}
-
-		.ge-m3-filter-btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			padding: 12px 18px;
-			border-radius: var(--ge-r-sm, 12px);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-on-surface, #0C2340);
-			font-size: 14px;
-			font-weight: 600;
-			box-shadow: var(--ge-shadow-1);
-			cursor: pointer;
-			transition: all 0.2s;
-		}
-
-		.ge-m3-filter-btn:hover {
-			border-color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
-		}
-
-		.ge-m3-filter-btn.is-active {
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF;
-			border-color: var(--md-sys-color-primary, #0C2340);
-		}
-
-		.ge-m3-filter-badge {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 20px;
-			height: 20px;
-			border-radius: 50%;
-			background: #FFFFFF;
-			color: var(--md-sys-color-primary, #0C2340);
-			font-size: 11px;
-			font-weight: 700;
-		}
-
-		/* View Mode Toggle: Grid & List */
-		.ge-m3-view-toggle-wrap {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			flex-shrink: 0;
-		}
-
-		.ge-m3-view-label {
-			font-size: 13px;
-			font-weight: 600;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			white-space: nowrap;
-		}
-
-		.ge-m3-view-toggle {
-			display: inline-flex;
-			align-items: center;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-sm, 12px);
-			padding: 3px;
-			box-shadow: var(--ge-shadow-1);
-			gap: 3px;
-		}
-
-		.ge-m3-view-btn {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 6px;
-			padding: 6px 12px;
-			height: 34px;
-			border-radius: var(--ge-r-xs, 8px);
-			border: none;
-			background: transparent;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			font-size: 12.5px;
-			font-weight: 600;
-			font-family: inherit;
-			cursor: pointer;
-			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-			white-space: nowrap;
-		}
-
-		.ge-m3-view-btn svg {
-			width: 15px;
-			height: 15px;
-			flex-shrink: 0;
-			stroke: currentColor;
-		}
-
-		.ge-m3-view-btn:hover:not(.is-active) {
-			background: var(--md-sys-color-surface-container, #F5F7FA);
-			color: var(--md-sys-color-primary, #0C2340);
-		}
-
-		.ge-m3-view-btn.is-active {
-			background: var(--md-sys-color-primary, #0C2340) !important;
-			color: #FFFFFF !important;
-			font-weight: 700;
-			box-shadow: 0 1px 4px rgba(12, 35, 64, 0.2);
-		}
-
-		.ge-m3-view-btn.is-active svg {
-			stroke: #FFFFFF !important;
-		}
-
-		@media (max-width: 639px) {
-			.ge-m3-view-label {
-				display: none;
-			}
-			.ge-m3-view-btn {
-				padding: 6px 10px;
-				font-size: 12px;
-			}
-		}
-
-		/* M3 Filter Panel Card */
-		.ge-m3-filter-panel {
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 24px;
-			margin-bottom: 24px;
-			box-shadow: var(--ge-shadow-2);
-		}
-
-		.ge-m3-filter-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 28px;
-		}
-
-		@media (min-width: 768px) {
-			.ge-m3-filter-grid {
-				grid-template-columns: repeat(2, 1fr);
-			}
-		}
-
-		@media (min-width: 1024px) {
-			.ge-m3-filter-grid {
-				grid-template-columns: repeat(3, 1fr);
-			}
-		}
-
-		.ge-m3-section-title {
-			font-size: 12px;
-			font-weight: 700;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			margin: 0 0 14px 0;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-		}
-
-		.ge-m3-price-inputs {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			margin-bottom: 18px;
-		}
-
-		.ge-m3-price-inputs input {
-			width: 100%;
-			padding: 8px 12px;
-			font-size: 15px;
-			font-weight: 600;
-			font-variant-numeric: tabular-nums;
-		}
-
-		.ge-m3-price-dash {
-			color: var(--md-sys-color-outline, #94A3B8);
-			font-weight: 700;
-		}
-
-		.ge-m3-slider-wrap {
-			position: relative;
-			height: 24px;
-			display: flex;
-			align-items: center;
-		}
-
-		.ge-m3-slider-base {
-			position: absolute;
-			left: 0;
-			right: 0;
-			height: 6px;
-			background: var(--md-sys-color-surface-container-high, #ECEFF2);
-			border-radius: 999px;
-		}
-
-		.ge-m3-slider-fill {
-			position: absolute;
-			height: 6px;
-			background: var(--md-sys-color-primary, #0C2340);
-			border-radius: 999px;
-		}
-
-		.m3-thumb {
-			position: absolute;
-			left: 0;
-			right: 0;
-			width: 100%;
-			appearance: none;
-			background: transparent;
-			pointer-events: none;
-			margin: 0;
-		}
-
-		.m3-thumb::-webkit-slider-thumb {
-			pointer-events: all;
-			width: 22px;
-			height: 22px;
-			-webkit-appearance: none;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 2.5px solid var(--md-sys-color-primary, #0C2340);
-			border-radius: 50%;
-			box-shadow: 0 2px 6px rgba(12, 35, 64, 0.25);
-			cursor: pointer;
-		}
-
-		.m3-thumb::-moz-range-thumb {
-			pointer-events: all;
-			width: 22px;
-			height: 22px;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 2.5px solid var(--md-sys-color-primary, #0C2340);
-			border-radius: 50%;
-			box-shadow: 0 2px 6px rgba(12, 35, 64, 0.25);
-			cursor: pointer;
-		}
-
-		.ge-m3-pills-scroll {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-			max-height: 180px;
-			overflow-y: auto;
-			padding-right: 4px;
-			padding-bottom: 4px;
-			scrollbar-width: thin;
-		}
-
+		.ge-m3-chip,
+		.ge-m3-qchip,
 		.ge-m3-filter-pill {
 			display: inline-flex;
 			align-items: center;
 			gap: 8px;
-			padding: 6px 14px;
-			border-radius: 999px;
-			font-size: 13px;
-			font-weight: 500;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			color: var(--md-sys-color-on-surface, #0C2340);
+			flex: 0 0 auto;
+			height: 32px;
+			padding: 0 16px;
+			border: 1px solid var(--md-sys-color-outline);
+			border-radius: var(--md-sys-shape-corner-small);
+			background: transparent;
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-label-large);
+			letter-spacing: 0.1px;
+			white-space: nowrap;
 			cursor: pointer;
-			transition: all 0.2s;
-			line-height: 1.3;
+			transition: padding var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
-		.ge-m3-filter-pill:hover {
-			border-color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
-		}
-
+		.ge-m3-chip.is-active,
+		.ge-m3-qchip.is-active,
 		.ge-m3-filter-pill.is-active {
-			background: var(--md-sys-color-primary, #0C2340) !important;
-			color: #FFFFFF !important;
-			border-color: var(--md-sys-color-primary, #0C2340) !important;
-			font-weight: 600;
+			padding-left: 8px;
+			border-color: transparent;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
 		}
 
-		/* Material 3 Shop Avatar inside store filter pills */
+		.ge-m3-filter-pill-shop { padding-left: 8px; }
+
+		.ge-m3-chip-check {
+			width: 0;
+			margin-right: -8px;
+			overflow: hidden;
+			opacity: 0;
+			font-size: 18px;
+			transition: width var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				margin var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		.is-active > .ge-m3-chip-check { width: 18px; margin-right: 0; opacity: 1; }
+		.ge-m3-filter-pill.is-active .ge-m3-shop-pill-avatar { display: none; }
+
 		.ge-m3-shop-pill-avatar {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			width: 20px;
-			height: 20px;
-			border-radius: 50%;
+			width: 24px;
+			height: 24px;
+			border-radius: var(--md-sys-shape-corner-full);
 			background: #FFFFFF;
-			border: 1px solid #E2E8F0;
+			box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant);
 			overflow: hidden;
 			flex-shrink: 0;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-			vertical-align: middle;
 		}
 
-		.ge-m3-shop-pill-avatar img {
-			width: 14px;
-			height: 14px;
-			object-fit: contain;
-			display: block;
-		}
+		.ge-m3-shop-pill-avatar img { width: 16px; height: 16px; object-fit: contain; display: block; }
 
 		.ge-m3-shop-pill-inits {
 			display: inline-flex;
@@ -804,239 +533,533 @@
 			justify-content: center;
 			width: 100%;
 			height: 100%;
-			font-size: 9px;
-			font-weight: 700;
+			font: var(--md-sys-typescale-label-small);
+			font-size: 10px;
 			color: #0C2340;
-			line-height: 1;
-			letter-spacing: -0.02em;
 			text-transform: uppercase;
 		}
 
-		.ge-m3-filter-pill.is-active .ge-m3-shop-pill-avatar {
-			border-color: rgba(255, 255, 255, 0.5);
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-		}
+		/* =========================================================
+		   7. SEARCH BAR, SORT FIELD, FILTER BUTTON, SEGMENTED BUTTON
+		   ========================================================= */
+		.ge-m3-controls { display: flex; flex-direction: column; gap: 16px; margin: 8px 0 16px; }
 
-		.ge-m3-filter-footer {
-			margin-top: 24px;
-			padding-top: 20px;
-			border-top: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+		.ge-m3-search-box { position: relative; flex: 1 1 auto; min-width: 0; }
+
+		.ge-m3-search-icon {
+			position: absolute;
+			top: 16px;
+			left: 16px;
 			display: flex;
-			flex-direction: column;
-			gap: 12px;
+			color: var(--md-sys-color-on-surface);
+			pointer-events: none;
 		}
 
-		@media (min-width: 768px) {
-			.ge-m3-filter-footer {
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-			}
+		.ge-m3-search-input {
+			width: 100%;
+			height: 56px;
+			padding: 0 56px;
+			border: 0;
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-surface-container-high);
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-body-large);
+			letter-spacing: 0.5px;
 		}
 
-		.ge-m3-reset-btn {
-			font-size: 14px;
-			font-weight: 600;
-			color: var(--md-sys-color-primary, #0C2340);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border-radius: var(--ge-r-sm, 12px);
-			padding: 12px 26px;
-			cursor: pointer;
-			transition: all 0.2s;
+		.ge-m3-search-input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 1; }
+		.ge-m3-search-input:focus { outline: none; }
+		.ge-m3-search-input:focus-visible { outline: 3px solid var(--md-sys-color-secondary); outline-offset: 2px; }
+
+		.ge-m3-search-clear { position: absolute; top: 8px; right: 8px; }
+		.ge-m3-search-clear[hidden] { display: none; }
+
+		.ge-m3-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+		@container ge-m3-comp (min-width: 900px) {
+			.ge-m3-controls { flex-direction: row; align-items: center; }
+			.ge-m3-actions-row { flex-wrap: nowrap; flex: 0 0 auto; }
+			.ge-m3-sort-wrap { flex: 0 0 220px; }
 		}
 
-		.ge-m3-reset-btn:hover {
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
+		/* Outlined text field and select (shared) */
+		.ge-m3-field,
+		.ge-m3-sort-wrap { position: relative; --ge-field-bg: var(--md-sys-color-surface); }
+
+		.ge-m3-sort-wrap { flex: 1 1 160px; min-width: 0; }
+
+		.ge-m3-input,
+		.ge-m3-select {
+			width: 100%;
+			height: 56px;
+			padding: 0 16px;
+			border: 1px solid var(--md-sys-color-outline);
+			border-radius: var(--md-sys-shape-corner-extra-small);
+			background: transparent;
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-body-large);
+			letter-spacing: 0.5px;
+			font-variant-numeric: tabular-nums;
+			appearance: none;
+			-moz-appearance: textfield;
 		}
 
-		.ge-m3-apply-btn {
+		.ge-m3-input::-webkit-outer-spin-button,
+		.ge-m3-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+		.ge-m3-select { padding-right: 48px; cursor: pointer; }
+		.ge-m3-select option { background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+
+		.ge-m3-input:hover,
+		.ge-m3-select:hover { border-color: var(--md-sys-color-on-surface); }
+
+		.ge-m3-input:focus,
+		.ge-m3-select:focus {
+			outline: none;
+			border-color: var(--md-sys-color-primary);
+			box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+		}
+
+		.ge-m3-field-label {
+			position: absolute;
+			top: 16px;
+			left: 12px;
+			padding: 0 4px;
+			background: var(--ge-field-bg);
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-body-large);
+			letter-spacing: 0.5px;
+			pointer-events: none;
+			transform-origin: left top;
+			transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		.ge-m3-input:focus ~ .ge-m3-field-label,
+		.ge-m3-input:not(:placeholder-shown) ~ .ge-m3-field-label,
+		.ge-m3-sort-wrap .ge-m3-field-label {
+			transform: translateY(-24px) scale(0.75);
+		}
+
+		.ge-m3-input:focus ~ .ge-m3-field-label,
+		.ge-m3-sort-wrap:focus-within .ge-m3-field-label { color: var(--md-sys-color-primary); }
+
+		.ge-m3-field-suffix {
+			position: absolute;
+			top: 16px;
+			right: 16px;
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-body-large);
+			pointer-events: none;
+		}
+
+		.ge-m3-sort-arrow {
+			position: absolute;
+			top: 16px;
+			right: 12px;
+			display: flex;
+			color: var(--md-sys-color-on-surface-variant);
+			pointer-events: none;
+		}
+
+		.ge-m3-filter-btn.is-active { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); box-shadow: none; }
+
+		.ge-m3-filter-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 24px;
+			height: 24px;
+			padding: 0 6px;
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-primary);
+			color: var(--md-sys-color-on-primary);
+			font: var(--md-sys-typescale-label-medium);
+		}
+
+		/* Segmented button (grid / list) */
+		.ge-m3-view-toggle-wrap { display: inline-flex; }
+
+		.ge-m3-view-toggle {
+			display: inline-flex;
+			height: 40px;
+			border: 1px solid var(--md-sys-color-outline);
+			border-radius: var(--md-sys-shape-corner-full);
+			overflow: hidden;
+		}
+
+		.ge-m3-view-btn {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
 			gap: 8px;
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF !important;
-			font-size: 14px;
-			font-weight: 600;
-			border-radius: var(--ge-r-sm, 12px);
-			padding: 12px 32px;
-			border: none;
-			box-shadow: var(--ge-shadow-1);
+			padding: 0 16px;
+			border: 0;
+			background: transparent;
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-label-large);
+			letter-spacing: 0.1px;
 			cursor: pointer;
-			transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+			white-space: nowrap;
 		}
 
-		.ge-m3-apply-btn:hover {
-			background: #143154;
-			transform: translateY(-1px);
-			box-shadow: var(--ge-shadow-2);
+		.ge-m3-view-btn + .ge-m3-view-btn { border-left: 1px solid var(--md-sys-color-outline); }
+		.ge-m3-view-btn .material-symbols-outlined { font-size: 18px; }
+		.ge-m3-view-btn .ge-m3-seg-check { display: none; }
+
+		.ge-m3-view-btn.is-active {
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
 		}
 
-		/* Results Count & Compare Trigger */
+		.ge-m3-view-btn.is-active .ge-m3-seg-check { display: inline-block; }
+		.ge-m3-view-btn.is-active .ge-m3-seg-icon { display: none; }
+
+		@container ge-m3-comp (max-width: 599px) {
+			.ge-m3-view-text { display: none; }
+			.ge-m3-view-btn { padding: 0 14px; }
+			.ge-m3-view-btn.is-active .ge-m3-seg-check { display: none; }
+			.ge-m3-view-btn.is-active .ge-m3-seg-icon { display: inline-block; }
+		}
+
 		.ge-m3-results-count {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			font-size: 14px;
-			font-weight: 600;
-			color: var(--md-sys-color-on-surface-variant, #667085);
 			margin-bottom: 16px;
-			padding: 0 4px;
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
+			color: var(--md-sys-color-on-surface-variant);
 		}
 
 		/* =========================================================
-		   PRODUCT CARDS (GRID, LIST, AND TABLE)
+		   8. FILTER SHEET (modal bottom sheet, modal side sheet >= 840px)
+		   ========================================================= */
+		.ge-m3-scrim {
+			position: fixed;
+			inset: 0;
+			z-index: 900;
+			background: rgba(0, 0, 0, 0.32);
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				visibility 0s linear var(--md-sys-motion-duration-short4);
+		}
+
+		.ge-m3-scrim.is-visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+
+		.ge-m3-filter-panel {
+			--ge-field-bg: var(--ge-card-bg);
+			position: fixed;
+			z-index: 910;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			flex-direction: column;
+			max-height: min(90dvh, 760px);
+			background: var(--ge-card-bg);
+			border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+			box-shadow: var(--md-sys-elevation-3);
+			transform: translateY(100%);
+			visibility: hidden;
+			transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-accelerate),
+				visibility 0s linear var(--md-sys-motion-duration-medium2);
+		}
+
+		.ge-m3-filter-panel.is-open {
+			transform: none;
+			visibility: visible;
+			transition: transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
+		}
+
+		.ge-m3-sheet-handle {
+			width: 32px;
+			height: 4px;
+			margin: 16px auto 0;
+			border-radius: 2px;
+			background: var(--md-sys-color-on-surface-variant);
+			opacity: 0.4;
+		}
+
+		.ge-m3-sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 8px 24px; }
+		.ge-m3-sheet-title { margin: 0; font: var(--md-sys-typescale-title-large); color: var(--md-sys-color-on-surface-variant); }
+		.ge-m3-filter-grid { display: flex; flex-direction: column; gap: 32px; padding: 8px 24px 24px; overflow-y: auto; }
+
+		.ge-m3-section-title {
+			margin: 0 0 16px;
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
+			color: var(--md-sys-color-on-surface);
+		}
+
+		.ge-m3-price-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 20px; }
+
+		.ge-m3-pills-scroll { display: flex; flex-wrap: wrap; gap: 8px; }
+
+		.ge-m3-filter-footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 16px 24px;
+			border-top: 1px solid var(--md-sys-color-outline-variant);
+		}
+
+		@media (min-width: 840px) {
+			.ge-m3-sheet-handle { display: none; }
+
+			.ge-m3-filter-panel {
+				top: 0;
+				left: auto;
+				width: 400px;
+				max-height: none;
+				border-radius: var(--md-sys-shape-corner-large) 0 0 var(--md-sys-shape-corner-large);
+				transform: translateX(100%);
+			}
+
+			.ge-m3-filter-panel.is-open { transform: none; }
+			.ge-m3-sheet-head { padding-top: 16px; }
+			.ge-m3-filter-grid { flex: 1 1 auto; }
+		}
+
+		/* Range slider (two native inputs on one track) */
+		.ge-m3-slider-wrap { position: relative; display: flex; align-items: center; height: 44px; }
+
+		.ge-m3-slider-base,
+		.ge-m3-slider-fill { position: absolute; height: 16px; border-radius: var(--md-sys-shape-corner-full); }
+		.ge-m3-slider-base { left: 0; right: 0; background: var(--md-sys-color-secondary-container); }
+		.ge-m3-slider-fill { background: var(--md-sys-color-primary); }
+
+		.m3-thumb {
+			position: absolute;
+			left: 0;
+			width: 100%;
+			height: 44px;
+			margin: 0;
+			background: transparent;
+			pointer-events: none;
+			appearance: none;
+			-webkit-appearance: none;
+		}
+
+		.m3-thumb::-webkit-slider-runnable-track { background: transparent; height: 44px; }
+
+		.m3-thumb::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			width: 12px;
+			height: 44px;
+			border: 0 solid var(--ge-card-bg);
+			border-width: 0 4px;
+			border-radius: 8px;
+			background: var(--md-sys-color-primary);
+			background-clip: padding-box;
+			pointer-events: all;
+			cursor: pointer;
+		}
+
+		.m3-thumb::-moz-range-thumb {
+			width: 4px;
+			height: 44px;
+			border: 4px solid var(--ge-card-bg);
+			border-width: 0 4px;
+			box-sizing: content-box;
+			border-radius: 8px;
+			background: var(--md-sys-color-primary);
+			background-clip: padding-box;
+			pointer-events: all;
+			cursor: pointer;
+		}
+
+		.m3-thumb:focus-visible { outline: none; }
+		.m3-thumb:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--md-sys-color-secondary); outline-offset: 0; }
+
+		/* =========================================================
+		   9. PRODUCT CARDS (elevated card, grid view)
 		   ========================================================= */
 		.ge-m3-grid {
 			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 14px;
-			align-items: start;
+			grid-template-columns: 1fr;
+			gap: 16px;
+			align-items: stretch;
 		}
 
-		@media (min-width: 640px) {
-			.ge-m3-grid {
-				grid-template-columns: repeat(3, minmax(0, 1fr));
-				gap: 16px;
-				align-items: start;
-			}
-		}
-
-		@media (min-width: 1024px) {
-			.ge-m3-grid {
-				grid-template-columns: repeat(4, minmax(0, 1fr));
-				gap: 18px;
-				align-items: start;
-			}
-		}
+		@container ge-m3-comp (min-width: 600px) { .ge-m3-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+		@container ge-m3-comp (min-width: 900px) { .ge-m3-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 		.ge-m3-card-grid {
+			position: relative;
 			display: flex;
 			flex-direction: column;
-			height: 100%;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 16px;
-			color: inherit !important;
-			box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.06));
-			transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-			position: relative;
+			overflow: hidden;
+			padding: 0;
+			background: var(--ge-card-bg);
+			color: var(--md-sys-color-on-surface);
+			border: 1px solid var(--ge-card-border);
+			border-radius: var(--md-sys-shape-corner-large-increased);
+			box-shadow: var(--ge-card-shadow);
 		}
 
-		.ge-m3-card-grid:hover {
-			transform: translateY(-2px);
-			box-shadow: var(--md-sys-elevation-2, 0 4px 12px rgba(0,0,0,0.08));
-			border-color: var(--ge-navy-border, #CBD7E6);
+		.ge-m3-card-grid .ge-m3-img-wrap {
+			height: 220px;
+			margin: -1px -1px 0;
+			padding: 24px;
+			border: 0;
+			border-radius: var(--md-sys-shape-corner-large-increased) var(--md-sys-shape-corner-large-increased) 0 0;
 		}
 
-		.ge-m3-img-wrap {
+		.ge-m3-img-wrap,
+		.ge-m3-list-img-wrap {
 			position: relative;
-			width: 100%;
-			height: 140px;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--md-sys-shape-md, 14px);
-			margin-bottom: 14px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			padding: 12px;
+			padding: 16px;
+			background: var(--ge-media-bg);
+			border: 1px solid var(--ge-card-border);
+			border-radius: var(--md-sys-shape-corner-large);
 			overflow: hidden;
 		}
 
-		@media (min-width: 768px) {
-			.ge-m3-img-wrap {
-				height: 160px;
-			}
-		}
+		.ge-m3-img-wrap { height: 200px; }
+
+		.ge-m3-product-img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
 		.ge-m3-deal-chip {
 			position: absolute;
-			top: 8px;
-			left: 8px;
-			background: var(--ge-amber-deal-bg, #FEF3C7);
-			color: var(--ge-amber-deal-text, #92400E);
-			border: 1px solid var(--ge-amber-deal-border, #FDE68A);
-			font-size: 11.5px;
-			font-weight: 700;
-			padding: 2px 8px;
-			border-radius: 999px;
+			top: 10px;
+			left: 10px;
 			z-index: 2;
-			box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+			display: inline-flex;
+			align-items: center;
+			height: 26px;
+			padding: 0 10px;
+			border: 1px solid var(--ge-amber-deal-border, #FDE68A);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-custom-color-deal-container);
+			color: var(--md-custom-color-on-deal-container);
+			font: var(--md-sys-typescale-label-medium);
+			font-weight: 700;
+			letter-spacing: 0.1px;
 		}
 
-		.ge-m3-product-img {
-			max-height: 100%;
-			max-width: 100%;
-			object-fit: contain;
-			mix-blend-mode: multiply;
-			transition: transform 0.25s ease;
+		.ge-m3-card-grid .ge-m3-deal-chip {
+			top: 14px;
+			left: 14px;
+			background: var(--md-sys-color-error-container);
+			border-color: transparent;
+			color: var(--md-sys-color-on-error-container);
 		}
 
-		.ge-m3-card-grid:hover .ge-m3-product-img,
-		.ge-m3-card-list:hover .ge-m3-product-img {
-			transform: scale(1.04);
+		[data-theme="dark"] .ge-m3-deal-chip { border-color: transparent; }
+
+		/* Compare selection: input chip with checkbox */
+		.ge-m3-cmp-toggle {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			height: 30px;
+			padding: 0 10px 0 8px;
+			border: 1px solid var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-small);
+			background: var(--md-sys-color-surface-container-lowest);
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-label-medium);
+			font-weight: 600;
+			letter-spacing: 0.1px;
+			white-space: nowrap;
+			cursor: pointer;
 		}
 
-		.ge-m3-card-content {
-			display: flex;
-			flex-direction: column;
-			flex-grow: 1;
-			text-align: left;
+		.ge-m3-cmp-toggle:has(input:checked) {
+			border-color: transparent;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
 		}
+
+		.ge-m3-cmp-toggle:has(input:focus-visible) { outline: 3px solid var(--md-sys-color-secondary); outline-offset: 2px; }
+
+		.ge-m3-cmp-chk {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		.ge-m3-cmp-box {
+			position: relative;
+			width: 18px;
+			height: 18px;
+			border: 2px solid var(--md-sys-color-on-surface-variant);
+			border-radius: 2px;
+			flex-shrink: 0;
+			transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+		}
+
+		.ge-m3-cmp-chk:checked + .ge-m3-cmp-box { border-color: var(--md-sys-color-primary); background: var(--md-sys-color-primary); }
+
+		.ge-m3-cmp-chk:checked + .ge-m3-cmp-box::after {
+			content: "";
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 5px;
+			height: 9px;
+			border: solid var(--md-sys-color-on-primary);
+			border-width: 0 2px 2px 0;
+			transform: translate(-50%, -50%) rotate(45deg);
+		}
+
+		.ge-m3-card-grid > .ge-m3-cmp-toggle { position: absolute; top: 14px; right: 14px; z-index: 3; }
+
+		.ge-m3-card-content { display: flex; flex-direction: column; flex-grow: 1; gap: 6px; padding: 18px 20px 20px; }
 
 		.ge-m3-brand {
-			font-size: 11px;
+			font: var(--md-sys-typescale-label-small);
 			font-weight: 700;
+			letter-spacing: 0.6px;
 			text-transform: uppercase;
-			letter-spacing: 0.3px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			margin-bottom: 4px;
+			color: var(--ge-text-muted);
 		}
 
 		.ge-m3-card-title {
-			font-size: 15px;
+			min-height: 44px;
+			margin: 0 0 12px;
+			font-family: var(--md-ref-typeface);
+			font-size: 16px;
 			line-height: 22px;
-			font-weight: 600;
-			color: var(--md-sys-color-primary, #0C2340);
-			margin: 0 0 10px 0;
+			font-weight: 700;
+			letter-spacing: 0;
+			color: var(--md-sys-color-primary);
 			display: -webkit-box;
 			-webkit-line-clamp: 2;
+			line-clamp: 2;
 			-webkit-box-orient: vertical;
 			overflow: hidden;
-			transition: color 0.2s ease;
 		}
 
-		.ge-m3-card-grid:hover .ge-m3-card-title,
-		.ge-m3-card-list:hover .ge-m3-card-title {
-			color: #143154;
-		}
+		.ge-m3-card-bottom { display: flex; flex-direction: column; gap: 14px; margin-top: auto; }
 
-		.ge-m3-card-bottom {
-			margin-top: auto;
-		}
-
-		.ge-m3-price-row {
-			display: flex;
-			align-items: baseline;
-			flex-wrap: wrap;
-			gap: 8px;
-			margin-bottom: 10px;
-		}
+		.ge-m3-price-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
 
 		.ge-m3-price-current {
-			font-size: 22px;
-			line-height: 28px;
+			font-family: var(--md-ref-typeface);
+			font-size: 24px;
+			line-height: 32px;
 			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
+			letter-spacing: -0.2px;
+			color: var(--md-sys-color-primary);
 			font-variant-numeric: tabular-nums;
 		}
 
 		.ge-m3-price-original {
-			font-size: 13.5px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
+			font: var(--md-sys-typescale-body-medium);
+			letter-spacing: 0;
+			font-weight: 500;
+			color: var(--ge-text-muted);
 			text-decoration: line-through;
 			font-variant-numeric: tabular-nums;
 		}
@@ -1044,1163 +1067,954 @@
 		.ge-m3-savings-chip {
 			display: inline-flex;
 			align-items: center;
-			font-size: 11px;
-			font-weight: 700;
-			color: #065F46;
-			background: #ECFDF5;
-			border: 1px solid #A7F3D0;
-			border-radius: 6px;
-			padding: 2px 7px;
-			white-space: nowrap;
+			height: 24px;
+			padding: 0 8px;
+			border-radius: var(--md-sys-shape-corner-small);
+			background: var(--md-sys-color-tertiary-container);
+			color: var(--md-sys-color-on-tertiary-container);
+			font: var(--md-sys-typescale-label-medium);
+			letter-spacing: 0.5px;
 			font-variant-numeric: tabular-nums;
-			line-height: 1.3;
+			white-space: nowrap;
 		}
 
-		/* =========================================================
-		   PRISSAMMENLIGNINGS-BAR & EXPANDABLE BUTIKKLISTE
-		   ========================================================= */
-		.ge-m3-shop-compare-trigger {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-xs, 8px);
-			padding: 7px 10px;
-			margin-bottom: 12px;
-			cursor: pointer;
-			transition: all 0.2s;
-			user-select: none;
-		}
-
-		.ge-m3-shop-compare-trigger:hover {
-			border-color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface-container-high, #ECEFF2);
-		}
-
-		.ge-m3-shop-compare-trigger.is-open {
-			border-color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-primary-container, #EAF0F6);
-		}
-
+		/* Retailer row: disclosure list item (several stores) or static item (one store) */
+		.ge-m3-shop-compare-trigger,
 		.ge-m3-single-shop-row {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-xs, 8px);
-			padding: 7px 10px;
-			margin-bottom: 12px;
-			user-select: none;
+			gap: 8px;
+			width: 100%;
+			min-height: 44px;
+			padding: 6px 12px;
+			border: 1px solid var(--ge-card-border);
+			border-radius: var(--md-sys-shape-corner-medium);
+			background: var(--ge-card-inset);
+			color: var(--md-sys-color-primary);
+			text-align: left;
 		}
 
-		.ge-m3-stock-badge {
-			display: inline-flex;
-			align-items: center;
-			gap: 5px;
-			font-size: 11px;
-			font-weight: 600;
-			color: var(--md-sys-color-on-surface-variant, #475467);
-		}
-		.ge-m3-stock-badge.is-in-stock {
-			color: var(--ge-green-800, #005236);
-		}
-		.ge-m3-stock-badge.is-out-of-stock {
-			color: var(--md-sys-color-error, #BA1A1A);
-		}
+		.ge-m3-shop-compare-trigger { cursor: pointer; }
+
+		.ge-m3-shop-compare-trigger.is-open { border-color: transparent; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 
 		.ge-m3-shop-name {
 			display: flex;
 			align-items: center;
-			font-size: 12px;
-			font-weight: 600;
-			color: var(--md-sys-color-primary, #0C2340);
-			gap: 6px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+			gap: 8px;
 			min-width: 0;
+			font: var(--md-sys-typescale-label-medium);
+			font-size: 13px;
+			letter-spacing: 0;
 		}
 
-		.ge-m3-shop-name span {
+		.ge-m3-shop-name > span:not(.ge-m3-shop-pill-avatar):not(.ge-m3-merchant-logo):not(.material-symbols-outlined) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+		.ge-m3-shop-name b { font-weight: 700; }
+
+		.ge-m3-shop-icon { font-size: 20px; color: var(--ge-text-muted); }
+		.is-open .ge-m3-shop-icon { color: inherit; }
+		.ge-m3-merchant-logo {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 24px;
+			height: 24px;
+			flex: 0 0 24px;
 			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			min-width: 0;
+			border: 1px solid var(--ge-card-border);
+			border-radius: 50%;
+			background: #fff;
 		}
+		.ge-m3-merchant-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+		.ge-m3-merchant-logo .ge-m3-merchant-logo-fallback { display: none; font-size: 16px; color: var(--ge-text-muted); }
+
+		.ge-m3-shop-name-text { display: flex; flex-direction: column; }
+		.ge-m3-shop-name-text small { font: var(--md-sys-typescale-label-small); letter-spacing: 0.5px; opacity: 0.8; }
+		.ge-m3-shop-name-text b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
 
 		.ge-m3-compare-badge {
 			display: inline-flex;
 			align-items: center;
-			gap: 4px;
-			font-size: 11px;
-			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			padding: 2px 8px;
-			border-radius: 999px;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			white-space: nowrap;
+			gap: 2px;
 			flex-shrink: 0;
+			font: var(--md-sys-typescale-label-medium);
+			letter-spacing: 0;
+			color: var(--md-sys-color-on-surface-variant);
+			white-space: nowrap;
 		}
 
-		/* Expandable store price comparison drawer inside card */
+		.ge-m3-compare-badge .material-symbols-outlined { font-size: 18px; margin-left: -2px; }
+		.is-open .ge-m3-compare-badge { color: inherit; }
+
+		.ge-m3-stock-badge,
+		.ge-m3-store-stock {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font: var(--md-sys-typescale-label-medium);
+			letter-spacing: 0.5px;
+			white-space: nowrap;
+		}
+
+		.is-in-stock { color: var(--md-sys-color-tertiary); }
+		.is-out-of-stock { color: var(--md-sys-color-error); }
+
+		/* Card rows show in-stock as a dot only; the text stays for screen readers */
+		.ge-m3-stock-badge.is-in-stock .ge-m3-stock-label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+
+		.ge-m3-stock-badge .ge-m3-stock-dot { width: 10px; height: 10px; }
+		.ge-m3-stock-badge.is-in-stock .ge-m3-stock-dot { background: var(--ge-green-600, #00A86B); }
+
+		.ge-m3-stock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: currentColor; }
+
+		/* =========================================================
+		   10. RETAILER OVERLAY (grid card) AND DRAWER (list card)
+		   ========================================================= */
 		.ge-m3-stores-table {
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-sm, 12px);
-			padding: 10px 12px;
-			margin-bottom: 12px;
-			box-shadow: var(--ge-shadow-1);
 			display: flex;
 			flex-direction: column;
-			gap: 8px;
-			animation: ge-expand 0.2s ease-out;
+			gap: 2px;
+			padding: 12px;
+			background: var(--ge-card-bg);
+			border: 1px solid var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-medium);
+			animation: ge-expand var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate);
 		}
 
-		/* In-card store overlay for Grid View to prevent stretching other cards */
+		/* In-card overlay for grid view: fills the card, other cards never stretch.
+		   Scrolls only as a fallback; the scrollbar is hidden. */
 		.ge-m3-stores-table.ge-m3-stores-popover {
 			position: absolute;
 			inset: 0;
 			z-index: 30;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 16px;
-			box-shadow: 0 14px 36px rgba(12, 35, 64, 0.22);
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
+			padding: 12px;
 			overflow-y: auto;
-			animation: ge-popover-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+			scrollbar-width: none;
+			background: var(--ge-card-bg);
+			border: 0;
+			border-radius: var(--md-sys-shape-corner-large);
+			box-shadow: var(--md-sys-elevation-3);
+			container-type: inline-size;
+			container-name: ge-m3-pop;
+			animation: ge-popover-in var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
 		}
 
-		@keyframes ge-popover-in {
-			from { opacity: 0; transform: scale(0.96); }
-			to { opacity: 1; transform: scale(1); }
+		.ge-m3-stores-popover::-webkit-scrollbar { display: none; }
+
+		.ge-m3-stores-table > * { flex-shrink: 0; }
+
+		@keyframes ge-popover-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+		@keyframes ge-expand { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+		.ge-m3-popover-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 8px;
+			padding-bottom: 8px;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
+			margin-bottom: 4px;
 		}
 
-		.ge-m3-popover-close {
-			width: 24px;
-			height: 24px;
-			border-radius: 50%;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			background: var(--md-sys-color-surface-container, #F5F7FA);
-			color: var(--md-sys-color-primary, #0C2340);
-			font-size: 15px;
-			font-weight: 700;
-			line-height: 1;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			transition: all 0.2s;
-		}
-		.ge-m3-popover-close:hover {
-			background: var(--md-sys-color-error-container, #FDE8E8);
-			color: var(--md-sys-color-on-error-container, #9B1C1C);
-			border-color: #F87171;
+		.ge-m3-popover-prod-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+		.ge-m3-popover-brand { font: var(--md-sys-typescale-label-small); letter-spacing: 0.5px; color: var(--md-sys-color-on-surface-variant); }
+
+		.ge-m3-popover-title {
+			margin: 0 0 2px;
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
+			color: var(--md-sys-color-on-surface);
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
 		}
 
-		@keyframes ge-expand {
-			from { opacity: 0; transform: translateY(-4px); }
-			to { opacity: 1; transform: translateY(0); }
-		}
+		.ge-m3-popover-meta { display: flex; flex-direction: column; font: var(--md-sys-typescale-body-small); letter-spacing: 0.4px; color: var(--md-sys-color-on-surface-variant); }
+		.ge-m3-popover-price-range { font-weight: 500; color: var(--md-sys-color-tertiary); }
+		.ge-m3-popover-close { margin: -4px -8px 0 0; }
 
 		.ge-m3-store-row {
+			position: relative;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			gap: 8px;
-			padding: 7px 10px;
-			border-radius: 8px;
-			border-bottom: 1px solid var(--md-sys-color-surface-container, #F5F7FA);
-			font-size: 12px;
-			position: relative;
-			transition: background 0.15s ease;
+			gap: 8px 12px;
+			min-height: 48px;
+			padding: 6px 8px;
+			border-radius: var(--md-sys-shape-corner-medium);
+			font: var(--md-sys-typescale-body-medium);
 		}
 
-		.ge-m3-store-row:last-child {
-			border-bottom: none;
-		}
+		.ge-m3-store-row + .ge-m3-store-row { border-top: 1px solid var(--md-sys-color-outline-variant); border-top-left-radius: 0; border-top-right-radius: 0; }
 
+		/* Best price row: same mint tones as the original design */
 		.ge-m3-store-row.is-best-deal {
-			background: var(--ge-green-50, #F1F8F4);
+			margin: 10px 0 2px;
 			border: 1px solid var(--ge-green-200, #C8E8D7);
-			margin: 8px 0 4px;
+			border-radius: var(--md-sys-shape-corner-medium);
+			background: var(--ge-green-50, #F1F8F4);
+			color: var(--md-sys-color-on-surface);
 		}
 
-		.ge-m3-store-row:not(.is-best-deal):hover {
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-		}
+		.ge-m3-store-row.is-best-deal + .ge-m3-store-row { border-top: 0; }
 
-		.ge-m3-store-left {
-			display: flex;
-			align-items: center;
-			gap: 5px;
-			min-width: 0;
-			flex: 1 1 auto;
-			overflow: hidden;
-		}
+		.ge-m3-store-left { display: flex; align-items: center; gap: 12px; flex: 1 1 auto; min-width: 0; }
+		.ge-m3-store-text { display: flex; flex-direction: column; min-width: 0; }
 
-		.ge-m3-store-left .ge-m3-shop-pill-avatar {
-			width: 18px;
-			height: 18px;
-			flex-shrink: 0;
-		}
-
-		.ge-m3-store-left .ge-m3-shop-pill-avatar img {
-			width: 13px;
-			height: 13px;
-		}
-
-		.ge-m3-store-left .ge-m3-stock-dot {
-			width: 6px;
-			height: 6px;
-			flex-shrink: 0;
-		}
-
-		.ge-m3-store-left b {
-			color: var(--md-sys-color-primary, #0C2340);
-			font-weight: 600;
-			font-size: 12px;
-			white-space: nowrap;
+		.ge-m3-store-text b {
+			font: var(--md-sys-typescale-label-large);
+			letter-spacing: 0.1px;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			min-width: 0;
-			display: inline-block;
+			white-space: nowrap;
 		}
 
 		.ge-m3-store-tag {
 			position: absolute;
 			top: -9px;
 			left: 10px;
-			font-size: 9px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: var(--ge-green-800, #005236);
-			background: var(--ge-green-100, #DCF5E8);
-			border: 1px solid var(--ge-green-200, #BEE3D0);
-			padding: 1px 7px;
-			border-radius: 999px;
-			white-space: nowrap;
-			line-height: 1.3;
 			z-index: 2;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+			display: inline-flex;
+			align-items: center;
+			height: 18px;
+			padding: 0 8px;
+			border: 1px solid var(--ge-green-200, #BEE3D0);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--ge-green-100, #DCF5E8);
+			color: var(--ge-green-800, #005236);
+			font: var(--md-sys-typescale-label-small);
+			font-size: 10px;
+			letter-spacing: 0.5px;
+			text-transform: uppercase;
+			white-space: nowrap;
 		}
 
-		.ge-m3-store-right {
-			display: flex;
-			align-items: center;
-			gap: 6px;
-			flex-shrink: 0;
-			margin-left: auto;
-		}
+		[data-theme="dark"] .ge-m3-store-tag { color: var(--md-sys-color-tertiary); }
+
+		.ge-m3-store-right { display: flex; align-items: center; flex-shrink: 0; margin-left: auto; }
+
+		.ge-m3-store-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
 
 		.ge-m3-store-price {
-			font-weight: 700;
-			font-size: 12px;
-			color: var(--md-sys-color-primary, #0C2340);
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
 			font-variant-numeric: tabular-nums;
 			white-space: nowrap;
 		}
 
-		.ge-m3-store-btn {
+		.ge-m3-store-row .ge-m3-shop-pill-avatar { width: 28px; height: 28px; }
+		.ge-m3-store-row .ge-m3-shop-pill-avatar img { width: 18px; height: 18px; }
+
+		.ge-m3-popover-close-btn { height: 32px; margin-top: 2px; }
+
+		.ge-m3-store-btn .material-symbols-outlined { display: none; }
+
+		/* Narrow cards: retailer action collapses to an icon button */
+		@container ge-m3-pop (max-width: 260px) {
+			.ge-m3-popover-meta span:first-child { display: none; }
+			.ge-m3-store-stock.is-in-stock .ge-m3-stock-label { display: none; }
+			.ge-m3-store-row { gap: 8px; padding: 6px; }
+			.ge-m3-store-left { gap: 8px; }
+			.ge-m3-store-row .ge-m3-shop-pill-avatar { width: 24px; height: 24px; }
+			.ge-m3-store-row .ge-m3-shop-pill-avatar img { width: 16px; height: 16px; }
+			.ge-m3-store-btn { width: 32px; padding: 0; }
+			.ge-m3-store-btn-label { display: none; }
+			.ge-m3-store-btn .material-symbols-outlined { display: inline-block; }
+		}
+
+		.ge-m3-cta-btn { width: 100%; height: 44px; font-size: 14px; font-weight: 700; letter-spacing: 0; }
+
+		.ge-m3-grid-cta {
 			display: inline-flex;
 			align-items: center;
-			justify-content: center;
-			height: 24px;
-			padding: 0 9px;
-			font-size: 11px;
-			font-weight: 600;
-			border-radius: 999px;
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF !important;
-			text-decoration: none !important;
-			transition: var(--ge-transition);
+			justify-content: flex-end;
+			align-self: flex-end;
+			gap: 6px;
+			min-height: 40px;
+			padding: 0 8px;
+			border-radius: var(--md-sys-shape-corner-full);
+			color: var(--md-sys-color-primary);
+			font: var(--md-sys-typescale-label-large);
+			font-weight: 700;
+			text-decoration: none;
+			transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 		}
 
-		.ge-m3-store-btn:hover {
-			background: #143154;
-		}
-
-		.ge-m3-stock-dot {
-			width: 8px;
-			height: 8px;
-			border-radius: 50%;
-			flex-shrink: 0;
-		}
-
-		.ge-m3-stock-dot.is-in-stock {
-			background: var(--ge-green-600, #00A86B);
-		}
-
-		.ge-m3-stock-dot.is-out-of-stock {
-			background: #FACC15;
-		}
-
-		.ge-m3-cta-btn {
-			width: 100%;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-			height: 42px;
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF !important;
-			font-size: 14px;
-			font-weight: 600;
-			padding: 0 18px;
-			border-radius: 999px;
-			border: none;
-			box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.06));
-			transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-			cursor: pointer;
-			text-decoration: none !important;
-		}
-
-		.ge-m3-cta-btn:hover {
-			background: #143154;
-			box-shadow: var(--md-sys-elevation-2, 0 3px 8px rgba(0,0,0,0.12));
-		}
+		.ge-m3-grid-cta:hover { background: var(--ge-card-inset); }
+		.ge-m3-grid-cta:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
+		.ge-m3-grid-cta .material-symbols-outlined { font-size: 18px; }
 
 		/* =========================================================
-		   LIST VIEW (2-Column Responsive Card Layout)
+		   11. LIST VIEW
 		   ========================================================= */
-		.ge-m3-list {
-			display: grid;
-			grid-template-columns: 1fr;
-			align-items: start;
-			gap: 16px;
-			width: 100%;
-		}
+		.ge-m3-list { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; align-items: start; }
+		.ge-m3-list-column { display: contents; }
 
-		/* 2-kolonners responsiv listevisning på store skjermer (>= 800px) */
-		@media (min-width: 800px) {
-			.ge-m3-list {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-				align-items: start;
-				gap: 16px;
-			}
-		}
-
-		/* Container query: tilpasser seg container uavhengig av sidetype */
-		@container ge-m3-comp (min-width: 800px) {
-			.ge-m3-list {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-				align-items: start;
-				gap: 16px;
-			}
+		@container ge-m3-comp (min-width: 840px) {
+			.ge-m3-list { display: flex; align-items: flex-start; gap: 16px; }
+			.ge-m3-list-column { display: flex; flex: 1 1 0; flex-direction: column; gap: 16px; min-width: 0; }
 		}
 
 		.ge-m3-card-list {
+			container-type: inline-size;
+			container-name: ge-m3-lcard;
 			display: flex;
 			flex-direction: column;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			padding: 16px;
-			color: inherit !important;
-			box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.06));
-			transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-			width: 100%;
-			box-sizing: border-box;
+			overflow: hidden;
+			background: var(--ge-card-bg);
+			color: var(--md-sys-color-on-surface);
+			border: 1px solid var(--ge-card-border);
+			border-radius: var(--md-sys-shape-corner-extra-large);
+			box-shadow: var(--ge-card-shadow);
 		}
 
-		.ge-m3-card-list:hover {
-			transform: translateY(-2px);
-			box-shadow: var(--md-sys-elevation-2, 0 4px 14px rgba(0,0,0,0.08));
-			border-color: var(--ge-navy-border, #CBD7E6);
-		}
+		.ge-m3-list-main-row { display: flex; align-items: stretch; min-height: 216px; }
 
-		.ge-m3-list-main-row {
-			display: flex;
-			align-items: stretch;
-			gap: 16px;
-			width: 100%;
-		}
-
+		/* Full-bleed photo on the left edge of the card */
 		.ge-m3-list-img-wrap {
-			position: relative;
-			width: 125px;
-			height: 125px;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--md-sys-shape-md, 14px);
-			flex-shrink: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 8px;
-			overflow: hidden;
+			flex: 0 0 clamp(180px, 28%, 300px);
+			padding: 0;
+			border: 0;
+			border-radius: 0;
+			background: var(--ge-media-bg);
 		}
 
-		@media (min-width: 768px) {
-			.ge-m3-list-img-wrap {
-				width: 135px;
-				height: 135px;
-			}
+		.ge-m3-list-img-wrap .ge-m3-product-img {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			padding: 20px;
+			box-sizing: border-box;
+			object-fit: contain;
+			object-position: center;
+			mix-blend-mode: normal;
 		}
 
-		.ge-m3-list-content {
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-			flex: 1 1 auto;
-			min-width: 0;
-			text-align: left;
-			gap: 8px;
+		.ge-m3-list-img-wrap .ge-m3-deal-chip {
+			top: 14px;
+			left: 14px;
+			background: var(--md-sys-color-error-container);
+			border-color: transparent;
+			color: var(--md-sys-color-on-error-container);
 		}
 
-		.ge-m3-list-top {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 8px;
-			margin-bottom: 2px;
+		.ge-m3-list-content { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; gap: 8px; padding: 24px 28px; }
+		.ge-m3-list-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+		.ge-m3-list-content .ge-m3-card-title { min-height: 0; margin: 0; font-size: 18px; line-height: 24px; }
+		.ge-m3-list-content .ge-m3-price-current { font-size: 32px; line-height: 40px; }
+		.ge-m3-list-content .ge-m3-price-original { font-size: 16px; line-height: 24px; }
+		.ge-m3-list-action-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: auto; }
+		.ge-m3-list-cta { width: auto; height: 48px; padding: 0 24px; flex-shrink: 0; }
+
+		/* Compare toggle in list cards: plain checkbox, no chip */
+		.ge-m3-card-list .ge-m3-cmp-toggle,
+		.ge-m3-card-list .ge-m3-cmp-toggle:has(input:checked) { height: 28px; padding: 0; border: 0; background: transparent; color: var(--ge-text-muted); }
+
+		/* Retailer row spans the card, drawer opens below it */
+		.ge-m3-shop-row--list {
+			min-height: 46px;
+			padding: 6px 24px;
+			border: 0;
+			border-top: 1px solid var(--ge-card-border);
+			border-radius: 0;
+			background: transparent;
+			color: var(--md-sys-color-primary);
 		}
 
-		.ge-m3-list-content .ge-m3-card-title {
-			font-size: 15px;
-			line-height: 20px;
+		.ge-m3-shop-row--list.is-open { background: transparent; color: var(--md-sys-color-primary); }
+		.ge-m3-shop-row--list .ge-m3-merchant-logo { width: 22px; height: 22px; flex-basis: 22px; }
+		.ge-m3-shop-line { font-weight: 500; color: var(--ge-text-muted); }
+		.ge-m3-shop-line b { color: var(--md-sys-color-primary); font-weight: 700; }
+		.ge-m3-card-grid .ge-m3-shop-prefix { font-size: 11px; }
+		.ge-m3-card-grid .ge-m3-shop-compare-trigger { min-height: 42px; padding: 6px 8px 6px 10px; gap: 6px; }
+		.ge-m3-card-grid .ge-m3-shop-name { gap: 6px; }
+		.ge-m3-card-grid .ge-m3-shop-icon { font-size: 18px; }
+
+		.ge-m3-shop-row--list .ge-m3-compare-badge {
+			height: 32px;
+			padding: 0 12px 0 16px;
+			border: 1px solid var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--ge-card-bg);
+			color: var(--md-sys-color-primary);
+			font: var(--md-sys-typescale-label-large);
 			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
-			margin: 0;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-		}
-
-		.ge-m3-list-bottom {
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-			margin-top: auto;
-		}
-
-		.ge-m3-list-action-row {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 8px;
-		}
-
-		.ge-m3-list-action-row .ge-m3-price-row {
-			margin-bottom: 0;
-			align-items: baseline;
-			gap: 6px;
-		}
-
-		.ge-m3-list-cta {
-			width: auto !important;
-			height: 38px !important;
-			padding: 0 16px !important;
-			font-size: 13px !important;
-			font-weight: 700 !important;
-			flex-shrink: 0;
 		}
 
 		.ge-m3-list-drawer-wrap {
-			margin-top: 14px;
-			padding-top: 14px;
-			border-top: 1px dashed var(--md-sys-color-outline-variant, #E4E7EC);
+			border-top: 1px dashed var(--md-sys-color-outline-variant);
+			background: var(--ge-drawer-bg);
 		}
 
-		/* Mobile responsive layout (< 520px) */
-		@media (max-width: 519px) {
-			.ge-m3-card-list {
-				padding: 12px;
-			}
+		.ge-m3-ldrawer { padding: 28px; animation: ge-expand var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate); }
 
-			.ge-m3-list-main-row {
-				gap: 12px;
-			}
-
-			.ge-m3-list-img-wrap {
-				width: 95px;
-				height: 95px;
-			}
-
-			.ge-m3-list-content .ge-m3-card-title {
-				font-size: 13.5px;
-				line-height: 18px;
-			}
-
-			.ge-m3-list-action-row {
-				flex-direction: column;
-				align-items: stretch;
-				gap: 6px;
-			}
-
-			.ge-m3-list-cta {
-				width: 100% !important;
-			}
+		.ge-m3-ldrawer-head {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 16px;
+			padding-bottom: 20px;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
 		}
 
-		/* =========================================================
-		   TABLE VIEW (PRISSAMMENLIGNINGSTABELL)
-		   ========================================================= */
-		.ge-m3-table-wrap {
-			width: 100%;
-			overflow-x: auto;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.06));
-		}
+		.ge-m3-ldrawer-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
-		.ge-m3-table {
-			width: 100%;
-			border-collapse: collapse;
-			text-align: left;
-			font-size: 13.5px;
-		}
-
-		.ge-m3-table th {
-			background: var(--md-sys-color-surface-container, #F5F7FA);
-			color: var(--md-sys-color-primary, #0C2340);
+		.ge-m3-ldrawer-title {
+			margin: 0 0 6px;
+			font-family: var(--md-ref-typeface);
+			font-size: 18px;
+			line-height: 24px;
 			font-weight: 700;
-			font-size: 12px;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			padding: 14px 16px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+			color: var(--md-sys-color-on-surface);
+		}
+
+		.ge-m3-ldrawer-meta { font: var(--md-sys-typescale-body-medium); color: var(--md-sys-color-on-surface-variant); }
+		.ge-m3-ldrawer-range { margin-top: 6px; font: var(--md-sys-typescale-label-large); font-weight: 700; color: var(--md-sys-color-tertiary); }
+
+		.ge-m3-ldrawer-rows { display: flex; flex-direction: column; gap: 4px; padding-top: 28px; }
+
+		.ge-m3-ldrow {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			min-height: 68px;
+			padding: 12px 16px;
+			border-radius: var(--md-sys-shape-corner-large);
+			font: var(--md-sys-typescale-body-large);
+		}
+
+		.ge-m3-ldrow.is-best-deal {
+			border: 1px solid var(--ge-green-200, #C8E8D7);
+			background: var(--ge-green-50, #F1F8F4);
+		}
+
+		.ge-m3-ldrow .ge-m3-store-tag { left: 14px; }
+		.ge-m3-ldrow-name { display: inline-flex; align-items: center; gap: 14px; min-width: 0; font-weight: 500; }
+		.ge-m3-ldrow-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+		.ge-m3-ldrow-dot.is-in-stock { background: var(--ge-green-700, #007A50); }
+		.ge-m3-ldrow-dot.is-out-of-stock { background: var(--md-sys-color-outline-variant); }
+		.ge-m3-ldrow-right { display: inline-flex; align-items: center; gap: 20px; flex-shrink: 0; }
+		.ge-m3-ldrow-price { font: var(--md-sys-typescale-title-medium); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+		.ge-m3-ldrow .ge-m3-store-btn { height: 40px; padding: 0 20px; font-weight: 700; }
+
+		/* Grid overlay uses the list drawer's retailer rows, scaled to fit one card. */
+		.ge-m3-grid-stores .ge-m3-ldrawer-head { gap: 8px; padding-bottom: 12px; }
+		.ge-m3-grid-stores .ge-m3-ldrawer-title { margin-bottom: 4px; font-size: 16px; line-height: 22px; }
+		.ge-m3-grid-stores .ge-m3-ldrawer-meta { font-size: 12px; }
+		.ge-m3-grid-stores .ge-m3-ldrawer-range { margin-top: 4px; font-size: 14px; }
+		.ge-m3-grid-stores .ge-m3-ldrawer-rows { gap: 4px; padding-top: 22px; }
+		.ge-m3-grid-stores .ge-m3-ldrow { min-height: 54px; gap: 8px; padding: 10px 12px; font-size: 14px; }
+		.ge-m3-grid-stores .ge-m3-ldrow-name { gap: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+		.ge-m3-grid-stores .ge-m3-ldrow-right { gap: 8px; }
+		.ge-m3-grid-stores .ge-m3-ldrow-price { font-size: 15px; }
+		.ge-m3-grid-stores .ge-m3-ldrow .ge-m3-store-btn { height: 34px; padding: 0 14px; font-size: 12px; }
+		.ge-m3-grid-stores .ge-m3-store-tag { top: -12px; left: 14px; height: 24px; padding: 0 14px; font-size: 11px; }
+
+		@container ge-m3-pop (max-width: 260px) {
+			.ge-m3-grid-stores { padding: 10px; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-head { padding-bottom: 10px; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-title { font-size: 14px; line-height: 19px; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-meta { font-size: 11px; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-range { font-size: 12px; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-rows { padding-top: 18px; }
+			.ge-m3-grid-stores .ge-m3-ldrow { min-height: 58px; gap: 8px; padding: 10px 12px; font-size: 13px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-name { gap: 6px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-dot { width: 8px; height: 8px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-right { gap: 8px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-price { font-size: 13px; }
+			.ge-m3-grid-stores .ge-m3-ldrow .ge-m3-store-btn { width: auto; height: 34px; padding: 0 12px; font-size: 11px; }
+			.ge-m3-grid-stores .ge-m3-store-tag { top: -12px; left: 10px; height: 24px; padding: 0 12px; font-size: 11px; }
+		}
+
+		@container ge-m3-pop (max-width: 180px) {
+			.ge-m3-grid-stores .ge-m3-ldrawer-title { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+			.ge-m3-grid-stores .ge-m3-ldrawer-meta { display: none; }
+			.ge-m3-grid-stores .ge-m3-ldrow { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 64px; gap: 4px; padding: 10px 8px 8px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-name { grid-column: 1; width: 100%; font-size: 12px; line-height: 16px; }
+			.ge-m3-grid-stores .ge-m3-ldrow-right { grid-column: 1; width: 100%; justify-content: space-between; }
+			.ge-m3-grid-stores .ge-m3-ldrow-price { font-size: 12px; line-height: 16px; }
+			.ge-m3-grid-stores .ge-m3-ldrow .ge-m3-store-btn { height: 28px; padding: 0 10px; }
+		}
+
+		.ge-m3-sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
 			white-space: nowrap;
 		}
 
-		.ge-m3-table td {
-			padding: 14px 16px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			vertical-align: middle;
+		/* Medium list cards (two columns): smaller type */
+		@container ge-m3-lcard (max-width: 700px) {
+			.ge-m3-list-main-row { min-height: 190px; }
+			.ge-m3-list-img-wrap { flex-basis: clamp(140px, 30%, 200px); }
+			.ge-m3-list-content { padding: 18px 20px; }
+			.ge-m3-list-content .ge-m3-card-title { font-size: 16px; line-height: 22px; }
+			.ge-m3-list-content .ge-m3-price-current { font-size: 24px; line-height: 32px; }
+			.ge-m3-list-content .ge-m3-price-original { font-size: 14px; }
+			.ge-m3-list-cta { height: 40px; padding: 0 18px; }
+			.ge-m3-shop-row--list { min-height: 46px; padding: 6px 20px; }
+			.ge-m3-ldrawer { padding: 20px; }
+			.ge-m3-ldrawer-rows { padding-top: 22px; }
+			.ge-m3-ldrow { min-height: 60px; padding: 8px 12px; font-size: 15px; }
+			.ge-m3-ldrow-right { gap: 12px; }
+			.ge-m3-ldrow-price { font-size: 15px; }
+			.ge-m3-ldrow .ge-m3-store-btn { height: 36px; padding: 0 16px; }
 		}
 
-		.ge-m3-table tr:last-child td {
-			border-bottom: none;
+		/* Narrow list cards: photo on top */
+		@container ge-m3-lcard (max-width: 480px) {
+			.ge-m3-list-main-row { flex-direction: column; min-height: 0; }
+			.ge-m3-list-img-wrap { flex: 0 0 auto; height: 180px; }
+			.ge-m3-list-content .ge-m3-card-title { min-height: 44px; }
+			.ge-m3-list-action-row { align-items: center; }
 		}
 
-		.ge-m3-table tr:hover td {
-			background: var(--ge-navy-selected-bg, #F0F4F8);
+		@container ge-m3-comp (max-width: 599px) {
+			.ge-m3-card-list { border-radius: var(--md-sys-shape-corner-large); }
+			.ge-m3-list-main-row { flex-direction: row; min-height: 124px; }
+			.ge-m3-list-img-wrap {
+				flex: 0 0 92px;
+				width: 92px;
+				min-height: 124px;
+				height: auto;
+				align-self: stretch;
+				background: var(--ge-media-bg);
+			}
+			.ge-m3-list-img-wrap .ge-m3-product-img { padding: 10px; }
+			.ge-m3-list-img-wrap .ge-m3-deal-chip { top: 6px; left: 6px; height: 20px; padding: 0 6px; font-size: 10px; }
+			.ge-m3-list-content { justify-content: center; gap: 4px; padding: 10px 12px; }
+			.ge-m3-list-top { gap: 4px; }
+			.ge-m3-list-content .ge-m3-brand { font-size: 10px; line-height: 14px; }
+			.ge-m3-card-list .ge-m3-cmp-toggle,
+			.ge-m3-card-list .ge-m3-cmp-toggle:has(input:checked) { height: 24px; gap: 4px; font-size: 11px; }
+			.ge-m3-list-content .ge-m3-card-title { min-height: 0; margin: 0; font-size: 14px; line-height: 18px; -webkit-line-clamp: 2; line-clamp: 2; }
+			.ge-m3-list-action-row { align-items: center; gap: 6px; margin-top: 2px; }
+			.ge-m3-list-action-row .ge-m3-price-row { display: flex; flex: 1 1 auto; flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; }
+			.ge-m3-list-content .ge-m3-price-current { font-size: 20px; line-height: 24px; }
+			.ge-m3-list-content .ge-m3-price-original { font-size: 11px; line-height: 14px; }
+			.ge-m3-list-action-row .ge-m3-savings-chip { height: 18px; padding: 0 6px; font-size: 10px; }
+			.ge-m3-list-cta { width: auto; height: 36px; gap: 4px; padding: 0 10px; font-size: 12px; }
+			.ge-m3-list-cta .material-symbols-outlined { font-size: 16px; }
+			.ge-m3-shop-row--list {
+				width: auto;
+				min-height: 44px;
+				margin: 0 12px;
+				padding: 6px 0;
+				border: 0;
+				border-top: 1px solid var(--ge-card-border);
+				border-radius: 0;
+				background: transparent;
+			}
+			.ge-m3-shop-row--list.is-open { background: transparent; }
+			.ge-m3-shop-row--list .ge-m3-compare-badge { height: 30px; padding: 0 4px 0 8px; border: 0; background: transparent; font-size: 12px; }
+			.ge-m3-list-drawer-wrap { margin: 0 10px 10px; border: 1px dashed var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-medium); }
+			.ge-m3-ldrawer { padding: 14px; }
+			.ge-m3-ldrawer-rows { padding-top: 18px; }
+			.ge-m3-ldrow { min-height: 54px; padding: 8px 10px; font-size: 13px; }
+			.ge-m3-ldrow-right { gap: 8px; }
+			.ge-m3-ldrow-price { font-size: 14px; }
+			.ge-m3-ldrow .ge-m3-store-btn { height: 32px; padding: 0 12px; }
 		}
 
-		.ge-table-thumb {
-			width: 50px;
-			height: 50px;
-			border-radius: 8px;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			overflow: hidden;
-			padding: 4px;
+		@container ge-m3-comp (max-width: 380px) {
+			.ge-m3-list-main-row { min-height: 108px; }
+			.ge-m3-list-img-wrap { flex-basis: 76px; width: 76px; min-height: 108px; }
+			.ge-m3-list-img-wrap .ge-m3-product-img { padding: 8px; }
+			.ge-m3-list-img-wrap .ge-m3-deal-chip { top: 5px; left: 5px; height: 18px; padding: 0 5px; font-size: 9px; }
+			.ge-m3-list-content { gap: 3px; padding: 8px; }
+			.ge-m3-list-top { min-height: 22px; justify-content: flex-end; }
+			.ge-m3-list-content .ge-m3-brand,
+			.ge-m3-card-list .ge-m3-cmp-toggle > span:last-child { display: none; }
+			.ge-m3-card-list .ge-m3-cmp-toggle,
+			.ge-m3-card-list .ge-m3-cmp-toggle:has(input:checked) { width: 24px; height: 24px; justify-content: center; padding: 0; }
+			.ge-m3-list-content .ge-m3-card-title { font-size: 13px; line-height: 17px; }
+			.ge-m3-list-action-row { gap: 4px; }
+			.ge-m3-list-content .ge-m3-price-current { font-size: 18px; line-height: 22px; }
+			.ge-m3-list-content .ge-m3-price-original { font-size: 10px; line-height: 12px; }
+			.ge-m3-list-cta { height: 32px; gap: 3px; padding: 0 8px; font-size: 11px; }
+			.ge-m3-list-cta .material-symbols-outlined { font-size: 14px; }
+			.ge-m3-shop-row--list { min-height: 40px; margin: 0 10px; padding: 4px 0; }
+			.ge-m3-shop-row--list .ge-m3-shop-name { gap: 6px; font-size: 12px; }
+			.ge-m3-shop-row--list .ge-m3-shop-icon { font-size: 18px; }
+			.ge-m3-shop-row--list .ge-m3-compare-badge { font-size: 11px; }
 		}
 
-		.ge-table-thumb img {
-			max-width: 100%;
-			max-height: 100%;
-			object-fit: contain;
-			mix-blend-mode: multiply;
-		}
+		/* Table view and load more */
+		.ge-m3-load-more-wrap { display: flex; justify-content: center; margin-top: 32px; }
 
-		.ge-table-prod-info b {
-			display: block;
-			font-size: 14px;
-			color: var(--md-sys-color-primary, #0C2340);
-			margin-bottom: 2px;
-		}
-
-		.ge-table-prod-info span {
-			font-size: 11px;
-			font-weight: 700;
-			text-transform: uppercase;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-		}
-
-		/* Side-by-side Comparison Bottom Sheet */
+		/* =========================================================
+		   12. COMPARE: FLOATING TOOLBAR, DIALOG, MATRIX
+		   ========================================================= */
 		.ge-m3-cmp-bar {
 			position: fixed;
-			bottom: 20px;
 			left: 50%;
-			transform: translateX(-50%);
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF;
-			padding: 12px 24px;
-			border-radius: 999px;
-			box-shadow: 0 10px 25px rgba(12, 35, 64, 0.35);
+			bottom: 16px;
+			z-index: 100;
 			display: flex;
 			align-items: center;
-			gap: 16px;
-			z-index: 100;
-			animation: ge-slideup 0.25s ease-out;
+			gap: 8px;
+			max-width: calc(100vw - 32px);
+			padding: 8px 8px 8px 20px;
+			background: #0C2340;
+			color: #FFFFFF;
+			border-radius: var(--md-sys-shape-corner-full);
+			box-shadow: var(--md-sys-elevation-3);
+			transform: translateX(-50%);
+			animation: ge-slideup var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
 		}
 
-		@keyframes ge-slideup {
-			from { transform: translate(-50%, 40px); opacity: 0; }
-			to { transform: translate(-50%, 0); opacity: 1; }
+		@keyframes ge-slideup { from { transform: translate(-50%, 24px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+		.ge-m3-cmp-bar-count { display: inline-flex; align-items: center; gap: 8px; margin-right: 8px; font: var(--md-sys-typescale-label-large); letter-spacing: 0.1px; white-space: nowrap; }
+		.ge-m3-cmp-bar .ge-m3-btn--filled { background: #FFFFFF; color: #0C2340; }
+		.ge-m3-cmp-bar .ge-m3-btn--text { color: #FFFFFF; text-decoration: underline; }
+		.ge-m3-cmp-bar-products { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+		.ge-m3-cmp-bar-product {
+			display: block;
+			width: 36px;
+			height: 36px;
+			object-fit: contain;
+			border: 1px solid rgba(255, 255, 255, 0.55);
+			border-radius: 50%;
+			background: #fff;
 		}
 
-		.ge-m3-cmp-bar-btn {
-			background: #FFFFFF;
-			color: var(--md-sys-color-primary, #0C2340);
-			font-weight: 700;
-			font-size: 13px;
-			padding: 8px 18px;
-			border-radius: 999px;
-			border: none;
-			cursor: pointer;
-			transition: var(--ge-transition);
+		@media (max-width: 599px) {
+			.ge-m3-cmp-bar {
+				left: 16px;
+				right: 16px;
+				max-width: none;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				padding: 12px 12px 12px 16px;
+				border-radius: var(--md-sys-shape-corner-extra-large);
+				transform: none;
+				animation-name: ge-slideup-compact;
+			}
+
+			.ge-m3-cmp-bar-count { flex: 1 1 auto; margin-right: 0; }
+			.ge-m3-cmp-bar-products { margin-right: 0; }
+			.ge-m3-cmp-bar-product { width: 32px; height: 32px; }
+			.ge-m3-cmp-bar .ge-m3-btn--filled { flex: 1 1 auto; }
 		}
 
-		.ge-m3-cmp-bar-btn:hover {
-			background: var(--ge-green-100, #DCF5E8);
-		}
+		@keyframes ge-slideup-compact { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-		/* Modal Scrim & Sheet for side by side */
 		.ge-m3-modal-scrim {
 			position: fixed;
 			inset: 0;
-			background: rgba(12, 35, 64, 0.45);
-			backdrop-filter: blur(4px);
 			z-index: 999;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			padding: 20px;
+			padding: 24px;
+			background: rgba(0, 0, 0, 0.32);
+			animation: ge-fade var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
+		@keyframes ge-fade { from { opacity: 0; } to { opacity: 1; } }
+
 		.ge-m3-modal-card {
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border-radius: var(--ge-r-lg, 20px);
+			display: flex;
+			flex-direction: column;
 			width: 100%;
-			max-width: 900px;
-			max-height: 90vh;
-			overflow-y: auto;
-			padding: 28px;
-			box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-			position: relative;
+			max-width: 1040px;
+			max-height: calc(100dvh - 48px);
+			overflow: hidden;
+			background: var(--md-sys-color-surface-container-high);
+			color: var(--md-sys-color-on-surface);
+			border-radius: var(--md-sys-shape-corner-extra-large);
+			box-shadow: var(--md-sys-elevation-3);
+			animation: ge-popover-in var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
+		}
+
+		@media (max-width: 599px) {
+			.ge-m3-modal-scrim { padding: 0; }
+			.ge-m3-modal-card { max-height: 100dvh; height: 100%; border-radius: 0; }
 		}
 
 		.ge-m3-modal-head {
 			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 24px;
-			padding-bottom: 16px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-		}
-
-		.ge-m3-modal-close {
-			width: 36px;
-			height: 36px;
-			border-radius: 50%;
-			border: none;
-			background: var(--md-sys-color-surface-container, #F5F7FA);
-			color: var(--md-sys-color-primary, #0C2340);
-			cursor: pointer;
-			display: grid;
-			place-items: center;
-		}
-
-		/* Comparison Matrix Table & Modal Scrim Alignment */
-		.ge-m3-modal-scrim,
-		.ge-m3-modal-scrim *,
-		.ge-m3-modal-scrim *::before,
-		.ge-m3-modal-scrim *::after,
-		.ge-m3-stores-popover,
-		.ge-m3-stores-popover *,
-		.ge-m3-stores-popover *::before,
-		.ge-m3-stores-popover *::after {
-			box-sizing: border-box;
-		}
-
-		/* Popover Header with Product Name */
-		.ge-m3-popover-header {
-			display: flex;
 			align-items: flex-start;
 			justify-content: space-between;
-			gap: 10px;
-			padding-bottom: 8px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			margin-bottom: 4px;
+			flex-wrap: wrap;
+			gap: 12px;
+			padding: 24px 16px 16px 24px;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
 		}
 
-		.ge-m3-popover-prod-info {
-			display: flex;
-			flex-direction: column;
-			min-width: 0;
-			flex: 1;
-		}
+		.ge-m3-modal-title { margin: 0 0 4px; font: var(--md-sys-typescale-headline-small); color: var(--md-sys-color-on-surface); }
+		.ge-m3-modal-supporting { margin: 0; font: var(--md-sys-typescale-body-medium); letter-spacing: 0.25px; color: var(--md-sys-color-on-surface-variant); }
+		.ge-m3-modal-actions { display: flex; align-items: center; gap: 8px; }
+		.ge-m3-modal-body { flex: 1 1 auto; overflow: auto; padding: 24px; }
 
-		.ge-m3-popover-brand {
-			font-size: 10.5px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.4px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			line-height: 1.2;
-		}
-
-		.ge-m3-popover-title {
-			font-size: 13.5px;
-			font-weight: 700;
-			color: var(--md-sys-color-primary, #0C2340);
-			line-height: 1.35;
-			margin: 2px 0 4px 0;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-		}
-
-		.ge-m3-popover-meta {
-			font-size: 11px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-			font-weight: 600;
-			display: flex;
-			flex-direction: column;
-			gap: 1px;
-		}
-
-		.ge-m3-popover-price-range {
-			color: var(--ge-green-800, #005236);
-			font-weight: 700;
-		}
-
-		.ge-m3-matrix-wrap {
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: var(--ge-r-md, 16px);
-			background: var(--md-sys-color-surface, #FFFFFF);
-			box-sizing: border-box;
-		}
-
-		.ge-m3-matrix-table {
-			width: 100%;
-			border-collapse: separate;
-			border-spacing: 0;
-			table-layout: fixed;
-			text-align: left;
-			font-size: 13px;
-			box-sizing: border-box;
-		}
-
-		.ge-m3-matrix-table th.matrix-label-col {
-			width: 150px;
-			min-width: 150px;
-			max-width: 150px;
-			padding: 12px 14px;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			font-weight: 700;
-			color: var(--md-sys-color-on-surface-variant, #475467);
-			font-size: 11.5px;
-			text-transform: uppercase;
-			letter-spacing: 0.4px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-right: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			vertical-align: middle;
-			box-sizing: border-box;
-		}
-
-		.ge-m3-matrix-table td.matrix-prod-col {
-			padding: 12px 16px;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-right: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			vertical-align: middle;
-			background: var(--md-sys-color-surface, #FFFFFF);
-			box-sizing: border-box;
-		}
-
-		/* Highlight Best Price column in comparison matrix */
-		.ge-m3-matrix-table td.matrix-prod-col.is-best-col {
-			background: var(--ge-green-50, #F1F8F4) !important;
-			border-left: 1px solid var(--ge-green-200, #C8E8D7);
-			border-right: 1px solid var(--ge-green-200, #C8E8D7);
-		}
-
-		.ge-m3-matrix-table tr.matrix-header-row td.matrix-prod-col.is-best-col {
-			background: var(--ge-green-50, #F1F8F4) !important;
-			border-top: 3px solid #059669;
-			border-left: 1px solid var(--ge-green-200, #C8E8D7);
-			border-right: 1px solid var(--ge-green-200, #C8E8D7);
-		}
-
-		.ge-m3-matrix-best-tag {
-			position: absolute;
-			top: -10px;
-			left: 50%;
-			transform: translateX(-50%);
-			background: #059669;
-			color: #FFFFFF;
-			font-size: 10px;
-			font-weight: 700;
-			padding: 2px 10px;
-			border-radius: 10px;
-			box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
-			white-space: nowrap;
-			z-index: 5;
-			text-transform: uppercase;
-			letter-spacing: 0.4px;
-		}
-
-		/* Difference filter toggle */
 		.ge-m3-diff-toggle {
+			position: relative;
 			display: inline-flex;
 			align-items: center;
 			gap: 8px;
-			font-size: 13px;
-			font-weight: 600;
-			color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-			border-radius: 20px;
-			padding: 6px 14px;
+			height: 32px;
+			padding: 0 16px;
+			border: 1px solid var(--md-sys-color-outline);
+			border-radius: var(--md-sys-shape-corner-small);
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-label-large);
+			letter-spacing: 0.1px;
 			cursor: pointer;
-			user-select: none;
-			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		}
-
-		.ge-m3-diff-toggle:hover {
-			background: #EAF0F6;
-			border-color: #CBD7E6;
+			white-space: nowrap;
+			transition: padding var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
 		.ge-m3-diff-toggle.is-active {
-			background: #0C2340;
-			color: #FFFFFF;
-			border-color: #0C2340;
-			box-shadow: 0 2px 6px rgba(12, 35, 64, 0.25);
+			padding-left: 8px;
+			border-color: transparent;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
 		}
 
-		.ge-m3-diff-checkbox {
-			accent-color: #059669;
-			width: 15px;
-			height: 15px;
-			cursor: pointer;
+		.ge-m3-diff-checkbox { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+		.ge-m3-diff-toggle:has(input:focus-visible) { outline: 3px solid var(--md-sys-color-secondary); outline-offset: 2px; }
+
+		.ge-m3-matrix-wrap {
+			overflow-x: auto;
+			background: var(--md-sys-color-surface-container-lowest);
+			border-radius: var(--md-sys-shape-corner-medium);
+			box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant);
 		}
 
-		/* Anti-Fit / "Vær obs på" note styling (Material 3 Surface Variant / Outlined Card) */
-		.ge-m3-antifit-box {
-			display: flex;
-			flex-direction: column;
-			gap: 6px;
-			background: #FAF7F2;
-			border: 1px solid #EBE5DB;
-			border-radius: 8px;
-			padding: 9px 12px;
-			font-size: 11.5px;
-			line-height: 1.45;
-			color: #3F372C;
-			text-align: left;
+		.ge-m3-matrix-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; text-align: left; font: var(--md-sys-typescale-body-medium); letter-spacing: 0.25px; }
+
+		.ge-m3-matrix-table th.matrix-label-col {
+			position: sticky;
+			left: 0;
+			z-index: 2;
+			width: 150px;
+			min-width: 150px;
+			padding: 16px;
+			background: var(--md-sys-color-surface-container-low);
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
+			vertical-align: middle;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
+			border-right: 1px solid var(--md-sys-color-outline-variant);
 		}
 
-		.ge-m3-antifit-box.is-clean {
-			background: #F4FBF7;
-			border: 1px solid #D1EFE0;
-			color: #065F46;
-		}
-
-		.ge-m3-antifit-header {
-			display: inline-flex;
-			align-items: center;
-			gap: 5px;
-			font-size: 10.5px;
-			font-weight: 700;
-			color: #9A6B2F;
-			letter-spacing: 0.2px;
-		}
-
-		.ge-m3-antifit-box.is-clean .ge-m3-antifit-header {
-			color: #059669;
-		}
-
-		.ge-m3-antifit-note {
-			display: flex;
-			align-items: flex-start;
-			gap: 6px;
+		.ge-m3-matrix-table td.matrix-prod-col {
+			padding: 16px;
+			vertical-align: middle;
+			border-bottom: 1px solid var(--md-sys-color-outline-variant);
 			font-weight: 500;
 		}
 
-		.ge-m3-antifit-bullet {
-			color: #C29B68;
-			font-size: 13px;
-			line-height: 1.25;
-			flex-shrink: 0;
-			font-weight: 700;
-		}
+		.ge-m3-matrix-table tr.matrix-header-row td { vertical-align: top; }
+		.ge-m3-matrix-table tr:last-child th,
+		.ge-m3-matrix-table tr:last-child td { border-bottom: 0; }
+		.ge-m3-matrix-table td.matrix-prod-col.is-best-col { background: color-mix(in srgb, var(--md-sys-color-tertiary-container) 55%, transparent); }
+		.ge-m3-matrix-table tr.matrix-action-row th,
+		.ge-m3-matrix-table tr.matrix-action-row td { background-color: var(--md-sys-color-surface-container-low); }
+		.ge-m3-matrix-table tr.matrix-action-row td.is-best-col { background: var(--md-sys-color-tertiary-container); }
 
-		.ge-m3-antifit-box.is-clean .ge-m3-antifit-bullet {
-			color: #10B981;
-			font-size: 11px;
-		}
+		.ge-m3-matrix-count { font: var(--md-sys-typescale-label-medium); letter-spacing: 0.5px; }
+		.ge-m3-matrix-card-top { position: relative; display: flex; flex-direction: column; gap: 8px; width: 100%; }
 
-		/* Spec winner badge */
-		.ge-m3-spec-win {
-			display: inline-block;
-			background: #ECFDF5;
-			color: #065F46;
-			border: 1px solid #A7F3D0;
-			font-size: 9.5px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.3px;
-			padding: 1px 6px;
-			border-radius: 4px;
-			margin-left: 6px;
-			vertical-align: middle;
-		}
-
-		.ge-m3-matrix-table tr:last-child td,
-		.ge-m3-matrix-table tr:last-child th {
-			border-bottom: none;
-		}
-
-		.ge-m3-matrix-table td.matrix-prod-col:last-child {
-			border-right: none;
-		}
-
-		.ge-m3-matrix-table tr.matrix-header-row td {
-			background: var(--md-sys-color-surface, #FFFFFF);
-			padding: 16px;
-			vertical-align: top;
-			box-sizing: border-box;
-		}
-
-		.ge-m3-matrix-card-top {
-			position: relative;
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-			box-sizing: border-box;
-			width: 100%;
+		.ge-m3-matrix-best-tag {
+			position: absolute;
+			top: 8px;
+			left: 8px;
+			z-index: 2;
+			display: inline-flex;
+			align-items: center;
+			height: 20px;
+			padding: 0 8px;
+			border-radius: var(--md-sys-shape-corner-small);
+			background: var(--md-sys-color-tertiary);
+			color: var(--md-sys-color-on-tertiary);
+			font: var(--md-sys-typescale-label-small);
+			letter-spacing: 0.5px;
+			white-space: nowrap;
 		}
 
 		.ge-m3-matrix-thumb {
-			height: 85px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			background: var(--md-sys-color-surface-container-low, #F5F7FA);
-			border-radius: 12px;
-			padding: 6px;
+			height: 96px;
+			padding: 8px;
+			border-radius: var(--md-sys-shape-corner-medium);
+			background: var(--ge-media-bg);
 			overflow: hidden;
 		}
 
-		.ge-m3-matrix-thumb img {
-			max-height: 100%;
-			max-width: 100%;
-			object-fit: contain;
-			mix-blend-mode: multiply;
-		}
+		.ge-m3-matrix-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
 		.ge-m3-matrix-remove-btn {
 			position: absolute;
-			top: -6px;
-			right: -6px;
-			width: 24px;
-			height: 24px;
-			border-radius: 50%;
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			background: #FFFFFF;
-			color: var(--ge-grey-500, #667085);
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			transition: all 0.2s;
+			top: 4px;
+			right: 4px;
 			z-index: 2;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			width: 32px;
+			height: 32px;
+			background: var(--md-sys-color-surface-container-lowest);
+			box-shadow: var(--md-sys-elevation-1);
 		}
 
-		.ge-m3-matrix-remove-btn:hover {
-			background: var(--md-sys-color-error-container, #FDE8E8);
-			color: var(--md-sys-color-on-error-container, #9B1C1C);
-			border-color: #F87171;
-		}
-
-		.ge-m3-matrix-brand {
-			font-size: 11px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: var(--md-sys-color-on-surface-variant, #667085);
-		}
+		.ge-m3-matrix-remove-btn .material-symbols-outlined { font-size: 18px; }
+		.ge-m3-matrix-brand { font: var(--md-sys-typescale-label-medium); letter-spacing: 0.5px; color: var(--md-sys-color-on-surface-variant); }
 
 		.ge-m3-matrix-prod-title {
-			font-size: 13.5px;
-			font-weight: 700;
-			line-height: 1.35;
-			color: var(--md-sys-color-primary, #0C2340);
+			height: 40px;
 			margin: 0;
+			font: var(--md-sys-typescale-title-small);
+			letter-spacing: 0.1px;
+			color: var(--md-sys-color-on-surface);
 			display: -webkit-box;
 			-webkit-line-clamp: 2;
+			line-clamp: 2;
 			-webkit-box-orient: vertical;
 			overflow: hidden;
-			height: 38px;
 		}
 
-		.ge-m3-matrix-price-row {
-			display: flex;
-			align-items: baseline;
-			gap: 6px;
-			margin: 2px 0 4px;
-		}
+		.ge-m3-matrix-price-row { display: flex; align-items: center; gap: 8px; }
+		.ge-m3-matrix-price { font: var(--md-sys-typescale-title-large); font-variant-numeric: tabular-nums; }
+		.ge-m3-matrix-price-cell { font: var(--md-sys-typescale-title-medium); font-variant-numeric: tabular-nums; }
+		.ge-m3-matrix-cta { width: 100%; }
+		.ge-m3-matrix-cta > span:not(.material-symbols-outlined) { overflow: hidden; text-overflow: ellipsis; }
+		.ge-m3-matrix-muted { color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-small); letter-spacing: 0.4px; font-weight: 400; }
+		.ge-m3-matrix-muted s { margin-right: 4px; }
+		.ge-m3-matrix-ok { color: var(--md-sys-color-tertiary); }
+		.ge-m3-matrix-stock { display: inline-flex; align-items: center; gap: 8px; font: var(--md-sys-typescale-label-large); }
+		.ge-m3-matrix-label-with-icon { display: flex; align-items: center; gap: 8px; }
+		.ge-m3-matrix-label-with-icon .material-symbols-outlined { font-size: 20px; }
 
-		.ge-m3-matrix-price {
-			font-size: 18px;
-			font-weight: 800;
-			color: var(--md-sys-color-primary, #0C2340);
-			font-variant-numeric: tabular-nums;
-		}
-
-		.ge-m3-matrix-cta {
+		.ge-m3-spec-pill,
+		.ge-m3-spec-win {
 			display: inline-flex;
 			align-items: center;
-			justify-content: center;
-			gap: 6px;
-			width: 100%;
-			max-width: 100%;
-			box-sizing: border-box;
-			height: 36px;
-			padding: 0 12px;
-			background: var(--md-sys-color-primary, #0C2340);
-			color: #FFFFFF !important;
-			text-decoration: none !important;
-			font-size: 12.5px;
-			font-weight: 600;
-			border-radius: 9999px;
-			transition: all 0.2s;
-			box-shadow: var(--md-sys-elevation-1, 0 1px 2px rgba(0,0,0,0.06));
-			white-space: nowrap;
-			overflow: hidden;
-		}
-
-		.ge-m3-matrix-cta span {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		.ge-m3-matrix-cta:hover {
-			background: #143154;
-			box-shadow: var(--md-sys-elevation-2, 0 3px 8px rgba(12,35,64,0.15));
-			transform: translateY(-1px);
-		}
-
-		.ge-m3-spec-pill {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			padding: 2px 8px;
-			border-radius: 999px;
-			font-size: 11.5px;
-			font-weight: 600;
+			height: 24px;
+			padding: 0 8px;
+			border-radius: var(--md-sys-shape-corner-small);
+			font: var(--md-sys-typescale-label-medium);
+			letter-spacing: 0.5px;
 			white-space: nowrap;
 			flex-shrink: 0;
 		}
-		.ge-m3-spec-pill.tert { background: var(--md-sys-color-tertiary-container, #DCF5E8); color: var(--md-sys-color-tertiary, #005236); }
-		.ge-m3-spec-pill.sec { background: var(--md-sys-color-secondary-container, #EAF0F6); color: var(--md-sys-color-secondary, #143154); }
-		.ge-m3-spec-pill.deal { background: var(--ge-amber-deal-bg, #FEF3C7); color: var(--ge-amber-deal-text, #92400E); border: 1px solid var(--ge-amber-deal-border, #FDE68A); }
 
-		/* Load More Button */
-		.ge-m3-load-more-wrap {
+		.ge-m3-spec-pill.tert,
+		.ge-m3-spec-win { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+		.ge-m3-spec-pill.sec { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+		.ge-m3-spec-pill.deal { background: var(--md-custom-color-deal-container); color: var(--md-custom-color-on-deal-container); }
+		.ge-m3-spec-win { height: 20px; margin-left: 8px; font: var(--md-sys-typescale-label-small); vertical-align: middle; }
+
+		/* "Vær obs på": tonal container (amber for caution, sage when clean) */
+		.ge-m3-antifit-box {
 			display: flex;
-			justify-content: center;
-			margin-top: 36px;
+			flex-direction: column;
+			gap: 8px;
+			padding: 12px;
+			border-radius: var(--md-sys-shape-corner-medium);
+			background: var(--md-custom-color-warning-container);
+			color: var(--md-custom-color-on-warning-container);
+			font: var(--md-sys-typescale-body-small);
+			letter-spacing: 0.4px;
+			font-weight: 400;
 		}
 
-		.ge-m3-load-more-btn {
-			background: var(--md-sys-color-surface, #FFFFFF);
-			border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-			color: var(--md-sys-color-primary, #0C2340);
-			font-size: 14px;
-			font-weight: 600;
-			padding: 12px 32px;
-			border-radius: 999px;
-			box-shadow: var(--ge-shadow-1);
-			cursor: pointer;
-			transition: all 0.2s;
+		.ge-m3-antifit-box.is-clean { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+		.ge-m3-antifit-header { display: inline-flex; align-items: center; gap: 4px; font: var(--md-sys-typescale-label-medium); letter-spacing: 0.5px; color: var(--md-custom-color-warning); }
+		.ge-m3-antifit-header .material-symbols-outlined { font-size: 18px; }
+		.ge-m3-antifit-box.is-clean .ge-m3-antifit-header { color: var(--md-sys-color-tertiary); }
+		.ge-m3-antifit-note { display: flex; align-items: flex-start; gap: 8px; }
+		.ge-m3-antifit-bullet { flex-shrink: 0; font-weight: 700; }
+
+		.ge-m3-matrix-summary {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px 16px;
+			margin-top: 16px;
+			padding: 12px 16px;
+			border-radius: var(--md-sys-shape-corner-medium);
+			background: var(--md-sys-color-surface-container-low);
+			font: var(--md-sys-typescale-body-medium);
+			letter-spacing: 0.25px;
 		}
 
-		.ge-m3-load-more-btn:hover {
-			border-color: var(--md-sys-color-primary, #0C2340);
-			background: var(--md-sys-color-surface-container-high, #F0F4F8);
-			transform: translateY(-1px);
-			box-shadow: var(--ge-shadow-2);
-		}
+		.ge-m3-matrix-summary-diff { color: var(--md-sys-color-tertiary); font-weight: 500; }
 	</style>
 </head>
 <body>
 
-	<!-- Prototype Topbar with Theme Switcher -->
-	<div class="demo-topbar">
+	<!-- Prototype top app bar with theme switcher -->
+	<header class="demo-topbar">
 		<div class="demo-badge">
 			<span class="demo-badge-dot"></span>
 			<span>Material 3 Prissammenligning Prototype</span>
 		</div>
-		<div class="demo-topbar-actions">
-			<button type="button" id="demo-theme-btn" class="theme-toggle-btn m3-sl">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-				<span id="theme-label">Bytt til mørk modus</span>
-			</button>
-		</div>
-	</div>
+		<button type="button" id="demo-theme-btn" class="ge-m3-btn ge-m3-btn--tonal m3-sl">
+			<span class="material-symbols-outlined" id="theme-icon" aria-hidden="true">dark_mode</span>
+			<span id="theme-label">Bytt til mørk modus</span>
+		</button>
+	</header>
 
 	<!-- Component Prototype Container -->
-	<div class="ge-m3-comp-wrapper" id="proto-app-root">
+	<main class="ge-m3-comp-wrapper" id="proto-app-root">
 
-		<!-- Cross-linking Banner to Kjøpsveileder -->
+		<!-- Cross-linking banner to Kjøpsveileder -->
 		<aside class="ge-m3-guide-banner">
 			<div class="ge-m3-guide-content">
-				<div class="ge-m3-guide-icon">
-					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="12" cy="12" r="10"></circle>
-						<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-						<line x1="12" y1="17" x2="12.01" y2="17"></line>
-					</svg>
-				</div>
+				<div class="ge-m3-guide-icon"><span class="material-symbols-outlined" aria-hidden="true">help</span></div>
 				<div class="ge-m3-guide-text">
 					<strong>Usikker på hvilket utstyr som passer best for deg?</strong>
 					<span>Finn optimal modell for leddbelastning, plass og budsjett i vår interaktive veileder.</span>
 				</div>
 			</div>
-			<a href="#kjopsveileder-hub" class="ge-m3-guide-btn m3-sl">
+			<a href="#kjopsveileder-hub" class="ge-m3-guide-btn ge-m3-btn ge-m3-btn--filled m3-sl">
 				Gå til Kjøpsveileder
-				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+				<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 			</a>
 		</aside>
 
 		<!-- Header -->
-		<div class="ge-m3-header">
+		<header class="ge-m3-header">
 			<h1 class="ge-m3-title">Prissammenligning</h1>
 			<p class="ge-m3-subtitle">Sammenlign dagspriser og tilbud fra våre samarbeidspartnere.</p>
-		</div>
+		</header>
 
-		<!-- 2-Level Department & Category Navigation -->
+		<!-- 2-level navigation: primary tabs (departments) and filter chips (categories, quick filters) -->
 		<div class="ge-m3-nav-section">
-			<!-- Level 1: Main Departments (Segmented Control) -->
 			<div class="ge-m3-dept-track" id="proto-dept-track" role="tablist" aria-label="Velg avdeling"></div>
-
-			<!-- Level 2: Sub-categories for Active Department -->
-			<div class="ge-m3-cats-bar" id="proto-cats-bar" role="tablist" aria-label="Velg kategori"></div>
-
-			<!-- Quick Filter Chips (Tier 1 Exposed Filters) -->
+			<div class="ge-m3-cats-bar" id="proto-cats-bar" role="group" aria-label="Velg kategori"></div>
 			<div class="ge-m3-quick-filters" id="proto-quick-filters" role="group" aria-label="Hurtigfiltre"></div>
 		</div>
 
-		<!-- Cross-Department Search Alert Banner -->
-		<div id="proto-dept-alert" style="display: none;"></div>
+		<!-- Cross-department search alert -->
+		<div id="proto-dept-alert" role="status" style="display: none;"></div>
 
-		<!-- Controls Bar -->
-		<div class="ge-m3-controls">
+		<!-- Controls: search bar, sort, filter, view mode -->
+		<div class="ge-m3-controls" role="search">
 			<div class="ge-m3-search-box">
-				<div class="ge-m3-search-icon">
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-				</div>
-				<input type="text" id="proto-search-input" class="ge-m3-input ge-m3-search-input" placeholder="Søk etter produkter og merker..." />
+				<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>
+				<input type="text" id="proto-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />
+				<button type="button" id="proto-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>
+					<span class="material-symbols-outlined" aria-hidden="true">close</span>
+				</button>
 			</div>
 
 			<div class="ge-m3-actions-row">
@@ -2212,33 +2026,27 @@
 						<option value="discount_desc">Størst rabatt (%)</option>
 						<option value="savings_desc">Størst kroneavslag</option>
 					</select>
-					<div class="ge-m3-sort-arrow">
-						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-					</div>
+					<label class="ge-m3-field-label" for="proto-sort-select">Sorter etter</label>
+					<span class="ge-m3-sort-arrow"><span class="material-symbols-outlined" aria-hidden="true">arrow_drop_down</span></span>
 				</div>
 
-				<button type="button" id="proto-filter-toggle" class="ge-m3-filter-btn m3-sl">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-						<line x1="21" y1="4" x2="14" y2="4"></line><line x1="10" y1="4" x2="3" y2="4"></line>
-						<line x1="21" y1="12" x2="12" y2="12"></line><line x1="8" y1="12" x2="3" y2="12"></line>
-						<line x1="21" y1="20" x2="16" y2="20"></line><line x1="12" y1="20" x2="3" y2="20"></line>
-						<line x1="14" y1="1" x2="14" y2="7"></line><line x1="8" y1="9" x2="8" y2="15"></line>
-						<line x1="16" y1="17" x2="16" y2="23"></line>
-					</svg>
+				<button type="button" id="proto-filter-toggle" class="ge-m3-filter-btn ge-m3-btn ge-m3-btn--outlined ge-m3-btn--m m3-sl" aria-haspopup="dialog" aria-controls="proto-filter-panel">
+					<span class="material-symbols-outlined" aria-hidden="true">tune</span>
 					<span>Filter</span>
 					<span id="proto-filter-badge" class="ge-m3-filter-badge" style="display: none;">0</span>
 				</button>
 
-				<!-- 2 View Modes: Grid & List with Clear Labels -->
+				<!-- Segmented button: grid / list -->
 				<div class="ge-m3-view-toggle-wrap">
-					<span class="ge-m3-view-label">Visning:</span>
 					<div class="ge-m3-view-toggle" role="group" aria-label="Velg visning">
-						<button type="button" id="proto-view-grid-btn" class="ge-m3-view-btn is-active m3-sl" title="Vis som rutenett">
-							<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+						<button type="button" id="proto-view-grid-btn" class="ge-m3-view-btn is-active m3-sl" title="Vis som rutenett" aria-pressed="true">
+							<span class="material-symbols-outlined ge-m3-seg-check" aria-hidden="true">check</span>
+							<span class="material-symbols-outlined ge-m3-seg-icon" aria-hidden="true">grid_view</span>
 							<span class="ge-m3-view-text">Rutenett</span>
 						</button>
-						<button type="button" id="proto-view-list-btn" class="ge-m3-view-btn m3-sl" title="Vis som liste">
-							<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+						<button type="button" id="proto-view-list-btn" class="ge-m3-view-btn m3-sl" title="Vis som liste" aria-pressed="false">
+							<span class="material-symbols-outlined ge-m3-seg-check" aria-hidden="true">check</span>
+							<span class="material-symbols-outlined ge-m3-seg-icon" aria-hidden="true">view_list</span>
 							<span class="ge-m3-view-text">Liste</span>
 						</button>
 					</div>
@@ -2246,121 +2054,120 @@
 			</div>
 		</div>
 
-		<!-- Filter Drawer Panel -->
-		<div id="proto-filter-panel" class="ge-m3-filter-panel" style="display: none;">
-			<div class="ge-m3-filter-grid">
-				<div>
-					<h4 class="ge-m3-section-title">Pris (NOK)</h4>
-					<div class="ge-m3-price-inputs">
-						<input type="number" id="proto-min-input" class="ge-m3-input" />
-						<span class="ge-m3-price-dash">-</span>
-						<input type="number" id="proto-max-input" class="ge-m3-input" />
-					</div>
-					<div class="ge-m3-slider-wrap">
-						<div class="ge-m3-slider-base"></div>
-						<div id="proto-slider-fill" class="ge-m3-slider-fill"></div>
-						<input type="range" id="proto-range-min" class="m3-thumb" style="z-index: 3;" />
-						<input type="range" id="proto-range-max" class="m3-thumb" style="z-index: 4;" />
-					</div>
-				</div>
-
-				<div>
-					<h4 class="ge-m3-section-title">Merke</h4>
-					<div id="proto-brands-wrap" class="ge-m3-pills-scroll"></div>
-				</div>
-
-				<div>
-					<h4 class="ge-m3-section-title">Butikk</h4>
-					<div id="proto-shops-wrap" class="ge-m3-pills-scroll"></div>
-				</div>
-			</div>
-
-			<div class="ge-m3-filter-footer">
-				<button type="button" id="proto-reset-btn" class="ge-m3-reset-btn m3-sl">Tøm filtre</button>
-				<button type="button" id="proto-apply-btn" class="ge-m3-apply-btn m3-sl">Vis treff</button>
-			</div>
-		</div>
-
 		<!-- Results Count -->
-		<div class="ge-m3-results-count">
+		<div class="ge-m3-results-count" aria-live="polite">
 			<span id="proto-results-count-text">Viser produkter</span>
 		</div>
 
-		<!-- Main Container (Grid, List, or Table) -->
+		<!-- Main Container (grid or list) -->
 		<div id="proto-cards-container" class="ge-m3-grid"></div>
 
 		<!-- Load More -->
 		<div id="proto-load-more-wrap" class="ge-m3-load-more-wrap" style="display: none;"></div>
 
+	</main>
+
+	<!-- Filter sheet: modal bottom sheet (compact), modal side sheet (>= 840px) -->
+	<div id="proto-filter-scrim" class="ge-m3-scrim"></div>
+	<aside id="proto-filter-panel" class="ge-m3-filter-panel" role="dialog" aria-modal="true" aria-labelledby="proto-filter-title" inert>
+		<div class="ge-m3-sheet-handle" aria-hidden="true"></div>
+		<div class="ge-m3-sheet-head">
+			<h2 id="proto-filter-title" class="ge-m3-sheet-title">Filtre</h2>
+			<button type="button" id="proto-filter-close-btn" class="ge-m3-icon-btn m3-sl" aria-label="Lukk filtre" title="Lukk filtre">
+				<span class="material-symbols-outlined" aria-hidden="true">close</span>
+			</button>
+		</div>
+
+		<div class="ge-m3-filter-grid">
+			<div>
+				<h3 class="ge-m3-section-title">Pris (NOK)</h3>
+				<div class="ge-m3-price-inputs">
+					<div class="ge-m3-field">
+						<input type="number" id="proto-min-input" class="ge-m3-input" placeholder=" " inputmode="numeric" />
+						<label class="ge-m3-field-label" for="proto-min-input">Fra</label>
+						<span class="ge-m3-field-suffix">kr</span>
+					</div>
+					<div class="ge-m3-field">
+						<input type="number" id="proto-max-input" class="ge-m3-input" placeholder=" " inputmode="numeric" />
+						<label class="ge-m3-field-label" for="proto-max-input">Til</label>
+						<span class="ge-m3-field-suffix">kr</span>
+					</div>
+				</div>
+				<div class="ge-m3-slider-wrap">
+					<div class="ge-m3-slider-base"></div>
+					<div id="proto-slider-fill" class="ge-m3-slider-fill"></div>
+					<input type="range" id="proto-range-min" class="m3-thumb" style="z-index: 3;" aria-label="Minimumspris" />
+					<input type="range" id="proto-range-max" class="m3-thumb" style="z-index: 4;" aria-label="Maksimumspris" />
+				</div>
+			</div>
+
+			<div>
+				<h3 class="ge-m3-section-title">Merke</h3>
+				<div id="proto-brands-wrap" class="ge-m3-pills-scroll"></div>
+			</div>
+
+			<div>
+				<h3 class="ge-m3-section-title">Butikk</h3>
+				<div id="proto-shops-wrap" class="ge-m3-pills-scroll"></div>
+			</div>
+		</div>
+
+		<div class="ge-m3-filter-footer">
+			<button type="button" id="proto-reset-btn" class="ge-m3-reset-btn ge-m3-btn ge-m3-btn--text m3-sl">Tøm filtre</button>
+			<button type="button" id="proto-apply-btn" class="ge-m3-apply-btn ge-m3-btn ge-m3-btn--filled m3-sl">Vis treff</button>
+		</div>
+	</aside>
+
+	<!-- Floating toolbar when products are selected for side-by-side comparison -->
+	<div id="proto-floating-cmp-bar" class="ge-m3-cmp-bar" role="region" aria-label="Sammenligning" style="display: none;">
+		<span class="ge-m3-cmp-bar-count">
+			<span class="material-symbols-outlined" aria-hidden="true">compare_arrows</span>
+			<span><b id="cmp-selected-count">0</b> modeller valgt</span>
+		</span>
+		<span id="cmp-selected-products" class="ge-m3-cmp-bar-products" aria-label="Valgte produkter"></span>
+		<button type="button" id="cmp-open-modal-btn" class="ge-m3-cmp-bar-btn ge-m3-btn ge-m3-btn--filled m3-sl">Sammenlign spesifikasjoner</button>
+		<button type="button" id="cmp-clear-btn" class="ge-m3-btn ge-m3-btn--text m3-sl">Nullstill</button>
 	</div>
 
-	<!-- Floating Compare Bar when products are selected for side-by-side comparison -->
-	<div id="proto-floating-cmp-bar" class="ge-m3-cmp-bar" style="display: none;">
-		<span><b id="cmp-selected-count">0</b> modeller valgt</span>
-		<button type="button" id="cmp-open-modal-btn" class="ge-m3-cmp-bar-btn m3-sl">Sammenlign spesifikasjoner</button>
-		<button type="button" id="cmp-clear-btn" style="background:transparent; border:none; color:#EAF0F6; cursor:pointer; font-size:12px; text-decoration:underline;">Nullstill</button>
-	</div>
-
-	<!-- Side-by-side Modal -->
-	<div id="proto-cmp-modal" class="ge-m3-modal-scrim" style="display: none;">
+	<!-- Side-by-side dialog -->
+	<div id="proto-cmp-modal" class="ge-m3-modal-scrim" role="dialog" aria-modal="true" aria-labelledby="proto-cmp-title" style="display: none;">
 		<div class="ge-m3-modal-card">
 			<div class="ge-m3-modal-head">
 				<div>
-					<h3 style="margin:0 0 4px; font-size:18px; color:var(--md-sys-color-primary);">Sammenlign modeller side-om-side</h3>
-					<span style="font-size:12.5px; color:var(--md-sys-color-on-surface-variant);">Strukturerte nøkkeltall og prissammenligning for de valgte modellene</span>
+					<h2 id="proto-cmp-title" class="ge-m3-modal-title">Sammenlign modeller side-om-side</h2>
+					<p class="ge-m3-modal-supporting">Strukturerte nøkkeltall og prissammenligning for de valgte modellene</p>
 				</div>
-				<div style="display:flex; align-items:center; gap:12px;">
-					<label class="ge-m3-diff-toggle" title="Skjul spesifikasjoner der modellene har like verdier">
+				<div class="ge-m3-modal-actions">
+					<label class="ge-m3-diff-toggle m3-sl" title="Skjul spesifikasjoner der modellene har like verdier">
 						<input type="checkbox" id="proto-cmp-diff-only" class="ge-m3-diff-checkbox" />
+						<span class="ge-m3-chip-check material-symbols-outlined" aria-hidden="true">check</span>
 						<span>Vis kun ulikheter</span>
 					</label>
-					<button type="button" id="proto-modal-close-btn" class="ge-m3-modal-close m3-sl" title="Lukk sammenligning">&times;</button>
+					<button type="button" id="proto-modal-close-btn" class="ge-m3-modal-close ge-m3-icon-btn m3-sl" title="Lukk sammenligning" aria-label="Lukk sammenligning">
+						<span class="material-symbols-outlined" aria-hidden="true">close</span>
+					</button>
 				</div>
 			</div>
-			<div id="proto-cmp-modal-body"></div>
+			<div id="proto-cmp-modal-body" class="ge-m3-modal-body"></div>
 		</div>
 	</div>
 
-	<!-- Interactive Logic for the Prototype with FULL Store Price Comparison -->
+	<!-- Interactive logic for the prototype with full store price comparison -->
 	<script>
-		// Realistisk prissammenligningsdata med flere butikker per produkt og avdelinger
 		// Realistisk prissammenligningsdata med 4 faglige hovedområder
 		var DEPARTMENTS = [
-			{
-				id: "kondisjon",
-				name: "Kondisjon",
-				categories: ["Alle", "Tredemøller", "Romaskiner", "Treningssykler", "Ellipsemaskiner"]
-			},
-			{
-				id: "styrke",
-				name: "Styrke",
-				categories: ["Alle", "Manualer", "Vektstenger", "Kettlebells", "Racks og stativer"]
-			},
-			{
-				id: "rehabilitering",
-				name: "Rehabilitering",
-				categories: ["Alle", "Knestøtter", "Ankelstøtter", "Ryggbelter", "Treningsstrikker"]
-			},
-			{
-				id: "restitusjon",
-				name: "Restitusjon",
-				categories: ["Alle", "Massasjepistoler", "Foam Rollers", "TENS-apparater"]
-			}
+			{ id: "kondisjon", name: "Kondisjon", categories: ["Alle", "Tredemøller", "Romaskiner", "Treningssykler", "Ellipsemaskiner"] },
+			{ id: "styrke", name: "Styrke", categories: ["Alle", "Manualer", "Vektstenger", "Kettlebells", "Racks og stativer"] },
+			{ id: "rehabilitering", name: "Rehabilitering", categories: ["Alle", "Knestøtter", "Ankelstøtter", "Ryggbelter", "Treningsstrikker"] },
+			{ id: "restitusjon", name: "Restitusjon", categories: ["Alle", "Massasjepistoler", "Foam Rollers", "TENS-apparater"] }
 		];
 
 		var sampleProducts = [
 			{
-				id: 1,
-				department: "kondisjon",
-				category: "Romaskiner",
-				brand: "Concept2",
+				id: 1, department: "kondisjon", category: "Romaskiner", brand: "Concept2",
 				name: "RowErg PM5 Romaskin Standard",
-				currentPrice: 12490,
-				originalPrice: 15600,
-				discount: 20,
-				shop: "Fjellsport",
-				inStock: true,
-				image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80",
+				currentPrice: 12490, originalPrice: 15600, discount: 20, shop: "Fjellsport", inStock: true,
+				image: "mock-products/rowing-machine.png",
 				url: "#deal-concept2",
 				specs: { "Motstand": "Luft", "Display": "PM5", "Brukervekt": "227 kg", "Vekt": "26 kg" },
 				stores: [
@@ -2371,17 +2178,10 @@
 				]
 			},
 			{
-				id: 2,
-				department: "kondisjon",
-				category: "Tredemøller",
-				brand: "Sole",
+				id: 2, department: "kondisjon", category: "Tredemøller", brand: "Sole",
 				name: "F85 Tredemølle 2024-modell m/Bluetooth og touchskjerm",
-				currentPrice: 24900,
-				originalPrice: 29294,
-				discount: 15,
-				shop: "Treningspartner",
-				inStock: true,
-				image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80",
+				currentPrice: 24900, originalPrice: 29294, discount: 15, shop: "Treningspartner", inStock: true,
+				image: "mock-products/treadmill.png",
 				url: "#deal-sole",
 				specs: { "Motor": "4.0 HK", "Toppfart": "22 km/t", "Løpeflate": "56x152 cm", "Brukervekt": "180 kg" },
 				stores: [
@@ -2391,17 +2191,10 @@
 				]
 			},
 			{
-				id: 16,
-				department: "kondisjon",
-				category: "Treningssykler",
-				brand: "Sole",
+				id: 16, department: "kondisjon", category: "Treningssykler", brand: "Sole",
 				name: "SB700 Spinningsykkel m/trådløs computer",
-				currentPrice: 9990,
-				originalPrice: 12490,
-				discount: 20,
-				shop: "Treningspartner",
-				inStock: true,
-				image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=400&q=80",
+				currentPrice: 9990, originalPrice: 12490, discount: 20, shop: "Treningspartner", inStock: true,
+				image: "mock-products/spin-bike.png",
 				url: "#deal-sole-sb700",
 				specs: { "Svinghjul": "22 kg", "Motstand": "Trinnløs friksjon", "Brukervekt": "135 kg", "Drivreim": "Poly-V" },
 				stores: [
@@ -2410,16 +2203,9 @@
 				]
 			},
 			{
-				id: 3,
-				department: "styrke",
-				category: "Kettlebells",
-				brand: "Abilica",
+				id: 3, department: "styrke", category: "Kettlebells", brand: "Abilica",
 				name: "Competition Kettlebell 16kg",
-				currentPrice: 899,
-				originalPrice: 1199,
-				discount: 25,
-				shop: "X-Life",
-				inStock: true,
+				currentPrice: 899, originalPrice: 1199, discount: 25, shop: "X-Life", inStock: true,
 				image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-kettlebell",
 				specs: { "Vekt": "16 kg", "Type": "Konkurranse", "Materiale": "Stål", "Fargekode": "Gul" },
@@ -2430,16 +2216,9 @@
 				]
 			},
 			{
-				id: 4,
-				department: "styrke",
-				category: "Racks og stativer",
-				brand: "Titan Life",
+				id: 4, department: "styrke", category: "Racks og stativer", brand: "Titan Life",
 				name: "Squat Rack Pro Hjemmegym",
-				currentPrice: 3499,
-				originalPrice: 4500,
-				discount: 22,
-				shop: "Treningspartner",
-				inStock: true,
+				currentPrice: 3499, originalPrice: 4500, discount: 22, shop: "Treningspartner", inStock: true,
 				image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-rack",
 				specs: { "Maksbelastning": "300 kg", "J-hooks": "Inkludert", "Sikkerhetsarmer": "Ja" },
@@ -2448,16 +2227,9 @@
 				]
 			},
 			{
-				id: 5,
-				department: "styrke",
-				category: "Vektstenger",
-				brand: "Gymgrossisten",
+				id: 5, department: "styrke", category: "Vektstenger", brand: "Gymgrossisten",
 				name: "Olympisk Vektstang 20kg",
-				currentPrice: 1999,
-				originalPrice: 2499,
-				discount: 20,
-				shop: "Gymgrossisten",
-				inStock: true,
+				currentPrice: 1999, originalPrice: 2499, discount: 20, shop: "Gymgrossisten", inStock: true,
 				image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-barbell",
 				specs: { "Vekt": "20 kg", "Grep": "28 mm", "Lengde": "220 cm", "Kulelager": "4 stk" },
@@ -2466,16 +2238,9 @@
 				]
 			},
 			{
-				id: 8,
-				department: "styrke",
-				category: "Manualer",
-				brand: "Bowflex",
+				id: 8, department: "styrke", category: "Manualer", brand: "Bowflex",
 				name: "SelectTech 552i Justerbare Manualer",
-				currentPrice: 2999,
-				originalPrice: 3899,
-				discount: 23,
-				shop: "Fjellsport",
-				inStock: true,
+				currentPrice: 2999, originalPrice: 3899, discount: 23, shop: "Fjellsport", inStock: true,
 				image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-bowflex",
 				specs: { "Vektintervall": "2 - 24 kg", "Antall trinn": "15", "Plassbesparende": "Ja" },
@@ -2486,16 +2251,9 @@
 				]
 			},
 			{
-				id: 9,
-				department: "rehabilitering",
-				category: "Knestøtter",
-				brand: "Bauerfeind",
+				id: 9, department: "rehabilitering", category: "Knestøtter", brand: "Bauerfeind",
 				name: "GenuTrain Medisinsk Knestøtte med silikonpelotte",
-				currentPrice: 999,
-				originalPrice: 1299,
-				discount: 23,
-				shop: "Bandasjisten",
-				inStock: true,
+				currentPrice: 999, originalPrice: 1299, discount: 23, shop: "Bandasjisten", inStock: true,
 				image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-genutrain",
 				specs: { "Type": "Kompresjon m/silikonpelotte", "Støttenivå": "Moderat avlastning", "Materiale": "Pustende strikk", "Neopren": "Nei" },
@@ -2506,16 +2264,9 @@
 				]
 			},
 			{
-				id: 10,
-				department: "rehabilitering",
-				category: "Knestøtter",
-				brand: "DonJoy",
+				id: 10, department: "rehabilitering", category: "Knestøtter", brand: "DonJoy",
 				name: "Reaction Web Knestøtte for hopperkne & patella",
-				currentPrice: 849,
-				originalPrice: 1099,
-				discount: 23,
-				shop: "Fjellsport",
-				inStock: true,
+				currentPrice: 849, originalPrice: 1099, discount: 23, shop: "Fjellsport", inStock: true,
 				image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-donjoy",
 				specs: { "Type": "Elastomer nettstruktur", "Støttenivå": "Patella avlastning", "Materiale": "Silikon/mesh", "Neopren": "Nei" },
@@ -2525,16 +2276,9 @@
 				]
 			},
 			{
-				id: 11,
-				department: "rehabilitering",
-				category: "Ankelstøtter",
-				brand: "Aso",
+				id: 11, department: "rehabilitering", category: "Ankelstøtter", brand: "Aso",
 				name: "Ankelortose med snøring og 8-tallsbånd",
-				currentPrice: 549,
-				originalPrice: 699,
-				discount: 21,
-				shop: "Bandasjisten",
-				inStock: true,
+				currentPrice: 549, originalPrice: 699, discount: 21, shop: "Bandasjisten", inStock: true,
 				image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-aso",
 				specs: { "Type": "Snøring + 8-tallsbånd", "Støttenivå": "Kraftig stabilitet", "Materiale": "Slitesterk nylon", "Neopren": "Nei" },
@@ -2544,16 +2288,9 @@
 				]
 			},
 			{
-				id: 12,
-				department: "rehabilitering",
-				category: "Ryggbelter",
-				brand: "Mueller",
+				id: 12, department: "rehabilitering", category: "Ryggbelter", brand: "Mueller",
 				name: "Justerbart Korsettbelte m/8 støttestag i stål",
-				currentPrice: 449,
-				originalPrice: 599,
-				discount: 25,
-				shop: "Gymgrossisten",
-				inStock: true,
+				currentPrice: 449, originalPrice: 599, discount: 25, shop: "Gymgrossisten", inStock: true,
 				image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-mueller",
 				specs: { "Type": "Korsett med 8 stålfjærer", "Støttenivå": "Justerbar kompresjon", "Bredde": "23 cm", "Neopren": "Ja" },
@@ -2563,16 +2300,9 @@
 				]
 			},
 			{
-				id: 17,
-				department: "rehabilitering",
-				category: "Treningsstrikker",
-				brand: "Abilica",
+				id: 17, department: "rehabilitering", category: "Treningsstrikker", brand: "Abilica",
 				name: "PowerBand Gummistrikk Sett (3 motstander)",
-				currentPrice: 349,
-				originalPrice: 499,
-				discount: 30,
-				shop: "X-Life",
-				inStock: true,
+				currentPrice: 349, originalPrice: 499, discount: 30, shop: "X-Life", inStock: true,
 				image: "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-powerband",
 				specs: { "Type": "Lukkede sirkelstrikker", "Motstand": "Lett / Medium / Hard", "Materiale": "100% naturgummi" },
@@ -2582,16 +2312,9 @@
 				]
 			},
 			{
-				id: 7,
-				department: "restitusjon",
-				category: "Massasjepistoler",
-				brand: "Therabody",
+				id: 7, department: "restitusjon", category: "Massasjepistoler", brand: "Therabody",
 				name: "Theragun Pro G5",
-				currentPrice: 4999,
-				originalPrice: 5999,
-				discount: 16,
-				shop: "Anton Sport",
-				inStock: true,
+				currentPrice: 4999, originalPrice: 5999, discount: 16, shop: "Anton Sport", inStock: true,
 				image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-theragun",
 				specs: { "Slaglengde": "16 mm", "Batteri": "150 min", "Bluetooth": "Ja", "Støynivå": "QuietForce" },
@@ -2601,16 +2324,9 @@
 				]
 			},
 			{
-				id: 13,
-				department: "restitusjon",
-				category: "Massasjepistoler",
-				brand: "Hyperice",
+				id: 13, department: "restitusjon", category: "Massasjepistoler", brand: "Hyperice",
 				name: "Hypervolt 2 Pro Dypvevsmassasje",
-				currentPrice: 3799,
-				originalPrice: 4499,
-				discount: 16,
-				shop: "Anton Sport",
-				inStock: true,
+				currentPrice: 3799, originalPrice: 4499, discount: 16, shop: "Anton Sport", inStock: true,
 				image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-hyperice",
 				specs: { "Slaglengde": "14 mm", "Batteri": "180 min", "Bluetooth": "Ja", "Støynivå": "QuietGlide" },
@@ -2620,16 +2336,9 @@
 				]
 			},
 			{
-				id: 14,
-				department: "restitusjon",
-				category: "Foam Rollers",
-				brand: "TriggerPoint",
+				id: 14, department: "restitusjon", category: "Foam Rollers", brand: "TriggerPoint",
 				name: "GRID Multi-densitet Foam Roller 33cm",
-				currentPrice: 449,
-				originalPrice: 599,
-				discount: 25,
-				shop: "Fjellsport",
-				inStock: true,
+				currentPrice: 449, originalPrice: 599, discount: 25, shop: "Fjellsport", inStock: true,
 				image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-triggerpoint",
 				specs: { "Lengde": "33 cm", "Diameter": "14 cm", "Mønster": "Multi-densitet EVA", "Maksvekt": "225 kg" },
@@ -2639,16 +2348,9 @@
 				]
 			},
 			{
-				id: 15,
-				department: "restitusjon",
-				category: "TENS-apparater",
-				brand: "Beurer",
+				id: 15, department: "restitusjon", category: "TENS-apparater", brand: "Beurer",
 				name: "EM 49 Digital TENS/EMS Smertebehandling",
-				currentPrice: 749,
-				originalPrice: 999,
-				discount: 25,
-				shop: "Bandasjisten",
-				inStock: true,
+				currentPrice: 749, originalPrice: 999, discount: 25, shop: "Bandasjisten", inStock: true,
 				image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-beurer",
 				specs: { "Programmer": "64", "Kanaler": "2 separate", "Elektroder": "4 selvklebende", "Display": "Blått baklys" },
@@ -2659,43 +2361,36 @@
 			}
 		];
 
-		// Material Symbols SVG Helper (100% parity with Kjøpsveilederne / Material 3)
+		// Material Symbols (Outlined) helper
 		var ICONS = {
-			store: '<path d="M3 9l1-5h16l1 5"/><path d="M3 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0"/><path d="M4 11v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><path d="M9 20v-5h6v5"/>',
-			close: '<path d="M18 6L6 18M6 6l12 12"/>',
-			ext: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>',
-			check: '<path d="M5 12l5 5 9-10"/>',
-			compare: '<path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>',
-			arrowUp: '<polyline points="18 15 12 9 6 15"/>',
-			arrowDown: '<polyline points="6 9 12 15 18 9"/>',
-			info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
-			fitness: '<path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12M3 12h3M18 12h3"/>',
-			rehab: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8M8 12h8"/>',
-			restitusjon: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'
+			close: 'close',
+			ext: 'open_in_new',
+			check: 'check',
+			arrowUp: 'expand_less',
+			arrowDown: 'expand_more',
+			info: 'info'
 		};
 
-		function ic(name, size, stroke) {
-			var sz = size || 16;
-			var sw = stroke || 2;
-			var path = ICONS[name] || '';
-			return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;">' + path + '</svg>';
+		function ic(name) {
+			return '<span class="material-symbols-outlined" aria-hidden="true">' + (ICONS[name] || name) + '</span>';
 		}
 
 		// Theme Switcher (Light / Dark)
 		var themeBtn = document.getElementById('demo-theme-btn');
 		var themeLabel = document.getElementById('theme-label');
+		var themeIcon = document.getElementById('theme-icon');
 		var isDark = false;
 
 		themeBtn.addEventListener('click', function() {
 			isDark = !isDark;
 			if (isDark) {
 				document.documentElement.setAttribute('data-theme', 'dark');
-				document.body.style.backgroundColor = '#08111E';
 				themeLabel.textContent = 'Bytt til lys modus';
+				themeIcon.textContent = 'light_mode';
 			} else {
 				document.documentElement.removeAttribute('data-theme');
-				document.body.style.backgroundColor = '#F5F7FA';
 				themeLabel.textContent = 'Bytt til mørk modus';
+				themeIcon.textContent = 'dark_mode';
 			}
 		});
 
@@ -2720,7 +2415,7 @@
 			activeDepartment: 'kondisjon', // 'kondisjon' | 'styrke' | 'rehabilitering' | 'restitusjon'
 			activeCategory: 'Alle',
 			activeQuickFilters: {}, // { in_stock: true, intervall: true }
-			viewMode: 'grid', // 'grid' | 'list' | 'table'
+			viewMode: 'grid', // 'grid' | 'list'
 			searchQuery: '',
 			activeShops: [],
 			activeBrands: [],
@@ -2876,12 +2571,15 @@
 
 		var catsBar = document.getElementById('proto-cats-bar');
 		var searchInput = document.getElementById('proto-search-input');
+		var searchClear = document.getElementById('proto-search-clear');
 		var sortSelect = document.getElementById('proto-sort-select');
 		var filterToggle = document.getElementById('proto-filter-toggle');
 		var filterBadge = document.getElementById('proto-filter-badge');
 		var viewGridBtn = document.getElementById('proto-view-grid-btn');
 		var viewListBtn = document.getElementById('proto-view-list-btn');
 		var filterPanel = document.getElementById('proto-filter-panel');
+		var filterScrim = document.getElementById('proto-filter-scrim');
+		var filterCloseBtn = document.getElementById('proto-filter-close-btn');
 		var minInput = document.getElementById('proto-min-input');
 		var maxInput = document.getElementById('proto-max-input');
 		var rangeMin = document.getElementById('proto-range-min');
@@ -2895,6 +2593,7 @@
 		var cardsContainer = document.getElementById('proto-cards-container');
 		var floatingCmpBar = document.getElementById('proto-floating-cmp-bar');
 		var cmpSelectedCount = document.getElementById('cmp-selected-count');
+		var cmpSelectedProducts = document.getElementById('cmp-selected-products');
 		var cmpOpenModalBtn = document.getElementById('cmp-open-modal-btn');
 		var cmpClearBtn = document.getElementById('cmp-clear-btn');
 		var cmpModal = document.getElementById('proto-cmp-modal');
@@ -2903,14 +2602,19 @@
 		var deptTrack = document.getElementById('proto-dept-track');
 		var deptAlert = document.getElementById('proto-dept-alert');
 
-		// Render Level 1: Main Department Tabs
+		var CHIP_CHECK = '<span class="ge-m3-chip-check material-symbols-outlined" aria-hidden="true">check</span>';
+
+		// Render Level 1: Main Department Tabs (primary tabs)
 		function renderDepartmentTabs() {
 			deptTrack.innerHTML = '';
 			DEPARTMENTS.forEach(function(dept) {
 				var btn = document.createElement('button');
+				var isActive = state.activeDepartment === dept.id;
 				btn.type = 'button';
-				btn.className = 'ge-m3-dept-btn' + (state.activeDepartment === dept.id ? ' is-active' : '');
-				
+				btn.setAttribute('role', 'tab');
+				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				btn.className = 'ge-m3-dept-btn m3-sl' + (isActive ? ' is-active' : '');
+
 				var count = state.products.filter(function(p) { return p.department === dept.id; }).length;
 
 				btn.innerHTML = '<span>' + dept.name + '</span>' +
@@ -2940,15 +2644,17 @@
 			});
 		}
 
-		// Render Level 2: Sub-category Chips for Active Department
+		// Render Level 2: Sub-category filter chips for active department
 		function renderCategoryChips() {
 			catsBar.innerHTML = '';
 			var currentDept = DEPARTMENTS.filter(function(d) { return d.id === state.activeDepartment; })[0] || DEPARTMENTS[0];
 			currentDept.categories.forEach(function(cat) {
 				var chip = document.createElement('button');
+				var isActive = cat === state.activeCategory;
 				chip.type = 'button';
-				chip.className = 'ge-m3-chip m3-sl' + (cat === state.activeCategory ? ' is-active' : '');
-				chip.textContent = cat;
+				chip.className = 'ge-m3-chip m3-sl' + (isActive ? ' is-active' : '');
+				chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+				chip.innerHTML = CHIP_CHECK + '<span>' + cat + '</span>';
 				chip.addEventListener('click', function() {
 					state.activeCategory = cat;
 					state.searchQuery = '';
@@ -2956,8 +2662,12 @@
 					state.activeShops = [];
 					searchInput.value = '';
 					if (deptAlert) deptAlert.style.display = 'none';
-					catsBar.querySelectorAll('.ge-m3-chip').forEach(function(c) { c.classList.remove('is-active'); });
+					catsBar.querySelectorAll('.ge-m3-chip').forEach(function(c) {
+						c.classList.remove('is-active');
+						c.setAttribute('aria-pressed', 'false');
+					});
 					chip.classList.add('is-active');
+					chip.setAttribute('aria-pressed', 'true');
 					renderUI();
 				});
 				catsBar.appendChild(chip);
@@ -2975,7 +2685,8 @@
 				btn.type = 'button';
 				var isActive = !!state.activeQuickFilters[def.id];
 				btn.className = 'ge-m3-qchip m3-sl' + (isActive ? ' is-active' : '');
-				btn.innerHTML = (isActive ? '<span class="ge-m3-qchip-check">✓</span> ' : '') + '<span>' + def.label + '</span>';
+				btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+				btn.innerHTML = CHIP_CHECK + '<span>' + def.label + '</span>';
 				btn.addEventListener('click', function() {
 					if (state.activeQuickFilters[def.id]) {
 						delete state.activeQuickFilters[def.id];
@@ -3003,6 +2714,8 @@
 		function renderUI(opts) {
 			opts = opts || {};
 
+			searchClear.hidden = state.searchQuery === '';
+
 			// Cross-department search check
 			if (state.searchQuery.trim() !== '') {
 				var q = state.searchQuery.toLowerCase();
@@ -3021,8 +2734,9 @@
 						var otherDeptId = otherHits[0].department;
 						var otherDeptObj = DEPARTMENTS.filter(function(d) { return d.id === otherDeptId; })[0];
 						deptAlert.className = 'ge-m3-dept-alert';
-						deptAlert.innerHTML = '<div>Fant <strong>' + otherHits.length + ' treff</strong> i <strong>' + otherDeptObj.name + '</strong> for «' + state.searchQuery + '»</div>' +
-							'<button type="button" class="ge-m3-dept-switch-btn" id="proto-dept-switch-btn">Bytt til ' + otherDeptObj.name + '</button>';
+						deptAlert.innerHTML = ic('search') +
+							'<div class="ge-m3-dept-alert-text">Fant <strong>' + otherHits.length + ' treff</strong> i <strong>' + otherDeptObj.name + '</strong> for «' + escapeHtml(state.searchQuery) + '»</div>' +
+							'<button type="button" class="ge-m3-dept-switch-btn ge-m3-btn ge-m3-btn--text m3-sl" id="proto-dept-switch-btn">Bytt til ' + otherDeptObj.name + '</button>';
 						deptAlert.style.display = 'flex';
 						document.getElementById('proto-dept-switch-btn').addEventListener('click', function() {
 							state.activeDepartment = otherDeptId;
@@ -3068,7 +2782,7 @@
 				var mSearch = target.indexOf(state.searchQuery.toLowerCase()) !== -1;
 				var mDept = p.department === state.activeDepartment;
 				var mCat = state.activeCategory === 'Alle' || p.category === state.activeCategory;
-				
+
 				var mShop = state.activeShops.length === 0;
 				if (!mShop && p.stores) {
 					mShop = p.stores.some(function(st) { return state.activeShops.indexOf(st.shop) !== -1; });
@@ -3122,7 +2836,12 @@
 			}
 			if (state.showFilters) filterToggle.classList.add('is-active');
 
-			filterPanel.style.display = state.showFilters ? 'block' : 'none';
+			// Filter sheet open state
+			filterPanel.classList.toggle('is-open', state.showFilters);
+			filterScrim.classList.toggle('is-visible', state.showFilters);
+			filterPanel.inert = !state.showFilters;
+			document.body.classList.toggle('ge-m3-sheet-open', state.showFilters);
+			filterToggle.setAttribute('aria-expanded', state.showFilters ? 'true' : 'false');
 
 			// Slider update
 			var cMin = state.minPrice === '' ? state.absMinPrice : Number(state.minPrice);
@@ -3162,7 +2881,7 @@
 				renderUI();
 			}, true);
 
-			applyBtn.innerHTML = 'Vis ' + sorted.length + ' treff <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+			applyBtn.innerHTML = 'Vis ' + sorted.length + ' treff';
 
 			resultsCountText.textContent = 'Viser ' + sorted.length + ' av ' + sorted.length + ' produkter';
 
@@ -3170,8 +2889,15 @@
 			if (state.selectedForCompare.length > 0) {
 				floatingCmpBar.style.display = 'flex';
 				cmpSelectedCount.textContent = state.selectedForCompare.length;
+				cmpSelectedProducts.innerHTML = state.products
+					.filter(function(prod) { return state.selectedForCompare.indexOf(prod.id) !== -1; })
+					.map(function(prod) {
+						return '<img class="ge-m3-cmp-bar-product" src="' + escapeHtml(prod.image) + '" alt="' + escapeHtml(prod.name) + '" title="' + escapeHtml(prod.name) + '" />';
+					})
+					.join('');
 			} else {
 				floatingCmpBar.style.display = 'none';
+				cmpSelectedProducts.innerHTML = '';
 			}
 
 			// Render Cards according to viewMode (grid or 2-column list)
@@ -3180,7 +2906,10 @@
 				cardsContainer.innerHTML = sorted.map(function(prod) { return renderGridCardHtml(prod); }).join('');
 			} else {
 				cardsContainer.className = 'ge-m3-list';
-				cardsContainer.innerHTML = sorted.map(function(prod) { return renderListCardHtml(prod); }).join('');
+				var columnSplit = Math.ceil(sorted.length / 2);
+				cardsContainer.innerHTML =
+					'<div class="ge-m3-list-column">' + sorted.slice(0, columnSplit).map(function(prod) { return renderListCardHtml(prod); }).join('') + '</div>' +
+					'<div class="ge-m3-list-column">' + sorted.slice(columnSplit).map(function(prod) { return renderListCardHtml(prod); }).join('') + '</div>';
 			}
 
 			// Attach store toggle clicks
@@ -3207,7 +2936,7 @@
 
 			// Attach compare checkboxes
 			document.querySelectorAll('.ge-m3-cmp-chk').forEach(function(chk) {
-				chk.addEventListener('change', function(e) {
+				chk.addEventListener('change', function() {
 					var id = parseInt(chk.getAttribute('data-id'), 10);
 					if (chk.checked) {
 						if (state.selectedForCompare.indexOf(id) === -1) state.selectedForCompare.push(id);
@@ -3286,18 +3015,31 @@
 			return '<span class="ge-m3-shop-pill-avatar"><span class="ge-m3-shop-pill-inits">' + escapeHtml(inits) + '</span></span>';
 		}
 
+		function renderMerchantLogoHtml(shopName) {
+			var logoUrl = getMerchantFavicon(shopName);
+			var logo = logoUrl
+				? '<img src="' + escapeHtml(logoUrl) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-flex\';" />'
+				: '';
+			return '<span class="ge-m3-merchant-logo" aria-hidden="true">' +
+				logo +
+				'<span class="ge-m3-merchant-logo-fallback material-symbols-outlined">storefront</span>' +
+			'</span>';
+		}
+
+		// Filter chips for brands and shops (selected state swaps the avatar for a check)
 		function renderPills(container, items, activeItems, onToggle, isShop) {
 			container.innerHTML = '';
 			items.forEach(function(item) {
 				var isActive = item === 'Alle' ? activeItems.length === 0 : activeItems.indexOf(item) !== -1;
 				var btn = document.createElement('button');
 				btn.type = 'button';
-				btn.className = 'ge-m3-filter-pill m3-sl' + (isShop ? ' ge-m3-filter-pill-shop' : '') + (isActive ? ' is-active' : '');
-				
+				btn.className = 'ge-m3-filter-pill m3-sl' + (isShop && item !== 'Alle' ? ' ge-m3-filter-pill-shop' : '') + (isActive ? ' is-active' : '');
+				btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+
 				if (isShop && item !== 'Alle') {
-					btn.innerHTML = renderShopAvatarHtml(item) + '<span>' + escapeHtml(item) + '</span>';
+					btn.innerHTML = CHIP_CHECK + renderShopAvatarHtml(item) + '<span>' + escapeHtml(item) + '</span>';
 				} else {
-					btn.textContent = item;
+					btn.innerHTML = CHIP_CHECK + '<span>' + escapeHtml(item) + '</span>';
 				}
 
 				btn.addEventListener('click', function() { onToggle(item); });
@@ -3305,52 +3047,92 @@
 			});
 		}
 
-		// STORE COMPARISON TABLE RENDERER (With Product Name in Overlay)
-		function renderStoresDrawer(p, isOverlay) {
-			if (!p.stores || p.stores.length === 0) return '';
+		function stockHtml(inStock, cls) {
+			return '<span class="' + cls + ' ' + (inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (inStock ? 'På lager' : 'Utsolgt') + '">' +
+				'<span class="ge-m3-stock-dot"></span><span class="ge-m3-stock-label">' + (inStock ? 'På lager' : 'Utsolgt') + '</span>' +
+			'</span>';
+		}
+
+		// Drawer inside list cards: full-width panel with plain rows (dot, name, price, buy)
+		function renderListDrawerHtml(p, isOverlay) {
 			var lowestPrice = p.currentPrice;
 			var maxPrice = p.stores[p.stores.length - 1].price;
 
-			var h = '<div class="ge-m3-stores-table' + (isOverlay ? ' ge-m3-stores-popover' : '') + '">';
-			
-			// Product Header with Brand, Name, Store count, Price range, and Close button
-			h += '<div class="ge-m3-popover-header">' +
-				'<div class="ge-m3-popover-prod-info">' +
-					'<span class="ge-m3-popover-brand">' + (p.brand || 'UTSTYR') + '</span>' +
-					'<h4 class="ge-m3-popover-title" title="' + p.name + '">' + p.name + '</h4>' +
-					'<div class="ge-m3-popover-meta">' +
-						'<span>Prissammenligning (' + p.stores.length + ' butikker)</span>' +
-						'<span class="ge-m3-popover-price-range">Fra ' + formatPrice(lowestPrice) + ' til ' + formatPrice(maxPrice) + '</span>' +
+			var h = '<div class="ge-m3-ldrawer' + (isOverlay ? ' ge-m3-stores-table ge-m3-stores-popover ge-m3-grid-stores' : '') + '">' +
+				'<div class="ge-m3-ldrawer-head">' +
+					'<div class="ge-m3-ldrawer-info">' +
+						'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+						'<h4 class="ge-m3-ldrawer-title">' + escapeHtml(p.name) + '</h4>' +
+						'<span class="ge-m3-ldrawer-meta">Prissammenligning (' + p.stores.length + ' butikker)</span>' +
+						'<span class="ge-m3-ldrawer-range">Fra ' + formatPrice(lowestPrice) + ' til ' + formatPrice(maxPrice) + '</span>' +
 					'</div>' +
+					'<button type="button" class="ge-m3-icon-btn m3-sl" data-close-id="' + p.id + '" title="Lukk forhandlerliste" aria-label="Lukk">' + ic('close') + '</button>' +
 				'</div>' +
-				'<button type="button" class="ge-m3-popover-close" data-close-id="' + p.id + '" title="Lukk forhandlerliste" aria-label="Lukk">' +
-					ic('close', 16, 2) +
-				'</button>' +
-			'</div>';
+				'<div class="ge-m3-ldrawer-rows">';
 
 			p.stores.forEach(function(st) {
 				var isBest = st.price === lowestPrice;
-
-				h += '<div class="ge-m3-store-row' + (isBest ? ' is-best-deal' : '') + '">' +
+				h += '<div class="ge-m3-ldrow' + (isBest ? ' is-best-deal' : '') + '">' +
 					(isBest ? '<span class="ge-m3-store-tag">Best pris</span>' : '') +
-					'<div class="ge-m3-store-left">' +
-						'<span class="ge-m3-stock-dot ' + (st.inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (st.inStock ? 'På lager' : 'Ikke på lager') + '"></span>' +
-						renderShopAvatarHtml(st.shop) +
-						'<b title="' + escapeHtml(st.shop) + '">' + escapeHtml(st.shop) + '</b>' +
-					'</div>' +
-					'<div class="ge-m3-store-right">' +
-						'<span class="ge-m3-store-price">' + formatPrice(st.price) + '</span>' +
-						'<a href="' + st.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-store-btn m3-sl">Kjøp</a>' +
-					'</div>' +
+					'<span class="ge-m3-ldrow-name">' +
+						renderMerchantLogoHtml(st.shop) +
+						escapeHtml(st.shop) +
+						'<span class="ge-m3-ldrow-dot ' + (st.inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (st.inStock ? 'På lager' : 'Utsolgt') + '"></span>' +
+						'<span class="ge-m3-sr-only">' + (st.inStock ? 'På lager' : 'Utsolgt') + '</span>' +
+					'</span>' +
+					'<span class="ge-m3-ldrow-right">' +
+						'<span class="ge-m3-ldrow-price">' + formatPrice(st.price) + '</span>' +
+						'<a href="' + st.url + '" target="_blank" rel="noopener sponsored" aria-label="Kjøp hos ' + escapeHtml(st.shop) + '" class="ge-m3-store-btn ge-m3-btn ge-m3-btn--filled m3-sl">Kjøp</a>' +
+					'</span>' +
 				'</div>';
 			});
 
-			h += '<button type="button" class="ge-m3-popover-close-btn" data-close-id="' + p.id + '" style="width:100%; height:32px; border-radius:8px; font-size:12px; font-weight:600; margin-top:8px; background:var(--md-sys-color-surface-container-low); color:var(--md-sys-color-on-surface-variant); border:1px solid var(--md-sys-color-outline-variant); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px;">' +
-				'<span>Lukk forhandlerliste</span> ' + ic('arrowUp', 12, 2.5) +
-			'</button>';
+			return h + '</div></div>';
+		}
 
-			h += '</div>';
-			return h;
+		// STORE COMPARISON TABLE RENDERER (With Product Name in Overlay)
+		function renderStoresDrawer(p, isOverlay) {
+			if (!p.stores || p.stores.length === 0) return '';
+			return renderListDrawerHtml(p, isOverlay);
+		}
+
+		function compareToggleHtml(p, isChecked) {
+			return '<label class="ge-m3-cmp-toggle">' +
+				'<input type="checkbox" class="ge-m3-cmp-chk" data-id="' + p.id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+				'<span class="ge-m3-cmp-box" aria-hidden="true"></span>' +
+				'<span>Sammenlign</span>' +
+			'</label>';
+		}
+
+		function priceRowHtml(p, showSavings, save) {
+			return '<div class="ge-m3-price-row">' +
+				'<span class="ge-m3-price-current">' + formatPrice(p.currentPrice) + '</span>' +
+				(p.originalPrice ? '<span class="ge-m3-price-original">' + formatPrice(p.originalPrice) + '</span>' : '') +
+				(showSavings ? '<span class="ge-m3-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
+			'</div>';
+		}
+
+		// Retailer disclosure row (several stores) or static row (one store)
+		function shopRowHtml(p, storeCount, isOpen, titleText, isList) {
+			var listCls = isList ? ' ge-m3-shop-row--list' : '';
+			if (storeCount > 1) {
+				return '<button type="button" class="ge-m3-shop-compare-trigger m3-sl' + listCls + (isOpen ? ' is-open' : '') + '" data-id="' + p.id + '" aria-expanded="' + (isOpen ? 'true' : 'false') + '" title="' + titleText + '">' +
+					'<span class="ge-m3-shop-name">' +
+						renderMerchantLogoHtml(p.shop) +
+						'<span class="ge-m3-shop-line"><span class="ge-m3-shop-prefix">Best pris:</span> <b>' + escapeHtml(p.shop) + '</b></span>' +
+					'</span>' +
+					(isList
+						? '<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp') : ic('arrowDown')) + '</span>'
+						: '<span class="ge-m3-compare-badge" title="' + storeCount + ' butikker" aria-label="' + storeCount + ' butikker">' + storeCount + (isOpen ? ic('arrowUp') : ic('arrowDown')) + '</span>') +
+				'</button>';
+			}
+			return '<div class="ge-m3-single-shop-row' + listCls + '">' +
+				'<div class="ge-m3-shop-name">' +
+					renderMerchantLogoHtml(p.shop) +
+					'<b>' + escapeHtml(p.shop) + '</b>' +
+				'</div>' +
+				stockHtml(p.inStock, 'ge-m3-stock-badge') +
+			'</div>';
 		}
 
 		// RENDER 1: GRID CARD
@@ -3363,59 +3145,28 @@
 			var showSavings = state.sortBy === 'savings_desc' && save > 0;
 
 			return '' +
-			'<div class="ge-m3-card-grid m3-sl">' +
-				'<div style="position:absolute; top:12px; right:12px; z-index:3;">' +
-					'<label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--md-sys-color-on-surface-variant); cursor:pointer; background:rgba(255,255,255,0.9); padding:2px 6px; border-radius:6px; border:1px solid var(--md-sys-color-outline-variant);">' +
-						'<input type="checkbox" class="ge-m3-cmp-chk" data-id="' + p.id + '" ' + (isChecked ? 'checked' : '') + ' /> Sammenlign' +
-					'</label>' +
-				'</div>' +
+			'<div class="ge-m3-card-grid">' +
+				compareToggleHtml(p, isChecked) +
 				'<div class="ge-m3-img-wrap">' +
 					(hasDisc ? '<span class="ge-m3-deal-chip">-' + p.discount + '%</span>' : '') +
-					'<img src="' + p.image + '" alt="' + p.name + '" class="ge-m3-product-img" />' +
+					'<img src="' + p.image + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" />' +
 				'</div>' +
 				'<div class="ge-m3-card-content">' +
-					'<span class="ge-m3-brand">' + (p.brand || 'UTSTYR') + '</span>' +
-					'<h3 class="ge-m3-card-title">' + p.name + '</h3>' +
+					'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+					'<h3 class="ge-m3-card-title">' + escapeHtml(p.name) + '</h3>' +
 					'<div class="ge-m3-card-bottom">' +
-						'<div class="ge-m3-price-row">' +
-							'<span class="ge-m3-price-current">' + formatPrice(p.currentPrice) + '</span>' +
-							(p.originalPrice ? '<span class="ge-m3-price-original">' + formatPrice(p.originalPrice) + '</span>' : '') +
-							(showSavings ? '<span class="ge-m3-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
-						'</div>' +
-
-						(storeCount > 1 ? (
-							// Interactive Price Comparison Trigger (multiple stores)
-							'<div class="ge-m3-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + p.id + '" title="Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker">' +
-								'<div class="ge-m3-shop-name">' +
-									renderShopAvatarHtml(p.shop) +
-									'<span>Best pris: ' + p.shop + '</span>' +
-								'</div>' +
-								'<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp', 11, 2.5) : ic('arrowDown', 11, 2.5)) + '</span>' +
-							'</div>' +
-							(isOpen ? renderStoresDrawer(p, true) : '')
-						) : (
-							// Clean Single Shop Row (no misleading "Billigst:", no chevron, not clickable)
-							'<div class="ge-m3-single-shop-row">' +
-								'<div class="ge-m3-shop-name">' +
-									renderShopAvatarHtml(p.shop) +
-									'<span>Hos ' + p.shop + '</span>' +
-								'</div>' +
-								'<span class="ge-m3-stock-badge ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '">' +
-									'<span class="ge-m3-stock-dot ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '"></span> ' +
-									(p.inStock ? 'På lager' : 'Utsolgt') +
-								'</span>' +
-							'</div>'
-						)) +
-
-						'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-cta-btn m3-sl">' +
-							'Gå til ' + p.shop + ' ' + ic('ext', 13, 2) +
+						priceRowHtml(p, showSavings, save) +
+						shopRowHtml(p, storeCount, isOpen, 'Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker') +
+						(isOpen && storeCount > 1 ? renderStoresDrawer(p, true) : '') +
+						'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-grid-cta" aria-label="Se tilbud hos ' + escapeHtml(p.shop) + '">' +
+							'Til butikk ' + ic('ext') +
 						'</a>' +
 					'</div>' +
 				'</div>' +
 			'</div>';
 		}
 
-		// RENDER 2: LIST CARD (2-Column Responsive Card Layout)
+		// RENDER 2: LIST CARD (2-column responsive card layout)
 		function renderListCardHtml(p) {
 			var hasDisc = p.discount && p.discount > 0;
 			var storeCount = p.stores ? p.stores.length : 1;
@@ -3425,61 +3176,32 @@
 			var showSavings = state.sortBy === 'savings_desc' && save > 0;
 
 			return '' +
-			'<div class="ge-m3-card-list m3-sl">' +
+			'<div class="ge-m3-card-list">' +
 				'<div class="ge-m3-list-main-row">' +
 					'<div class="ge-m3-list-img-wrap">' +
 						(hasDisc ? '<span class="ge-m3-deal-chip">-' + p.discount + '%</span>' : '') +
-						'<img src="' + p.image + '" alt="' + p.name + '" class="ge-m3-product-img" />' +
+						'<img src="' + p.image + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" />' +
 					'</div>' +
 					'<div class="ge-m3-list-content">' +
-						'<div>' +
-							'<div class="ge-m3-list-top">' +
-								'<span class="ge-m3-brand">' + (p.brand || 'UTSTYR') + '</span>' +
-								'<label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--md-sys-color-on-surface-variant); cursor:pointer;">' +
-									'<input type="checkbox" class="ge-m3-cmp-chk" data-id="' + p.id + '" ' + (isChecked ? 'checked' : '') + ' /> Sammenlign' +
-								'</label>' +
-							'</div>' +
-							'<h3 class="ge-m3-card-title">' + p.name + '</h3>' +
+						'<div class="ge-m3-list-top">' +
+							'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+							compareToggleHtml(p, isChecked) +
 						'</div>' +
-						'<div class="ge-m3-list-bottom">' +
-							'<div class="ge-m3-list-action-row">' +
-								'<div class="ge-m3-price-row">' +
-									'<span class="ge-m3-price-current">' + formatPrice(p.currentPrice) + '</span>' +
-									(p.originalPrice ? '<span class="ge-m3-price-original">' + formatPrice(p.originalPrice) + '</span>' : '') +
-									(showSavings ? '<span class="ge-m3-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
-								'</div>' +
-								'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-cta-btn m3-sl ge-m3-list-cta">' +
-									'Til butikk ' + ic('ext', 13, 2) +
-								'</a>' +
-							'</div>' +
-							(storeCount > 1 ? (
-								'<div class="ge-m3-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + p.id + '" style="margin:0;" title="Klikk for å sammenligne forhandlere">' +
-									'<div class="ge-m3-shop-name">' +
-										renderShopAvatarHtml(p.shop) +
-										'<span>Best pris: <b>' + p.shop + '</b></span>' +
-									'</div>' +
-									'<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp', 11, 2.5) : ic('arrowDown', 11, 2.5)) + '</span>' +
-								'</div>'
-							) : (
-								'<div class="ge-m3-single-shop-row" style="margin:0;">' +
-									'<div class="ge-m3-shop-name">' +
-										renderShopAvatarHtml(p.shop) +
-										'<span>Hos <b>' + p.shop + '</b></span>' +
-									'</div>' +
-									'<span class="ge-m3-stock-badge ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '">' +
-										'<span class="ge-m3-stock-dot ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '"></span> ' +
-										(p.inStock ? 'På lager' : 'Utsolgt') +
-									'</span>' +
-								'</div>'
-							)) +
+						'<h3 class="ge-m3-card-title">' + escapeHtml(p.name) + '</h3>' +
+						'<div class="ge-m3-list-action-row">' +
+							priceRowHtml(p, showSavings, save) +
+							'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-cta-btn ge-m3-btn ge-m3-btn--filled ge-m3-list-cta m3-sl">' +
+								'Til butikk ' + ic('ext') +
+							'</a>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
+				shopRowHtml(p, storeCount, isOpen, 'Klikk for å sammenligne forhandlere', true) +
 				(isOpen && storeCount > 1 ? '<div class="ge-m3-list-drawer-wrap">' + renderStoresDrawer(p, false) + '</div>' : '') +
 			'</div>';
 		}
 
-		// Side-by-side Matrix Modal Renderer (Pixel-aligned with Kjøpsveileder & Material 3)
+		// Side-by-side matrix renderer
 		function renderCompareMatrix() {
 			var selected = state.products.filter(function(p) { return state.selectedForCompare.indexOf(p.id) !== -1; });
 			if (selected.length === 0) {
@@ -3492,7 +3214,7 @@
 			var priceDiff = maxPrice - minPrice;
 			var onlyDiff = !!state.showOnlyDiffs;
 
-			// Sync checkbox state in modal header
+			// Sync checkbox state in dialog header
 			var diffChk = document.getElementById('proto-cmp-diff-only');
 			if (diffChk) {
 				diffChk.checked = onlyDiff;
@@ -3513,6 +3235,11 @@
 			// Equal column width: for 1-2 items distribute nicely, for 3+ items maintain uniform 260px width
 			var colWidth = selected.length <= 2 ? 'calc(' + (100 / selected.length) + '% - ' + (150 / selected.length) + 'px)' : '260px';
 
+			function isLowestOf(p) { return selected.length > 1 && p.currentPrice === minPrice; }
+			function cell(p, inner) {
+				return '<td class="matrix-prod-col' + (isLowestOf(p) ? ' is-best-col' : '') + '">' + inner + '</td>';
+			}
+
 			var h = '<div class="ge-m3-matrix-wrap"><table class="ge-m3-matrix-table">';
 			h += '<colgroup>';
 			h += '<col style="width:150px; min-width:150px;">';
@@ -3521,78 +3248,75 @@
 			});
 			h += '</colgroup>';
 
-			// 1. Header row with compact cards (Always shown)
-			h += '<tr class="matrix-header-row"><th class="matrix-label-col"><span style="font-size:11px; color:var(--ge-grey-500);">Modeller (' + selected.length + ')</span></th>';
+			// 1. Header row with compact cards (always shown)
+			h += '<tr class="matrix-header-row"><th class="matrix-label-col"><span class="ge-m3-matrix-count">Modeller (' + selected.length + ')</span></th>';
 			selected.forEach(function(p) {
-				var isLowest = selected.length > 1 && p.currentPrice === minPrice;
+				var isLowest = isLowestOf(p);
 				h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
 					'<div class="ge-m3-matrix-card-top' + (isLowest ? ' is-best-deal' : '') + '">' +
 						(isLowest ? '<span class="ge-m3-matrix-best-tag">Best pris</span>' : '') +
-						'<button type="button" class="ge-m3-matrix-remove-btn" data-remove-id="' + p.id + '" title="Fjern fra sammenligning" aria-label="Fjern">' +
-							ic('close', 14, 2.5) +
+						'<button type="button" class="ge-m3-matrix-remove-btn ge-m3-icon-btn m3-sl" data-remove-id="' + p.id + '" title="Fjern fra sammenligning" aria-label="Fjern">' +
+							ic('close') +
 						'</button>' +
 						'<div class="ge-m3-matrix-thumb">' +
-							'<img src="' + p.image + '" alt="' + p.name + '" />' +
+							'<img src="' + p.image + '" alt="' + escapeHtml(p.name) + '" />' +
 						'</div>' +
-						'<span class="ge-m3-matrix-brand">' + (p.brand || 'UTSTYR') + '</span>' +
-						'<h4 class="ge-m3-matrix-prod-title" title="' + p.name + '">' + p.name + '</h4>' +
+						'<span class="ge-m3-matrix-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+						'<h4 class="ge-m3-matrix-prod-title" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</h4>' +
 						'<div class="ge-m3-matrix-price-row">' +
 							'<span class="ge-m3-matrix-price">' + formatPrice(p.currentPrice) + '</span>' +
 							(p.discount ? '<span class="ge-m3-spec-pill deal">-' + p.discount + '%</span>' : '') +
 						'</div>' +
-						'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-matrix-cta m3-sl">' +
-							'<span>Gå til ' + p.shop + '</span> ' + ic('ext', 13, 2) +
+						'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-matrix-cta ge-m3-btn ge-m3-btn--filled m3-sl">' +
+							'<span>Gå til ' + escapeHtml(p.shop) + '</span> ' + ic('ext') +
 						'</a>' +
 					'</div>' +
 				'</td>';
 			});
 			h += '</tr>';
 
-			// 2. Dagspris / Prissammenligning rad
+			// 2. Dagspris / prissammenligning rad
 			var isPriceIdentical = selected.every(function(p) { return p.currentPrice === selected[0].currentPrice; });
 			if (!onlyDiff || !isPriceIdentical) {
 				h += '<tr><th class="matrix-label-col">Beste dagspris</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
-						'<b style="font-size:15px; color:var(--md-sys-color-primary); font-variant-numeric:tabular-nums;">' + formatPrice(p.currentPrice) + '</b>' +
-						(isLowest ? ' <span class="ge-m3-spec-pill tert" style="margin-left:4px;">Best pris</span>' : '') +
-					'</td>';
+					h += cell(p,
+						'<b class="ge-m3-matrix-price-cell">' + formatPrice(p.currentPrice) + '</b>' +
+						(isLowestOf(p) ? ' <span class="ge-m3-spec-pill tert">Best pris</span>' : '')
+					);
 				});
 				h += '</tr>';
 			}
 
-			// 3. Forhandler / Butikker rad
+			// 3. Forhandler / butikker rad
 			var isShopIdentical = selected.every(function(p) {
 				return p.shop === selected[0].shop && (p.stores ? p.stores.length : 1) === (selected[0].stores ? selected[0].stores.length : 1);
 			});
 			if (!onlyDiff || !isShopIdentical) {
 				h += '<tr><th class="matrix-label-col">Forhandler</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
 					var count = p.stores ? p.stores.length : 1;
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
-						'<span style="font-weight:600; color:var(--md-sys-color-primary);">' + p.shop + '</span> ' +
-						(count > 1 ? '<span style="font-size:11px; color:var(--ge-grey-500);">(' + count + ' butikker)</span>' : '<span style="font-size:11px; color:var(--ge-green-800);">(Eneste forhandler)</span>') +
-					'</td>';
+					h += cell(p,
+						'<span>' + escapeHtml(p.shop) + '</span> ' +
+						(count > 1 ? '<span class="ge-m3-matrix-muted">(' + count + ' butikker)</span>' : '<span class="ge-m3-matrix-muted ge-m3-matrix-ok">(Eneste forhandler)</span>')
+					);
 				});
 				h += '</tr>';
 			}
 
-			// 4. Rabatt & Førpris rad
+			// 4. Rabatt & førpris rad
 			var isOrigIdentical = selected.every(function(p) { return (p.originalPrice || 0) === (selected[0].originalPrice || 0); });
 			if (!onlyDiff || !isOrigIdentical) {
 				h += '<tr><th class="matrix-label-col">Førpris / Tilbud</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
 					if (p.originalPrice && p.originalPrice > p.currentPrice) {
 						var save = p.originalPrice - p.currentPrice;
-						h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
-							'<s style="color:var(--ge-grey-400); font-size:12px; margin-right:4px;">' + formatPrice(p.originalPrice) + '</s>' +
-							'<span class="ge-m3-spec-pill deal">Spar ' + formatPrice(save) + '</span>' +
-						'</td>';
+						h += cell(p,
+							'<span class="ge-m3-matrix-muted"><s>' + formatPrice(p.originalPrice) + '</s></span>' +
+							'<span class="ge-m3-spec-pill deal">Spar ' + formatPrice(save) + '</span>'
+						);
 					} else {
-						h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '"><span style="color:var(--ge-grey-400); font-size:12px;">Ordinær pris</span></td>';
+						h += cell(p, '<span class="ge-m3-matrix-muted">Ordinær pris</span>');
 					}
 				});
 				h += '</tr>';
@@ -3603,13 +3327,11 @@
 			if (!onlyDiff || !isStockIdentical) {
 				h += '<tr><th class="matrix-label-col">Lagerstatus</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
-						'<span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;">' +
-							'<span class="ge-m3-stock-dot ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '"></span>' +
-							(p.inStock ? 'På lager' : 'Utsolgt') +
-						'</span>' +
-					'</td>';
+					h += cell(p,
+						'<span class="ge-m3-matrix-stock ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '">' +
+							'<span class="ge-m3-stock-dot"></span>' + (p.inStock ? 'På lager' : 'Utsolgt') +
+						'</span>'
+					);
 				});
 				h += '</tr>';
 			}
@@ -3619,33 +3341,26 @@
 			if (!onlyDiff || !isCatIdentical) {
 				h += '<tr><th class="matrix-label-col">Kategori</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '"><span class="ge-m3-spec-pill sec">' + p.category + '</span></td>';
+					h += cell(p, '<span class="ge-m3-spec-pill sec">' + escapeHtml(p.category) + '</span>');
 				});
 				h += '</tr>';
 			}
 
-			// 7. "Vær obs på" (Anti-Fit faglige forbehold) rad
+			// 7. "Vær obs på" (faglige forbehold) rad
 			var allAntiFitNotes = selected.map(function(p) { return getAntiFitNotes(p).join(' | '); });
 			var isAntiFitIdentical = allAntiFitNotes.every(function(n) { return n === allAntiFitNotes[0]; });
 			if (!onlyDiff || !isAntiFitIdentical) {
 				h += '<tr><th class="matrix-label-col">' +
-					'<div style="display:flex; align-items:center; gap:6px; color:#1E293B; font-weight:700;">' +
-						'<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#F1F5F9; color:#475569;">' +
-							ic('info', 13, 2) +
-						'</span>' +
-						'<span>Vær obs på</span>' +
-					'</div>' +
+					'<div class="ge-m3-matrix-label-with-icon">' + ic('info') + '<span>Vær obs på</span></div>' +
 				'</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
 					var notes = getAntiFitNotes(p);
 					var hasRealNotes = notes.length > 0 && notes[0] !== 'Ingen spesielle forbehold registrert for standard bruk.';
 
 					var boxClass = 'ge-m3-antifit-box' + (hasRealNotes ? '' : ' is-clean');
 					var headerHtml = hasRealNotes
-						? '<div class="ge-m3-antifit-header">' + ic('info', 12, 2) + ' <span>Obs</span></div>'
-						: '<div class="ge-m3-antifit-header">' + ic('check', 12, 2) + ' <span>Allround-modell</span></div>';
+						? '<div class="ge-m3-antifit-header">' + ic('info') + ' <span>Obs</span></div>'
+						: '<div class="ge-m3-antifit-header">' + ic('check') + ' <span>Allround-modell</span></div>';
 
 					var noteHtml = notes.map(function(n) {
 						var bullet = hasRealNotes ? '•' : '✓';
@@ -3655,17 +3370,12 @@
 						'</div>';
 					}).join('');
 
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
-						'<div class="' + boxClass + '">' +
-							headerHtml +
-							noteHtml +
-						'</div>' +
-					'</td>';
+					h += cell(p, '<div class="' + boxClass + '">' + headerHtml + noteHtml + '</div>');
 				});
 				h += '</tr>';
 			}
 
-			// 8. Dynamic Specs rader (med automatisk vinner-merking og diff-skjuling)
+			// 8. Dynamiske spesifikasjonsrader (med automatisk vinner-merking og diff-skjuling)
 			var higherBetterKeys = ['Toppfart', 'Motor', 'Brukervekt', 'Slaglengde', 'Maksbelastning', 'Batteri'];
 			specKeys.forEach(function(key) {
 				var isHigherBetter = higherBetterKeys.indexOf(key) !== -1;
@@ -3697,40 +3407,36 @@
 
 				h += '<tr><th class="matrix-label-col">' + key + '</th>';
 				selected.forEach(function(p) {
-					var isLowest = selected.length > 1 && p.currentPrice === minPrice;
-					var rawVal = (p.specs && p.specs[key]) ? p.specs[key] : '<span style="color:var(--ge-grey-400); font-weight:normal;">—</span>';
+					var rawVal = (p.specs && p.specs[key]) ? p.specs[key] : '<span class="ge-m3-matrix-muted">—</span>';
 					var isWin = false;
 					if (maxNum > -1 && p.specs && p.specs[key]) {
 						var parsed = parseFloat(p.specs[key]);
 						if (!isNaN(parsed) && parsed === maxNum) isWin = true;
 					}
 
-					h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '" style="font-weight:600; color:var(--md-sys-color-primary);">' +
-						rawVal + (isWin ? ' <span class="ge-m3-spec-win">Høyest</span>' : '') +
-					'</td>';
+					h += cell(p, rawVal + (isWin ? ' <span class="ge-m3-spec-win">Høyest</span>' : ''));
 				});
 				h += '</tr>';
 			});
 
-			// 9. Bunnrad med handlingsknapp (Alltid synlig)
-			h += '<tr style="background:var(--md-sys-color-surface-container-low);"><th class="matrix-label-col" style="background:var(--md-sys-color-surface-container-low);">Handling</th>';
+			// 9. Bunnrad med handlingsknapp (alltid synlig)
+			h += '<tr class="matrix-action-row"><th class="matrix-label-col">Handling</th>';
 			selected.forEach(function(p) {
-				var isLowest = selected.length > 1 && p.currentPrice === minPrice;
-				h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '" style="' + (isLowest ? 'background:var(--ge-green-50, #F1F8F4);' : 'background:var(--md-sys-color-surface-container-low);') + '">' +
-					'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-matrix-cta m3-sl" style="height:34px; font-size:12px;">' +
-						'<span>Se tilbud</span> ' + ic('ext', 12, 2) +
-					'</a>' +
-				'</td>';
+				h += cell(p,
+					'<a href="' + p.url + '" target="_blank" rel="noopener sponsored" class="ge-m3-matrix-cta ge-m3-btn ge-m3-btn--tonal m3-sl">' +
+						'<span>Se tilbud</span> ' + ic('ext') +
+					'</a>'
+				);
 			});
 			h += '</tr>';
 
 			h += '</table></div>';
 
-			// Summary footer in modal
+			// Summary footer in dialog
 			if (selected.length > 1 && priceDiff > 0) {
-				h += '<div style="margin-top:14px; padding:10px 14px; background:var(--md-sys-color-surface-container-low); border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:12.5px;">' +
+				h += '<div class="ge-m3-matrix-summary">' +
 					'<span>Prisspenn i sammenligningen: <b>' + formatPrice(minPrice) + '</b> – <b>' + formatPrice(maxPrice) + '</b></span>' +
-					'<span style="color:var(--ge-green-800); font-weight:700;">Prisforskjell: ' + formatPrice(priceDiff) + '</span>' +
+					'<span class="ge-m3-matrix-summary-diff">Prisforskjell: ' + formatPrice(priceDiff) + '</span>' +
 				'</div>';
 			}
 
@@ -3751,13 +3457,40 @@
 			});
 		}
 
-		cmpOpenModalBtn.addEventListener('click', function() {
+		function openCompareModal() {
 			renderCompareMatrix();
-			cmpModal.style.display = 'flex';
+			if (state.selectedForCompare.length > 0) {
+				cmpModal.style.display = 'flex';
+				modalCloseBtn.focus();
+			}
+		}
+
+		function closeCompareModal() {
+			cmpModal.style.display = 'none';
+			cmpOpenModalBtn.focus();
+		}
+
+		function setFiltersOpen(open) {
+			state.showFilters = open;
+			renderUI();
+			if (open) filterCloseBtn.focus();
+			else filterToggle.focus();
+		}
+
+		cmpOpenModalBtn.addEventListener('click', openCompareModal);
+		modalCloseBtn.addEventListener('click', closeCompareModal);
+		cmpModal.addEventListener('click', function(e) { if (e.target === cmpModal) closeCompareModal(); });
+
+		document.getElementById('proto-cmp-diff-only').addEventListener('change', function(e) {
+			state.showOnlyDiffs = e.target.checked;
+			renderCompareMatrix();
 		});
 
-		modalCloseBtn.addEventListener('click', function() { cmpModal.style.display = 'none'; });
-		cmpModal.addEventListener('click', function(e) { if (e.target === cmpModal) cmpModal.style.display = 'none'; });
+		document.addEventListener('keydown', function(e) {
+			if (e.key !== 'Escape') return;
+			if (cmpModal.style.display !== 'none') closeCompareModal();
+			else if (state.showFilters) setFiltersOpen(false);
+		});
 
 		cmpClearBtn.addEventListener('click', function() {
 			state.selectedForCompare = [];
@@ -3765,19 +3498,17 @@
 		});
 
 		// View Mode Listeners (Grid and List)
-		viewGridBtn.addEventListener('click', function() {
-			state.viewMode = 'grid';
-			viewGridBtn.classList.add('is-active');
-			viewListBtn.classList.remove('is-active');
+		function setViewMode(mode) {
+			state.viewMode = mode;
+			viewGridBtn.classList.toggle('is-active', mode === 'grid');
+			viewListBtn.classList.toggle('is-active', mode === 'list');
+			viewGridBtn.setAttribute('aria-pressed', mode === 'grid' ? 'true' : 'false');
+			viewListBtn.setAttribute('aria-pressed', mode === 'list' ? 'true' : 'false');
 			renderUI();
-		});
+		}
 
-		viewListBtn.addEventListener('click', function() {
-			state.viewMode = 'list';
-			viewListBtn.classList.add('is-active');
-			viewGridBtn.classList.remove('is-active');
-			renderUI();
-		});
+		viewGridBtn.addEventListener('click', function() { setViewMode('grid'); });
+		viewListBtn.addEventListener('click', function() { setViewMode('list'); });
 
 		// Filters & Search Listeners
 		searchInput.addEventListener('input', function(e) {
@@ -3785,15 +3516,21 @@
 			renderUI();
 		});
 
+		searchClear.addEventListener('click', function() {
+			state.searchQuery = '';
+			searchInput.value = '';
+			renderUI();
+			searchInput.focus();
+		});
+
 		sortSelect.addEventListener('change', function(e) {
 			state.sortBy = e.target.value;
 			renderUI();
 		});
 
-		filterToggle.addEventListener('click', function() {
-			state.showFilters = !state.showFilters;
-			renderUI();
-		});
+		filterToggle.addEventListener('click', function() { setFiltersOpen(!state.showFilters); });
+		filterCloseBtn.addEventListener('click', function() { setFiltersOpen(false); });
+		filterScrim.addEventListener('click', function() { setFiltersOpen(false); });
 
 		rangeMin.addEventListener('input', function(e) {
 			state.minPrice = Math.min(Number(e.target.value), (state.maxPrice !== '' ? Number(state.maxPrice) : state.absMaxPrice) - 1);
@@ -3825,10 +3562,7 @@
 			renderUI();
 		});
 
-		applyBtn.addEventListener('click', function() {
-			state.showFilters = false;
-			renderUI();
-		});
+		applyBtn.addEventListener('click', function() { setFiltersOpen(false); });
 
 		// Init
 		renderUI();
