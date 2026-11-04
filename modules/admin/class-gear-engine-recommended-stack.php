@@ -271,3 +271,4 @@ class Gear_Engine_Recommended_Stack {
 		);
 	}
 }
+

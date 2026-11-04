@@ -106,3 +106,4 @@ if ( $failures > 0 ) {
 	echo "\nAll recommended stack tests passed!\n";
 	exit( 0 );
 }
+
