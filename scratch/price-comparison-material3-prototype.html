@@ -748,7 +748,10 @@
 		}
 
 		.ge-m3-filter-pill {
-			padding: 7px 15px;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 14px;
 			border-radius: 999px;
 			font-size: 13px;
 			font-weight: 500;
@@ -757,6 +760,7 @@
 			color: var(--md-sys-color-on-surface, #0C2340);
 			cursor: pointer;
 			transition: all 0.2s;
+			line-height: 1.3;
 		}
 
 		.ge-m3-filter-pill:hover {
@@ -769,6 +773,48 @@
 			color: #FFFFFF !important;
 			border-color: var(--md-sys-color-primary, #0C2340) !important;
 			font-weight: 600;
+		}
+
+		/* Material 3 Shop Avatar inside store filter pills */
+		.ge-m3-shop-pill-avatar {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			border-radius: 50%;
+			background: #FFFFFF;
+			border: 1px solid #E2E8F0;
+			overflow: hidden;
+			flex-shrink: 0;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+			vertical-align: middle;
+		}
+
+		.ge-m3-shop-pill-avatar img {
+			width: 14px;
+			height: 14px;
+			object-fit: contain;
+			display: block;
+		}
+
+		.ge-m3-shop-pill-inits {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			font-size: 9px;
+			font-weight: 700;
+			color: #0C2340;
+			line-height: 1;
+			letter-spacing: -0.02em;
+			text-transform: uppercase;
+		}
+
+		.ge-m3-filter-pill.is-active .ge-m3-shop-pill-avatar {
+			border-color: rgba(255, 255, 255, 0.5);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 		}
 
 		.ge-m3-filter-footer {
@@ -2625,6 +2671,16 @@
 			return Number(p).toLocaleString('no-NO') + ',-';
 		}
 
+		function escapeHtml(str) {
+			if (!str) return '';
+			return String(str)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
+		}
+
 		// State
 		var state = {
 			products: sampleProducts,
@@ -3060,7 +3116,7 @@
 					else state.activeBrands.push(b);
 				}
 				renderUI();
-			});
+			}, false);
 
 			// Render Shop pills
 			renderPills(shopsWrap, dynamicShops, state.activeShops, function(s) {
@@ -3071,7 +3127,7 @@
 					else state.activeShops.push(s);
 				}
 				renderUI();
-			});
+			}, true);
 
 			applyBtn.innerHTML = 'Vis ' + sorted.length + ' treff <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
 
@@ -3131,14 +3187,86 @@
 			});
 		}
 
-		function renderPills(container, items, activeItems, onToggle) {
+		// Merchant domain resolution & avatars (Parity with Gear Picker)
+		var KNOWN_MERCHANT_DOMAINS = {
+			'treningspartner': 'treningspartner.no',
+			'gymgrossisten':   'gymgrossisten.no',
+			'fjellsport':      'fjellsport.no',
+			'sportmann':       'sportmann.no',
+			'mylna':           'mylnasport.no',
+			'e-wheels':        'e-wheels.no',
+			'xxl':             'xxl.no',
+			'antonsport':      'antonsport.no',
+			'tights':          'tights.no',
+			'milrab':          'milrab.no',
+			'proteinfabrikken':'proteinfabrikken.no',
+			'x-life':          'x-life.no',
+			'xlife':           'x-life.no'
+		};
+
+		function cleanShopName(raw) {
+			var s = String(raw || '').trim();
+			var m = s.match(/\(([^)]+)\)$/);
+			return m ? m[1].trim() : s;
+		}
+
+		function getShopInitials(n) {
+			var clean = cleanShopName(n).replace(/[()[\]{}_-]/g, ' ').trim();
+			var parts = clean.split(/\s+/).filter(Boolean);
+			if (!parts.length) { return 'GE'; }
+			return (parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].slice(0, 2)).toUpperCase();
+		}
+
+		function getMerchantFavicon(shopName) {
+			var cleaned = cleanShopName(shopName);
+			var lower = cleaned.toLowerCase().replace(/[^a-z0-9]/g, '');
+			var domain = null;
+
+			for (var key in KNOWN_MERCHANT_DOMAINS) {
+				if (lower.indexOf(key) !== -1 || key.indexOf(lower) !== -1) {
+					domain = KNOWN_MERCHANT_DOMAINS[key];
+					break;
+				}
+			}
+
+			if (!domain && shopName && shopName.indexOf('.') !== -1) {
+				domain = shopName.toLowerCase().trim();
+			}
+
+			if (!domain && lower.length > 0) {
+				domain = lower + '.no';
+			}
+
+			return domain ? 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=128' : null;
+		}
+
+		function renderShopAvatarHtml(shopName) {
+			var inits = getShopInitials(shopName);
+			var logoUrl = getMerchantFavicon(shopName);
+
+			if (logoUrl) {
+				return '<span class="ge-m3-shop-pill-avatar">' +
+					'<img src="' + escapeHtml(logoUrl) + '" alt="' + escapeHtml(shopName) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'inline-flex\';}" />' +
+					'<span class="ge-m3-shop-pill-inits" style="display:none;">' + escapeHtml(inits) + '</span>' +
+				'</span>';
+			}
+			return '<span class="ge-m3-shop-pill-avatar"><span class="ge-m3-shop-pill-inits">' + escapeHtml(inits) + '</span></span>';
+		}
+
+		function renderPills(container, items, activeItems, onToggle, isShop) {
 			container.innerHTML = '';
 			items.forEach(function(item) {
 				var isActive = item === 'Alle' ? activeItems.length === 0 : activeItems.indexOf(item) !== -1;
 				var btn = document.createElement('button');
 				btn.type = 'button';
-				btn.className = 'ge-m3-filter-pill m3-sl' + (isActive ? ' is-active' : '');
-				btn.textContent = item;
+				btn.className = 'ge-m3-filter-pill m3-sl' + (isShop ? ' ge-m3-filter-pill-shop' : '') + (isActive ? ' is-active' : '');
+				
+				if (isShop && item !== 'Alle') {
+					btn.innerHTML = renderShopAvatarHtml(item) + '<span>' + escapeHtml(item) + '</span>';
+				} else {
+					btn.textContent = item;
+				}
+
 				btn.addEventListener('click', function() { onToggle(item); });
 				container.appendChild(btn);
 			});
@@ -3174,6 +3302,7 @@
 					(isBest ? '<span class="ge-m3-store-tag">Best pris</span>' : '') +
 					'<div class="ge-m3-store-left">' +
 						'<span class="ge-m3-stock-dot ' + (st.inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (st.inStock ? 'På lager' : 'Ikke på lager') + '"></span>' +
+						renderShopAvatarHtml(st.shop) +
 						'<b>' + st.shop + '</b>' +
 					'</div>' +
 					'<div class="ge-m3-store-right">' +
@@ -3225,7 +3354,7 @@
 							// Interactive Price Comparison Trigger (multiple stores)
 							'<div class="ge-m3-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + p.id + '" title="Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker">' +
 								'<div class="ge-m3-shop-name">' +
-									ic('store', 14, 1.8) +
+									renderShopAvatarHtml(p.shop) +
 									'<span>Best pris: ' + p.shop + '</span>' +
 								'</div>' +
 								'<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp', 11, 2.5) : ic('arrowDown', 11, 2.5)) + '</span>' +
@@ -3235,7 +3364,7 @@
 							// Clean Single Shop Row (no misleading "Billigst:", no chevron, not clickable)
 							'<div class="ge-m3-single-shop-row">' +
 								'<div class="ge-m3-shop-name">' +
-									ic('store', 14, 1.8) +
+									renderShopAvatarHtml(p.shop) +
 									'<span>Hos ' + p.shop + '</span>' +
 								'</div>' +
 								'<span class="ge-m3-stock-badge ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '">' +
@@ -3293,7 +3422,7 @@
 							(storeCount > 1 ? (
 								'<div class="ge-m3-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + p.id + '" style="margin:0;" title="Klikk for å sammenligne forhandlere">' +
 									'<div class="ge-m3-shop-name">' +
-										ic('store', 14, 1.8) +
+										renderShopAvatarHtml(p.shop) +
 										'<span>Best pris: <b>' + p.shop + '</b></span>' +
 									'</div>' +
 									'<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp', 11, 2.5) : ic('arrowDown', 11, 2.5)) + '</span>' +
@@ -3301,7 +3430,7 @@
 							) : (
 								'<div class="ge-m3-single-shop-row" style="margin:0;">' +
 									'<div class="ge-m3-shop-name">' +
-										ic('store', 14, 1.8) +
+										renderShopAvatarHtml(p.shop) +
 										'<span>Hos <b>' + p.shop + '</b></span>' +
 									'</div>' +
 									'<span class="ge-m3-stock-badge ' + (p.inStock ? 'is-in-stock' : 'is-out-of-stock') + '">' +

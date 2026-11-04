@@ -1297,7 +1297,7 @@
 				}
 				state.visibleCount = initialLimit;
 				updateUI();
-			});
+			}, false);
 
 			renderFilterPills(shopsWrap, dynamicShops, state.activeShops, function (shop) {
 				if (shop === 'Alle') {
@@ -1312,7 +1312,7 @@
 				}
 				state.visibleCount = initialLimit;
 				updateUI();
-			});
+			}, true);
 
 			// Update filter apply button text
 			filterApplyBtn.innerHTML = 'Vis ' + sorted.length + ' treff <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
@@ -1620,15 +1620,87 @@
 		updateUI();
 	}
 
-	// Helper to render filter pills for Brands and Shops
-	function renderFilterPills(container, items, activeItems, onClick) {
+	// Merchant domain resolution & avatars (Parity with Gear Picker)
+	var KNOWN_MERCHANT_DOMAINS = {
+		'treningspartner': 'treningspartner.no',
+		'gymgrossisten':   'gymgrossisten.no',
+		'fjellsport':      'fjellsport.no',
+		'sportmann':       'sportmann.no',
+		'mylna':           'mylnasport.no',
+		'e-wheels':        'e-wheels.no',
+		'xxl':             'xxl.no',
+		'antonsport':      'antonsport.no',
+		'tights':          'tights.no',
+		'milrab':          'milrab.no',
+		'proteinfabrikken':'proteinfabrikken.no',
+		'x-life':          'x-life.no',
+		'xlife':           'x-life.no'
+	};
+
+	function cleanShopName(raw) {
+		var s = String(raw || '').trim();
+		var m = s.match(/\(([^)]+)\)$/);
+		return m ? m[1].trim() : s;
+	}
+
+	function getShopInitials(n) {
+		var clean = cleanShopName(n).replace(/[()[\]{}_-]/g, ' ').trim();
+		var parts = clean.split(/\s+/).filter(Boolean);
+		if (!parts.length) { return 'GE'; }
+		return (parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].slice(0, 2)).toUpperCase();
+	}
+
+	function getMerchantFavicon(shopName) {
+		var cleaned = cleanShopName(shopName);
+		var lower = cleaned.toLowerCase().replace(/[^a-z0-9]/g, '');
+		var domain = null;
+
+		for (var key in KNOWN_MERCHANT_DOMAINS) {
+			if (lower.indexOf(key) !== -1 || key.indexOf(lower) !== -1) {
+				domain = KNOWN_MERCHANT_DOMAINS[key];
+				break;
+			}
+		}
+
+		if (!domain && shopName && shopName.indexOf('.') !== -1) {
+			domain = shopName.toLowerCase().trim();
+		}
+
+		if (!domain && lower.length > 0) {
+			domain = lower + '.no';
+		}
+
+		return domain ? 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=128' : null;
+	}
+
+	function renderShopAvatarHtml(shopName) {
+		var inits = getShopInitials(shopName);
+		var logoUrl = getMerchantFavicon(shopName);
+
+		if (logoUrl) {
+			return '<span class="ge-shop-pill-avatar">' +
+				'<img src="' + escapeHtml(logoUrl) + '" alt="' + escapeHtml(shopName) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'inline-flex\';}" />' +
+				'<span class="ge-shop-pill-inits" style="display:none;">' + escapeHtml(inits) + '</span>' +
+			'</span>';
+		}
+		return '<span class="ge-shop-pill-avatar"><span class="ge-shop-pill-inits">' + escapeHtml(inits) + '</span></span>';
+	}
+
+	// Helper to render filter pills for Brands and Shops (with M3 Avatar support for Shops)
+	function renderFilterPills(container, items, activeItems, onClick, isShop) {
 		container.innerHTML = '';
 		items.forEach(function (item) {
 			var isActive = item === 'Alle' ? activeItems.length === 0 : activeItems.indexOf(item) !== -1;
 			var btn = document.createElement('button');
 			btn.type = 'button';
-			btn.className = 'ge-filter-pill-btn' + (isActive ? ' is-active' : '');
-			btn.textContent = item;
+			btn.className = 'ge-filter-pill-btn' + (isShop ? ' ge-filter-pill-shop' : '') + (isActive ? ' is-active' : '');
+			
+			if (isShop && item !== 'Alle') {
+				btn.innerHTML = renderShopAvatarHtml(item) + '<span>' + escapeHtml(item) + '</span>';
+			} else {
+				btn.textContent = item;
+			}
+
 			btn.addEventListener('click', function () {
 				onClick(item);
 			});
@@ -1679,6 +1751,7 @@
 								'<span>Sammenlign</span>' +
 							'</label>' +
 							'<div class="ge-list-shop-badge">' +
+								renderShopAvatarHtml(product.shop) +
 								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
 								escapeHtml(product.shop || 'Nettbutikk') +
 								(product.otherShops > 0 ? ' <span class="ge-other-shops-badge">(+' + product.otherShops + ')</span>' : '') +
@@ -1697,6 +1770,7 @@
 							(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 						'</div>' +
 						'<div class="ge-mobile-shop-label">' +
+							renderShopAvatarHtml(product.shop) +
 							'<span class="ge-stock-dot ' + stockClass + '"></span>' +
 							escapeHtml(product.shop || '') +
 						'</div>' +
@@ -1743,8 +1817,8 @@
 						(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 					'</div>' +
 					'<div class="ge-shop-strip">' +
-						'<div class="ge-shop-name-wrap">' +
-							shopIcon() +
+						'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
+							renderShopAvatarHtml(product.shop) +
 							'<span>' + escapeHtml(product.shop || 'Nettbutikk') + '</span>' +
 						'</div>' +
 						'<div class="ge-stock-meta">' +
