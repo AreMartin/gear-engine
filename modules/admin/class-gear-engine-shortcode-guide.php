@@ -23,6 +23,7 @@ class Gear_Engine_Shortcode_Guide {
 		add_action( 'admin_menu', array( $this, 'register_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_post_gear_engine_create_core_pages', array( $this, 'handle_create_core_pages' ) );
+		add_action( 'admin_post_gear_engine_install_recommended_stack', array( $this, 'handle_install_recommended_stack' ) );
 	}
 
 	/**
@@ -383,9 +384,46 @@ class Gear_Engine_Shortcode_Guide {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'gear-engine' ), '', array( 'response' => 403 ) );
 		}
 
-		$shortcodes = self::get_shortcodes();
-		$page_map   = self::get_page_map();
+		$shortcodes   = self::get_shortcodes();
+		$page_map     = self::get_page_map();
+		$stack_status = class_exists( 'Gear_Engine_Recommended_Stack' ) ? Gear_Engine_Recommended_Stack::get_status() : array();
 		include GEAR_ENGINE_PATH . 'modules/admin/templates/shortcode-guide.php';
+	}
+
+	/**
+	 * Handle admin request to automatically install & activate GeneratePress and GenerateBlocks.
+	 *
+	 * @return void
+	 */
+	public function handle_install_recommended_stack(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'gear-engine' ), '', array( 'response' => 403 ) );
+		}
+
+		check_admin_referer( 'gear_engine_install_recommended_stack', 'gear_engine_nonce' );
+
+		$res = class_exists( 'Gear_Engine_Recommended_Stack' )
+			? Gear_Engine_Recommended_Stack::install_and_activate()
+			: array( 'success' => false, 'errors' => array( 'Module missing' ) );
+
+		$args = array(
+			'page' => self::PAGE_SLUG,
+		);
+
+		if ( ! empty( $res['success'] ) ) {
+			$args['gear_engine_stack_installed'] = '1';
+		} elseif ( ! empty( $res['errors'] ) ) {
+			$args['gear_engine_stack_error'] = rawurlencode( implode( ' ', $res['errors'] ) );
+		}
+
+		$redirect_url = add_query_arg( $args, admin_url( 'options-general.php' ) );
+
+		if ( function_exists( 'wp_safe_redirect' ) ) {
+			wp_safe_redirect( $redirect_url );
+			if ( ! defined( 'GEAR_ENGINE_TESTING' ) ) {
+				exit;
+			}
+		}
 	}
 
 	/**

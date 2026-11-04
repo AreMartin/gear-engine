@@ -15,7 +15,15 @@ $gear_engine_group = '';
 ?>
 <div class="wrap gear-engine-guide">
 	<h1><?php esc_html_e( 'Shortcodes & Pages', 'gear-engine' ); ?></h1>
-	<?php if ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
+	<?php if ( isset( $_GET['gear_engine_stack_installed'] ) ) : ?>
+		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
+			<p><strong>✓ <?php esc_html_e( 'GeneratePress og GenerateBlocks er installert og aktivert!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Nettstedet kjører nå med optimalisert ytelse, ren kodebase og full Gutenberg-støtte.', 'gear-engine' ); ?></p>
+		</div>
+	<?php elseif ( isset( $_GET['gear_engine_stack_error'] ) ) : ?>
+		<div class="notice notice-error is-dismissible" style="margin-top: 15px;">
+			<p><strong>✕ <?php esc_html_e( 'Installasjonen støtte på et problem:', 'gear-engine' ); ?></strong> <?php echo esc_html( sanitize_text_field( wp_unslash( $_GET['gear_engine_stack_error'] ) ) ); ?></p>
+		</div>
+	<?php elseif ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
 		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
 			<p><strong>✓ <?php esc_html_e( 'Kjernesidene ble opprettet!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Sidene for Kjøpsveiledere, Treningsprogram, Symptomsjekker, Digital Fysio og Prissammenligning er nå klare.', 'gear-engine' ); ?></p>
 		</div>
@@ -28,6 +36,64 @@ $gear_engine_group = '';
 			<p><strong>✓ <?php esc_html_e( 'Testdata ble lagt inn!', 'gear-engine' ); ?></strong> <?php printf( esc_html__( 'Lagt inn %d øvelser og %d godkjente protokoller for testing.', 'gear-engine' ), absint( $_GET['seeded_ex'] ?? 0 ), absint( $_GET['seeded_proto'] ?? 0 ) ); ?></p>
 		</div>
 	<?php endif; ?>
+
+	<!-- Anbefalt fundament: GeneratePress & GenerateBlocks -->
+	<?php
+	$gear_engine_theme_info  = $stack_status['theme'] ?? array();
+	$gear_engine_plugin_info = $stack_status['plugin'] ?? array();
+	$gear_engine_stack_done  = ! empty( $stack_status['complete'] );
+	?>
+	<div class="gear-engine-guide__hero-action" style="background: #FFFFFF; border: 1px solid #CBD7E6; border-left: 4px solid #0C2340; padding: 18px 22px; border-radius: 8px; margin: 20px 0 24px;">
+		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+			<div style="max-width: 620px;">
+				<h3 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #0C2340;">
+					<?php esc_html_e( 'Anbefalt fundament: GeneratePress & GenerateBlocks', 'gear-engine' ); ?>
+				</h3>
+				<p style="margin: 0 0 10px; font-size: 13px; color: #4A5A6A; line-height: 1.5;">
+					<?php esc_html_e( 'Fysionett og Gear Engine er bygget for maksimal ytelse og null bloat. GeneratePress gir deg et lynraskt, tilgjengelig tema, mens GenerateBlocks gir semantiske, lette blokker uten unødvendige skript.', 'gear-engine' ); ?>
+				</p>
+				<div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 12.5px;">
+					<span style="display: inline-flex; align-items: center; gap: 6px;">
+						<strong>GeneratePress (Tema):</strong>
+						<?php if ( ! empty( $gear_engine_theme_info['active'] ) ) : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #DCF5E8; color: #005236; font-weight: 700; padding: 2px 8px; border-radius: 999px;">✓ <?php esc_html_e( 'Aktivt', 'gear-engine' ); ?><?php echo ! empty( $gear_engine_theme_info['version'] ) ? ' (v' . esc_html( $gear_engine_theme_info['version'] ) . ')' : ''; ?></span>
+						<?php elseif ( ! empty( $gear_engine_theme_info['installed'] ) ) : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #FEF3C7; color: #92400E; font-weight: 600; padding: 2px 8px; border-radius: 999px;"><?php esc_html_e( 'Installert, inaktivt', 'gear-engine' ); ?></span>
+						<?php else : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #F0F2F5; color: #667085; font-weight: 600; padding: 2px 8px; border-radius: 999px;"><?php esc_html_e( 'Ikke installert', 'gear-engine' ); ?></span>
+						<?php endif; ?>
+					</span>
+					<span style="display: inline-flex; align-items: center; gap: 6px;">
+						<strong>GenerateBlocks (Plugin):</strong>
+						<?php if ( ! empty( $gear_engine_plugin_info['active'] ) ) : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #DCF5E8; color: #005236; font-weight: 700; padding: 2px 8px; border-radius: 999px;">✓ <?php esc_html_e( 'Aktivt', 'gear-engine' ); ?><?php echo ! empty( $gear_engine_plugin_info['version'] ) ? ' (v' . esc_html( $gear_engine_plugin_info['version'] ) . ')' : ''; ?></span>
+						<?php elseif ( ! empty( $gear_engine_plugin_info['installed'] ) ) : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #FEF3C7; color: #92400E; font-weight: 600; padding: 2px 8px; border-radius: 999px;"><?php esc_html_e( 'Installert, inaktivt', 'gear-engine' ); ?></span>
+						<?php else : ?>
+							<span style="display: inline-flex; align-items: center; gap: 4px; background: #F0F2F5; color: #667085; font-weight: 600; padding: 2px 8px; border-radius: 999px;"><?php esc_html_e( 'Ikke installert', 'gear-engine' ); ?></span>
+						<?php endif; ?>
+					</span>
+				</div>
+			</div>
+			<?php if ( $gear_engine_stack_done ) : ?>
+				<div style="display: inline-flex; align-items: center; gap: 8px; background: #DCF5E8; border: 1px solid #BEE3D0; color: #005236; padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: 13.5px;">
+					<span>✓</span> <?php esc_html_e( 'GeneratePress og GenerateBlocks er klare!', 'gear-engine' ); ?>
+				</div>
+			<?php else : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin: 0;">
+					<input type="hidden" name="action" value="gear_engine_install_recommended_stack">
+					<?php
+					if ( function_exists( 'wp_nonce_field' ) ) {
+						wp_nonce_field( 'gear_engine_install_recommended_stack', 'gear_engine_nonce' );
+					}
+					?>
+					<button type="submit" class="button button-primary button-hero" style="background-color: #0C2340; border-color: #0C2340; color: #FFFFFF; font-weight: 700;">
+						<?php esc_html_e( 'Installer og aktiver GeneratePress & GenerateBlocks (1 klikk)', 'gear-engine' ); ?>
+					</button>
+				</form>
+			<?php endif; ?>
+		</div>
+	</div>
 
 	<h2><?php esc_html_e( 'Shortcodes', 'gear-engine' ); ?></h2>
 	<table class="widefat striped">
@@ -56,10 +122,10 @@ $gear_engine_group = '';
 		</tbody>
 	</table>
 
-	<div class="gear-engine-guide__hero-action" style="background: #FFFFFF; border: 1px solid #CBD7E6; border-left: 4px solid #1A2A3A; padding: 18px 22px; border-radius: 8px; margin: 28px 0 20px;">
+	<div class="gear-engine-guide__hero-action" style="background: #FFFFFF; border: 1px solid #CBD7E6; border-left: 4px solid #0C2340; padding: 18px 22px; border-radius: 8px; margin: 28px 0 20px;">
 		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
 			<div style="max-width: 600px;">
-				<h3 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #1A2A3A;">
+				<h3 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #0C2340;">
 					<?php esc_html_e( 'Hurtigoppsett av kjernesider', 'gear-engine' ); ?>
 				</h3>
 				<p style="margin: 0; font-size: 13px; color: #4A5A6A; line-height: 1.5;">
@@ -73,7 +139,7 @@ $gear_engine_group = '';
 					wp_nonce_field( 'gear_engine_create_core_pages', 'gear_engine_nonce' );
 				}
 				?>
-				<button type="submit" class="button button-primary button-hero" style="background-color: #1A2A3A; border-color: #1A2A3A; color: #FFFFFF; font-weight: 700;">
+				<button type="submit" class="button button-primary button-hero" style="background-color: #0C2340; border-color: #0C2340; color: #FFFFFF; font-weight: 700;">
 					<?php esc_html_e( 'Opprett manglende kjernesider automatisk (1 klikk)', 'gear-engine' ); ?>
 				</button>
 			</form>
