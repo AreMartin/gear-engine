@@ -1136,6 +1136,77 @@
 	margin-top: 2px;
 }
 
+.gear-engine-hub__price-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	background: #F0F4F8;
+	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	border-radius: var(--ge-r-md, 16px);
+	padding: 16px 20px;
+	margin-top: 32px;
+}
+
+.gear-engine-hub__price-banner-content {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.gear-engine-hub__price-banner-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: #FFFFFF;
+	color: #1A2A3A;
+	flex-shrink: 0;
+	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.08);
+}
+
+.gear-engine-hub__price-banner-text {
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+}
+
+.gear-engine-hub__price-banner-text strong {
+	font-size: 14px;
+	font-weight: 700;
+	color: #1A2A3A;
+	line-height: 1.3;
+}
+
+.gear-engine-hub__price-banner-text span {
+	font-size: 13px;
+	color: #64748b;
+	line-height: 1.4;
+}
+
+.gear-engine-hub__price-banner-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: #1A2A3A;
+	color: #FFFFFF !important;
+	font-size: 13px;
+	font-weight: 700;
+	padding: 9px 18px;
+	border-radius: 9999px;
+	text-decoration: none !important;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.gear-engine-hub__price-banner-btn:hover {
+	background: #0C2340;
+	transform: translateY(-1px);
+}
+
 .gear-engine-hub__back-bar {
 	max-width: 760px;
 	margin: 0 auto 16px;
@@ -1184,6 +1255,16 @@
 
 	.gear-engine-hub__trust-banner {
 		grid-template-columns: 1fr;
+	}
+
+	.gear-engine-hub__price-banner {
+		flex-direction: column;
+		align-items: stretch;
+		padding: 14px;
+	}
+
+	.gear-engine-hub__price-banner-btn {
+		justify-content: center;
 	}
 }
 

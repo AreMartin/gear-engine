@@ -17,7 +17,7 @@ $gear_engine_group = '';
 	<h1><?php esc_html_e( 'Shortcodes & Pages', 'gear-engine' ); ?></h1>
 	<?php if ( isset( $_GET['gear_engine_pages_created'] ) ) : ?>
 		<div class="notice notice-success is-dismissible" style="margin-top: 15px;">
-			<p><strong>✓ <?php esc_html_e( 'Kjernesidene ble opprettet!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Sidene for Kjøpsveiledere, Treningsprogram, Symptomsjekker og Digital Fysio er nå klare.', 'gear-engine' ); ?></p>
+			<p><strong>✓ <?php esc_html_e( 'Kjernesidene ble opprettet!', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Sidene for Kjøpsveiledere, Treningsprogram, Symptomsjekker, Digital Fysio og Prissammenligning er nå klare.', 'gear-engine' ); ?></p>
 		</div>
 	<?php endif; ?>
 
@@ -55,7 +55,7 @@ $gear_engine_group = '';
 					<?php esc_html_e( 'Hurtigoppsett av kjernesider', 'gear-engine' ); ?>
 				</h3>
 				<p style="margin: 0; font-size: 13px; color: #4A5A6A; line-height: 1.5;">
-					<?php esc_html_e( 'Trykk på knappen for å opprette alle manglende sider automatisk (/kjopsveiledere/, /treningsprogram/, /symptomsjekker/ og /fysio-chat/) med riktige kortkoder ferdig satt inn.', 'gear-engine' ); ?>
+					<?php esc_html_e( 'Trykk på knappen for å opprette alle manglende sider automatisk (/kjopsveiledere/, /priser/, /treningsprogram/, /symptomsjekker/ og /fysio-chat/) med riktige kortkoder ferdig satt inn.', 'gear-engine' ); ?>
 				</p>
 			</div>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin: 0;">

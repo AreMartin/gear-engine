@@ -101,6 +101,29 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 		<?php endforeach; ?>
 	</div>
 
+	<!-- Price Comparison Cross-Link Banner -->
+	<aside class="gear-engine-hub__price-banner" aria-label="<?php esc_attr_e( 'Prissammenligning', 'gear-engine' ); ?>">
+		<div class="gear-engine-hub__price-banner-content">
+			<div class="gear-engine-hub__price-banner-icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<line x1="12" y1="1" x2="12" y2="23"></line>
+					<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+				</svg>
+			</div>
+			<div class="gear-engine-hub__price-banner-text">
+				<strong><?php esc_html_e( 'Vet du allerede hva du leter etter?', 'gear-engine' ); ?></strong>
+				<span><?php esc_html_e( 'Sammenlign dagspriser, tekniske spesifikasjoner og tilbud i vår komplette priskatalog.', 'gear-engine' ); ?></span>
+			</div>
+		</div>
+		<a href="<?php echo esc_url( home_url( '/priser/' ) ); ?>" class="gear-engine-hub__price-banner-btn">
+			<span><?php esc_html_e( 'Gå til Prissammenligning', 'gear-engine' ); ?></span>
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<line x1="5" y1="12" x2="19" y2="12"></line>
+				<polyline points="12 5 19 12 12 19"></polyline>
+			</svg>
+		</a>
+	</aside>
+
 	<!-- Trust Signals Footer -->
 	<div class="gear-engine-hub__trust-banner">
 		<div class="gear-engine-hub__trust-item">

@@ -104,6 +104,13 @@ class Gear_Engine_Shortcode_Guide {
 				'note'        => __( 'Use anywhere. Needs imported products with a price and affiliate link.', 'gear-engine' ),
 			),
 			array(
+				'group'       => __( 'Prissammenligning', 'gear-engine' ),
+				'tag'         => class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SHORTCODE_TAG : 'gear_engine_price_comparison',
+				'example'     => '[' . ( class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SHORTCODE_TAG : 'gear_engine_price_comparison' ) . ']',
+				'description' => __( 'Fasettert prissammenligning og produktkatalog med avdelingsvelger, prisslider og sammenligningsmotor. Opsjoner: department="kondisjon|styrke|rehabilitering|restitusjon", group="slug".', 'gear-engine' ),
+				'note'        => __( 'Hovedkatalog på /priser/. Kan også filtreres til en bestemt avdeling på andre undersider.', 'gear-engine' ),
+			),
+			array(
 				'group'       => __( 'Produkter', 'gear-engine' ),
 				'tag'         => 'gear_product',
 				'example'     => '[gear_product id="123"]',
@@ -284,6 +291,16 @@ class Gear_Engine_Shortcode_Guide {
 			);
 		}
 
+		$compare_tag = class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SHORTCODE_TAG : 'gear_engine_price_comparison';
+		$map[]       = array(
+			'level'   => 0,
+			'title'   => __( 'Prissammenligning (Katalog)', 'gear-engine' ),
+			'path'    => 'priser',
+			'tag'     => $compare_tag,
+			'example' => '[' . $compare_tag . ']',
+			'hint'    => __( 'Fasettert prissammenligning med avansert filtrering, sammenligningsmodal og avdelingstabs.', 'gear-engine' ),
+		);
+
 		$hub_status = self::get_page_status( 'kjopsveiledere', $hub_tag );
 
 		foreach ( $map as $index => $row ) {
@@ -390,6 +407,7 @@ class Gear_Engine_Shortcode_Guide {
 		$hub_tag      = class_exists( 'Gear_Engine_Gear_Picker' ) ? Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG : 'gear_engine_gear_picker_hub';
 		$triage_tag   = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::PICKER_SHORTCODE_TAG : 'gear_engine_triage_picker';
 		$viewer_tag   = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::SHORTCODE_TAG : 'gear_engine_protocol';
+		$compare_tag  = class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SHORTCODE_TAG : 'gear_engine_price_comparison';
 
 		$core_pages = array(
 			array(
@@ -397,6 +415,12 @@ class Gear_Engine_Shortcode_Guide {
 				'title'   => __( 'Kjøpsveiledere', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[' . $hub_tag . ']<!-- /wp:shortcode -->',
 				'tag'     => $hub_tag,
+			),
+			array(
+				'slug'    => 'priser',
+				'title'   => __( 'Prissammenligning', 'gear-engine' ),
+				'content' => '<!-- wp:shortcode -->[' . $compare_tag . ']<!-- /wp:shortcode -->',
+				'tag'     => $compare_tag,
 			),
 			array(
 				'slug'    => $program_path,

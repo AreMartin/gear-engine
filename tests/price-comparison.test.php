@@ -281,6 +281,18 @@ $cpt_class_content = file_get_contents( GEAR_ENGINE_PATH . 'includes/class-gear-
 assert_test( strpos( $cpt_class_content, 'gae_lock_categories' ) !== false, 'CPT metabox renders gae_lock_categories field' );
 assert_test( strpos( $cpt_class_content, 'gae_department' ) !== false, 'CPT metabox renders gae_department select' );
 
+// Test 15: Cross-link integration & Shortcode Guide
+$hub_template = file_get_contents( GEAR_ENGINE_PATH . 'modules/gear-picker/templates/picker-hub.php' );
+assert_test( strpos( $hub_template, 'gear-engine-hub__price-banner' ) !== false, 'Hub template contains price banner cross-link' );
+assert_test( strpos( $hub_template, '/priser/' ) !== false, 'Hub price banner links to /priser/' );
+
+$hub_css = file_get_contents( GEAR_ENGINE_PATH . 'modules/gear-picker/assets/css/gear-picker.css' );
+assert_test( strpos( $hub_css, '.gear-engine-hub__price-banner' ) !== false, 'Gear picker CSS contains price banner styling' );
+
+$guide_class = file_get_contents( GEAR_ENGINE_PATH . 'modules/admin/class-gear-engine-shortcode-guide.php' );
+assert_test( strpos( $guide_class, 'gear_engine_price_comparison' ) !== false, 'Shortcode Guide references gear_engine_price_comparison tag' );
+assert_test( strpos( $guide_class, "'priser'" ) !== false, 'Shortcode Guide registers /priser/ core page' );
+
 echo "========================================================\n";
 if ( $failed === 0 ) {
 	echo "ALL PRICE COMPARISON TESTS PASSED ($passed/$passed)\n";

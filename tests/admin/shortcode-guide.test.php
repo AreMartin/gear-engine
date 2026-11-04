@@ -70,6 +70,7 @@ require_once ABSPATH . 'modules/exercises/class-gear-engine-exercises-cpt.php';
 require_once ABSPATH . 'modules/exercises/class-gear-engine-protocol-viewer.php';
 require_once ABSPATH . 'modules/triage/class-gear-engine-triage.php';
 require_once ABSPATH . 'modules/gear-picker/class-gear-engine-gear-picker.php';
+require_once ABSPATH . 'modules/price-comparison/class-gear-engine-price-comparison.php';
 require_once ABSPATH . 'modules/admin/class-gear-engine-shortcode-guide.php';
 
 $failures = 0;
@@ -87,7 +88,7 @@ function page( $id, $content, $status = 'publish' ) {
 // Shortcode list.
 $list = Gear_Engine_Shortcode_Guide::get_shortcodes();
 $tags = array_column( $list, 'tag' );
-foreach ( array( 'gae_physio_chat', 'gear_engine_triage_picker', 'gear_engine_triage', 'gear_engine_protocol', 'gear_engine_gear_picker', 'gear_product' ) as $tag ) {
+foreach ( array( 'gae_physio_chat', 'gear_engine_triage_picker', 'gear_engine_triage', 'gear_engine_protocol', 'gear_engine_gear_picker', 'gear_engine_price_comparison', 'gear_product' ) as $tag ) {
 	t( "lists $tag", in_array( $tag, $tags, true ) );
 }
 t( 'every example starts with its own tag', ! array_filter( $list, function ( $r ) { return 0 !== strpos( $r['example'], '[' . $r['tag'] ); } ) );
@@ -176,6 +177,7 @@ $guide = new Gear_Engine_Shortcode_Guide();
 $guide->handle_create_core_pages();
 t( 'handle_create_core_pages inserts core pages', count( $GLOBALS['inserted_posts'] ) > $inserted_before );
 t( 'handle_create_core_pages creates kjopsveiledere', isset( $GLOBALS['pages']['kjopsveiledere'] ) );
+t( 'handle_create_core_pages creates priser', isset( $GLOBALS['pages']['priser'] ) && false !== strpos( $GLOBALS['pages']['priser']->post_content, 'gear_engine_price_comparison' ) );
 t( 'handle_create_core_pages redirects with success flag', false !== strpos( $GLOBALS['redirected_to'], 'gear_engine_pages_created=1' ) );
 
 // Existing page lacking shortcode test.
