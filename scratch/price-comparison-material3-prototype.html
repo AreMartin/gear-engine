@@ -288,7 +288,7 @@
 			align-items: center;
 			justify-content: space-between;
 			gap: 8px 16px;
-			background: var(--md-sys-color-surface-container);
+			background: var(--md-sys-color-surface-container-lowest);
 			border-radius: var(--md-sys-shape-corner-extra-large);
 		}
 
@@ -383,6 +383,8 @@
 
 		.ge-m3-header { margin-bottom: 24px; }
 
+		.ge-m3-mobile-search-slot { display: none; }
+
 		.ge-m3-title {
 			margin: 0 0 4px;
 			font: var(--md-sys-typescale-headline-large);
@@ -396,16 +398,38 @@
 			color: var(--md-sys-color-on-surface-variant);
 		}
 
+		.ge-m3-affiliate-disclosure {
+			display: flex;
+			align-items: flex-start;
+			gap: 5px;
+			margin: 6px 0 0;
+			font: var(--md-sys-typescale-label-small);
+			color: var(--ge-text-muted);
+		}
+
+		.ge-m3-affiliate-disclosure .material-symbols-outlined {
+			flex: 0 0 auto;
+			font-size: 14px;
+			line-height: 16px;
+		}
+
 		/* =========================================================
-		   6. NAVIGATION: PRIMARY TABS, FILTER CHIPS
+		   6. NAVIGATION: PRIMARY TABS, CATEGORY PILLS, FILTER CHIPS
 		   ========================================================= */
 		.ge-m3-nav-section { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
 
 		.ge-m3-dept-track {
 			display: flex;
+			width: max-content;
+			max-width: 100%;
+			gap: 2px;
 			overflow-x: auto;
+			padding: 4px;
 			scrollbar-width: none;
-			border-bottom: 1px solid var(--md-sys-color-outline-variant);
+			border: 1px solid var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-surface-container-lowest);
+			box-shadow: 0 1px 3px rgba(12, 35, 64, 0.08);
 		}
 
 		.ge-m3-dept-track::-webkit-scrollbar { display: none; }
@@ -417,33 +441,66 @@
 			justify-content: center;
 			gap: 8px;
 			flex: 0 0 auto;
-			height: 48px;
+			height: 40px;
 			padding: 0 16px;
 			border: 0;
+			border-radius: var(--md-sys-shape-corner-full);
 			background: transparent;
 			color: var(--md-sys-color-on-surface-variant);
 			font: var(--md-sys-typescale-title-small);
 			letter-spacing: 0.1px;
 			white-space: nowrap;
 			cursor: pointer;
-			transition: color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+			transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
-		.ge-m3-dept-btn::before {
-			content: "";
-			position: absolute;
-			left: 16px;
-			right: 16px;
-			bottom: 0;
-			height: 3px;
-			border-radius: 3px 3px 0 0;
-			background: var(--md-sys-color-primary);
-			transform: scaleX(0);
-			transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+		.ge-m3-dept-btn.is-active {
+			background: var(--md-sys-color-primary-container);
+			color: var(--md-sys-color-on-primary-container);
 		}
 
-		.ge-m3-dept-btn.is-active { color: var(--md-sys-color-primary); }
-		.ge-m3-dept-btn.is-active::before { transform: scaleX(1); }
+		@container ge-m3-comp (max-width: 599px) {
+			.ge-m3-mobile-search-slot {
+				display: block;
+				margin-bottom: 16px;
+			}
+
+			.ge-m3-dept-track {
+				gap: 0;
+				padding: 0;
+				border: 0;
+				border-radius: 0;
+				background: transparent;
+				box-shadow: none;
+			}
+
+			.ge-m3-dept-btn {
+				height: 44px;
+				border-radius: 0;
+			}
+
+			.ge-m3-dept-btn::before {
+				content: "";
+				position: absolute;
+				right: 16px;
+				bottom: 0;
+				left: 16px;
+				height: 3px;
+				border-radius: var(--md-sys-shape-corner-full);
+				background: var(--md-sys-color-primary);
+				transform: scaleX(0);
+				transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+			}
+
+			.ge-m3-dept-btn.is-active {
+				background: transparent;
+				color: var(--md-sys-color-primary);
+			}
+
+			.ge-m3-dept-btn.is-active::before { transform: scaleX(1); }
+		}
 
 		.ge-m3-dept-badge {
 			display: inline-flex;
@@ -478,7 +535,7 @@
 
 		.ge-m3-dept-alert-text { flex: 1 1 auto; min-width: 0; }
 
-		/* Filter chips: shared by categories, quick filters, brands and shops */
+		/* Shared base chip styles; category navigation pills override these below. */
 		.ge-m3-cats-bar,
 		.ge-m3-quick-filters {
 			display: flex;
@@ -518,6 +575,64 @@
 				background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
+		.ge-m3-cats-bar { gap: 12px; }
+
+		.ge-m3-cats-bar .ge-m3-chip {
+			height: 40px;
+			padding: 0 20px;
+			border-color: var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-surface-container-lowest);
+			box-shadow: 0 1px 3px rgba(12, 35, 64, 0.08);
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-body-medium);
+			transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		.ge-m3-cats-bar .ge-m3-chip:hover:not(.is-active) {
+			background: var(--md-sys-color-surface-container-low);
+			box-shadow: 0 2px 5px rgba(12, 35, 64, 0.1);
+		}
+
+		.ge-m3-cats-bar .ge-m3-chip.is-active {
+			padding: 0 20px;
+			border-color: #0C2340;
+			background: #0C2340;
+			box-shadow: 0 2px 5px rgba(12, 35, 64, 0.12);
+			color: #FFFFFF;
+		}
+
+		.ge-m3-cats-bar .ge-m3-chip-check { display: none; }
+
+		.ge-m3-quick-filters .ge-m3-qchip {
+			height: 32px;
+			padding: 0 12px;
+			border-color: var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: transparent;
+			color: var(--md-sys-color-on-surface-variant);
+			font: var(--md-sys-typescale-label-medium);
+			box-shadow: none;
+			transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		.ge-m3-quick-filters .ge-m3-qchip:hover:not(.is-active) {
+			border-color: var(--md-sys-color-outline);
+			background: var(--md-sys-color-surface-container-low);
+		}
+
+		.ge-m3-quick-filters .ge-m3-qchip.is-active {
+			padding: 0 12px;
+			border-color: transparent;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
+			box-shadow: none;
+		}
+
 		.ge-m3-chip.is-active,
 		.ge-m3-qchip.is-active,
 		.ge-m3-filter-pill.is-active {
@@ -529,6 +644,33 @@
 
 		.ge-m3-filter-pill-shop { padding-left: 8px; }
 
+		#proto-filter-panel .ge-m3-filter-pill {
+			height: 40px;
+			padding: 0 14px;
+			border-color: var(--md-sys-color-outline-variant);
+			border-radius: var(--md-sys-shape-corner-full);
+			background: var(--md-sys-color-surface-container-lowest);
+			color: var(--md-sys-color-on-surface);
+			font: var(--md-sys-typescale-body-small);
+			box-shadow: none;
+			transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+				color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+		}
+
+		#proto-filter-panel .ge-m3-filter-pill:hover:not(.is-active) {
+			border-color: var(--md-sys-color-outline);
+			background: var(--md-sys-color-surface-container-low);
+		}
+
+		#proto-filter-panel .ge-m3-filter-pill.is-active {
+			padding: 0 14px;
+			border-color: transparent;
+			background: var(--md-sys-color-secondary-container);
+			color: var(--md-sys-color-on-secondary-container);
+			box-shadow: none;
+		}
+
 		.ge-m3-chip-check {
 			width: 0;
 			margin-right: -8px;
@@ -539,9 +681,8 @@
 				margin var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
 				opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
-
 		.is-active > .ge-m3-chip-check { width: 18px; margin-right: 0; opacity: 1; }
-		.ge-m3-filter-pill.is-active .ge-m3-shop-pill-avatar { display: none; }
+		.is-active > .ge-m3-chip-check { width: 18px; margin-right: 0; opacity: 1; }
 
 		.ge-m3-shop-pill-avatar {
 			display: inline-flex;
@@ -801,9 +942,42 @@
 
 		@container ge-m3-comp (max-width: 599px) {
 			.ge-m3-view-text { display: none; }
-			.ge-m3-view-btn { padding: 0 14px; }
+			.ge-m3-actions-row {
+				display: grid;
+				width: 100%;
+				grid-template-columns: minmax(0, 1fr) auto auto;
+				gap: 8px;
+			}
+			.ge-m3-sort-wrap { flex: initial; }
+			.ge-m3-sort-select {
+				height: 44px;
+				padding-right: 36px;
+				padding-left: 40px;
+				font: 400 13px/18px var(--md-ref-typeface);
+				letter-spacing: 0.25px;
+			}
+			.ge-m3-sort-arrow { top: 50%; transform: translateY(-50%); }
+			.ge-m3-filter-btn {
+				height: 44px;
+				gap: 6px;
+				padding: 0 12px;
+				font: 400 13px/18px var(--md-ref-typeface);
+			}
+			.ge-m3-filter-btn .material-symbols-outlined { font-size: 18px; }
+			.ge-m3-filter-badge { min-width: 20px; height: 20px; }
+			.ge-m3-view-toggle { height: 44px; }
+			.ge-m3-view-btn { gap: 6px; padding: 0 10px; }
+			.ge-m3-view-btn .ge-m3-seg-icon {
+				font-size: 18px;
+				font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20;
+			}
 			.ge-m3-view-btn.is-active .ge-m3-seg-check { display: none; }
 			.ge-m3-view-btn.is-active .ge-m3-seg-icon { display: inline-block; }
+		}
+
+		@container ge-m3-comp (max-width: 320px) {
+			.ge-m3-actions-row { grid-template-columns: minmax(0, 1fr) auto; }
+			.ge-m3-view-toggle-wrap { grid-column: 2; grid-row: 2; justify-self: end; }
 		}
 
 		.ge-m3-results-count {
@@ -1700,7 +1874,7 @@
 			.ge-m3-list-content .ge-m3-price-current { font-size: 20px; line-height: 24px; }
 			.ge-m3-list-content .ge-m3-price-original { font-size: 11px; line-height: 14px; }
 			.ge-m3-list-action-row .ge-m3-savings-chip { height: 18px; padding: 0 6px; font-size: 10px; }
-			.ge-m3-list-cta { width: auto; height: 36px; gap: 4px; padding: 0 10px; font-size: 12px; }
+			.ge-m3-list-cta { width: auto; height: 36px; gap: 6px; padding: 0 14px; font-size: 12px; }
 			.ge-m3-list-cta .material-symbols-outlined { font-size: 16px; }
 			.ge-m3-shop-row--list {
 				width: auto;
@@ -2080,6 +2254,11 @@
 	<!-- Component Prototype Container -->
 	<main class="ge-m3-comp-wrapper" id="proto-app-root">
 
+		<p class="ge-m3-affiliate-disclosure">
+			<span class="material-symbols-outlined" aria-hidden="true">info</span>
+			<span>Noen av butikkene er samarbeidspartnere, og vi kan motta provisjon hvis du handler via lenkene. Dette påvirker ikke prisen.</span>
+		</p>
+
 		<!-- Cross-linking banner to Kjøpsveileder -->
 		<aside class="ge-m3-guide-banner">
 			<div class="ge-m3-guide-content">
@@ -2098,10 +2277,12 @@
 		<!-- Header -->
 		<header class="ge-m3-header">
 			<h1 class="ge-m3-title">Prissammenligning</h1>
-			<p class="ge-m3-subtitle">Sammenlign dagspriser og tilbud fra våre samarbeidspartnere.</p>
+			<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>
 		</header>
 
-		<!-- 2-level navigation: primary tabs (departments) and filter chips (categories, quick filters) -->
+		<div class="ge-m3-mobile-search-slot" id="proto-mobile-search-slot"></div>
+
+		<!-- 2-level navigation: department tabs and category pills, followed by quick filters -->
 		<div class="ge-m3-nav-section">
 			<div class="ge-m3-dept-track" id="proto-dept-track" role="tablist" aria-label="Velg avdeling"></div>
 			<div class="ge-m3-cats-bar" id="proto-cats-bar" role="group" aria-label="Velg kategori"></div>
@@ -2112,8 +2293,8 @@
 		<div id="proto-dept-alert" role="status" style="display: none;"></div>
 
 		<!-- Controls: search bar, sort, filter, view mode -->
-		<div class="ge-m3-controls" role="search">
-			<div class="ge-m3-search-box">
+		<div class="ge-m3-controls">
+			<div class="ge-m3-search-box" id="proto-search-box" role="search">
 				<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>
 				<input type="text" id="proto-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />
 				<button type="button" id="proto-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>
@@ -2131,7 +2312,7 @@
 						<option value="discount_desc">Størst rabatt (%)</option>
 						<option value="savings_desc">Størst kroneavslag</option>
 					</select>
-					<span class="ge-m3-sort-arrow"><span class="material-symbols-outlined" aria-hidden="true">arrow_drop_down</span></span>
+					<span class="ge-m3-sort-arrow"><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></span>
 				</div>
 
 				<button type="button" id="proto-filter-toggle" class="ge-m3-filter-btn ge-m3-btn ge-m3-btn--outlined ge-m3-btn--m m3-sl" aria-haspopup="dialog" aria-controls="proto-filter-panel">
@@ -2690,6 +2871,10 @@
 		}
 
 		var catsBar = document.getElementById('proto-cats-bar');
+		var searchBox = document.getElementById('proto-search-box');
+		var mobileSearchSlot = document.getElementById('proto-mobile-search-slot');
+		var controls = document.querySelector('.ge-m3-controls');
+		var actionsRow = document.querySelector('.ge-m3-actions-row');
 		var searchInput = document.getElementById('proto-search-input');
 		var searchClear = document.getElementById('proto-search-clear');
 		var sortSelect = document.getElementById('proto-sort-select');
@@ -2721,6 +2906,19 @@
 		var modalCloseBtn = document.getElementById('proto-modal-close-btn');
 		var deptTrack = document.getElementById('proto-dept-track');
 		var deptAlert = document.getElementById('proto-dept-alert');
+
+		function syncSearchPlacement() {
+			if (document.getElementById('proto-app-root').clientWidth <= 599) {
+				if (searchBox.parentNode !== mobileSearchSlot) {
+					mobileSearchSlot.appendChild(searchBox);
+				}
+			} else if (searchBox.parentNode !== controls) {
+				controls.insertBefore(searchBox, actionsRow);
+			}
+		}
+
+		syncSearchPlacement();
+		window.addEventListener('resize', syncSearchPlacement);
 
 		var CHIP_CHECK = '<span class="ge-m3-chip-check material-symbols-outlined" aria-hidden="true">check</span>';
 
@@ -2764,7 +2962,7 @@
 			});
 		}
 
-		// Render Level 2: Sub-category filter chips for active department
+		// Render Level 2: Category pills for active department
 		function renderCategoryChips() {
 			catsBar.innerHTML = '';
 			var currentDept = DEPARTMENTS.filter(function(d) { return d.id === state.activeDepartment; })[0] || DEPARTMENTS[0];
@@ -3146,7 +3344,7 @@
 			'</span>';
 		}
 
-		// Filter chips for brands and shops (selected state swaps the avatar for a check)
+		// Filter chips for brands and shops (selected state retains shop logos)
 		function renderPills(container, items, activeItems, onToggle, isShop) {
 			container.innerHTML = '';
 			items.forEach(function(item) {
