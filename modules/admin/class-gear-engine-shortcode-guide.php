@@ -112,6 +112,13 @@ class Gear_Engine_Shortcode_Guide {
 				'note'        => __( 'Hovedkatalog på /priser/. Kan også filtreres til en bestemt avdeling på andre undersider.', 'gear-engine' ),
 			),
 			array(
+				'group'       => __( 'Globalt Søk (Autosuggest)', 'gear-engine' ),
+				'tag'         => class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SEARCH_SHORTCODE_TAG : 'gear_engine_search',
+				'example'     => '[' . ( class_exists( 'Gear_Engine_Price_Comparison' ) ? Gear_Engine_Price_Comparison::SEARCH_SHORTCODE_TAG : 'gear_engine_search' ) . ']',
+				'description' => __( 'Globalt autosuggest-søk etter symptomsjekkere, AI-chat, treningsprogrammer, produktkategorier og enkeltprodukter. Opsjoner: placeholder="...", max_width="560px".', 'gear-engine' ),
+				'note'        => __( 'Alias: [fysionett_sok]. Kan plasseres i forside-hero, toppmeny eller artikler.', 'gear-engine' ),
+			),
+			array(
 				'group'       => __( 'Produkter', 'gear-engine' ),
 				'tag'         => 'gear_product',
 				'example'     => '[gear_product id="123"]',

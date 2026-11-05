@@ -324,6 +324,26 @@ assert_test( strpos( $hub_css, '.gear-engine-hub__price-banner' ) !== false, 'Ge
 $guide_class = file_get_contents( GEAR_ENGINE_PATH . 'modules/admin/class-gear-engine-shortcode-guide.php' );
 assert_test( strpos( $guide_class, 'gear_engine_price_comparison' ) !== false, 'Shortcode Guide references gear_engine_price_comparison tag' );
 assert_test( strpos( $guide_class, "'priser'" ) !== false, 'Shortcode Guide registers /priser/ core page' );
+assert_test( strpos( $guide_class, 'gear_engine_search' ) !== false, 'Shortcode Guide documents gear_engine_search shortcode' );
+
+// Test 16: Global Omni-Search & Autosuggest Shortcode ([gear_engine_search])
+assert_test( Gear_Engine_Price_Comparison::SEARCH_SHORTCODE_TAG === 'gear_engine_search', 'Defines SEARCH_SHORTCODE_TAG = gear_engine_search' );
+assert_test( Gear_Engine_Price_Comparison::SEARCH_SHORTCODE_ALIAS === 'fysionett_sok', 'Defines SEARCH_SHORTCODE_ALIAS = fysionett_sok' );
+
+$search_index = Gear_Engine_Price_Comparison::get_global_search_index();
+assert_test( is_array( $search_index ) && isset( $search_index['tools'], $search_index['programs'] ), 'get_global_search_index() returns tools and programs arrays' );
+assert_test( count( $search_index['tools'] ) >= 3, 'Global search index includes triage, chat, and buying guides' );
+assert_test( count( $search_index['programs'] ) >= 1, 'Global search index includes training programs' );
+
+$search_shortcode_html = $module->render_search_shortcode( array( 'placeholder' => 'Test søk...' ) );
+assert_test( strpos( $search_shortcode_html, 'ge-m3-standalone-search' ) !== false, 'render_search_shortcode outputs .ge-m3-standalone-search container' );
+assert_test( strpos( $search_shortcode_html, 'data-search-index=' ) !== false, 'render_search_shortcode embeds data-search-index' );
+assert_test( strpos( $search_shortcode_html, 'Test søk...' ) !== false, 'render_search_shortcode respects custom placeholder attribute' );
+assert_test( strpos( $html, 'data-search-index=' ) !== false, 'Main price comparison container also embeds data-search-index' );
+
+assert_test( strpos( $js_content, 'attachOmniSearch' ) !== false && strpos( $js_content, 'initStandaloneSearchBars' ) !== false, 'JS defines attachOmniSearch and initStandaloneSearchBars' );
+assert_test( strpos( $js_content, 'ge-m3-search-suggest' ) !== false && strpos( $css_content, '.ge-m3-search-suggest' ) !== false, 'JS and CSS support Material 3 autosuggest dropdown' );
+assert_test( strpos( $js_content, "urlParams.get('open')" ) !== false, 'JS supports ?open={id} parameter to auto-expand product retailer prices' );
 
 echo "========================================================\n";
 if ( $failed === 0 ) {

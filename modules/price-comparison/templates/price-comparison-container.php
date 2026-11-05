@@ -21,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		id="fysionett-prissok-root"
 		class="ge-m3-comp-wrapper"
 		data-feed="<?php echo esc_attr( $encoded_feed ); ?>"
+		data-search-index="<?php echo esc_attr( $encoded_search_index ?? '' ); ?>"
 		data-initial-department="<?php echo esc_attr( $initial_department ); ?>"
 		data-initial-category="<?php echo esc_attr( $initial_category ); ?>"
 		data-initial-view="<?php echo esc_attr( $initial_view ); ?>"

@@ -29,6 +29,16 @@ class Gear_Engine_Price_Comparison {
 	public const SHORTCODE_ALIAS = 'fysionett_prissammenligning';
 
 	/**
+	 * Global omni-search shortcode tag.
+	 */
+	public const SEARCH_SHORTCODE_TAG = 'gear_engine_search';
+
+	/**
+	 * Secondary alias for global omni-search shortcode.
+	 */
+	public const SEARCH_SHORTCODE_ALIAS = 'fysionett_sok';
+
+	/**
 	 * Option holding cache version for feed invalidation.
 	 */
 	public const OPTION_CACHE_VERSION = 'gear_engine_price_comparison_cache_version';
@@ -94,6 +104,8 @@ class Gear_Engine_Price_Comparison {
 	public function register_shortcode(): void {
 		add_shortcode( self::SHORTCODE_TAG, array( $this, 'render' ) );
 		add_shortcode( self::SHORTCODE_ALIAS, array( $this, 'render' ) );
+		add_shortcode( self::SEARCH_SHORTCODE_TAG, array( $this, 'render_search_shortcode' ) );
+		add_shortcode( self::SEARCH_SHORTCODE_ALIAS, array( $this, 'render_search_shortcode' ) );
 	}
 
 	/**
@@ -582,6 +594,224 @@ class Gear_Engine_Price_Comparison {
 	}
 
 	/**
+	 * Build global omni-search index for tools (triage, chat, guides) and training programs.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function get_global_search_index(): array {
+		$triage_base = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::get_base_path() : 'symptomsjekk';
+		$program_base = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::get_page_path() : 'treningsprogram';
+
+		$tools = array(
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Digital fysio (AI-chat)', 'gear-engine' ),
+				'subtitle' => __( 'Spør fysio-assistenten om plager, øvelser og utstyr', 'gear-engine' ),
+				'keywords' => 'chat ai fysioterapeut spørsmål råd veiledning smerter',
+				'icon'     => 'forum',
+				'url'      => home_url( '/digital-fysio/' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Symptomsjekker – Velg kroppsdel', 'gear-engine' ),
+				'subtitle' => __( 'Interaktiv kartlegging av ledd- og muskelsmerter', 'gear-engine' ),
+				'keywords' => 'symptomsjekk triage vondt smerte skade sjekk',
+				'icon'     => 'medical_services',
+				'url'      => home_url( '/' . trim( $triage_base, '/' ) . '/' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Kjøpsveiledere (Oversikt)', 'gear-engine' ),
+				'subtitle' => __( 'Interaktive guider tilpasset leddbelastning, plass og budsjett', 'gear-engine' ),
+				'keywords' => 'kjøpsveileder guide anbefaling velger utstyr',
+				'icon'     => 'explore',
+				'url'      => home_url( '/kjopsveiledere/' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Kjøpsveileder: Tredemølle', 'gear-engine' ),
+				'subtitle' => __( 'Finn riktig demping, motorstyrke og løpeflate', 'gear-engine' ),
+				'keywords' => 'tredemølle kjøpsveileder løpebånd kondisjon',
+				'icon'     => 'directions_run',
+				'url'      => home_url( '/kjopsveiledere/?type=treadmill' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Kjøpsveileder: Romaskin', 'gear-engine' ),
+				'subtitle' => __( 'Sammenlign luft-, vann- og magnetmotstand', 'gear-engine' ),
+				'keywords' => 'romaskin kjøpsveileder roing kondisjon',
+				'icon'     => 'rowing',
+				'url'      => home_url( '/kjopsveiledere/?type=romaskin' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Kjøpsveileder: Ergometersykkel', 'gear-engine' ),
+				'subtitle' => __( 'Skånsom trening for kne og hofte med lavt innsteg', 'gear-engine' ),
+				'keywords' => 'ergometersykkel treningssykkel sykkel kjøpsveileder kne',
+				'icon'     => 'pedal_bike',
+				'url'      => home_url( '/kjopsveiledere/?type=ergometersykkel' ),
+			),
+			array(
+				'type'     => 'tool',
+				'title'    => __( 'Kjøpsveileder: Rehab & Hjelpemidler', 'gear-engine' ),
+				'subtitle' => __( 'Støtter, strikker og hjelpemidler ved skade og opptrening', 'gear-engine' ),
+				'keywords' => 'rehab rehabilitering hjelpemidler støtte kjøpsveileder',
+				'icon'     => 'healing',
+				'url'      => home_url( '/kjopsveiledere/?type=rehab-guide' ),
+			),
+		);
+
+		$region_cards = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::get_region_cards() : array(
+			array( 'region' => 'kne', 'label' => 'Kne', 'subtitle' => 'Smerter foran, på siden eller inne i kneet' ),
+			array( 'region' => 'rygg', 'label' => 'Korsrygg og rygg', 'subtitle' => 'Kink, stivhet eller utstrålende smerter i ryggen' ),
+			array( 'region' => 'skulder', 'label' => 'Skulder', 'subtitle' => 'Smerter ved løft, rotasjonsplager eller stiv skulder' ),
+			array( 'region' => 'nakke', 'label' => 'Nakke', 'subtitle' => 'Stiv nakke, spenningshodepine eller utstråling i arm' ),
+			array( 'region' => 'hofte', 'label' => 'Hofte og lyske', 'subtitle' => 'Smerter på utsiden av hoften, i lysken eller setet' ),
+			array( 'region' => 'fot-ankel', 'label' => 'Fot og ankel', 'subtitle' => 'Overtråkk, akillesplager eller smerter under foten' ),
+		);
+
+		foreach ( $region_cards as $card ) {
+			$region_slug = sanitize_key( (string) ( $card['region'] ?? '' ) );
+			if ( '' === $region_slug ) {
+				continue;
+			}
+			$label    = (string) ( $card['label'] ?? ucfirst( $region_slug ) );
+			$subtitle = (string) ( $card['subtitle'] ?? __( 'Start symptomsjekk for denne kroppsdelen', 'gear-engine' ) );
+			$tools[]  = array(
+				'type'     => 'triage',
+				'title'    => sprintf( __( 'Symptomsjekk: %s', 'gear-engine' ), $label ),
+				'subtitle' => $subtitle,
+				'keywords' => 'symptomsjekk triage smerter vondt ' . mb_strtolower( $label . ' ' . $subtitle, 'UTF-8' ),
+				'icon'     => 'clinical_notes',
+				'url'      => home_url( '/' . trim( $triage_base, '/' ) . '/' . $region_slug . '/' ),
+			);
+		}
+
+		$programs = array();
+		if ( class_exists( 'Gear_Engine_Protocol_Viewer' ) ) {
+			foreach ( Gear_Engine_Protocol_Viewer::get_listed_protocols() as $proto ) {
+				$slug        = sanitize_title( (string) ( $proto['slug'] ?? '' ) );
+				$name        = (string) ( $proto['name'] ?? '' );
+				$description = (string) ( $proto['description'] ?? '' );
+				if ( '' === $slug || '' === $name ) {
+					continue;
+				}
+				$subtitle = __( 'Faglig treningsprogram med video og dosering', 'gear-engine' );
+				if ( '' !== $description ) {
+					$subtitle = function_exists( 'wp_trim_words' ) ? wp_trim_words( $description, 12, '…' ) : $description;
+				}
+				$programs[] = array(
+					'type'     => 'program',
+					'title'    => $name,
+					'subtitle' => $subtitle,
+					'keywords' => 'treningsprogram øvelser opptrening rehabilitering ' . mb_strtolower( $name . ' ' . $description, 'UTF-8' ),
+					'icon'     => 'fitness_center',
+					'url'      => Gear_Engine_Protocol_Viewer::get_program_url( $slug ),
+				);
+			}
+		}
+
+		if ( empty( $programs ) ) {
+			$default_programs = array(
+				array(
+					'slug'     => 'fremre-knesmerter',
+					'title'    => __( 'Fremre knesmerter (Patellofemoralt smertesyndrom)', 'gear-engine' ),
+					'subtitle' => __( 'Styrke- og kontrolløvelser for kne og hofte i 3 faser', 'gear-engine' ),
+					'keywords' => 'kne knesmerter løpekne hopperkne trapp trening øvelser',
+				),
+				array(
+					'slug'     => 'uspesifikke-korsryggsmerter',
+					'title'    => __( 'Korsryggsmerter – Bevegelse og ryggstyrke', 'gear-engine' ),
+					'subtitle' => __( 'Trygg opptrening ved akutt kink eller langvarig stivhet i rygg', 'gear-engine' ),
+					'keywords' => 'rygg korsrygg kink hekseskudd ryggsmerter øvelser',
+				),
+				array(
+					'slug'     => 'subakromielle-skuldersmerter',
+					'title'    => __( 'Skuldersmerter (Rotatorcuff og skulderblad)', 'gear-engine' ),
+					'subtitle' => __( 'Opptrening for senebetennelse og inneklemming i skulderen', 'gear-engine' ),
+					'keywords' => 'skulder rotatorcuff senebetennelse løft øvelser',
+				),
+				array(
+					'slug'     => 'ankelovertrakk',
+					'title'    => __( 'Ankelovertråkk og ustabil ankel', 'gear-engine' ),
+					'subtitle' => __( 'Balanse-, styrke- og mobilitetsprogram for fot og ankel', 'gear-engine' ),
+					'keywords' => 'ankel fot overtråkk forstuing balanse øvelser',
+				),
+				array(
+					'slug'     => 'nakkesmerter',
+					'title'    => __( 'Nakkesmerter og kontorstivhet', 'gear-engine' ),
+					'subtitle' => __( 'Avspenning, bevegelighet og dyp nakkestyrke', 'gear-engine' ),
+					'keywords' => 'nakke stiv nakke hodepine skuldre kontor øvelser',
+				),
+				array(
+					'slug'     => 'hoftesmerter-gluteal-tendinopati',
+					'title'    => __( 'Hoftesmerter og senesmerter på utsiden av hoften', 'gear-engine' ),
+					'subtitle' => __( 'Belastningsstyring og styrke for hofte og sete', 'gear-engine' ),
+					'keywords' => 'hofte lyske sete slimpose senebetennelse øvelser',
+				),
+			);
+
+			foreach ( $default_programs as $dp ) {
+				$programs[] = array(
+					'type'     => 'program',
+					'title'    => $dp['title'],
+					'subtitle' => $dp['subtitle'],
+					'keywords' => 'treningsprogram øvelser opptrening ' . $dp['keywords'],
+					'icon'     => 'fitness_center',
+					'url'      => rtrim( home_url( '/' . trim( $program_base, '/' ) . '/' ), '/' ) . '/?program=' . rawurlencode( $dp['slug'] ),
+				);
+			}
+		}
+
+		return array(
+			'priserUrl'   => home_url( '/priser/' ),
+			'programsUrl' => home_url( '/' . trim( $program_base, '/' ) . '/' ),
+			'tools'       => $tools,
+			'programs'    => $programs,
+		);
+	}
+
+	/**
+	 * Render standalone global omni-search bar shortcode [gear_engine_search].
+	 *
+	 * @param array<string, mixed> $atts Shortcode attributes.
+	 * @return string Rendered HTML.
+	 */
+	public function render_search_shortcode( $atts = array() ): string {
+		$atts = shortcode_atts(
+			array(
+				'placeholder' => __( 'Søk etter symptomer, treningsprogram eller utstyr...', 'gear-engine' ),
+				'max_width'   => '560px',
+			),
+			$atts,
+			self::SEARCH_SHORTCODE_TAG
+		);
+
+		wp_enqueue_style( 'gear-engine-tokens' );
+		wp_enqueue_style( 'gear-engine-price-comparison' );
+		wp_enqueue_script( 'gear-engine-price-comparison' );
+
+		$feed_data            = self::get_feed();
+		$encoded_feed         = rawurlencode( (string) wp_json_encode( $feed_data ) );
+		$encoded_search_index = rawurlencode( (string) wp_json_encode( self::get_global_search_index() ) );
+		$placeholder          = sanitize_text_field( (string) $atts['placeholder'] );
+		$max_width            = sanitize_text_field( (string) $atts['max_width'] );
+
+		ob_start();
+		?>
+		<div class="ge-price-comp-wrapper ge-m3-standalone-search-wrapper" style="max-width: <?php echo esc_attr( $max_width ); ?>;">
+			<div
+				class="ge-m3-standalone-search"
+				data-feed="<?php echo esc_attr( $encoded_feed ); ?>"
+				data-search-index="<?php echo esc_attr( $encoded_search_index ); ?>"
+				data-placeholder="<?php echo esc_attr( $placeholder ); ?>"
+			></div>
+		</div>
+		<?php
+		return (string) ob_get_clean();
+	}
+
+	/**
 	 * Render the price comparison catalog shortcode.
 	 *
 	 * @param array<string, mixed> $atts Shortcode attributes.
@@ -608,7 +838,8 @@ class Gear_Engine_Price_Comparison {
 		$feed_data = self::get_feed();
 
 		// Encode JSON safely for embedding in data attribute.
-		$encoded_feed = rawurlencode( (string) wp_json_encode( $feed_data ) );
+		$encoded_feed         = rawurlencode( (string) wp_json_encode( $feed_data ) );
+		$encoded_search_index = rawurlencode( (string) wp_json_encode( self::get_global_search_index() ) );
 
 		$initial_category   = sanitize_text_field( $atts['category'] );
 		$initial_department = sanitize_key( $atts['department'] ?: $atts['group'] );

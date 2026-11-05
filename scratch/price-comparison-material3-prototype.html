@@ -57,9 +57,9 @@
 			--md-sys-color-scrim: #000000;
 			--md-sys-color-shadow: #000000;
 
-			/* Custom colour roles (brand amber), harmonised with the scheme */
-			--md-custom-color-deal-container: #FEF3C7;
-			--md-custom-color-on-deal-container: #92400E;
+			/* Custom colour roles (deal = brand emerald), harmonised with the scheme */
+			--md-custom-color-deal-container: #007A50;
+			--md-custom-color-on-deal-container: #FFFFFF;
 			--md-custom-color-warning-container: #FDF0D5;
 			--md-custom-color-on-warning-container: #4A3300;
 			--md-custom-color-warning: #8A5A00;
@@ -143,8 +143,8 @@
 			--md-sys-color-inverse-on-surface: #2E3035;
 			--md-sys-color-inverse-primary: #465F86;
 
-			--md-custom-color-deal-container: #5A4300;
-			--md-custom-color-on-deal-container: #FFE08A;
+			--md-custom-color-deal-container: #007A50;
+			--md-custom-color-on-deal-container: #FFFFFF;
 			--md-custom-color-warning-container: #3F2E00;
 			--md-custom-color-on-warning-container: #FFDDA8;
 			--md-custom-color-warning: #F2BE5C;
@@ -416,11 +416,9 @@
 			.ge-m3-guide-btn { width: 100%; margin-top: 4px; }
 		}
 
-		.ge-m3-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-bottom: 24px; }
-		.ge-m3-header-text { flex: 1 1 280px; min-width: 0; }
-		.ge-m3-header-search-slot { flex: 1 1 340px; max-width: 460px; width: 100%; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
-
-		.ge-m3-mobile-search-slot { display: none; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
+		.ge-m3-header { margin-bottom: 16px; }
+		.ge-m3-header-text { min-width: 0; }
+		.ge-m3-header-search-slot { width: 100%; max-width: 460px; margin-top: 12px; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
 
 		.ge-m3-title {
 			margin: 0 0 4px;
@@ -494,6 +492,10 @@
 				color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 
+		.ge-m3-dept-btn:not(.is-active):hover { background: #F4F7FA; } /* HOVER-LIGHT */
+		.ge-m3-dept-btn:hover::after,
+		.ge-m3-filter-btn:hover::after { opacity: 0; } /* HOVER-LIGHT: no darkening overlay */
+
 		.ge-m3-dept-btn.is-active {
 			background: var(--md-sys-color-surface-container-high);
 			color: var(--md-sys-color-on-surface);
@@ -504,9 +506,7 @@
 		@container ge-m3-comp (max-width: 599px) {
 			.ge-m3-comp-wrapper > * { order: 10; }
 			.ge-m3-header { order: 1; margin-bottom: 12px; }
-			.ge-m3-header-search-slot { display: none; }
 			.ge-m3-affiliate-disclosure { order: 2; margin: 0 0 8px; }
-			.ge-m3-mobile-search-slot { order: 3; }
 			.ge-m3-nav-section { order: 4; }
 			#proto-dept-alert { order: 5; }
 			.ge-m3-controls { order: 6; }
@@ -514,11 +514,6 @@
 			#proto-cards-container { order: 8; }
 			#proto-load-more-wrap { order: 9; }
 			.ge-m3-guide-banner { order: 20; }
-
-			.ge-m3-mobile-search-slot {
-				display: block;
-				margin-bottom: 16px;
-			}
 
 			.ge-m3-quick-filters-slot { display: none; }
 
@@ -570,8 +565,8 @@
 			height: 20px;
 			padding: 0 6px;
 			border-radius: var(--md-sys-shape-corner-full);
-			background: var(--md-sys-color-secondary-container);
-			color: var(--md-sys-color-on-secondary-container);
+			background: var(--md-sys-color-surface-container-high); /* BADGE-GREY (was secondary-container) */
+			color: var(--md-sys-color-on-surface); /* BADGE-GREY (was on-secondary-container) */
 			font: var(--md-sys-typescale-label-small);
 		}
 
@@ -654,7 +649,7 @@
 		}
 
 		.ge-m3-cats-bar .ge-m3-chip:hover:not(.is-active) {
-			background: var(--md-sys-color-surface-container-low);
+			background: #F4F7FA; /* HOVER-LIGHT (was surface-container-low) */
 			box-shadow: 0 2px 5px rgba(12, 35, 64, 0.1);
 		}
 
@@ -684,14 +679,14 @@
 
 		.ge-m3-quick-filters .ge-m3-qchip:hover:not(.is-active) {
 			border-color: var(--md-sys-color-outline);
-			background: var(--md-sys-color-surface-container-low);
+			background: #F4F7FA; /* HOVER-LIGHT (was surface-container-low) */
 		}
 
 		.ge-m3-quick-filters .ge-m3-qchip.is-active {
 			padding: 0 12px;
-			border-color: transparent;
-			background: var(--md-sys-color-secondary-container);
-			color: var(--md-sys-color-on-secondary-container);
+			border-color: var(--md-sys-color-outline-variant); /* SELECTED-GREY (was transparent) */
+			background: var(--md-sys-color-surface-container-high); /* SELECTED-GREY (was secondary-container) */
+			color: var(--md-sys-color-on-surface); /* SELECTED-GREY (was on-secondary-container) */
 			box-shadow: none;
 		}
 
@@ -699,9 +694,9 @@
 		.ge-m3-qchip.is-active,
 		.ge-m3-filter-pill.is-active {
 			padding-left: 8px;
-			border-color: transparent;
-			background: var(--md-sys-color-secondary-container);
-			color: var(--md-sys-color-on-secondary-container);
+			border-color: var(--md-sys-color-outline-variant); /* SELECTED-GREY (was transparent) */
+			background: var(--md-sys-color-surface-container-high); /* SELECTED-GREY (was secondary-container) */
+			color: var(--md-sys-color-on-surface); /* SELECTED-GREY (was on-secondary-container) */
 		}
 
 		.ge-m3-filter-pill-shop { padding-left: 8px; }
@@ -722,14 +717,14 @@
 
 		#proto-filter-panel .ge-m3-filter-pill:hover:not(.is-active) {
 			border-color: var(--md-sys-color-outline);
-			background: var(--md-sys-color-surface-container-low);
+			background: #F4F7FA; /* HOVER-LIGHT (was surface-container-low) */
 		}
 
 		#proto-filter-panel .ge-m3-filter-pill.is-active {
 			padding: 0 14px;
-			border-color: transparent;
-			background: var(--md-sys-color-secondary-container);
-			color: var(--md-sys-color-on-secondary-container);
+			border-color: transparent; /* DRAWER-NO-BORDER (was outline-variant) */
+			background: var(--md-sys-color-surface-container-high); /* SELECTED-GREY (was secondary-container) */
+			color: var(--md-sys-color-on-surface); /* SELECTED-GREY (was on-secondary-container) */
 			box-shadow: none;
 		}
 
@@ -801,7 +796,7 @@
 
 		.ge-m3-search-input {
 			width: 100%;
-			height: 56px;
+			height: 48px;
 			padding: 0 56px;
 			border: 1px solid rgba(12, 35, 64, 0.08);
 			border-radius: var(--md-sys-shape-corner-full);
@@ -943,7 +938,7 @@
 				box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 		}
 		.ge-m3-filter-btn .material-symbols-outlined { font-size: 20px; }
-		.ge-m3-filter-btn:hover { background: #F2F4F7; box-shadow: inset 0 0 0 1px var(--ge-control-ink), var(--ge-control-shadow); }
+		.ge-m3-filter-btn:hover { background: #F4F7FA; /* HOVER-LIGHT (was #F2F4F7) */ box-shadow: inset 0 0 0 1px var(--ge-control-ink), var(--ge-control-shadow); }
 		.ge-m3-filter-btn.is-active { background: #fff; color: var(--ge-control-ink); box-shadow: inset 0 0 0 1px var(--ge-control-ink), var(--ge-control-shadow); }
 		.ge-m3-controls :is(.ge-m3-search-input, .ge-m3-sort-select, .ge-m3-filter-btn, .ge-m3-view-btn):focus-visible {
 			outline: 3px solid var(--ge-control-ink);
@@ -995,13 +990,21 @@
 		.ge-m3-view-btn + .ge-m3-view-btn { border-left: 1px solid var(--ge-control-ink); }
 		.ge-m3-view-btn .material-symbols-outlined { font-size: 18px; }
 		.ge-m3-view-btn .ge-m3-seg-check { display: none; }
-		.ge-m3-view-btn:not(.is-active):hover { background: #F2F4F7; }
+		.ge-m3-view-btn:not(.is-active):hover { background: #F4F7FA; /* HOVER-LIGHT (was #F2F4F7) */ }
 
 		.ge-m3-view-btn.is-active {
-			background: var(--ge-control-ink);
-			color: #fff;
+			background: var(--md-sys-color-surface-container-high); /* SELECTED-GREY (was --ge-control-ink) */
+			color: var(--md-sys-color-on-surface); /* SELECTED-GREY (was #fff) */
 		}
-		.ge-m3-view-btn.is-active:hover { background: #183655; }
+		.ge-m3-view-btn.is-active:hover { background: var(--md-sys-color-surface-container-high); /* SELECTED-GREY (was #183655) */ }
+		.ge-m3-view-btn:not(.is-active):hover::after,
+		.ge-m3-chip:not(.is-active):hover::after,
+		.ge-m3-qchip:not(.is-active):hover::after,
+		.ge-m3-filter-pill:not(.is-active):hover::after,
+		.ge-m3-view-btn.is-active:hover::after,
+		.ge-m3-chip.is-active:hover::after,
+		.ge-m3-qchip.is-active:hover::after,
+		.ge-m3-filter-pill.is-active:hover::after { opacity: 0; } /* HOVER-LIGHT: no overlay; selected items have no hover */
 
 		.ge-m3-view-btn.is-active .ge-m3-seg-check { display: inline-block; }
 		.ge-m3-view-btn.is-active .ge-m3-seg-icon { display: none; }
@@ -1268,7 +1271,7 @@
 			align-items: center;
 			height: 26px;
 			padding: 0 10px;
-			border: 1px solid var(--ge-amber-deal-border, #FDE68A);
+			border: 1px solid transparent;
 			border-radius: var(--md-sys-shape-corner-full);
 			background: var(--md-custom-color-deal-container);
 			color: var(--md-custom-color-on-deal-container);
@@ -1280,9 +1283,6 @@
 		.ge-m3-card-grid .ge-m3-deal-chip {
 			top: 14px;
 			left: 14px;
-			background: var(--md-sys-color-error-container);
-			border-color: transparent;
-			color: var(--md-sys-color-on-error-container);
 		}
 
 		[data-theme="dark"] .ge-m3-deal-chip { border-color: transparent; }
@@ -1752,9 +1752,6 @@
 		.ge-m3-list-img-wrap .ge-m3-deal-chip {
 			top: 14px;
 			left: 14px;
-			background: var(--md-sys-color-error-container);
-			border-color: transparent;
-			color: var(--md-sys-color-on-error-container);
 		}
 
 		.ge-m3-list-content { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; gap: 8px; padding: 24px 28px; }
@@ -2448,11 +2445,18 @@
 
 		<!-- Header -->
 		<header class="ge-m3-header">
-			<div class="ge-m3-header-text"><h1 class="ge-m3-title">Prissammenligning</h1><p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p></div><div class="ge-m3-header-search-slot" id="proto-header-search-slot"></div>
+			<div class="ge-m3-header-text"><h1 class="ge-m3-title">Prissammenligning</h1><p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p></div>
+			<div class="ge-m3-header-search-slot" id="proto-header-search-slot">
+				<div class="ge-m3-search-box" id="proto-search-box" role="search">
+					<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>
+					<input type="text" id="proto-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />
+					<button type="button" id="proto-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>
+						<span class="material-symbols-outlined" aria-hidden="true">close</span>
+					</button>
+				</div>
+			</div>
 
 		</header>
-
-		<div class="ge-m3-mobile-search-slot" id="proto-mobile-search-slot"></div>
 
 		<!-- 2-level navigation: department tabs and category pills, followed by quick filters -->
 		<div class="ge-m3-nav-section">
@@ -2464,16 +2468,8 @@
 		<!-- Cross-department search alert -->
 		<div id="proto-dept-alert" role="status" style="display: none;"></div>
 
-		<!-- Controls: search bar, sort, filter, view mode -->
+		<!-- Controls: sort, filter, view mode -->
 		<div class="ge-m3-controls">
-			<div class="ge-m3-search-box" id="proto-search-box" role="search">
-				<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>
-				<input type="text" id="proto-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />
-				<button type="button" id="proto-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>
-					<span class="material-symbols-outlined" aria-hidden="true">close</span>
-				</button>
-			</div>
-
 			<div class="ge-m3-actions-row">
 				<div class="ge-m3-sort-wrap">
 					<span class="ge-m3-sort-icon"><span class="material-symbols-outlined" aria-hidden="true">sort</span></span>
@@ -3049,8 +3045,6 @@
 		}
 
 		var catsBar = document.getElementById('proto-cats-bar');
-		var searchBox = document.getElementById('proto-search-box');
-		var mobileSearchSlot = document.getElementById('proto-mobile-search-slot');
 		var controls = document.querySelector('.ge-m3-controls');
 		var actionsRow = document.querySelector('.ge-m3-actions-row');
 		var quickFiltersWrap = document.getElementById('proto-quick-filters');
@@ -3095,20 +3089,12 @@
 			guideBanner.hidden = true;
 		});
 
-		function syncSearchPlacement() {
+		function syncResultsPlacement() {
 			var isMobile = document.getElementById('proto-app-root').clientWidth <= 599;
-			var headerSlot = document.getElementById('proto-header-search-slot');
 			var resultsWrap = document.querySelector('.ge-m3-results-count');
 			if (resultsWrap && controls && actionsRow) {
 				if (isMobile) { if (resultsWrap.parentNode !== appRoot) appRoot.insertBefore(resultsWrap, cardsContainer); }
 				else if (resultsWrap.parentNode !== controls) { controls.insertBefore(resultsWrap, actionsRow); }
-			}
-			if (isMobile) {
-				if (searchBox.parentNode !== mobileSearchSlot) {
-					mobileSearchSlot.appendChild(searchBox);
-				}
-			} else if (headerSlot && searchBox.parentNode !== headerSlot) { headerSlot.appendChild(searchBox); } else if (false) {
-				controls.insertBefore(searchBox, actionsRow);
 			}
 		}
 
@@ -3124,9 +3110,9 @@
 			}
 		}
 
-		syncSearchPlacement();
+		syncResultsPlacement();
 		syncQuickFiltersPlacement();
-		window.addEventListener('resize', syncSearchPlacement);
+		window.addEventListener('resize', syncResultsPlacement);
 		window.addEventListener('resize', syncQuickFiltersPlacement);
 
 		var CHIP_CHECK = '<span class="ge-m3-chip-check material-symbols-outlined" aria-hidden="true">check</span>';

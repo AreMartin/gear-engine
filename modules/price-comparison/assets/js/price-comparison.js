@@ -291,6 +291,304 @@
 
 	var CHIP_CHECK = '<span class="ge-m3-chip-check material-symbols-outlined" aria-hidden="true">check</span>';
 
+	var DEFAULT_SEARCH_INDEX = {
+		priserUrl: '/priser/',
+		programsUrl: '/treningsprogram/',
+		tools: [
+			{ type: 'tool', title: 'Digital fysio (AI-chat)', subtitle: 'Spør fysio-assistenten om plager, øvelser og utstyr', keywords: 'chat ai fysioterapeut spørsmål råd veiledning smerter', icon: 'forum', url: '/digital-fysio/' },
+			{ type: 'tool', title: 'Symptomsjekker – Velg kroppsdel', subtitle: 'Interaktiv kartlegging av ledd- og muskelsmerter', keywords: 'symptomsjekk triage vondt smerte skade sjekk', icon: 'medical_services', url: '/symptomsjekk/' },
+			{ type: 'triage', title: 'Symptomsjekk: Kne', subtitle: 'Smerter foran, på siden eller inne i kneet', keywords: 'symptomsjekk triage smerter vondt kne knesmerter menisk korsbånd løpekne', icon: 'clinical_notes', url: '/symptomsjekk/kne/' },
+			{ type: 'triage', title: 'Symptomsjekk: Korsrygg og rygg', subtitle: 'Kink, stivhet eller utstrålende smerter i ryggen', keywords: 'symptomsjekk triage smerter vondt rygg korsrygg kink isjias prolaps', icon: 'clinical_notes', url: '/symptomsjekk/rygg/' },
+			{ type: 'triage', title: 'Symptomsjekk: Skulder', subtitle: 'Smerter ved løft, rotasjonsplager eller stiv skulder', keywords: 'symptomsjekk triage smerter vondt skulder rotatorcuff senebetennelse', icon: 'clinical_notes', url: '/symptomsjekk/skulder/' },
+			{ type: 'triage', title: 'Symptomsjekk: Nakke', subtitle: 'Stiv nakke, spenningshodepine eller utstråling i arm', keywords: 'symptomsjekk triage smerter vondt nakke hodepine stiv', icon: 'clinical_notes', url: '/symptomsjekk/nakke/' },
+			{ type: 'triage', title: 'Symptomsjekk: Hofte og lyske', subtitle: 'Smerter på utsiden av hoften, i lysken eller setet', keywords: 'symptomsjekk triage smerter vondt hofte lyske sete', icon: 'clinical_notes', url: '/symptomsjekk/hofte/' },
+			{ type: 'triage', title: 'Symptomsjekk: Fot og ankel', subtitle: 'Overtråkk, akillesplager eller smerter under foten', keywords: 'symptomsjekk triage smerter vondt fot ankel overtråkk akilles plantar', icon: 'clinical_notes', url: '/symptomsjekk/fot-ankel/' },
+			{ type: 'tool', title: 'Kjøpsveiledere (Oversikt)', subtitle: 'Interaktive guider tilpasset leddbelastning, plass og budsjett', keywords: 'kjøpsveileder guide anbefaling velger utstyr', icon: 'explore', url: '/kjopsveiledere/' },
+			{ type: 'tool', title: 'Kjøpsveileder: Tredemølle', subtitle: 'Finn riktig demping, motorstyrke og løpeflate', keywords: 'tredemølle kjøpsveileder løpebånd kondisjon', icon: 'directions_run', url: '/kjopsveiledere/?type=treadmill' },
+			{ type: 'tool', title: 'Kjøpsveileder: Romaskin', subtitle: 'Sammenlign luft-, vann- og magnetmotstand', keywords: 'romaskin kjøpsveileder roing kondisjon', icon: 'rowing', url: '/kjopsveiledere/?type=romaskin' },
+			{ type: 'tool', title: 'Kjøpsveileder: Ergometersykkel', subtitle: 'Skånsom trening for kne og hofte med lavt innsteg', keywords: 'ergometersykkel treningssykkel sykkel kjøpsveileder kne', icon: 'pedal_bike', url: '/kjopsveiledere/?type=ergometersykkel' },
+			{ type: 'tool', title: 'Kjøpsveileder: Rehab & Hjelpemidler', subtitle: 'Støtter, strikker og hjelpemidler ved skade og opptrening', keywords: 'rehab rehabilitering hjelpemidler støtte kjøpsveileder', icon: 'healing', url: '/kjopsveiledere/?type=rehab-guide' }
+		],
+		programs: [
+			{ type: 'program', title: 'Fremre knesmerter (Patellofemoralt smertesyndrom)', subtitle: 'Styrke- og kontrolløvelser for kne og hofte i 3 faser', keywords: 'treningsprogram øvelser opptrening kne knesmerter løpekne hopperkne trapp', icon: 'fitness_center', url: '/treningsprogram/?program=fremre-knesmerter' },
+			{ type: 'program', title: 'Korsryggsmerter – Bevegelse og ryggstyrke', subtitle: 'Trygg opptrening ved akutt kink eller langvarig stivhet i rygg', keywords: 'treningsprogram øvelser opptrening rygg korsrygg kink hekseskudd ryggsmerter', icon: 'fitness_center', url: '/treningsprogram/?program=uspesifikke-korsryggsmerter' },
+			{ type: 'program', title: 'Skuldersmerter (Rotatorcuff og skulderblad)', subtitle: 'Opptrening for senebetennelse og inneklemming i skulderen', keywords: 'treningsprogram øvelser opptrening skulder rotatorcuff senebetennelse løft', icon: 'fitness_center', url: '/treningsprogram/?program=subakromielle-skuldersmerter' },
+			{ type: 'program', title: 'Ankelovertråkk og ustabil ankel', subtitle: 'Balanse-, styrke- og mobilitetsprogram for fot og ankel', keywords: 'treningsprogram øvelser opptrening ankel fot overtråkk forstuing balanse', icon: 'fitness_center', url: '/treningsprogram/?program=ankelovertrakk' },
+			{ type: 'program', title: 'Nakkesmerter og kontorstivhet', subtitle: 'Avspenning, bevegelighet og dyp nakkestyrke', keywords: 'treningsprogram øvelser opptrening nakke stiv nakke hodepine skuldre kontor', icon: 'fitness_center', url: '/treningsprogram/?program=nakkesmerter' },
+			{ type: 'program', title: 'Hoftesmerter og senesmerter på utsiden av hoften', subtitle: 'Belastningsstyring og styrke for hofte og sete', keywords: 'treningsprogram øvelser opptrening hofte lyske sete slimpose senebetennelse', icon: 'fitness_center', url: '/treningsprogram/?program=hoftesmerter-gluteal-tendinopati' }
+		]
+	};
+
+	function parseSearchIndexAttr(el) {
+		var raw = el ? el.getAttribute('data-search-index') : '';
+		if (raw) {
+			try {
+				var parsed = JSON.parse(decodeURIComponent(raw));
+				if (parsed && typeof parsed === 'object') {
+					return parsed;
+				}
+			} catch (e) {}
+		}
+		return DEFAULT_SEARCH_INDEX;
+	}
+
+	function attachOmniSearch(opts) {
+		var searchBox = opts.searchBox;
+		var searchInput = opts.searchInput;
+		var searchClear = opts.searchClear;
+		var suggestEl = opts.suggestEl;
+		var products = opts.products || fallbackProducts;
+		var searchIndex = opts.searchIndex || DEFAULT_SEARCH_INDEX;
+		var priserUrl = searchIndex.priserUrl || '/priser/';
+
+		if (!searchBox || !searchInput || !suggestEl) return;
+
+		var activeIdx = -1;
+		var currentActions = [];
+
+		function closeSuggest() {
+			suggestEl.hidden = true;
+			suggestEl.innerHTML = '';
+			searchInput.setAttribute('aria-expanded', 'false');
+			activeIdx = -1;
+			currentActions = [];
+		}
+
+		function buildProductUrl(prod) {
+			var dept = prod.department || inferDepartment(prod);
+			var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+			return priserUrl + sep + 'dept=' + encodeURIComponent(dept) + '&q=' + encodeURIComponent(prod.name) + '&open=' + encodeURIComponent(prod.id);
+		}
+
+		function buildCategoryUrl(deptId, catName) {
+			var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+			return priserUrl + sep + 'dept=' + encodeURIComponent(deptId) + '&cat=' + encodeURIComponent(catName);
+		}
+
+		function renderSuggestions() {
+			var q = (searchInput.value || '').trim().toLowerCase();
+			if (q.length < 1) {
+				closeSuggest();
+				return;
+			}
+
+			var words = q.split(/\s+/).filter(Boolean);
+			function matchesText(haystack) {
+				var h = (haystack || '').toLowerCase();
+				return words.every(function (w) { return h.indexOf(w) !== -1; });
+			}
+
+			// 1. Tools & Triage
+			var matchedTools = (searchIndex.tools || []).filter(function (t) {
+				return matchesText((t.title || '') + ' ' + (t.subtitle || '') + ' ' + (t.keywords || ''));
+			}).slice(0, 3);
+
+			// 2. Training Programs
+			var matchedPrograms = (searchIndex.programs || []).filter(function (p) {
+				return matchesText((p.title || '') + ' ' + (p.subtitle || '') + ' ' + (p.keywords || ''));
+			}).slice(0, 3);
+
+			// 3. Product Categories
+			var matchedCategories = [];
+			DEPARTMENTS.forEach(function (dept) {
+				dept.categories.forEach(function (cat) {
+					if (cat === 'Alle') return;
+					if (matchesText(cat + ' ' + dept.name)) {
+						var count = products.filter(function (p) {
+							return (p.department || inferDepartment(p)) === dept.id && p.category === cat;
+						}).length;
+						matchedCategories.push({
+							deptId: dept.id,
+							deptName: dept.name,
+							category: cat,
+							count: count
+						});
+					}
+				});
+			});
+			matchedCategories = matchedCategories.slice(0, 3);
+
+			// 4. Products
+			var matchedProducts = products.filter(function (p) {
+				return matchesText((p.name || '') + ' ' + (p.brand || '') + ' ' + (p.category || ''));
+			}).slice(0, 4);
+
+			currentActions = [];
+			var html = '';
+
+			function addSection(title, itemsHtml) {
+				if (!itemsHtml) return;
+				html += '<div class="ge-m3-suggest-group">' +
+					'<div class="ge-m3-suggest-group-title">' + escapeHtml(title) + '</div>' +
+					itemsHtml +
+				'</div>';
+			}
+
+			if (matchedTools.length > 0) {
+				var toolsHtml = matchedTools.map(function (t) {
+					var idx = currentActions.length;
+					currentActions.push(function () {
+						window.location.href = t.url;
+					});
+					var badgeLabel = t.type === 'triage' ? 'Symptomsjekk' : 'Veileder';
+					return '<a href="' + escapeHtml(t.url) + '" class="ge-m3-suggest-item m3-sl" role="option" data-suggest-idx="' + idx + '">' +
+						'<span class="ge-m3-suggest-icon"><span class="material-symbols-outlined" aria-hidden="true">' + escapeHtml(t.icon || 'explore') + '</span></span>' +
+						'<span class="ge-m3-suggest-body">' +
+							'<span class="ge-m3-suggest-title">' + escapeHtml(t.title) + '</span>' +
+							'<span class="ge-m3-suggest-sub">' + escapeHtml(t.subtitle || '') + '</span>' +
+						'</span>' +
+						'<span class="ge-m3-suggest-badge">' + badgeLabel + '</span>' +
+					'</a>';
+				}).join('');
+				addSection('Symptomsjekk & Veiledning', toolsHtml);
+			}
+
+			if (matchedPrograms.length > 0) {
+				var progHtml = matchedPrograms.map(function (p) {
+					var idx = currentActions.length;
+					currentActions.push(function () {
+						window.location.href = p.url;
+					});
+					return '<a href="' + escapeHtml(p.url) + '" class="ge-m3-suggest-item m3-sl" role="option" data-suggest-idx="' + idx + '">' +
+						'<span class="ge-m3-suggest-icon is-program"><span class="material-symbols-outlined" aria-hidden="true">' + escapeHtml(p.icon || 'fitness_center') + '</span></span>' +
+						'<span class="ge-m3-suggest-body">' +
+							'<span class="ge-m3-suggest-title">' + escapeHtml(p.title) + '</span>' +
+							'<span class="ge-m3-suggest-sub">' + escapeHtml(p.subtitle || '') + '</span>' +
+						'</span>' +
+						'<span class="ge-m3-suggest-badge is-program">Program</span>' +
+					'</a>';
+				}).join('');
+				addSection('Treningsprogrammer', progHtml);
+			}
+
+			if (matchedCategories.length > 0) {
+				var catHtml = matchedCategories.map(function (c) {
+					var idx = currentActions.length;
+					var catUrl = buildCategoryUrl(c.deptId, c.category);
+					currentActions.push(function () {
+						if (opts.onSelectCategory) {
+							opts.onSelectCategory(c.deptId, c.category);
+							closeSuggest();
+						} else {
+							window.location.href = catUrl;
+						}
+					});
+					return '<a href="' + escapeHtml(catUrl) + '" class="ge-m3-suggest-item m3-sl" role="option" data-suggest-idx="' + idx + '">' +
+						'<span class="ge-m3-suggest-icon is-category"><span class="material-symbols-outlined" aria-hidden="true">category</span></span>' +
+						'<span class="ge-m3-suggest-body">' +
+							'<span class="ge-m3-suggest-title">' + escapeHtml(c.category) + '</span>' +
+							'<span class="ge-m3-suggest-sub">Kategori i ' + escapeHtml(c.deptName) + (c.count ? ' · ' + c.count + ' modeller' : '') + '</span>' +
+						'</span>' +
+						'<span class="ge-m3-suggest-badge">Kategori</span>' +
+					'</a>';
+				}).join('');
+				addSection('Produktkategorier', catHtml);
+			}
+
+			if (matchedProducts.length > 0) {
+				var prodHtml = matchedProducts.map(function (p) {
+					var idx = currentActions.length;
+					var prodUrl = buildProductUrl(p);
+					var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
+					currentActions.push(function () {
+						if (opts.onSelectProduct) {
+							opts.onSelectProduct(p);
+							closeSuggest();
+						} else {
+							window.location.href = prodUrl;
+						}
+					});
+					return '<a href="' + escapeHtml(prodUrl) + '" class="ge-m3-suggest-item ge-m3-suggest-item--product m3-sl" role="option" data-suggest-idx="' + idx + '">' +
+						'<span class="ge-m3-suggest-thumb">' +
+							(p.image ? '<img src="' + escapeHtml(p.image) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';" />' : '<span class="material-symbols-outlined" aria-hidden="true">shopping_bag</span>') +
+						'</span>' +
+						'<span class="ge-m3-suggest-body">' +
+							'<span class="ge-m3-suggest-title">' + escapeHtml((p.brand ? p.brand + ' ' : '') + p.name) + '</span>' +
+							'<span class="ge-m3-suggest-sub">' + escapeHtml(p.category || '') + ' · ' + storeCount + (storeCount === 1 ? ' butikk' : ' butikker') + '</span>' +
+						'</span>' +
+						'<span class="ge-m3-suggest-price">' +
+							'<strong>' + formatPrice(p.currentPrice) + '</strong>' +
+							'<span>Se priser</span>' +
+						'</span>' +
+					'</a>';
+				}).join('');
+				addSection('Produkter (Prissammenligning)', prodHtml);
+			}
+
+			if (!html) {
+				closeSuggest();
+				return;
+			}
+
+			suggestEl.innerHTML = html;
+			suggestEl.hidden = false;
+			searchInput.setAttribute('aria-expanded', 'true');
+			activeIdx = -1;
+
+			suggestEl.querySelectorAll('[data-suggest-idx]').forEach(function (itemEl) {
+				itemEl.addEventListener('click', function (e) {
+					var i = parseInt(itemEl.getAttribute('data-suggest-idx'), 10);
+					if (currentActions[i]) {
+						e.preventDefault();
+						currentActions[i]();
+					}
+				});
+			});
+		}
+
+		function updateActiveOption() {
+			var items = suggestEl.querySelectorAll('[data-suggest-idx]');
+			items.forEach(function (el, i) {
+				el.classList.toggle('is-focused', i === activeIdx);
+				if (i === activeIdx && el.scrollIntoView) {
+					el.scrollIntoView({ block: 'nearest' });
+				}
+			});
+		}
+
+		searchInput.addEventListener('input', function () {
+			if (opts.onInputChange) {
+				opts.onInputChange(searchInput.value);
+			}
+			renderSuggestions();
+		});
+
+		searchInput.addEventListener('focus', function () {
+			if ((searchInput.value || '').trim().length >= 1) {
+				renderSuggestions();
+			}
+		});
+
+		searchInput.addEventListener('keydown', function (e) {
+			if (suggestEl.hidden || currentActions.length === 0) return;
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				activeIdx = (activeIdx + 1) % currentActions.length;
+				updateActiveOption();
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				activeIdx = activeIdx <= 0 ? currentActions.length - 1 : activeIdx - 1;
+				updateActiveOption();
+			} else if (e.key === 'Enter' && activeIdx >= 0 && currentActions[activeIdx]) {
+				e.preventDefault();
+				currentActions[activeIdx]();
+			} else if (e.key === 'Escape') {
+				closeSuggest();
+			}
+		});
+
+		document.addEventListener('click', function (e) {
+			if (!searchBox.contains(e.target)) {
+				closeSuggest();
+			}
+		});
+
+		return {
+			close: closeSuggest,
+			refresh: renderSuggestions
+		};
+	}
+
 	// Deterministisk mapping til avdeling for alle produkter
 	function inferDepartment(product) {
 		if (product && product.department) {
@@ -778,6 +1076,7 @@
 		var initialDept = (urlParams && urlParams.get('dept')) ? urlParams.get('dept') : initialDeptAttr;
 		var initialCat = (urlParams && urlParams.get('cat')) ? urlParams.get('cat') : initialCatAttr;
 		var initialQ = (urlParams && urlParams.get('q')) ? urlParams.get('q') : '';
+		var initialOpenId = (urlParams && urlParams.get('open')) ? parseInt(urlParams.get('open'), 10) : 0;
 
 		// If category set without department, infer department from category
 		if (initialCat !== 'Alle' && (!urlParams || !urlParams.get('dept')) && !root.getAttribute('data-initial-department')) {
@@ -808,7 +1107,7 @@
 			activeQuickFilters: {},
 			selectedForCompare: [],
 			showOnlyDiffs: false,
-			openStores: {},
+			openStores: initialOpenId > 0 ? (function () { var o = {}; o[initialOpenId] = true; return o; })() : {},
 			minPrice: '',
 			maxPrice: '',
 			absMinPrice: 0,
@@ -1825,15 +2124,51 @@
 			else filterToggleBtn.focus();
 		}
 
-		// 3. Attach Event Listeners
-		if (searchInput) {
-			searchInput.addEventListener('input', function (e) {
-				state.searchQuery = e.target.value;
+		// 3. Attach Event Listeners & Omni-Search Autosuggest
+		var searchSuggest = root.querySelector('#ge-search-suggest');
+		var searchIndex = parseSearchIndexAttr(root);
+		var omniCtrl = attachOmniSearch({
+			searchBox: searchBox,
+			searchInput: searchInput,
+			searchClear: searchClear,
+			suggestEl: searchSuggest,
+			products: state.products,
+			searchIndex: searchIndex,
+			onInputChange: function (val) {
+				state.searchQuery = val;
 				state.visibleCount = initialLimit;
 				updateUrlState();
 				updateUI();
-			});
-		}
+			},
+			onSelectCategory: function (deptId, catName) {
+				if (state.activeDepartment !== deptId) {
+					switchDepartment(deptId);
+				}
+				state.searchQuery = '';
+				if (searchInput) searchInput.value = '';
+				switchCategory(catName);
+				if (cardsContainer && cardsContainer.scrollIntoView) {
+					cardsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			},
+			onSelectProduct: function (prod) {
+				var targetDept = prod.department || inferDepartment(prod);
+				if (state.activeDepartment !== targetDept) {
+					switchDepartment(targetDept);
+				}
+				state.activeCategory = 'Alle';
+				state.searchQuery = prod.name;
+				state.openStores = {};
+				state.openStores[prod.id] = true;
+				if (searchInput) searchInput.value = prod.name;
+				renderCategoryChips();
+				updateUrlState();
+				updateUI();
+				if (cardsContainer && cardsContainer.scrollIntoView) {
+					cardsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			}
+		});
 
 		if (searchClear) {
 			searchClear.addEventListener('click', function () {
@@ -1842,6 +2177,7 @@
 					searchInput.value = '';
 					searchInput.focus();
 				}
+				if (omniCtrl) omniCtrl.close();
 				state.visibleCount = initialLimit;
 				updateUrlState();
 				updateUI();
@@ -2055,10 +2391,11 @@
 			'<div class="ge-m3-header-search-slot" id="ge-header-search-slot">' +
 				'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
 					'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
-					'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />' +
+					'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter symptomer, program eller utstyr..." aria-label="Søk etter symptomer, program eller utstyr" aria-autocomplete="list" aria-controls="ge-search-suggest" aria-expanded="false" autocomplete="off" enterkeyhint="search" />' +
 					'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
 						'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
 					'</button>' +
+					'<div id="ge-search-suggest" class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
 				'</div>' +
 			'</div>' +
 		'</header>' +
@@ -2183,18 +2520,54 @@
 		}
 	}
 
+	function initStandaloneSearchBars() {
+		var nodes = document.querySelectorAll('.ge-m3-standalone-search');
+		Array.prototype.forEach.call(nodes, function (node) {
+			if (node.dataset.geInitialized === '1') return;
+			node.dataset.geInitialized = '1';
+
+			var placeholder = node.getAttribute('data-placeholder') || 'Søk i utstyr, programmer og symptomsjekk...';
+			var products = parseFeedAttr(node.getAttribute('data-feed'));
+			var searchIndex = parseSearchIndexAttr(node.getAttribute('data-search-index'));
+
+			node.innerHTML =
+				'<div class="ge-m3-search-box">' +
+					'<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>' +
+					'<input type="search" class="ge-m3-search-input" autocomplete="off" placeholder="' + escapeHtml(placeholder) + '" aria-label="Søk på hele nettstedet">' +
+					'<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="Tøm søk" hidden>' +
+						'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+					'</button>' +
+					'<div class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
+				'</div>';
+
+			attachOmniSearch({
+				inputEl: node.querySelector('.ge-m3-search-input'),
+				clearBtnEl: node.querySelector('.ge-m3-search-clear'),
+				suggestEl: node.querySelector('.ge-m3-search-suggest'),
+				getProducts: function () { return products; },
+				searchIndex: searchIndex
+			});
+		});
+	}
+
+	function bootAll() {
+		initPriceComparison();
+		initStandaloneSearchBars();
+	}
+
 	// Expose public API for integration and testing
 	window.GearEnginePriceComparison = {
 		DEPARTMENTS: DEPARTMENTS,
 		inferDepartment: inferDepartment,
 		getAntiFitNotes: getAntiFitNotes,
 		QUICK_FILTER_DEFS: QUICK_FILTER_DEFS,
-		init: initPriceComparison
+		init: bootAll,
+		initStandaloneSearchBars: initStandaloneSearchBars
 	};
 
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initPriceComparison);
+		document.addEventListener('DOMContentLoaded', bootAll);
 	} else {
-		initPriceComparison();
+		bootAll();
 	}
 })();
