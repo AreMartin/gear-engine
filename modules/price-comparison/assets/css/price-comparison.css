@@ -307,11 +307,12 @@ body.ge-m3-sheet-open {
 }
 
 .ge-m3-header {
-	margin-bottom: 24px;
+	margin-bottom: 16px;
 }
 
 .ge-m3-mobile-search-slot {
-	display: none;
+	display: block;
+	margin-bottom: 20px;
 }
 
 .ge-price-comp-wrapper .ge-m3-title {
@@ -746,11 +747,15 @@ body.ge-m3-sheet-open {
 /* =========================================================
    5. SEARCH BAR, SORT FIELD, FILTER BUTTON, SEGMENTED BUTTON
    ========================================================= */
-.ge-m3-controls {
+.ge-m3-controls,
+.ge-m3-mobile-search-slot {
 	--ge-control-ink: #0C2340;
 	--ge-control-text: #19212F;
 	--ge-control-border: #C2C6D2;
 	--ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04);
+}
+
+.ge-m3-controls {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
@@ -820,17 +825,22 @@ body.ge-m3-sheet-open {
 	gap: 12px;
 }
 
-@container ge-m3-comp (min-width: 900px) {
+@container ge-m3-comp (min-width: 600px) {
 	.ge-m3-controls {
 		flex-direction: row;
 		align-items: center;
 	}
 	.ge-m3-actions-row {
+		width: 100%;
 		flex-wrap: nowrap;
-		flex: 0 0 auto;
+		flex: 1 1 auto;
 	}
 	.ge-m3-sort-wrap {
 		flex: 0 0 220px;
+	}
+	.ge-m3-view-toggle-wrap,
+	.ge-comp-view-toggle-wrap {
+		margin-left: auto;
 	}
 }
 
@@ -994,7 +1004,7 @@ body.ge-m3-sheet-open {
 	box-shadow: inset 0 0 0 1px var(--ge-control-ink), var(--ge-control-shadow);
 }
 
-.ge-m3-controls :is(.ge-m3-search-input, .ge-m3-sort-select, .ge-m3-filter-btn, .ge-m3-view-btn):focus-visible {
+:is(.ge-m3-controls, .ge-m3-mobile-search-slot) :is(.ge-m3-search-input, .ge-m3-sort-select, .ge-m3-filter-btn, .ge-m3-view-btn):focus-visible {
 	outline: 3px solid var(--ge-control-ink);
 	outline-offset: 2px;
 }

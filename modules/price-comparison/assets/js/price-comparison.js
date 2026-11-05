@@ -892,15 +892,11 @@
 			searchInput.value = state.searchQuery;
 		}
 
-		// Responsive placement of search bar and quick filters (< 600px)
+		// Global search bar stays in #ge-mobile-search-slot on all viewports; quick filters relocate on mobile (< 600px)
 		function syncSearchPlacement() {
-			if (!searchBox || !mobileSearchSlot || !controls || !actionsRow) return;
-			if (root.clientWidth <= 599) {
-				if (searchBox.parentNode !== mobileSearchSlot) {
-					mobileSearchSlot.appendChild(searchBox);
-				}
-			} else if (searchBox.parentNode !== controls) {
-				controls.insertBefore(searchBox, actionsRow);
+			if (!searchBox || !mobileSearchSlot) return;
+			if (searchBox.parentNode !== mobileSearchSlot) {
+				mobileSearchSlot.appendChild(searchBox);
 			}
 		}
 
@@ -2043,7 +2039,15 @@
 			'<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>' +
 		'</header>' +
 
-		'<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot"></div>' +
+		'<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot">' +
+			'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
+				'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
+				'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />' +
+				'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
+					'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+				'</button>' +
+			'</div>' +
+		'</div>' +
 
 		'<div class="ge-m3-nav-section ge-dept-section">' +
 			'<div class="ge-m3-dept-track ge-dept-track" id="ge-dept-track" role="tablist" aria-label="Velg avdeling"></div>' +
@@ -2054,14 +2058,6 @@
 		'<div id="ge-dept-alert" role="status" style="display: none;"></div>' +
 
 		'<div class="ge-m3-controls">' +
-			'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
-				'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
-				'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />' +
-				'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
-					'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
-				'</button>' +
-			'</div>' +
-
 			'<div class="ge-m3-actions-row">' +
 				'<div class="ge-m3-sort-wrap">' +
 					'<span class="ge-m3-sort-icon"><span class="material-symbols-outlined" aria-hidden="true">sort</span></span>' +

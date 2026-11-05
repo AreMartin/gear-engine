@@ -418,7 +418,7 @@
 
 		.ge-m3-header { margin-bottom: 24px; }
 
-		.ge-m3-mobile-search-slot { display: none; }
+		.ge-m3-mobile-search-slot { display: block; margin-bottom: 20px; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
 
 		.ge-m3-title {
 			margin: 0 0 4px;
@@ -820,9 +820,10 @@
 
 		.ge-m3-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
-		@container ge-m3-comp (min-width: 900px) {
+		@container ge-m3-comp (min-width: 600px) {
 			.ge-m3-controls { flex-direction: row; align-items: center; }
-			.ge-m3-actions-row { flex-wrap: nowrap; flex: 0 0 auto; }
+			.ge-m3-actions-row { width: 100%; flex-wrap: nowrap; flex: 1 1 auto; }
+			.ge-m3-view-toggle-wrap { margin-left: auto; }
 			.ge-m3-sort-wrap { flex: 0 0 220px; }
 		}
 
@@ -3091,7 +3092,7 @@
 		});
 
 		function syncSearchPlacement() {
-			if (document.getElementById('proto-app-root').clientWidth <= 599) {
+			if (true) {
 				if (searchBox.parentNode !== mobileSearchSlot) {
 					mobileSearchSlot.appendChild(searchBox);
 				}
