@@ -970,13 +970,13 @@
 		return '' +
 		'<div class="ge-m3-card-grid ge-card-grid">' +
 			compareToggleHtml(p, isChecked) +
-			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap">' +
+			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap" data-detail-id="' + p.id + '" role="button" tabindex="0" aria-label="Vis produktdetaljer for ' + escapeHtml(p.name) + '" title="Vis produktdetaljer og spesifikasjoner">' +
 				(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
 				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 			'</div>' +
 			'<div class="ge-m3-card-content">' +
 				'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
-				'<h3 class="ge-m3-card-title">' + escapeHtml(p.name) + '</h3>' +
+				'<h3 class="ge-m3-card-title"><button type="button" class="ge-m3-card-title-btn" data-detail-id="' + p.id + '">' + escapeHtml(p.name) + '</button></h3>' +
 				'<div class="ge-m3-card-bottom">' +
 					priceRowHtml(p, showSavings, save) +
 					shopRowHtml(p, storeCount, isOpen, 'Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker', false) +
@@ -1003,7 +1003,7 @@
 		return '' +
 		'<div class="ge-m3-card-list ge-card-list">' +
 			'<div class="ge-m3-list-main-row ge-list-main-row">' +
-				'<div class="ge-m3-list-img-wrap">' +
+				'<div class="ge-m3-list-img-wrap" data-detail-id="' + p.id + '" role="button" tabindex="0" aria-label="Vis produktdetaljer for ' + escapeHtml(p.name) + '" title="Vis produktdetaljer og spesifikasjoner">' +
 					(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
 					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 				'</div>' +
@@ -1012,7 +1012,7 @@
 						'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
 						compareToggleHtml(p, isChecked) +
 					'</div>' +
-					'<h3 class="ge-m3-card-title">' + escapeHtml(p.name) + '</h3>' +
+					'<h3 class="ge-m3-card-title"><button type="button" class="ge-m3-card-title-btn" data-detail-id="' + p.id + '">' + escapeHtml(p.name) + '</button></h3>' +
 					'<div class="ge-m3-list-action-row">' +
 						priceRowHtml(p, showSavings, save) +
 						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener sponsored" class="ge-m3-cta-btn ge-m3-btn ge-m3-btn--filled ge-m3-list-cta m3-sl">' +
@@ -1108,6 +1108,7 @@
 			selectedForCompare: [],
 			showOnlyDiffs: false,
 			openStores: initialOpenId > 0 ? (function () { var o = {}; o[initialOpenId] = true; return o; })() : {},
+			activeProductId: initialOpenId > 0 ? initialOpenId : null,
 			minPrice: '',
 			maxPrice: '',
 			absMinPrice: 0,
@@ -1389,11 +1390,18 @@
 					url.searchParams.delete('q');
 				}
 
+				if (state.activeProductId) {
+					url.searchParams.set('open', String(state.activeProductId));
+				} else {
+					url.searchParams.delete('open');
+				}
+
 				if (url.toString() !== window.location.href) {
 					window.history.pushState({
 						dept: state.activeDepartment,
 						cat: state.activeCategory,
-						q: state.searchQuery
+						q: state.searchQuery,
+						open: state.activeProductId || null
 					}, '', url.toString());
 				}
 			} catch (e) {}
@@ -1413,6 +1421,7 @@
 		// Comparison Dock & Modal DOM nodes
 		var floatingDock = document.getElementById('ge-floating-cmp-bar');
 		var cmpModal = document.getElementById('ge-cmp-modal');
+		var productModal = document.getElementById('ge-product-modal');
 
 		if (!floatingDock) {
 			var dockEl = document.createElement('aside');
@@ -1463,6 +1472,23 @@
 			filterHost.appendChild(modalEl);
 			cmpModal = modalEl;
 		}
+
+		if (!productModal) {
+			var prodModalEl = document.createElement('div');
+			prodModalEl.id = 'ge-product-modal';
+			prodModalEl.className = 'ge-m3-modal-scrim ge-product-modal-scrim';
+			prodModalEl.style.display = 'none';
+			prodModalEl.setAttribute('role', 'dialog');
+			prodModalEl.setAttribute('aria-modal', 'true');
+			prodModalEl.setAttribute('aria-labelledby', 'ge-product-modal-title');
+			prodModalEl.innerHTML = '<div class="ge-m3-modal-card ge-product-modal-card">' +
+				'<div id="ge-product-modal-content"></div>' +
+			'</div>';
+			filterHost.appendChild(prodModalEl);
+			productModal = prodModalEl;
+		}
+
+		var productModalContent = document.getElementById('ge-product-modal-content');
 
 		var dockSelectedCount = document.getElementById('ge-cmp-selected-count');
 		var dockThumbs = document.getElementById('ge-dock-thumbs');
@@ -1788,6 +1814,264 @@
 			});
 		}
 
+		function renderProductDetailModal(productId) {
+			if (!productModal || !productModalContent) return false;
+			var p = state.products.filter(function (item) {
+				return Number(item.id) === Number(productId);
+			})[0];
+			if (!p) return false;
+
+			var deptId = p.department || inferDepartment(p);
+			var deptObj = DEPARTMENTS.filter(function (d) { return d.id === deptId; })[0];
+			var deptName = deptObj ? deptObj.name : deptId;
+			var stores = (p.stores && p.stores.length > 0) ? p.stores : [
+				{ shop: p.shop || 'Nettbutikk', price: p.currentPrice, inStock: p.inStock !== false, isBest: true, url: p.url || '#' }
+			];
+			var lowestPrice = p.currentPrice || stores[0].price;
+			var maxPrice = stores[stores.length - 1].price;
+			var hasDisc = p.discount && p.discount > 0;
+			var save = (p.originalPrice && p.originalPrice > p.currentPrice) ? (p.originalPrice - p.currentPrice) : 0;
+			var isChecked = state.selectedForCompare.indexOf(p.id) !== -1;
+			var safeImg = p.image && p.image.length > 5 ? p.image : '';
+			var bestStore = stores[0] || { shop: p.shop || 'Nettbutikk', url: p.url || '#', price: lowestPrice, inStock: p.inStock !== false };
+
+			var specEntries = [];
+			if (p.specs && typeof p.specs === 'object') {
+				Object.keys(p.specs).forEach(function (k) {
+					if (p.specs[k]) {
+						specEntries.push({ key: k, val: p.specs[k] });
+					}
+				});
+			}
+			if (specEntries.length === 0) {
+				specEntries.push({ key: 'Kategori', val: p.category || 'Treningsutstyr' });
+				specEntries.push({ key: 'Merke', val: p.brand || 'Ukjent' });
+			}
+
+			var notes = getAntiFitNotes(p);
+
+			var related = state.products.filter(function (other) {
+				return other.id !== p.id && other.category === p.category;
+			});
+			if (related.length < 3) {
+				var deptRelated = state.products.filter(function (other) {
+					var od = other.department || inferDepartment(other);
+					return other.id !== p.id && other.category !== p.category && od === deptId;
+				});
+				related = related.concat(deptRelated);
+			}
+			related = related.slice(0, 3);
+
+			var storesRowsHtml = stores.map(function (st) {
+				var isBest = st.price === lowestPrice;
+				var rowClass = 'ge-m3-ldrow ge-m3-ldrow-link' + (isBest ? ' is-best-deal' : '');
+				return '<a href="' + escapeHtml(st.url || '#') + '" target="_blank" rel="noopener sponsored" aria-label="Kjøp hos ' + escapeHtml(st.shop) + ' for ' + formatPrice(st.price) + (st.inStock ? ', på lager' : ', utsolgt') + '" class="' + rowClass + '">' +
+					(isBest ? '<span class="ge-m3-store-tag">Best pris</span>' : '') +
+					'<span class="ge-m3-ldrow-name">' +
+						renderMerchantLogoHtml(st.shop) +
+						escapeHtml(st.shop) +
+						'<span class="ge-m3-ldrow-dot ' + (st.inStock ? 'is-in-stock' : 'is-out-of-stock') + '" title="' + (st.inStock ? 'På lager' : 'Utsolgt') + '"></span>' +
+						'<span class="ge-m3-sr-only">' + (st.inStock ? 'På lager' : 'Utsolgt') + '</span>' +
+					'</span>' +
+					'<span class="ge-m3-ldrow-right">' +
+						'<span class="ge-m3-ldrow-price">' + formatPrice(st.price) + '</span>' +
+						'<span class="ge-m3-store-btn ge-m3-btn ge-m3-btn--filled m3-sl" aria-hidden="true">Til butikk ' + ic('ext') + '</span>' +
+					'</span>' +
+				'</a>';
+			}).join('');
+
+			var specsHtml = specEntries.map(function (entry) {
+				return '<div class="ge-prod-modal-spec-item">' +
+					'<dt>' + escapeHtml(entry.key) + '</dt>' +
+					'<dd>' + escapeHtml(entry.val) + '</dd>' +
+				'</div>';
+			}).join('');
+
+			var notesHtml = notes.map(function (note) {
+				return '<li>' + escapeHtml(note) + '</li>';
+			}).join('');
+
+			var relatedHtml = '';
+			if (related.length > 0) {
+				relatedHtml = '<section class="ge-prod-modal-related" aria-label="Lignende produkter">' +
+					'<h3 class="ge-prod-modal-section-title">Alternativer i samme kategori</h3>' +
+					'<div class="ge-prod-modal-related-grid">' +
+						related.map(function (rel) {
+							return '<div class="ge-prod-modal-rel-card">' +
+								'<button type="button" class="ge-prod-modal-rel-main m3-sl" data-detail-id="' + rel.id + '">' +
+									'<span class="ge-prod-modal-rel-thumb">' +
+										(rel.image ? '<img src="' + escapeHtml(rel.image) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';" />' : '') +
+									'</span>' +
+									'<span class="ge-prod-modal-rel-info">' +
+										'<span class="ge-m3-brand">' + escapeHtml(rel.brand || 'UTSTYR') + '</span>' +
+										'<span class="ge-prod-modal-rel-title">' + escapeHtml(rel.name) + '</span>' +
+										'<span class="ge-prod-modal-rel-price">Fra ' + formatPrice(rel.currentPrice) + '</span>' +
+									'</span>' +
+								'</button>' +
+								'<button type="button" class="ge-prod-modal-rel-cmp ge-m3-btn ge-m3-btn--tonal m3-sl" data-compare-pair-id="' + rel.id + '">' +
+									'<span class="material-symbols-outlined" aria-hidden="true">compare_arrows</span>' +
+									'<span>Sammenlign med denne</span>' +
+								'</button>' +
+							'</div>';
+						}).join('') +
+					'</div>' +
+				'</section>';
+			}
+
+			productModalContent.innerHTML =
+				'<div class="ge-m3-modal-head ge-prod-modal-head">' +
+					'<div class="ge-prod-modal-head-text">' +
+						'<div class="ge-prod-modal-breadcrumbs">' +
+							'<span class="ge-m3-spec-pill sec">' + escapeHtml(deptName) + '</span>' +
+							'<span class="ge-prod-modal-bc-sep" aria-hidden="true">›</span>' +
+							'<span class="ge-m3-spec-pill sec">' + escapeHtml(p.category || 'Utstyr') + '</span>' +
+							'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
+						'</div>' +
+						'<h2 id="ge-product-modal-title" class="ge-m3-modal-title">' + escapeHtml(p.name) + '</h2>' +
+					'</div>' +
+					'<div class="ge-m3-modal-actions">' +
+						'<label class="ge-m3-diff-toggle ge-prod-modal-cmp-toggle m3-sl' + (isChecked ? ' is-active' : '') + '" title="Legg til i side-om-side sammenligning">' +
+							'<input type="checkbox" id="ge-prod-modal-cmp-chk" class="ge-m3-diff-checkbox" data-id="' + p.id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+							CHIP_CHECK +
+							'<span>Sammenlign</span>' +
+						'</label>' +
+						'<button type="button" id="ge-product-modal-close" class="ge-m3-modal-close ge-m3-icon-btn m3-sl" title="Lukk produktvisning" aria-label="Lukk produktvisning">' + ic('close') + '</button>' +
+					'</div>' +
+				'</div>' +
+				'<div class="ge-m3-modal-body ge-prod-modal-body">' +
+					'<div class="ge-prod-modal-hero">' +
+						'<div class="ge-prod-modal-visual">' +
+							'<div class="ge-prod-modal-img-card">' +
+								(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
+								stockHtml(p.inStock !== false, 'ge-m3-stock-badge ge-prod-modal-stock') +
+								(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-prod-modal-img" onerror="this.style.display=\'none\';" />' : '') +
+							'</div>' +
+							'<div class="ge-prod-modal-best-box">' +
+								'<div class="ge-prod-modal-best-meta">' +
+									'<span class="ge-prod-modal-best-label">Laveste pris nå hos <strong>' + escapeHtml(bestStore.shop) + '</strong></span>' +
+									'<div class="ge-m3-price-row">' +
+										'<span class="ge-m3-price-current">' + formatPrice(lowestPrice) + '</span>' +
+										(p.originalPrice ? '<span class="ge-m3-price-original">' + formatPrice(p.originalPrice) + '</span>' : '') +
+										(save > 0 ? '<span class="ge-m3-savings-chip ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
+									'</div>' +
+								'</div>' +
+								'<a href="' + escapeHtml(bestStore.url || '#') + '" target="_blank" rel="noopener sponsored" class="ge-prod-modal-primary-cta ge-m3-btn ge-m3-btn--filled m3-sl">' +
+									'<span>Gå til beste tilbud hos ' + escapeHtml(bestStore.shop) + '</span>' +
+									ic('ext') +
+								'</a>' +
+							'</div>' +
+						'</div>' +
+						'<div class="ge-prod-modal-stores">' +
+							'<div class="ge-prod-modal-stores-head">' +
+								'<div>' +
+									'<h3 class="ge-prod-modal-section-title">Prissammenligning (' + stores.length + (stores.length === 1 ? ' butikk' : ' butikker') + ')</h3>' +
+									(stores.length > 1 && maxPrice > lowestPrice
+										? '<p class="ge-prod-modal-stores-sub">Prisspenn fra ' + formatPrice(lowestPrice) + ' til ' + formatPrice(maxPrice) + ' (du sparer opptil ' + formatPrice(maxPrice - lowestPrice) + ')</p>'
+										: '<p class="ge-prod-modal-stores-sub">Oppdaterte priser og lagerstatus fra våre tilknyttede forhandlere</p>') +
+								'</div>' +
+							'</div>' +
+							'<div class="ge-m3-ldrawer-rows ge-prod-modal-store-rows">' +
+								storesRowsHtml +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+					'<div class="ge-prod-modal-details">' +
+						'<section class="ge-prod-modal-specs-card" aria-label="Tekniske spesifikasjoner">' +
+							'<h3 class="ge-prod-modal-section-title">' +
+								'<span class="material-symbols-outlined" aria-hidden="true">fact_check</span>' +
+								'<span>Tekniske spesifikasjoner</span>' +
+							'</h3>' +
+							'<dl class="ge-prod-modal-spec-list">' +
+								specsHtml +
+							'</dl>' +
+						'</section>' +
+						'<section class="ge-prod-modal-notes-card" aria-label="Faglig vurdering">' +
+							'<h3 class="ge-prod-modal-section-title">' +
+								'<span class="material-symbols-outlined" aria-hidden="true">health_and_safety</span>' +
+								'<span>Faglig vurdering – Vær obs på</span>' +
+							'</h3>' +
+							'<div class="ge-m3-antifit-box ge-antifit-box">' +
+								'<ul>' + notesHtml + '</ul>' +
+							'</div>' +
+						'</section>' +
+					'</div>' +
+					relatedHtml +
+				'</div>';
+
+			var closeBtn = productModalContent.querySelector('#ge-product-modal-close');
+			if (closeBtn) {
+				closeBtn.addEventListener('click', closeProductModal);
+			}
+
+			var modalCmpChk = productModalContent.querySelector('#ge-prod-modal-cmp-chk');
+			if (modalCmpChk) {
+				modalCmpChk.addEventListener('change', function () {
+					var id = p.id;
+					if (modalCmpChk.checked) {
+						if (state.selectedForCompare.length >= 3) {
+							alert('Du kan sammenligne maksimalt 3 produkter samtidig.');
+							modalCmpChk.checked = false;
+							return;
+						}
+						if (state.selectedForCompare.indexOf(id) === -1) {
+							state.selectedForCompare.push(id);
+						}
+					} else {
+						var idx = state.selectedForCompare.indexOf(id);
+						if (idx !== -1) state.selectedForCompare.splice(idx, 1);
+					}
+					var toggleLbl = modalCmpChk.closest('.ge-prod-modal-cmp-toggle');
+					if (toggleLbl) toggleLbl.classList.toggle('is-active', modalCmpChk.checked);
+					updateUI();
+				});
+			}
+
+			productModalContent.querySelectorAll('[data-detail-id]').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					var nextId = parseInt(btn.getAttribute('data-detail-id'), 10);
+					openProductModal(nextId);
+				});
+			});
+
+			productModalContent.querySelectorAll('[data-compare-pair-id]').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					var otherId = parseInt(btn.getAttribute('data-compare-pair-id'), 10);
+					if (state.selectedForCompare.indexOf(p.id) === -1) {
+						if (state.selectedForCompare.length >= 3) state.selectedForCompare.shift();
+						state.selectedForCompare.push(p.id);
+					}
+					if (state.selectedForCompare.indexOf(otherId) === -1) {
+						if (state.selectedForCompare.length >= 3) state.selectedForCompare.shift();
+						state.selectedForCompare.push(otherId);
+					}
+					closeProductModal();
+					updateUI();
+					openCompareModal();
+				});
+			});
+
+			return true;
+		}
+
+		function openProductModal(productId) {
+			if (!renderProductDetailModal(productId)) return;
+			state.activeProductId = Number(productId);
+			productModal.style.display = 'flex';
+			document.body.style.overflow = 'hidden';
+			updateUrlState();
+			var closeBtn = productModalContent.querySelector('#ge-product-modal-close');
+			if (closeBtn) closeBtn.focus();
+		}
+
+		function closeProductModal() {
+			state.activeProductId = null;
+			if (productModal) {
+				productModal.style.display = 'none';
+				document.body.style.overflow = '';
+			}
+			updateUrlState();
+		}
+
 		// Main update function
 		function updateUI(options) {
 			options = options || {};
@@ -2010,6 +2294,25 @@
 						'<div class="ge-m3-list-column ge-comp-list-column">' + visibleProducts.slice(columnSplit).map(function (prod) { return renderListCardHtml(prod, state); }).join('') + '</div>';
 				}
 
+				// Attach product detail modal triggers (image & title)
+				cardsContainer.querySelectorAll('[data-detail-id]').forEach(function (el) {
+					el.addEventListener('click', function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						var id = parseInt(el.getAttribute('data-detail-id'), 10);
+						openProductModal(id);
+					});
+					if (el.tagName !== 'BUTTON') {
+						el.addEventListener('keydown', function (e) {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								var id = parseInt(el.getAttribute('data-detail-id'), 10);
+								openProductModal(id);
+							}
+						});
+					}
+				});
+
 				// Attach store compare trigger listeners
 				cardsContainer.querySelectorAll('.ge-m3-shop-compare-trigger').forEach(function (el) {
 					el.addEventListener('click', function (e) {
@@ -2157,16 +2460,11 @@
 					switchDepartment(targetDept);
 				}
 				state.activeCategory = 'Alle';
-				state.searchQuery = prod.name;
 				state.openStores = {};
 				state.openStores[prod.id] = true;
-				if (searchInput) searchInput.value = prod.name;
 				renderCategoryChips();
-				updateUrlState();
 				updateUI();
-				if (cardsContainer && cardsContainer.scrollIntoView) {
-					cardsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-				}
+				openProductModal(prod.id);
 			}
 		});
 
@@ -2285,9 +2583,17 @@
 			});
 		}
 
+		if (productModal) {
+			productModal.addEventListener('click', function (e) {
+				if (e.target === productModal) closeProductModal();
+			});
+		}
+
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape') {
-				if (cmpModal && cmpModal.style.display !== 'none') {
+				if (productModal && productModal.style.display !== 'none') {
+					closeProductModal();
+				} else if (cmpModal && cmpModal.style.display !== 'none') {
 					closeCompareModal();
 				} else if (state.showFilters) {
 					setFiltersOpen(false);
@@ -2323,6 +2629,7 @@
 			var newDept = (stateObj && stateObj.dept) || (urlP && urlP.get('dept')) || initialDeptAttr;
 			var newCat = (stateObj && stateObj.cat) || (urlP && urlP.get('cat')) || initialCatAttr;
 			var newQ = (stateObj && typeof stateObj.q === 'string') ? stateObj.q : ((urlP && urlP.get('q')) || '');
+			var newOpen = (stateObj && stateObj.open) || (urlP && urlP.get('open') ? parseInt(urlP.get('open'), 10) : null);
 
 			var deptValid = DEPARTMENTS.some(function (d) { return d.id === newDept; });
 			if (!deptValid) newDept = 'kondisjon';
@@ -2347,10 +2654,19 @@
 			renderCategoryChips();
 			renderQuickFilters();
 			updateUI();
+
+			if (newOpen) {
+				openProductModal(newOpen);
+			} else if (productModal && productModal.style.display !== 'none') {
+				closeProductModal();
+			}
 		});
 
 		// Initial render
 		updateUI();
+		if (state.activeProductId) {
+			openProductModal(state.activeProductId);
+		}
 	}
 
 	// Initial DOM skeleton constructor matching scratch/price-comparison-material3-prototype.html

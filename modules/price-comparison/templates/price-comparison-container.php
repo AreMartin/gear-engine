@@ -97,6 +97,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div id="ge-cmp-modal-body" class="ge-m3-modal-body"></div>
 		</div>
 	</div>
+
+	<!-- Utvidet produktdetalj-modal (Alternativ A: Hurtigvisning med butikkliste, specs og faglige råd) -->
+	<div id="ge-product-modal" class="ge-m3-modal-scrim ge-product-modal-scrim" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ge-product-modal-title">
+		<div class="ge-m3-modal-card ge-product-modal-card">
+			<div id="ge-product-modal-content"></div>
+		</div>
+	</div>
 </div>
 <style>
 @keyframes ge-spin {

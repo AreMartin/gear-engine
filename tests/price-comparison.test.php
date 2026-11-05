@@ -345,6 +345,12 @@ assert_test( strpos( $js_content, 'attachOmniSearch' ) !== false && strpos( $js_
 assert_test( strpos( $js_content, 'ge-m3-search-suggest' ) !== false && strpos( $css_content, '.ge-m3-search-suggest' ) !== false, 'JS and CSS support Material 3 autosuggest dropdown' );
 assert_test( strpos( $js_content, "urlParams.get('open')" ) !== false, 'JS supports ?open={id} parameter to auto-expand product retailer prices' );
 
+// Test 17: Alternativ A - Extended Product Detail Modal (#ge-product-modal)
+assert_test( strpos( $html, 'id="ge-product-modal"' ) !== false, 'Container template contains #ge-product-modal dialog' );
+assert_test( strpos( $js_content, 'renderProductDetailModal' ) !== false && strpos( $js_content, 'openProductModal' ) !== false, 'JS defines renderProductDetailModal and openProductModal' );
+assert_test( strpos( $js_content, 'data-detail-id' ) !== false, 'Product cards and related items include data-detail-id triggers' );
+assert_test( strpos( $css_content, '.ge-product-modal-card' ) !== false && strpos( $css_content, '.ge-prod-modal-hero' ) !== false, 'CSS contains Material 3 styling for extended product detail modal' );
+
 echo "========================================================\n";
 if ( $failed === 0 ) {
 	echo "ALL PRICE COMPARISON TESTS PASSED ($passed/$passed)\n";
