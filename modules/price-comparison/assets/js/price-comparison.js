@@ -1126,13 +1126,75 @@
 
 			// Summary footer
 			if (selected.length > 1 && priceDiff > 0) {
-				h += '<div style="margin-top:14px; padding:10px 14px; background:#f8fafc; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:12.5px; border:1px solid #e2e8f0;">' +
+				h += '<div class="ge-matrix-summary">' +
 					'<span>Prisspenn i sammenligningen: <b>' + formatPrice(minPrice) + '</b> – <b>' + formatPrice(maxPrice) + '</b></span>' +
-					'<span style="color:#059669; font-weight:700;">Prisforskjell: ' + formatPrice(priceDiff) + '</span>' +
+					'<span class="ge-matrix-summary-diff">Prisforskjell: ' + formatPrice(priceDiff) + '</span>' +
 				'</div>';
 			}
 
 			cmpModalBody.innerHTML = h;
+
+			var compareTable = cmpModalBody.querySelector('.ge-matrix-table');
+			if (compareTable) {
+				var tableRows = compareTable.querySelectorAll('tr');
+				var mobileList = document.createElement('div');
+				mobileList.className = 'ge-mobile-compare-list';
+				mobileList.setAttribute('aria-label', 'Sammenligning per modell');
+
+				selected.forEach(function (product, productIndex) {
+					var productCell = tableRows[0].cells[productIndex + 1];
+					var productHeader = productCell ? productCell.querySelector('.ge-matrix-card-top') : null;
+					if (!productHeader) return;
+
+					var specRows = [];
+					for (var rowIndex = 1; rowIndex < tableRows.length; rowIndex++) {
+						var row = tableRows[rowIndex];
+						if (row.classList.contains('matrix-action-row')) continue;
+
+						var labelCell = row.cells[0];
+						var valueCell = row.cells[productIndex + 1];
+						if (!labelCell || !valueCell) continue;
+
+						var specRow = document.createElement('div');
+						specRow.className = 'ge-mobile-spec-row';
+						var label = document.createElement('dt');
+						label.innerHTML = labelCell.innerHTML;
+						var value = document.createElement('dd');
+						value.innerHTML = valueCell.innerHTML;
+						specRow.appendChild(label);
+						specRow.appendChild(value);
+						specRows.push(specRow);
+					}
+
+					var card = document.createElement('section');
+					card.className = 'ge-mobile-product-card';
+					card.setAttribute('aria-label', 'Sammenligning: ' + product.name);
+
+					var header = document.createElement('div');
+					header.className = 'ge-mobile-product-head';
+					header.appendChild(productHeader.cloneNode(true));
+					card.appendChild(header);
+
+					if (specRows.length) {
+						var specs = document.createElement('dl');
+						specs.className = 'ge-mobile-product-specs';
+						specRows.forEach(function (specRow) { specs.appendChild(specRow); });
+						card.appendChild(specs);
+					} else {
+						var empty = document.createElement('p');
+						empty.className = 'ge-mobile-empty-specs';
+						empty.textContent = 'Ingen spesifikasjoner å vise med valgt filter.';
+						card.appendChild(empty);
+					}
+
+					mobileList.appendChild(card);
+				});
+
+				var matrixWrap = compareTable.closest('.ge-matrix-wrap');
+				if (matrixWrap && mobileList.childElementCount) {
+					matrixWrap.parentNode.insertBefore(mobileList, matrixWrap.nextSibling);
+				}
+			}
 
 			// Attach remove button listeners
 			cmpModalBody.querySelectorAll('.ge-matrix-remove-btn').forEach(function (btn) {
@@ -2096,4 +2158,3 @@
 		initPriceComparison();
 	}
 })();
-
