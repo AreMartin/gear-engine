@@ -493,8 +493,8 @@
 		}
 
 		.ge-m3-dept-btn.is-active {
-			background: var(--md-sys-color-primary-container);
-			color: var(--md-sys-color-on-primary-container);
+			background: var(--md-sys-color-surface-container-high);
+			color: var(--md-sys-color-on-surface);
 		}
 
 		.ge-m3-comp-wrapper.is-mobile-layout { display: flex; flex-direction: column; }
@@ -704,7 +704,7 @@
 		.ge-m3-filter-pill-shop { padding-left: 8px; }
 
 		#proto-filter-panel .ge-m3-filter-pill {
-			height: 40px;
+			height: 36px;
 			padding: 0 14px;
 			border-color: var(--md-sys-color-outline-variant);
 			border-radius: var(--md-sys-shape-corner-full);
@@ -853,6 +853,7 @@
 
 		.ge-m3-select { padding-right: 48px; cursor: pointer; }
 		.ge-m3-sort-select {
+			height: 48px;
 			padding-left: 44px;
 			border-color: var(--md-sys-color-outline-variant);
 			border-radius: var(--md-sys-shape-corner-full);
@@ -909,11 +910,12 @@
 
 		.ge-m3-sort-arrow {
 			position: absolute;
-			top: 16px;
+			top: 50%;
 			right: 12px;
 			display: flex;
 			color: var(--ge-control-ink);
 			pointer-events: none;
+			transform: translateY(-50%);
 		}
 		.ge-m3-sort-icon {
 			position: absolute;
@@ -926,7 +928,7 @@
 		}
 
 		.ge-m3-filter-btn {
-			height: 56px;
+			height: 48px;
 			padding: 0 20px;
 			background: #fff;
 			color: var(--ge-control-ink);
@@ -961,7 +963,7 @@
 
 		.ge-m3-view-toggle {
 			display: inline-flex;
-			height: 56px;
+			height: 48px;
 			border: 1px solid var(--ge-control-ink);
 			border-radius: var(--md-sys-shape-corner-full);
 			box-shadow: var(--ge-control-shadow);
@@ -1001,6 +1003,7 @@
 
 		@container ge-m3-comp (max-width: 599px) {
 			.ge-m3-view-text { display: none; }
+			.ge-m3-controls { margin-bottom: 12px; }
 			.ge-m3-actions-row {
 				display: grid;
 				width: 100%;
@@ -1009,22 +1012,21 @@
 			}
 			.ge-m3-sort-wrap { flex: initial; }
 			.ge-m3-sort-select {
-				height: 44px;
+				height: 40px;
 				padding-right: 36px;
 				padding-left: 40px;
 				font: 400 13px/18px var(--md-ref-typeface);
 				letter-spacing: 0.25px;
 			}
-			.ge-m3-sort-arrow { top: 50%; transform: translateY(-50%); }
 			.ge-m3-filter-btn {
-				height: 44px;
+				height: 40px;
 				gap: 6px;
 				padding: 0 12px;
 				font: 400 13px/18px var(--md-ref-typeface);
 			}
 			.ge-m3-filter-btn .material-symbols-outlined { font-size: 18px; }
 			.ge-m3-filter-badge { min-width: 20px; height: 20px; }
-			.ge-m3-view-toggle { height: 44px; }
+			.ge-m3-view-toggle { height: 40px; }
 			.ge-m3-view-btn { gap: 6px; padding: 0 10px; }
 			.ge-m3-view-btn .ge-m3-seg-icon {
 				font-size: 18px;
@@ -1110,6 +1112,7 @@
 		@media (max-width: 599px) {
 			.ge-m3-filter-quick-filters { display: flex; }
 			.ge-m3-filter-quick-filters .ge-m3-qchip { height: 48px; }
+			#proto-filter-panel .ge-m3-pills-scroll .ge-m3-filter-pill { height: 40px; }
 		}
 
 		.ge-m3-section-title {
@@ -1289,19 +1292,19 @@
 			padding: 0 10px 0 8px;
 			border: 1px solid var(--md-sys-color-outline-variant);
 			border-radius: var(--md-sys-shape-corner-small);
-			background: var(--md-sys-color-surface-container-lowest);
+			background: color-mix(in srgb, var(--md-sys-color-surface-container-lowest) 76%, transparent);
 			color: var(--md-sys-color-on-surface-variant);
 			font: var(--md-sys-typescale-label-medium);
 			font-weight: 600;
 			letter-spacing: 0.1px;
 			white-space: nowrap;
 			cursor: pointer;
+			-webkit-backdrop-filter: blur(10px) saturate(140%);
+			backdrop-filter: blur(10px) saturate(140%);
 		}
 
 		.ge-m3-cmp-toggle:has(input:checked) {
-			border-color: transparent;
-			background: var(--md-sys-color-secondary-container);
-			color: var(--md-sys-color-on-secondary-container);
+			background: color-mix(in srgb, var(--md-sys-color-surface-container-lowest) 76%, transparent);
 		}
 
 		.ge-m3-cmp-toggle:has(input:focus-visible) { outline: 3px solid var(--md-sys-color-secondary); outline-offset: 2px; }
@@ -2098,7 +2101,7 @@
 			max-width: 1040px;
 			max-height: calc(100dvh - 48px);
 			overflow: hidden;
-			background: var(--md-sys-color-surface-container-high);
+			background: var(--md-sys-color-surface-container-lowest);
 			color: var(--md-sys-color-on-surface);
 			border-radius: var(--md-sys-shape-corner-extra-large);
 			box-shadow: var(--md-sys-elevation-3);
@@ -2123,7 +2126,7 @@
 		.ge-m3-modal-title { margin: 0 0 4px; font: var(--md-sys-typescale-headline-small); color: var(--md-sys-color-on-surface); }
 		.ge-m3-modal-supporting { margin: 0; font: var(--md-sys-typescale-body-medium); letter-spacing: 0.25px; color: var(--md-sys-color-on-surface-variant); }
 		.ge-m3-modal-actions { display: flex; align-items: center; gap: 8px; }
-		.ge-m3-modal-body { flex: 1 1 auto; overflow: auto; padding: 24px; }
+		.ge-m3-modal-body { flex: 1 1 auto; overflow: auto; padding: 24px; background: var(--md-sys-color-surface-container-lowest); }
 
 		.ge-m3-diff-toggle {
 			position: relative;
@@ -2319,6 +2322,72 @@
 		}
 
 		.ge-m3-matrix-summary-diff { color: var(--md-sys-color-tertiary); font-weight: 500; }
+		.ge-m3-mobile-compare-list { display: none; }
+
+		@media (max-width: 599px) {
+			.ge-m3-modal-head { flex-direction: column; gap: 8px; padding: 16px 16px 12px; }
+			.ge-m3-modal-title { font-size: 22px; line-height: 28px; }
+			.ge-m3-modal-supporting { font-size: 13px; line-height: 18px; }
+			.ge-m3-modal-actions { width: 100%; justify-content: space-between; }
+			.ge-m3-modal-body { padding: 16px; }
+			.ge-m3-matrix-wrap { display: none; }
+			.ge-m3-mobile-compare-list { display: grid; gap: 16px; }
+			.ge-m3-mobile-product-card {
+				overflow: hidden;
+				border: 1px solid var(--md-sys-color-outline-variant);
+				border-radius: var(--md-sys-shape-corner-large);
+				background: var(--md-sys-color-surface-container-lowest);
+			}
+			.ge-m3-mobile-product-head { padding: 16px; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-card-top {
+				display: grid;
+				grid-template-columns: 72px minmax(0, 1fr);
+				align-items: center;
+				gap: 4px 12px;
+			}
+			.ge-m3-mobile-product-card .ge-m3-matrix-thumb {
+				grid-column: 1;
+				grid-row: 1 / span 3;
+				width: 72px;
+				height: 72px;
+				padding: 4px;
+			}
+			.ge-m3-mobile-product-card .ge-m3-matrix-brand,
+			.ge-m3-mobile-product-card .ge-m3-matrix-prod-title,
+			.ge-m3-mobile-product-card .ge-m3-matrix-price-row { grid-column: 2; min-width: 0; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-brand { padding-right: 36px; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-prod-title { height: auto; padding-right: 36px; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-price-row { flex-wrap: wrap; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-price { font-size: 20px; line-height: 28px; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-cta { grid-column: 1 / -1; margin-top: 8px; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-best-tag { top: 0; left: 0; }
+			.ge-m3-mobile-product-card .ge-m3-matrix-remove-btn { top: 0; right: 0; }
+			.ge-m3-mobile-product-specs { margin: 0; padding: 0 16px; }
+			.ge-m3-mobile-spec-row {
+				display: grid;
+				grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1.2fr);
+				gap: 12px;
+				padding: 12px 0;
+				border-top: 1px solid var(--md-sys-color-outline-variant);
+			}
+			.ge-m3-mobile-spec-row dt {
+				color: var(--md-sys-color-on-surface-variant);
+				font: var(--md-sys-typescale-label-large);
+			}
+			.ge-m3-mobile-spec-row dd {
+				min-width: 0;
+				margin: 0;
+				font: var(--md-sys-typescale-body-medium);
+				overflow-wrap: anywhere;
+			}
+			.ge-m3-mobile-empty-specs {
+				margin: 0;
+				padding: 12px 16px 16px;
+				color: var(--md-sys-color-on-surface-variant);
+				font: var(--md-sys-typescale-body-small);
+			}
+			.ge-m3-matrix-summary { gap: 8px; }
+		}
 	</style>
 </head>
 <body>
@@ -2566,7 +2635,6 @@
 				stores: [
 					{ shop: "Fjellsport", price: 12490, inStock: true, isBest: true, url: "#deal-fjellsport" },
 					{ shop: "Treningspartner", price: 12990, inStock: true, isBest: false, url: "#deal-tp" },
-					{ shop: "X-Life", price: 13490, inStock: true, isBest: false, url: "#deal-xlife" },
 					{ shop: "Anton Sport", price: 13990, inStock: false, isBest: false, url: "#deal-anton" }
 				]
 			},
@@ -2598,13 +2666,12 @@
 			{
 				id: 3, department: "styrke", category: "Kettlebells", brand: "Abilica",
 				name: "Competition Kettlebell 16kg",
-				currentPrice: 899, originalPrice: 1199, discount: 25, shop: "X-Life", inStock: true,
+				currentPrice: 999, originalPrice: 1199, discount: 17, shop: "Treningspartner", inStock: true,
 				image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-kettlebell",
 				specs: { "Vekt": "16 kg", "Type": "Konkurranse", "Materiale": "Stål", "Fargekode": "Gul" },
 				stores: [
-					{ shop: "X-Life", price: 899, inStock: true, isBest: true, url: "#deal-xlife" },
-					{ shop: "Treningspartner", price: 999, inStock: true, isBest: false, url: "#deal-tp" },
+					{ shop: "Treningspartner", price: 999, inStock: true, isBest: true, url: "#deal-tp" },
 					{ shop: "Gymgrossisten", price: 1049, inStock: true, isBest: false, url: "#deal-gym" }
 				]
 			},
@@ -2688,20 +2755,18 @@
 				url: "#deal-mueller",
 				specs: { "Type": "Korsett med 8 stålfjærer", "Støttenivå": "Justerbar kompresjon", "Bredde": "23 cm", "Neopren": "Ja" },
 				stores: [
-					{ shop: "Gymgrossisten", price: 449, inStock: true, isBest: true, url: "#deal-gym" },
-					{ shop: "X-Life", price: 529, inStock: true, isBest: false, url: "#deal-xlife" }
+					{ shop: "Gymgrossisten", price: 449, inStock: true, isBest: true, url: "#deal-gym" }
 				]
 			},
 			{
 				id: 17, department: "rehabilitering", category: "Treningsstrikker", brand: "Abilica",
 				name: "PowerBand Gummistrikk Sett (3 motstander)",
-				currentPrice: 349, originalPrice: 499, discount: 30, shop: "X-Life", inStock: true,
+				currentPrice: 399, originalPrice: 499, discount: 20, shop: "Treningspartner", inStock: true,
 				image: "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?auto=format&fit=crop&w=400&q=80",
 				url: "#deal-powerband",
 				specs: { "Type": "Lukkede sirkelstrikker", "Motstand": "Lett / Medium / Hard", "Materiale": "100% naturgummi" },
 				stores: [
-					{ shop: "X-Life", price: 349, inStock: true, isBest: true, url: "#deal-xlife" },
-					{ shop: "Treningspartner", price: 399, inStock: true, isBest: false, url: "#deal-tp" }
+					{ shop: "Treningspartner", price: 399, inStock: true, isBest: true, url: "#deal-tp" }
 				]
 			},
 			{
@@ -3420,9 +3485,7 @@
 			'antonsport':      'antonsport.no',
 			'tights':          'tights.no',
 			'milrab':          'milrab.no',
-			'proteinfabrikken':'proteinfabrikken.no',
-			'x-life':          'x-life.no',
-			'xlife':           'x-life.no'
+			'proteinfabrikken':'proteinfabrikken.no'
 		};
 
 		function cleanShopName(raw) {
@@ -3718,7 +3781,7 @@
 				h += '<td class="matrix-prod-col' + (isLowest ? ' is-best-col' : '') + '">' +
 					'<div class="ge-m3-matrix-card-top' + (isLowest ? ' is-best-deal' : '') + '">' +
 						(isLowest ? '<span class="ge-m3-matrix-best-tag">Best pris</span>' : '') +
-						'<button type="button" class="ge-m3-matrix-remove-btn ge-m3-icon-btn m3-sl" data-remove-id="' + p.id + '" title="Fjern fra sammenligning" aria-label="Fjern">' +
+						'<button type="button" class="ge-m3-matrix-remove-btn ge-m3-icon-btn m3-sl" data-remove-id="' + p.id + '" title="Fjern fra sammenligning" aria-label="Fjern ' + escapeHtml(p.name) + ' fra sammenligning">' +
 							ic('close') +
 						'</button>' +
 						'<div class="ge-m3-matrix-thumb">' +
@@ -3904,6 +3967,37 @@
 			}
 
 			cmpModalBody.innerHTML = h;
+
+			var compareTable = cmpModalBody.querySelector('.ge-m3-matrix-table');
+			if (compareTable) {
+				var tableRows = compareTable.querySelectorAll('tr');
+				var mobileList = document.createElement('div');
+				mobileList.className = 'ge-m3-mobile-compare-list';
+				mobileList.setAttribute('aria-label', 'Sammenligning per modell');
+				mobileList.innerHTML = selected.map(function(p, productIndex) {
+					var productCell = tableRows[0].cells[productIndex + 1];
+					var specRows = [];
+					for (var rowIndex = 1; rowIndex < tableRows.length; rowIndex++) {
+						var row = tableRows[rowIndex];
+						if (row.classList.contains('matrix-action-row')) continue;
+						var labelCell = row.cells[0];
+						var valueCell = row.cells[productIndex + 1];
+						if (!labelCell || !valueCell) continue;
+						specRows.push(
+							'<div class="ge-m3-mobile-spec-row"><dt>' + labelCell.innerHTML + '</dt><dd>' + valueCell.innerHTML + '</dd></div>'
+						);
+					}
+
+					return '<section class="ge-m3-mobile-product-card" aria-label="Sammenligning: ' + escapeHtml(p.name) + '">' +
+						'<div class="ge-m3-mobile-product-head">' + productCell.innerHTML + '</div>' +
+						(specRows.length
+							? '<dl class="ge-m3-mobile-product-specs">' + specRows.join('') + '</dl>'
+							: '<p class="ge-m3-mobile-empty-specs">Ingen forskjeller å vise for denne modellen med valgt filter.</p>') +
+					'</section>';
+				}).join('');
+				var matrixWrap = compareTable.parentNode;
+				matrixWrap.parentNode.insertBefore(mobileList, matrixWrap.nextSibling);
+			}
 
 			// Attach remove button listeners
 			cmpModalBody.querySelectorAll('.ge-m3-matrix-remove-btn').forEach(function(btn) {
