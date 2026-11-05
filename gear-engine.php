@@ -41,7 +41,9 @@ gear_engine_register_autoloader();
  * @return void
  */
 function gear_engine_register_shared_assets(): void {
-	wp_register_style( 'gear-engine-tokens', GEAR_ENGINE_URL . 'assets/css/gear-engine-tokens.css', array(), GEAR_ENGINE_VERSION );
+	$tokens_path = GEAR_ENGINE_PATH . 'assets/css/gear-engine-tokens.css';
+	$tokens_ver  = file_exists( $tokens_path ) ? (string) filemtime( $tokens_path ) : GEAR_ENGINE_VERSION;
+	wp_register_style( 'gear-engine-tokens', GEAR_ENGINE_URL . 'assets/css/gear-engine-tokens.css', array(), $tokens_ver );
 }
 
 /**

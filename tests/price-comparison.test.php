@@ -167,19 +167,19 @@ assert_test( strpos( $css_content, 'ge-comp-view-toggle-wrap' ) !== false, 'CSS 
 assert_test( strpos( $css_content, 'ge-savings-chip' ) !== false, 'CSS contains .ge-savings-chip styling' );
 assert_test( strpos( $css_content, 'ge-comp-quick-filters' ) !== false, 'CSS contains .ge-comp-quick-filters' );
 assert_test( strpos( $css_content, '.ge-comp-filter-panel.is-open' ) !== false && strpos( $css_content, 'transform: translateY(100%)' ) !== false, 'Filter sheet opens from the bottom on compact layouts' );
-assert_test( strpos( $css_content, '@container ge-price-comp-root (min-width: 840px)' ) !== false && strpos( $css_content, 'transform: translateX(100%)' ) !== false, 'Filter sheet opens from the side on desktop' );
+assert_test( strpos( $css_content, '@media (min-width: 840px)' ) !== false && strpos( $css_content, 'transform: translateX(100%)' ) !== false, 'Filter sheet opens from the side on desktop' );
 assert_test( strpos( $css_content, 'border-radius: 9999px;' ) !== false && strpos( $css_content, '.ge-filter-pill-btn.is-active' ) !== false, 'Filter chips use rounded Material 3 shapes and selected states' );
-assert_test( strpos( $css_content, '@container ge-price-comp-root (max-width: 599px)' ) !== false, 'Quick filters move into the filter sheet on mobile' );
-assert_test( strpos( $css_content, 'border-radius: 9999px !important;' ) !== false, 'Search input is forced to pill shape' );
-assert_test( strpos( $css_content, '.ge-card-grid-img-wrap .ge-discount-badge' ) !== false && strpos( $css_content, 'var(--md-sys-color-error-container, #FFDAD6)' ) !== false, 'Product discount badges use the prototype red tone' );
-assert_test( strpos( $css_content, 'width: auto !important;' ) !== false, 'List view call-to-action keeps its compact prototype width on mobile' );
-assert_test( strpos( $css_content, '@container ge-price-comp-root (min-width: 800px)' ) !== false, 'CSS contains 2-column container query at >=800px' );
+assert_test( strpos( $css_content, '@container ge-m3-comp (max-width: 599px)' ) !== false, 'Quick filters move into the filter sheet on mobile' );
+assert_test( strpos( $css_content, 'border-radius: var(--md-sys-shape-corner-full);' ) !== false, 'Search input uses Material 3 full pill shape' );
+assert_test( strpos( $css_content, '.ge-card-grid-img-wrap .ge-discount-badge' ) !== false && strpos( $css_content, 'var(--md-sys-color-error-container)' ) !== false, 'Product discount badges use the prototype red tone' );
+assert_test( strpos( $css_content, '.ge-m3-list-cta' ) !== false && strpos( $css_content, 'width: auto;' ) !== false, 'List view call-to-action keeps its compact prototype width on mobile' );
+assert_test( strpos( $css_content, '@container ge-m3-comp (min-width: 840px)' ) !== false, 'CSS contains 2-column container query at >=840px' );
 assert_test( strpos( $css_content, 'align-items: start' ) !== false, 'CSS list grid uses align-items: start' );
 
 assert_test( strpos( $js_content, 'QUICK_FILTER_DEFS' ) !== false, 'JS contains QUICK_FILTER_DEFS' );
 assert_test( strpos( $js_content, 'ge-savings-chip' ) !== false, 'JS conditionally renders ge-savings-chip' );
 assert_test( strpos( $js_content, 'ge-list-main-row' ) !== false && strpos( $js_content, 'ge-list-shop-row' ) !== false, 'JS renders prototype list-card structure and retailer footer' );
-assert_test( strpos( $js_content, 'ge-comp-list-column' ) !== false && strpos( $css_content, '@container ge-price-comp-root (min-width: 840px)' ) !== false, 'List view uses the prototype two-column container breakpoint' );
+assert_test( strpos( $js_content, 'ge-comp-list-column' ) !== false && strpos( $css_content, '@container ge-m3-comp (min-width: 840px)' ) !== false, 'List view uses the prototype two-column container breakpoint' );
 assert_test( strpos( $js_content, 'ge-list-compare-box' ) !== false && strpos( $js_content, 'aria-expanded=' ) !== false, 'JS preserves accessible list comparison controls' );
 assert_test( strpos( $js_content, 'Til butikk ' ) !== false, 'JS uses prototype list-card call-to-action' );
 assert_test( strpos( $js_content, 'Rutenett' ) !== false, 'JS contains labeled Rutenett view button' );
