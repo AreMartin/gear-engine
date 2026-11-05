@@ -416,9 +416,11 @@
 			.ge-m3-guide-btn { width: 100%; margin-top: 4px; }
 		}
 
-		.ge-m3-header { margin-bottom: 24px; }
+		.ge-m3-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-bottom: 24px; }
+		.ge-m3-header-text { flex: 1 1 280px; min-width: 0; }
+		.ge-m3-header-search-slot { flex: 1 1 340px; max-width: 460px; width: 100%; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
 
-		.ge-m3-mobile-search-slot { display: block; margin-bottom: 20px; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
+		.ge-m3-mobile-search-slot { display: none; --ge-control-ink: #0C2340; --ge-control-text: #19212F; --ge-control-border: #C2C6D2; --ge-control-shadow: 0 1px 2px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04); }
 
 		.ge-m3-title {
 			margin: 0 0 4px;
@@ -501,7 +503,8 @@
 
 		@container ge-m3-comp (max-width: 599px) {
 			.ge-m3-comp-wrapper > * { order: 10; }
-			.ge-m3-header { order: 1; }
+			.ge-m3-header { order: 1; margin-bottom: 12px; }
+			.ge-m3-header-search-slot { display: none; }
 			.ge-m3-affiliate-disclosure { order: 2; margin: 0 0 8px; }
 			.ge-m3-mobile-search-slot { order: 3; }
 			.ge-m3-nav-section { order: 4; }
@@ -821,10 +824,11 @@
 		.ge-m3-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
 		@container ge-m3-comp (min-width: 600px) {
-			.ge-m3-controls { flex-direction: row; align-items: center; }
-			.ge-m3-actions-row { width: 100%; flex-wrap: nowrap; flex: 1 1 auto; }
+			.ge-m3-controls { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; }
+			.ge-m3-controls .ge-m3-results-count { margin-bottom: 0; }
+			.ge-m3-actions-row { width: auto; flex-wrap: nowrap; flex: 0 0 auto; margin-left: auto; }
 			.ge-m3-view-toggle-wrap { margin-left: auto; }
-			.ge-m3-sort-wrap { flex: 0 0 220px; }
+			.ge-m3-sort-wrap { flex: 0 0 196px; width: 196px; }
 		}
 
 		/* Outlined text field and select (shared) */
@@ -2444,8 +2448,8 @@
 
 		<!-- Header -->
 		<header class="ge-m3-header">
-			<h1 class="ge-m3-title">Prissammenligning</h1>
-			<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>
+			<div class="ge-m3-header-text"><h1 class="ge-m3-title">Prissammenligning</h1><p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p></div><div class="ge-m3-header-search-slot" id="proto-header-search-slot"></div>
+
 		</header>
 
 		<div class="ge-m3-mobile-search-slot" id="proto-mobile-search-slot"></div>
@@ -3092,11 +3096,18 @@
 		});
 
 		function syncSearchPlacement() {
-			if (true) {
+			var isMobile = document.getElementById('proto-app-root').clientWidth <= 599;
+			var headerSlot = document.getElementById('proto-header-search-slot');
+			var resultsWrap = document.querySelector('.ge-m3-results-count');
+			if (resultsWrap && controls && actionsRow) {
+				if (isMobile) { if (resultsWrap.parentNode !== appRoot) appRoot.insertBefore(resultsWrap, cardsContainer); }
+				else if (resultsWrap.parentNode !== controls) { controls.insertBefore(resultsWrap, actionsRow); }
+			}
+			if (isMobile) {
 				if (searchBox.parentNode !== mobileSearchSlot) {
 					mobileSearchSlot.appendChild(searchBox);
 				}
-			} else if (searchBox.parentNode !== controls) {
+			} else if (headerSlot && searchBox.parentNode !== headerSlot) { headerSlot.appendChild(searchBox); } else if (false) {
 				controls.insertBefore(searchBox, actionsRow);
 			}
 		}

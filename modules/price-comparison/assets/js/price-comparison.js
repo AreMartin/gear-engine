@@ -849,9 +849,11 @@
 		var catsBar = root.querySelector('#ge-comp-cats-bar');
 		var deptAlert = root.querySelector('#ge-dept-alert');
 		var searchBox = root.querySelector('#ge-search-box');
+		var headerSearchSlot = root.querySelector('#ge-header-search-slot');
 		var mobileSearchSlot = root.querySelector('#ge-mobile-search-slot');
 		var controls = root.querySelector('.ge-m3-controls');
 		var actionsRow = root.querySelector('.ge-m3-actions-row');
+		var resultsCountWrap = root.querySelector('.ge-m3-results-count');
 		var quickFiltersSlot = root.querySelector('#ge-comp-quick-filters-slot');
 		var searchInput = root.querySelector('#ge-search-input');
 		var searchClear = root.querySelector('#ge-search-clear');
@@ -892,11 +894,22 @@
 			searchInput.value = state.searchQuery;
 		}
 
-		// Global search bar stays in #ge-mobile-search-slot on all viewports; quick filters relocate on mobile (< 600px)
+		// Responsive placement: header search + inline results count on desktop (>= 600px), stacked on mobile (< 600px)
 		function syncSearchPlacement() {
 			if (!searchBox || !mobileSearchSlot) return;
-			if (searchBox.parentNode !== mobileSearchSlot) {
-				mobileSearchSlot.appendChild(searchBox);
+			var isMobile = root.clientWidth <= 599;
+			var searchTarget = isMobile ? mobileSearchSlot : (headerSearchSlot || mobileSearchSlot);
+			if (searchBox.parentNode !== searchTarget) {
+				searchTarget.appendChild(searchBox);
+			}
+			if (resultsCountWrap && controls && actionsRow) {
+				if (isMobile) {
+					if (resultsCountWrap.parentNode !== root) {
+						root.insertBefore(resultsCountWrap, cardsContainer);
+					}
+				} else if (resultsCountWrap.parentNode !== controls) {
+					controls.insertBefore(resultsCountWrap, actionsRow);
+				}
 			}
 		}
 
@@ -2035,19 +2048,22 @@
 		) : '') +
 
 		'<header class="ge-m3-header">' +
-			'<h1 class="ge-m3-title">Prissammenligning</h1>' +
-			'<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>' +
+			'<div class="ge-m3-header-text">' +
+				'<h1 class="ge-m3-title">Prissammenligning</h1>' +
+				'<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>' +
+			'</div>' +
+			'<div class="ge-m3-header-search-slot" id="ge-header-search-slot">' +
+				'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
+					'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
+					'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />' +
+					'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
+						'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+					'</button>' +
+				'</div>' +
+			'</div>' +
 		'</header>' +
 
-		'<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot">' +
-			'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
-				'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
-				'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter produkter og merker..." aria-label="Søk etter produkter og merker" autocomplete="off" enterkeyhint="search" />' +
-				'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
-					'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
-				'</button>' +
-			'</div>' +
-		'</div>' +
+		'<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot"></div>' +
 
 		'<div class="ge-m3-nav-section ge-dept-section">' +
 			'<div class="ge-m3-dept-track ge-dept-track" id="ge-dept-track" role="tablist" aria-label="Velg avdeling"></div>' +
