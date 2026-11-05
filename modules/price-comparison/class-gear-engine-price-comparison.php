@@ -49,20 +49,25 @@ class Gear_Engine_Price_Comparison {
 	 * @return void
 	 */
 	public function register_assets(): void {
-		$base_url = GEAR_ENGINE_URL . 'modules/price-comparison/assets/';
+		$base_url  = GEAR_ENGINE_URL . 'modules/price-comparison/assets/';
+		$base_path = GEAR_ENGINE_PATH . 'modules/price-comparison/assets/';
+		$css_path  = $base_path . 'css/price-comparison.css';
+		$js_path   = $base_path . 'js/price-comparison.js';
+		$css_mtime = file_exists( $css_path ) ? filemtime( $css_path ) : false;
+		$js_mtime  = file_exists( $js_path ) ? filemtime( $js_path ) : false;
 
 		wp_register_style(
 			'gear-engine-price-comparison',
 			$base_url . 'css/price-comparison.css',
 			array( 'gear-engine-tokens' ),
-			GEAR_ENGINE_VERSION
+			false !== $css_mtime ? (string) $css_mtime : GEAR_ENGINE_VERSION
 		);
 
 		wp_register_script(
 			'gear-engine-price-comparison',
 			$base_url . 'js/price-comparison.js',
 			array(),
-			GEAR_ENGINE_VERSION,
+			false !== $js_mtime ? (string) $js_mtime : GEAR_ENGINE_VERSION,
 			true
 		);
 	}
@@ -624,4 +629,3 @@ class Gear_Engine_Price_Comparison {
 		return ob_get_clean();
 	}
 }
-

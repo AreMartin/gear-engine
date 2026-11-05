@@ -9,10 +9,18 @@ define( 'GEAR_ENGINE_PATH', ABSPATH );
 define( 'GEAR_ENGINE_URL', 'http://example.com/' );
 define( 'GEAR_ENGINE_VERSION', '1.0.0' );
 
+$registered_assets = array();
+
 function add_action() {}
 function add_shortcode() {}
-function wp_register_style() {}
-function wp_register_script() {}
+function wp_register_style( $handle, $src = '', $deps = array(), $version = false, $media = 'all' ) {
+	global $registered_assets;
+	$registered_assets['style'][ $handle ] = $version;
+}
+function wp_register_script( $handle, $src = '', $deps = array(), $version = false, $in_footer = false ) {
+	global $registered_assets;
+	$registered_assets['script'][ $handle ] = $version;
+}
 function wp_enqueue_style() {}
 function wp_enqueue_script() {}
 function update_option() {}
@@ -119,8 +127,17 @@ assert_test( Gear_Engine_Price_Comparison::SHORTCODE_ALIAS === 'fysionett_prissa
 
 // 3. Render method with fallback data
 $module = new Gear_Engine_Price_Comparison();
+$module->register_assets();
 $html   = $module->render( array() );
 
+assert_test(
+	$registered_assets['style']['gear-engine-price-comparison'] === (string) filemtime( GEAR_ENGINE_PATH . 'modules/price-comparison/assets/css/price-comparison.css' ),
+	'Price comparison stylesheet uses file modification time for cache busting'
+);
+assert_test(
+	$registered_assets['script']['gear-engine-price-comparison'] === (string) filemtime( GEAR_ENGINE_PATH . 'modules/price-comparison/assets/js/price-comparison.js' ),
+	'Price comparison script uses file modification time for cache busting'
+);
 assert_test( strpos( $html, 'id="fysionett-prissok-root"' ) !== false, 'Rendered HTML contains #fysionett-prissok-root' );
 assert_test( strpos( $html, 'data-feed="' ) !== false, 'Rendered HTML contains encoded data-feed' );
 assert_test( strpos( $html, 'ge-price-comp-guide-banner' ) !== false, 'Rendered HTML contains guide cross-link banner' );
@@ -149,11 +166,18 @@ $js_content  = file_get_contents( GEAR_ENGINE_PATH . 'modules/price-comparison/a
 assert_test( strpos( $css_content, 'ge-comp-view-toggle-wrap' ) !== false, 'CSS contains .ge-comp-view-toggle-wrap' );
 assert_test( strpos( $css_content, 'ge-savings-chip' ) !== false, 'CSS contains .ge-savings-chip styling' );
 assert_test( strpos( $css_content, 'ge-comp-quick-filters' ) !== false, 'CSS contains .ge-comp-quick-filters' );
+assert_test( strpos( $css_content, 'border-radius: 9999px !important;' ) !== false, 'Search input is forced to pill shape' );
+assert_test( strpos( $css_content, '.ge-card-grid-img-wrap .ge-discount-badge' ) !== false && strpos( $css_content, 'var(--md-sys-color-error-container, #FFDAD6)' ) !== false, 'Product discount badges use the prototype red tone' );
+assert_test( strpos( $css_content, 'width: auto !important;' ) !== false, 'List view call-to-action keeps its compact prototype width on mobile' );
 assert_test( strpos( $css_content, '@container ge-price-comp-root (min-width: 800px)' ) !== false, 'CSS contains 2-column container query at >=800px' );
 assert_test( strpos( $css_content, 'align-items: start' ) !== false, 'CSS list grid uses align-items: start' );
 
 assert_test( strpos( $js_content, 'QUICK_FILTER_DEFS' ) !== false, 'JS contains QUICK_FILTER_DEFS' );
 assert_test( strpos( $js_content, 'ge-savings-chip' ) !== false, 'JS conditionally renders ge-savings-chip' );
+assert_test( strpos( $js_content, 'ge-list-main-row' ) !== false && strpos( $js_content, 'ge-list-shop-row' ) !== false, 'JS renders prototype list-card structure and retailer footer' );
+assert_test( strpos( $js_content, 'ge-comp-list-column' ) !== false && strpos( $css_content, '@container ge-price-comp-root (min-width: 840px)' ) !== false, 'List view uses the prototype two-column container breakpoint' );
+assert_test( strpos( $js_content, 'ge-list-compare-box' ) !== false && strpos( $js_content, 'aria-expanded=' ) !== false, 'JS preserves accessible list comparison controls' );
+assert_test( strpos( $js_content, 'Til butikk ' ) !== false, 'JS uses prototype list-card call-to-action' );
 assert_test( strpos( $js_content, 'Rutenett' ) !== false, 'JS contains labeled Rutenett view button' );
 assert_test( strpos( $js_content, 'Liste' ) !== false, 'JS contains labeled Liste view button' );
 

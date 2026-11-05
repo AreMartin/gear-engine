@@ -2519,7 +2519,7 @@ tr.matrix-header-row td {
 	height: 56px;
 	padding: 0 20px 0 48px;
 	border: 1px solid var(--ge-pc-outline) !important;
-	border-radius: 9999px;
+	border-radius: 9999px !important;
 	background: var(--ge-pc-surface) !important;
 	color: var(--ge-pc-text) !important;
 	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.06) !important;
@@ -2673,6 +2673,19 @@ tr.matrix-header-row td {
 
 #fysionett-prissok-root .ge-card-cmp-label:hover { background: color-mix(in srgb, var(--ge-pc-surface) 90%, transparent); }
 #fysionett-prissok-root .ge-comp-chk { width: 18px; height: 18px; accent-color: var(--md-sys-color-primary, #0C2340); }
+
+#fysionett-prissok-root .ge-card-grid-img-wrap .ge-discount-badge,
+#fysionett-prissok-root .ge-card-list-img-wrap .ge-discount-badge {
+	border-color: transparent;
+	background: var(--md-sys-color-error-container, #FFDAD6);
+	color: var(--md-sys-color-on-error-container, #410002);
+}
+
+[data-theme="dark"] #fysionett-prissok-root .ge-card-grid-img-wrap .ge-discount-badge,
+[data-theme="dark"] #fysionett-prissok-root .ge-card-list-img-wrap .ge-discount-badge {
+	background: #93000A;
+	color: #FFDAD6;
+}
 
 #fysionett-prissok-root .ge-comp-results-count {
 	margin-bottom: 16px;
@@ -3036,6 +3049,527 @@ tr.matrix-header-row td {
 @container ge-price-comp-root (max-width: 359px) {
 	#fysionett-prissok-root .ge-comp-action-row { grid-template-columns: minmax(0, 1fr) auto; }
 	#fysionett-prissok-root .ge-comp-view-toggle-wrap { grid-column: 2; grid-row: 2; justify-self: end; }
+}
+
+/* List cards follow the prototype's full-bleed image and retailer-footer layout. */
+#fysionett-prissok-root .ge-comp-list { gap: 16px; }
+#fysionett-prissok-root .ge-comp-list-column { display: contents; }
+
+#fysionett-prissok-root .ge-card-list {
+	container-type: inline-size;
+	container-name: ge-price-comp-list-card;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid var(--ge-pc-outline);
+	border-radius: 28px;
+	background: var(--ge-pc-surface);
+	color: var(--ge-pc-text);
+	box-shadow: var(--ge-shadow-1, 0 1px 3px rgba(12, 35, 64, 0.05));
+}
+
+#fysionett-prissok-root .ge-card-list:hover {
+	border-color: var(--ge-pc-outline);
+	box-shadow: var(--ge-shadow-2, 0 6px 16px -4px rgba(12, 35, 64, 0.08));
+	transform: none;
+}
+
+#fysionett-prissok-root .ge-card-list:hover .ge-card-img { transform: none; }
+
+#fysionett-prissok-root .ge-list-main-row {
+	display: flex;
+	align-items: stretch;
+	min-height: 216px;
+}
+
+#fysionett-prissok-root .ge-card-list-img-wrap {
+	flex: 0 0 clamp(180px, 28%, 300px);
+	width: auto;
+	height: auto;
+	min-height: 0;
+	align-self: stretch;
+	padding: 0;
+	overflow: hidden;
+	border: 0;
+	border-radius: 0;
+	background: color-mix(in srgb, var(--md-sys-color-primary, #0C2340) 4.5%, transparent);
+}
+
+#fysionett-prissok-root .ge-card-list-img-wrap .ge-card-img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	padding: 20px;
+	object-fit: contain;
+	object-position: center;
+	mix-blend-mode: normal;
+}
+
+#fysionett-prissok-root .ge-card-list-img-wrap .ge-discount-badge {
+	top: 14px;
+	left: 14px;
+	min-height: 26px;
+	padding: 2px 10px;
+	border-radius: 9999px;
+	font-size: 12px;
+}
+
+#fysionett-prissok-root .ge-card-list-content {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	justify-content: initial;
+	gap: 8px;
+	min-width: 0;
+	padding: 24px 28px;
+	text-align: left;
+}
+
+#fysionett-prissok-root .ge-list-top-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-brand {
+	margin: 0;
+	font-size: 11px;
+	line-height: 16px;
+	letter-spacing: 0.6px;
+	color: var(--ge-pc-muted);
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-title {
+	min-height: 0;
+	margin: 0;
+	font-size: 18px;
+	line-height: 24px;
+	letter-spacing: 0;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-title-link {
+	color: inherit !important;
+	text-decoration: none !important;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-title-link:hover {
+	color: var(--md-sys-color-primary, #0C2340) !important;
+	text-decoration: underline !important;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-cmp-label,
+#fysionett-prissok-root .ge-card-list .ge-card-cmp-label:hover {
+	position: relative;
+	height: 28px;
+	min-height: 28px;
+	gap: 8px;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--ge-pc-muted);
+	box-shadow: none;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.1px;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-comp-chk {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+#fysionett-prissok-root .ge-list-compare-box {
+	position: relative;
+	width: 18px;
+	height: 18px;
+	flex: 0 0 18px;
+	border: 2px solid var(--ge-pc-muted);
+	border-radius: 2px;
+	transition: background-color 100ms ease;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-comp-chk:checked + .ge-list-compare-box {
+	border-color: var(--md-sys-color-primary, #0C2340);
+	background: var(--md-sys-color-primary, #0C2340);
+}
+
+#fysionett-prissok-root .ge-card-list .ge-comp-chk:checked + .ge-list-compare-box::after {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 5px;
+	height: 9px;
+	border: solid #FFFFFF;
+	border-width: 0 2px 2px 0;
+	content: "";
+	transform: translate(-50%, -60%) rotate(45deg);
+}
+
+#fysionett-prissok-root .ge-card-list .ge-card-cmp-label:has(.ge-comp-chk:focus-visible) {
+	outline: 3px solid var(--ge-grey-500, #667085);
+	outline-offset: 2px;
+}
+
+#fysionett-prissok-root .ge-list-action-row {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: auto;
+}
+
+#fysionett-prissok-root .ge-list-action-row .ge-price-row {
+	flex: 1 1 auto;
+	gap: 4px 8px;
+	min-width: 0;
+	margin: 0;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-price-current {
+	font-size: 32px;
+	line-height: 40px;
+	font-weight: 700;
+	letter-spacing: -0.2px;
+	font-variant-numeric: tabular-nums;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-price-original {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 500;
+	color: var(--ge-pc-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-savings-chip {
+	display: inline-flex;
+	align-items: center;
+	height: 24px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: 8px;
+	background: var(--ge-green-100, #DCF5E8);
+	color: var(--ge-green-900, #002B1C);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-list-cta {
+	flex: 0 0 auto;
+	width: auto !important;
+	height: 48px;
+	padding: 0 24px;
+	border-radius: 9999px;
+	font-size: 14px;
+	letter-spacing: 0;
+	white-space: nowrap;
+}
+
+#fysionett-prissok-root .ge-card-list .ge-list-cta svg { width: 16px; height: 16px; }
+
+#fysionett-prissok-root .ge-list-shop-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	width: 100%;
+	min-height: 46px;
+	margin: 0;
+	padding: 6px 24px;
+	border: 0;
+	border-top: 1px solid var(--ge-pc-outline);
+	border-radius: 0;
+	background: transparent;
+	color: var(--md-sys-color-primary, #0C2340);
+	text-align: left;
+}
+
+#fysionett-prissok-root button.ge-list-shop-row {
+	font: inherit;
+	cursor: pointer;
+}
+
+#fysionett-prissok-root .ge-list-shop-row-trigger,
+#fysionett-prissok-root .ge-list-shop-row-trigger:hover,
+#fysionett-prissok-root .ge-list-shop-row-trigger.is-open {
+	border-right: 0;
+	border-bottom: 0;
+	border-left: 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--md-sys-color-primary, #0C2340);
+	box-shadow: none;
+	transform: none;
+}
+
+#fysionett-prissok-root .ge-list-shop-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#fysionett-prissok-root .ge-list-shop-name > b,
+#fysionett-prissok-root .ge-list-shop-line b {
+	color: var(--md-sys-color-primary, #0C2340);
+	font-weight: 700;
+}
+
+#fysionett-prissok-root .ge-list-shop-line {
+	min-width: 0;
+	overflow: hidden;
+	color: var(--ge-pc-muted);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#fysionett-prissok-root .ge-list-shop-row .ge-shop-pill-avatar {
+	width: 22px;
+	height: 22px;
+	flex: 0 0 22px;
+}
+
+#fysionett-prissok-root .ge-list-shop-row .ge-shop-pill-avatar img { width: 16px; height: 16px; }
+
+#fysionett-prissok-root .ge-list-stock-state {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex: 0 0 auto;
+	color: var(--ge-pc-muted);
+	font-size: 13px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+#fysionett-prissok-root .ge-list-stock-state .ge-stock-dot {
+	width: 10px;
+	height: 10px;
+	margin: 0;
+}
+
+#fysionett-prissok-root .ge-list-stock-state.is-in-stock { color: var(--ge-green-800, #005236); }
+#fysionett-prissok-root .ge-list-stock-state.is-out-of-stock { color: var(--ge-coral, #D92D20); }
+#fysionett-prissok-root .ge-list-stock-state.is-out-of-stock .ge-stock-dot { background: currentColor; }
+#fysionett-prissok-root .ge-list-stock-state.is-in-stock .ge-list-stock-label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+#fysionett-prissok-root .ge-list-other-shops {
+	color: var(--ge-pc-muted);
+	font-size: 12px;
+}
+
+#fysionett-prissok-root .ge-list-shop-row .ge-compare-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	height: 32px;
+	padding: 0 12px 0 16px;
+	border: 1px solid var(--ge-pc-outline);
+	border-radius: 9999px;
+	background: var(--ge-pc-surface);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 14px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+#fysionett-prissok-root .ge-list-drawer-wrap {
+	width: auto;
+	margin: 0;
+	padding: 0;
+	border-top: 1px dashed var(--ge-pc-outline);
+	background: var(--ge-grey-25, #FAFBFC);
+}
+
+#fysionett-prissok-root .ge-list-drawer-wrap .ge-stock-dot.is-out-of-stock { background: var(--ge-grey-300, #D0D5DD); }
+#fysionett-prissok-root .ge-list-drawer-wrap .ge-stock-dot.is-in-stock { background: var(--ge-green-700, #007A50); }
+
+@container ge-price-comp-root (max-width: 839px) {
+	#fysionett-prissok-root .ge-comp-list {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 16px;
+	}
+}
+
+@container ge-price-comp-root (min-width: 840px) {
+	#fysionett-prissok-root .ge-comp-list {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+	}
+
+	#fysionett-prissok-root .ge-comp-list-column {
+		display: flex;
+		flex: 1 1 0;
+		flex-direction: column;
+		gap: 16px;
+		min-width: 0;
+	}
+}
+
+@container ge-price-comp-list-card (max-width: 700px) {
+	#fysionett-prissok-root .ge-list-main-row { min-height: 190px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap { flex-basis: clamp(140px, 30%, 200px); }
+	#fysionett-prissok-root .ge-card-list-content { padding: 18px 20px; }
+	#fysionett-prissok-root .ge-card-list .ge-card-title { font-size: 16px; line-height: 22px; }
+	#fysionett-prissok-root .ge-card-list .ge-price-current { font-size: 24px; line-height: 32px; }
+	#fysionett-prissok-root .ge-card-list .ge-price-original { font-size: 14px; }
+	#fysionett-prissok-root .ge-card-list .ge-list-cta { height: 40px; padding: 0 18px; }
+	#fysionett-prissok-root .ge-list-shop-row { min-height: 46px; padding: 6px 20px; }
+}
+
+@container ge-price-comp-list-card (max-width: 480px) {
+	#fysionett-prissok-root .ge-list-main-row { flex-direction: column; min-height: 0; }
+	#fysionett-prissok-root .ge-card-list-img-wrap { flex: 0 0 auto; height: 180px; }
+	#fysionett-prissok-root .ge-card-list .ge-card-title { min-height: 44px; }
+	#fysionett-prissok-root .ge-list-action-row { align-items: center; }
+}
+
+@container ge-price-comp-root (max-width: 599px) {
+	#fysionett-prissok-root .ge-card-list { border-radius: 16px; }
+	#fysionett-prissok-root .ge-list-main-row { flex-direction: row; min-height: 124px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap {
+		flex: 0 0 92px;
+		width: 92px;
+		min-height: 124px;
+		height: auto;
+		align-self: stretch;
+		background: color-mix(in srgb, var(--md-sys-color-primary, #0C2340) 4.5%, transparent);
+	}
+
+	#fysionett-prissok-root .ge-card-list-img-wrap .ge-card-img { padding: 10px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap .ge-discount-badge {
+		top: 6px;
+		left: 6px;
+		min-height: 20px;
+		padding: 0 6px;
+		font-size: 10px;
+	}
+
+	#fysionett-prissok-root .ge-card-list-content {
+		justify-content: center;
+		gap: 4px;
+		padding: 10px 12px;
+	}
+
+	#fysionett-prissok-root .ge-list-top-row { gap: 4px; }
+	#fysionett-prissok-root .ge-card-list .ge-card-brand { font-size: 10px; line-height: 14px; }
+	#fysionett-prissok-root .ge-card-list .ge-card-cmp-label,
+	#fysionett-prissok-root .ge-card-list .ge-card-cmp-label:hover {
+		height: 24px;
+		min-height: 24px;
+		gap: 4px;
+		font-size: 11px;
+	}
+
+	#fysionett-prissok-root .ge-list-action-row { align-items: center; gap: 6px; margin-top: 2px; }
+	#fysionett-prissok-root .ge-list-action-row .ge-price-row {
+		flex: 1 1 auto;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0;
+		min-width: 0;
+	}
+
+	#fysionett-prissok-root .ge-card-list .ge-price-current { font-size: 20px; line-height: 24px; }
+	#fysionett-prissok-root .ge-card-list .ge-price-original { font-size: 11px; line-height: 14px; }
+	#fysionett-prissok-root .ge-list-action-row .ge-savings-chip { height: 18px; padding: 0 6px; font-size: 10px; }
+	#fysionett-prissok-root .ge-card-list .ge-list-cta { height: 36px; gap: 6px; padding: 0 14px; font-size: 12px; }
+	#fysionett-prissok-root .ge-card-list .ge-list-cta svg { width: 16px; height: 16px; }
+	#fysionett-prissok-root .ge-list-shop-row { min-height: 44px; margin: 0 12px; padding: 6px 0; }
+	#fysionett-prissok-root .ge-list-shop-row-trigger,
+	#fysionett-prissok-root .ge-list-shop-row-trigger:hover,
+	#fysionett-prissok-root .ge-list-shop-row-trigger.is-open {
+		width: calc(100% - 24px);
+	}
+
+	#fysionett-prissok-root .ge-list-shop-row .ge-compare-badge {
+		height: 30px;
+		padding: 0 4px 0 8px;
+		border: 0;
+		background: transparent;
+		font-size: 12px;
+	}
+
+	#fysionett-prissok-root .ge-list-drawer-wrap {
+		margin: 0 10px 10px;
+		border: 1px dashed var(--ge-pc-outline);
+		border-radius: 12px;
+	}
+}
+
+@container ge-price-comp-root (max-width: 380px) {
+	#fysionett-prissok-root .ge-list-main-row { min-height: 108px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap { flex-basis: 76px; width: 76px; min-height: 108px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap .ge-card-img { padding: 8px; }
+	#fysionett-prissok-root .ge-card-list-img-wrap .ge-discount-badge {
+		top: 5px;
+		left: 5px;
+		min-height: 18px;
+		padding: 0 5px;
+		font-size: 9px;
+	}
+
+	#fysionett-prissok-root .ge-card-list-content { gap: 3px; padding: 8px; }
+	#fysionett-prissok-root .ge-list-top-row { min-height: 22px; justify-content: flex-end; }
+	#fysionett-prissok-root .ge-card-list .ge-card-brand,
+	#fysionett-prissok-root .ge-card-list .ge-card-cmp-label > span:last-child { display: none; }
+	#fysionett-prissok-root .ge-card-list .ge-card-cmp-label,
+	#fysionett-prissok-root .ge-card-list .ge-card-cmp-label:hover {
+		width: 24px;
+		height: 24px;
+		min-height: 24px;
+		justify-content: center;
+		padding: 0;
+	}
+
+	#fysionett-prissok-root .ge-list-action-row { gap: 4px; }
+	#fysionett-prissok-root .ge-card-list .ge-card-title { font-size: 13px; line-height: 17px; }
+	#fysionett-prissok-root .ge-card-list .ge-price-current { font-size: 18px; line-height: 22px; }
+	#fysionett-prissok-root .ge-card-list .ge-price-original { font-size: 10px; line-height: 12px; }
+	#fysionett-prissok-root .ge-card-list .ge-list-cta { height: 32px; gap: 3px; padding: 0 8px; font-size: 11px; }
+	#fysionett-prissok-root .ge-card-list .ge-list-cta svg { width: 14px; height: 14px; }
+	#fysionett-prissok-root .ge-list-shop-row { min-height: 40px; margin: 0 10px; padding: 4px 0; }
+	#fysionett-prissok-root .ge-list-shop-row-trigger,
+	#fysionett-prissok-root .ge-list-shop-row-trigger:hover,
+	#fysionett-prissok-root .ge-list-shop-row-trigger.is-open { width: calc(100% - 20px); }
+	#fysionett-prissok-root .ge-list-shop-name { gap: 6px; font-size: 12px; }
+	#fysionett-prissok-root .ge-list-shop-row .ge-shop-pill-avatar { width: 18px; height: 18px; flex-basis: 18px; }
+	#fysionett-prissok-root .ge-list-shop-row .ge-shop-pill-avatar img { width: 13px; height: 13px; }
+	#fysionett-prissok-root .ge-list-shop-row .ge-compare-badge { font-size: 11px; }
+	#fysionett-prissok-root .ge-list-stock-state { font-size: 11px; }
+}
+
+[data-theme="dark"] #fysionett-prissok-root .ge-card-list .ge-savings-chip {
+	background: rgba(0, 168, 107, 0.22);
+	color: #C2ECD3;
 }
 
 @keyframes ge-slideup-mobile {

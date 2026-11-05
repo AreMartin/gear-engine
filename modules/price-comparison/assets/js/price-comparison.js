@@ -1411,9 +1411,15 @@
 			cardsContainer.className = state.viewMode === 'grid' ? 'ge-comp-grid' : 'ge-comp-list';
 
 			if (visibleProducts.length > 0) {
-				var cardsHtml = visibleProducts.map(function (prod) {
-					return state.viewMode === 'list' ? renderListCard(prod, state) : renderGridCard(prod, state);
-				}).join('');
+				var cardsHtml;
+				if (state.viewMode === 'list') {
+					var columnSplit = Math.ceil(visibleProducts.length / 2);
+					cardsHtml =
+						'<div class="ge-comp-list-column">' + visibleProducts.slice(0, columnSplit).map(function (prod) { return renderListCard(prod, state); }).join('') + '</div>' +
+						'<div class="ge-comp-list-column">' + visibleProducts.slice(columnSplit).map(function (prod) { return renderListCard(prod, state); }).join('') + '</div>';
+				} else {
+					cardsHtml = visibleProducts.map(function (prod) { return renderGridCard(prod, state); }).join('');
+				}
 				cardsContainer.innerHTML = cardsHtml;
 
 				// Attach compare checkbox listeners
@@ -1894,63 +1900,59 @@
 		var isChecked = state && state.selectedForCompare && state.selectedForCompare.indexOf(product.id) !== -1;
 		var storeCount = (product.stores && product.stores.length > 0) ? product.stores.length : ((product.otherShops || 0) + 1);
 		var isOpen = !!(state && state.openStores && state.openStores[product.id]);
+		var hasStoreComparison = storeCount > 1 && product.stores && product.stores.length > 1;
+		var shopRow;
+
+		if (hasStoreComparison) {
+			shopRow = '<button type="button" class="ge-shop-compare-trigger ge-list-shop-row ge-list-shop-row-trigger' + (isOpen ? ' is-open' : '') + '" data-id="' + product.id + '" aria-expanded="' + (isOpen ? 'true' : 'false') + '" title="Klikk for å sammenligne forhandlere">' +
+				'<span class="ge-list-shop-name">' +
+					renderShopAvatarHtml(product.shop) +
+					'<span class="ge-list-shop-line"><span>Best pris:</span> <b>' + escapeHtml(product.shop || 'Nettbutikk') + '</b></span>' +
+				'</span>' +
+				'<span class="ge-compare-badge">' + storeCount + ' butikker ' + (isOpen ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') + '</span>' +
+			'</button>';
+		} else {
+			shopRow = '<div class="ge-list-shop-row ge-list-shop-row-static">' +
+				'<span class="ge-list-shop-name">' +
+					renderShopAvatarHtml(product.shop) +
+					'<b>' + escapeHtml(product.shop || 'Nettbutikk') + '</b>' +
+					(product.otherShops > 0 ? '<span class="ge-list-other-shops">(+' + product.otherShops + ')</span>' : '') +
+				'</span>' +
+				'<span class="ge-list-stock-state ' + stockClass + '"><span class="ge-stock-dot ' + stockClass + '"></span><span class="ge-list-stock-label">' + (product.inStock ? 'På lager' : 'Utsolgt') + '</span></span>' +
+			'</div>';
+		}
 
 		return '' +
 		'<div class="ge-card-list">' +
-			'<div class="ge-card-list-img-wrap">' +
-				(hasDiscount ? '<div class="ge-discount-badge">-' + product.discount + '%</div>' : '') +
-				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(product.name) + '" class="ge-card-img" onerror="this.style.display=\'none\';" />' : '') +
-			'</div>' +
-			'<div class="ge-card-list-content">' +
-				'<div>' +
+			'<div class="ge-list-main-row">' +
+				'<div class="ge-card-list-img-wrap">' +
+					(hasDiscount ? '<div class="ge-discount-badge">-' + product.discount + '%</div>' : '') +
+					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(product.name) + '" class="ge-card-img" onerror="this.style.display=\'none\';" />' : '') +
+				'</div>' +
+				'<div class="ge-card-list-content">' +
 					'<div class="ge-list-top-row">' +
 						'<span class="ge-card-brand">' + escapeHtml(product.brand || 'UTSTYR') + '</span>' +
-						'<div style="display: flex; align-items: center; gap: 8px;">' +
-							'<label class="ge-card-cmp-label" title="Legg til i sammenligning">' +
-								'<input type="checkbox" class="ge-comp-chk" data-id="' + product.id + '"' + (isChecked ? ' checked' : '') + ' />' +
-								'<span>Sammenlign</span>' +
-							'</label>' +
-							'<div class="ge-list-shop-badge">' +
-								renderShopAvatarHtml(product.shop) +
-								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
-								escapeHtml(product.shop || 'Nettbutikk') +
-								(product.otherShops > 0 ? ' <span class="ge-other-shops-badge">(+' + product.otherShops + ')</span>' : '') +
-							'</div>' +
-						'</div>' +
+						'<label class="ge-card-cmp-label" title="Legg til i sammenligning">' +
+							'<input type="checkbox" class="ge-comp-chk" data-id="' + product.id + '"' + (isChecked ? ' checked' : '') + ' />' +
+							'<span class="ge-list-compare-box" aria-hidden="true"></span>' +
+							'<span>Sammenlign</span>' +
+						'</label>' +
 					'</div>' +
-					'<h3 class="ge-card-title">' +
-						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-title-link">' + escapeHtml(product.name) + '</a>' +
-					'</h3>' +
-				'</div>' +
-				'<div class="ge-list-bottom-row">' +
-					'<div class="ge-list-price-block">' +
+					'<h3 class="ge-card-title"><a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-card-title-link">' + escapeHtml(product.name) + '</a></h3>' +
+					'<div class="ge-list-action-row">' +
 						'<div class="ge-price-row">' +
 							'<span class="ge-price-current">' + formatPrice(product.currentPrice) + '</span>' +
 							(product.originalPrice ? '<span class="ge-price-original">' + formatPrice(product.originalPrice) + '</span>' : '') +
 							(showSavings ? '<span class="ge-savings-chip">Spar ' + formatPrice(save) + '</span>' : '') +
 						'</div>' +
-						(storeCount > 1 && product.stores && product.stores.length > 1 ? (
-							'<div class="ge-shop-compare-trigger ' + (isOpen ? 'is-open' : '') + '" data-id="' + product.id + '" style="margin:0;" title="Klikk for å sammenligne forhandlere">' +
-								'<div class="ge-shop-name-wrap" style="gap: 6px;">' +
-									renderShopAvatarHtml(product.shop) +
-									'<span>Best pris: <b>' + escapeHtml(product.shop) + '</b></span>' +
-								'</div>' +
-								'<span class="ge-compare-badge">' + storeCount + ' butikker ' + (isOpen ? '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') + '</span>' +
-							'</div>'
-						) : (
-							'<div class="ge-mobile-shop-label">' +
-								renderShopAvatarHtml(product.shop) +
-								'<span class="ge-stock-dot ' + stockClass + '"></span>' +
-								escapeHtml(product.shop || '') +
-							'</div>'
-						)) +
+						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn ge-list-cta">' +
+							'Til butikk ' + externalLinkIcon() +
+						'</a>' +
 					'</div>' +
-					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer sponsored" class="ge-cta-btn">' +
-						'Gå til ' + escapeHtml(product.shop || 'butikk') + ' ' + externalLinkIcon() +
-					'</a>' +
 				'</div>' +
-				(isOpen && storeCount > 1 && product.stores ? '<div class="ge-list-drawer-wrap">' + renderStoresDrawer(product, false) + '</div>' : '') +
 			'</div>' +
+			shopRow +
+			(isOpen && hasStoreComparison ? '<div class="ge-list-drawer-wrap">' + renderStoresDrawer(product, false) + '</div>' : '') +
 		'</div>';
 	}
 
