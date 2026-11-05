@@ -3576,3 +3576,405 @@ tr.matrix-header-row td {
 	from { transform: translateY(24px); opacity: 0; }
 	to { transform: none; opacity: 1; }
 }
+
+body.ge-price-comp-filter-open {
+	overflow: hidden;
+}
+
+.ge-price-comp-wrapper.ge-price-comp-filter-host-open {
+	position: relative;
+	z-index: 10000;
+}
+
+#fysionett-prissok-root .ge-comp-quick-filters-slot:empty,
+#fysionett-prissok-root .ge-filter-quick-filters-slot:empty {
+	display: none;
+}
+
+#fysionett-prissok-root .ge-comp-filter-scrim {
+	position: fixed;
+	inset: 0;
+	z-index: 9998;
+	background: rgba(0, 0, 0, 0.32);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 180ms ease, visibility 0s linear 220ms;
+}
+
+#fysionett-prissok-root .ge-comp-filter-scrim.is-visible {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transition-delay: 0s;
+}
+
+#fysionett-prissok-root .ge-comp-filter-panel {
+	--ge-field-bg: var(--ge-pc-surface);
+	position: fixed;
+	z-index: 9999;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	width: auto;
+	max-height: min(90vh, 760px);
+	max-height: min(90dvh, 760px);
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 0;
+	border-radius: 28px 28px 0 0;
+	background: var(--ge-pc-surface);
+	color: var(--ge-pc-text);
+	box-shadow: 0 -8px 32px rgba(16, 24, 40, 0.18);
+	transform: translateY(100%);
+	visibility: hidden;
+	transition: transform 280ms cubic-bezier(0.2, 0, 0, 1),
+		visibility 0s linear 280ms;
+}
+
+#fysionett-prissok-root .ge-comp-filter-panel.is-open {
+	transform: none;
+	visibility: visible;
+	transition: transform 360ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+#fysionett-prissok-root .ge-filter-sheet-handle {
+	width: 32px;
+	height: 4px;
+	margin: 16px auto 0;
+	border-radius: 9999px;
+	background: var(--ge-pc-muted);
+	opacity: 0.4;
+}
+
+#fysionett-prissok-root .ge-filter-sheet-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 56px;
+	padding: 8px 8px 8px 24px;
+}
+
+#fysionett-prissok-root .ge-filter-sheet-title {
+	margin: 0;
+	color: var(--ge-pc-text);
+	font-size: 22px;
+	font-weight: 500;
+	line-height: 28px;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+#fysionett-prissok-root .ge-filter-close-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 40px;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 0;
+	border-radius: 9999px;
+	background: transparent;
+	color: var(--ge-pc-text);
+	cursor: pointer;
+	transition: background-color 180ms ease;
+}
+
+#fysionett-prissok-root .ge-filter-close-btn:hover {
+	background: var(--ge-pc-inset);
+}
+
+#fysionett-prissok-root .ge-filter-close-btn:focus-visible,
+#fysionett-prissok-root .ge-filter-pill-btn:focus-visible,
+#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-quick-chip:focus-visible,
+#fysionett-prissok-root .ge-filter-reset-btn:focus-visible,
+#fysionett-prissok-root .ge-filter-apply-btn:focus-visible {
+	outline: 2px solid var(--md-sys-color-primary, #0C2340) !important;
+	outline-offset: 2px;
+}
+
+#fysionett-prissok-root .ge-filter-grid {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 28px;
+	min-height: 0;
+	padding: 8px 24px 24px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters {
+	display: none;
+	flex-direction: column;
+	gap: 12px;
+}
+
+#fysionett-prissok-root .ge-filter-section-title {
+	margin: 0 0 12px;
+	color: var(--ge-pc-text);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+	letter-spacing: 0.1px;
+	text-transform: none;
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters .ge-filter-section-title {
+	margin-bottom: 0;
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-comp-quick-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-quick-chip {
+	height: 40px;
+	padding: 0 14px;
+	border: 1px solid var(--ge-pc-outline);
+	border-radius: 9999px;
+	background: transparent;
+	color: var(--ge-pc-text);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-quick-chip:hover:not(.is-active) {
+	border-color: var(--ge-grey-300, #D0D5DD);
+	background: var(--ge-pc-canvas);
+}
+
+#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-quick-chip.is-active {
+	border-color: transparent !important;
+	background: var(--md-sys-color-secondary-container, var(--ge-navy-100, #DCE2F2)) !important;
+	color: var(--md-sys-color-on-secondary-container, var(--ge-pc-text)) !important;
+}
+
+#fysionett-prissok-root .ge-filter-price-inputs {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 12px;
+	margin: 8px 0 20px;
+}
+
+#fysionett-prissok-root .ge-price-input-box {
+	position: relative;
+	min-width: 0;
+}
+
+#fysionett-prissok-root .ge-price-input-box input {
+	width: 100%;
+	height: 56px;
+	padding: 0 44px 0 16px;
+	border: 1px solid var(--ge-pc-outline);
+	border-radius: 4px;
+	background: var(--ge-pc-surface);
+	color: var(--ge-pc-text);
+	font-size: 16px;
+	font-weight: 400;
+	font-variant-numeric: tabular-nums;
+	appearance: textfield;
+}
+
+#fysionett-prissok-root .ge-price-input-box input::-webkit-outer-spin-button,
+#fysionett-prissok-root .ge-price-input-box input::-webkit-inner-spin-button {
+	margin: 0;
+	-webkit-appearance: none;
+}
+
+#fysionett-prissok-root .ge-price-input-box input:hover {
+	border-color: var(--ge-pc-text);
+}
+
+#fysionett-prissok-root .ge-price-input-box input:focus {
+	border-color: var(--md-sys-color-primary, #0C2340);
+	outline: 0;
+	box-shadow: inset 0 0 0 1px var(--md-sys-color-primary, #0C2340);
+}
+
+#fysionett-prissok-root .ge-price-input-box label {
+	position: absolute;
+	top: 50%;
+	left: 12px;
+	padding: 0 4px;
+	background: var(--ge-field-bg);
+	color: var(--ge-pc-muted);
+	font-size: 16px;
+	line-height: 20px;
+	pointer-events: none;
+	transform: translateY(-50%);
+	transform-origin: left top;
+	transition: top 160ms ease, transform 160ms ease, color 160ms ease;
+}
+
+#fysionett-prissok-root .ge-price-input-box input:focus + label,
+#fysionett-prissok-root .ge-price-input-box input:not(:placeholder-shown) + label {
+	top: 0;
+	transform: translateY(-50%) scale(0.75);
+}
+
+#fysionett-prissok-root .ge-price-input-box input:focus + label {
+	color: var(--md-sys-color-primary, #0C2340);
+}
+
+#fysionett-prissok-root .ge-price-input-box > span {
+	position: absolute;
+	top: 50%;
+	right: 14px;
+	color: var(--ge-pc-muted);
+	font-size: 16px;
+	line-height: 20px;
+	pointer-events: none;
+	transform: translateY(-50%);
+}
+
+#fysionett-prissok-root .ge-slider-track-wrap {
+	height: 44px;
+}
+
+#fysionett-prissok-root .ge-slider-base-bar,
+#fysionett-prissok-root .ge-slider-fill-bar {
+	height: 16px;
+	border-radius: 9999px;
+}
+
+#fysionett-prissok-root .ge-slider-base-bar {
+	background: var(--md-sys-color-secondary-container, var(--ge-navy-100, #DCE2F2));
+}
+
+#fysionett-prissok-root .ge-slider-fill-bar {
+	background: var(--md-sys-color-primary, #0C2340);
+}
+
+#fysionett-prissok-root .ge-filter-pills-wrap {
+	gap: 8px;
+	max-height: 220px;
+	padding: 0 4px 4px 0;
+}
+
+#fysionett-prissok-root .ge-filter-pill-btn {
+	min-height: 36px;
+	padding: 0 14px;
+	border: 1px solid var(--ge-pc-outline);
+	border-radius: 9999px;
+	background: var(--ge-pc-surface);
+	color: var(--ge-pc-text);
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 20px;
+	box-shadow: none;
+	transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+#fysionett-prissok-root .ge-filter-pill-btn:hover:not(.is-active) {
+	border-color: var(--ge-grey-300, #D0D5DD);
+	background: var(--ge-pc-canvas);
+}
+
+#fysionett-prissok-root .ge-filter-pill-btn.is-active {
+	padding: 0 14px;
+	border-color: transparent !important;
+	background: var(--md-sys-color-secondary-container, var(--ge-navy-100, #DCE2F2)) !important;
+	color: var(--md-sys-color-on-secondary-container, var(--ge-pc-text)) !important;
+	box-shadow: none;
+}
+
+#fysionett-prissok-root .ge-filter-pill-btn.is-active .ge-shop-pill-avatar {
+	border-color: var(--ge-pc-outline);
+	box-shadow: none;
+}
+
+#fysionett-prissok-root .ge-filter-footer {
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0;
+	padding: 16px 24px max(16px, env(safe-area-inset-bottom));
+	border-top: 1px solid var(--ge-pc-outline);
+	background: var(--ge-pc-surface);
+}
+
+#fysionett-prissok-root .ge-filter-reset-btn,
+#fysionett-prissok-root .ge-filter-apply-btn {
+	width: auto;
+	min-height: 40px;
+	padding: 0 16px;
+	border-radius: 9999px;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	box-shadow: none;
+	transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+#fysionett-prissok-root .ge-filter-reset-btn {
+	border: 0;
+	background: transparent;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+
+#fysionett-prissok-root .ge-filter-reset-btn:hover {
+	background: var(--ge-pc-inset);
+}
+
+#fysionett-prissok-root .ge-filter-apply-btn {
+	gap: 8px;
+	border: 0;
+	background: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF !important;
+}
+
+#fysionett-prissok-root .ge-filter-apply-btn:hover {
+	background: var(--ge-navy-700, #143154);
+	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.2);
+	transform: none;
+}
+
+@container ge-price-comp-root (max-width: 599px) {
+	#fysionett-prissok-root .ge-comp-quick-filters-slot { display: none; }
+	#fysionett-prissok-root .ge-filter-quick-filters { display: flex; }
+	#fysionett-prissok-root .ge-filter-quick-filters-slot .ge-quick-chip { height: 48px; }
+	#fysionett-prissok-root .ge-filter-pills-wrap .ge-filter-pill-btn { min-height: 40px; }
+}
+
+@container ge-price-comp-root (min-width: 840px) {
+	#fysionett-prissok-root .ge-filter-sheet-handle { display: none; }
+
+	#fysionett-prissok-root .ge-comp-filter-panel {
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: auto;
+		width: min(400px, 100vw);
+		max-height: none;
+		border-radius: 28px 0 0 28px;
+		box-shadow: -8px 0 32px rgba(16, 24, 40, 0.18);
+		transform: translateX(100%);
+	}
+
+	#fysionett-prissok-root .ge-comp-filter-panel.is-open { transform: none; }
+	#fysionett-prissok-root .ge-filter-sheet-head { padding-top: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#fysionett-prissok-root .ge-comp-filter-scrim,
+	#fysionett-prissok-root .ge-comp-filter-panel,
+	#fysionett-prissok-root .ge-filter-close-btn,
+	#fysionett-prissok-root .ge-filter-pill-btn,
+	#fysionett-prissok-root .ge-filter-reset-btn,
+	#fysionett-prissok-root .ge-filter-apply-btn {
+		transition-duration: 0.01ms;
+	}
+}

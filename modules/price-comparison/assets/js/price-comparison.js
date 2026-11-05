@@ -762,6 +762,23 @@
 		renderCategoryChips();
 		renderQuickFilters();
 
+		var quickFiltersWrap = root.querySelector('#ge-comp-quick-filters');
+		var quickFiltersSlot = root.querySelector('#ge-comp-quick-filters-slot');
+		var quickFiltersPanelSlot = root.querySelector('#ge-comp-quick-filters-panel-slot');
+		function syncQuickFiltersPlacement() {
+			if (!quickFiltersWrap || !quickFiltersSlot || !quickFiltersPanelSlot) return;
+			var target = root.clientWidth <= 599 ? quickFiltersPanelSlot : quickFiltersSlot;
+			if (quickFiltersWrap.parentNode !== target) {
+				target.appendChild(quickFiltersWrap);
+			}
+		}
+		syncQuickFiltersPlacement();
+		if (typeof ResizeObserver !== 'undefined') {
+			new ResizeObserver(syncQuickFiltersPlacement).observe(root);
+		} else {
+			window.addEventListener('resize', syncQuickFiltersPlacement);
+		}
+
 		// Cache DOM nodes for smooth targeted updates
 		var searchInput = root.querySelector('.ge-comp-search-input');
 		if (searchInput && state.searchQuery) {
@@ -773,6 +790,9 @@
 		var viewGridBtn = root.querySelector('#ge-view-grid-btn');
 		var viewListBtn = root.querySelector('#ge-view-list-btn');
 		var filterPanel = root.querySelector('#ge-comp-filter-panel');
+		var filterScrim = root.querySelector('#ge-comp-filter-scrim');
+		var filterCloseBtn = root.querySelector('#ge-filter-close-btn');
+		var filterHost = root.closest('.ge-price-comp-wrapper') || root;
 		var priceMinInput = root.querySelector('#ge-price-min-input');
 		var priceMaxInput = root.querySelector('#ge-price-max-input');
 		var sliderMin = root.querySelector('#ge-slider-min');
@@ -1353,7 +1373,13 @@
 			}
 
 			// D. Update Filter Panel Visibility & Sliders
-			filterPanel.style.display = state.showFilters ? 'block' : 'none';
+			filterPanel.classList.toggle('is-open', state.showFilters);
+			filterScrim.classList.toggle('is-visible', state.showFilters);
+			filterPanel.inert = !state.showFilters;
+			filterPanel.setAttribute('aria-hidden', state.showFilters ? 'false' : 'true');
+			filterToggleBtn.setAttribute('aria-expanded', state.showFilters ? 'true' : 'false');
+			document.body.classList.toggle('ge-price-comp-filter-open', state.showFilters);
+			filterHost.classList.toggle('ge-price-comp-filter-host-open', state.showFilters);
 
 			var curMin = state.minPrice === '' ? state.absMinPrice : Number(state.minPrice);
 			var curMax = state.maxPrice === '' ? state.absMaxPrice : Number(state.maxPrice);
@@ -1552,6 +1578,29 @@
 		filterToggleBtn.addEventListener('click', function () {
 			state.showFilters = !state.showFilters;
 			updateUI();
+			if (state.showFilters) {
+				filterCloseBtn.focus();
+			}
+		});
+
+		filterCloseBtn.addEventListener('click', function () {
+			state.showFilters = false;
+			updateUI();
+			filterToggleBtn.focus();
+		});
+
+		filterScrim.addEventListener('click', function () {
+			state.showFilters = false;
+			updateUI();
+			filterToggleBtn.focus();
+		});
+
+		document.addEventListener('keydown', function (e) {
+			if (state.showFilters && e.key === 'Escape') {
+				state.showFilters = false;
+				updateUI();
+				filterToggleBtn.focus();
+			}
 		});
 
 		// View mode buttons
@@ -1613,6 +1662,7 @@
 		filterApplyBtn.addEventListener('click', function () {
 			state.showFilters = false;
 			updateUI();
+			filterToggleBtn.focus();
 			setTimeout(function () {
 				if (resultsCount) {
 					var topPos = resultsCount.getBoundingClientRect().top + window.scrollY;
@@ -2038,7 +2088,9 @@
 		'<div class="ge-dept-alert" id="ge-dept-alert" style="display: none;" role="alert"></div>' +
 
 		// Quick Filter Chips (Tier 1 Exposed Filters)
-		'<div class="ge-comp-quick-filters" id="ge-comp-quick-filters" role="group" aria-label="Hurtigfiltre"></div>' +
+		'<div id="ge-comp-quick-filters-slot" class="ge-comp-quick-filters-slot">' +
+			'<div class="ge-comp-quick-filters" id="ge-comp-quick-filters" role="group" aria-label="Hurtigfiltre"></div>' +
+		'</div>' +
 
 		// Controls Bar: Search, Sort, Filter Toggle, View Toggle
 		'<div class="ge-comp-controls">' +
@@ -2063,7 +2115,7 @@
 					'</div>' +
 				'</div>' +
 
-				'<button type="button" class="ge-comp-filter-toggle">' +
+				'<button type="button" class="ge-comp-filter-toggle" aria-haspopup="dialog" aria-controls="ge-comp-filter-panel" aria-expanded="false">' +
 					'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
 						'<line x1="21" y1="4" x2="14" y2="4"></line><line x1="10" y1="4" x2="3" y2="4"></line>' +
 						'<line x1="21" y1="12" x2="12" y2="12"></line><line x1="8" y1="12" x2="3" y2="12"></line>' +
@@ -2091,26 +2143,41 @@
 			'</div>' +
 		'</div>' +
 
-		// Expanded Filter Drawer
-		'<div id="ge-comp-filter-panel" class="ge-comp-filter-panel" style="display: none;">' +
+		// Responsive modal filter sheet
+		'<div id="ge-comp-filter-scrim" class="ge-comp-filter-scrim" aria-hidden="true"></div>' +
+		'<aside id="ge-comp-filter-panel" class="ge-comp-filter-panel" role="dialog" aria-modal="true" aria-labelledby="ge-filter-title" aria-hidden="true" inert>' +
+			'<div class="ge-filter-sheet-handle" aria-hidden="true"></div>' +
+			'<div class="ge-filter-sheet-head">' +
+				'<h3 id="ge-filter-title" class="ge-filter-sheet-title">Filtre</h3>' +
+				'<button type="button" id="ge-filter-close-btn" class="ge-filter-close-btn" aria-label="Lukk filtre" title="Lukk filtre">' +
+					'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+				'</button>' +
+			'</div>' +
 			'<div class="ge-filter-grid">' +
+				'<div class="ge-filter-quick-filters">' +
+					'<h4 class="ge-filter-section-title">Hurtigfiltre</h4>' +
+					'<div id="ge-comp-quick-filters-panel-slot" class="ge-filter-quick-filters-slot"></div>' +
+				'</div>' +
 				// Price Section
 				'<div>' +
-					'<h4 class="ge-filter-section-title">Pris</h4>' +
+					'<h4 class="ge-filter-section-title">Pris (NOK)</h4>' +
 					'<div class="ge-filter-price-inputs">' +
 						'<div class="ge-price-input-box">' +
-							'<input type="number" id="ge-price-min-input" />' +
+							'<input type="number" id="ge-price-min-input" placeholder=" " inputmode="numeric" aria-label="Minimumspris" />' +
+							'<label for="ge-price-min-input">Fra</label>' +
+							'<span aria-hidden="true">kr</span>' +
 						'</div>' +
-						'<span class="ge-price-dash">-</span>' +
 						'<div class="ge-price-input-box">' +
-							'<input type="number" id="ge-price-max-input" />' +
+							'<input type="number" id="ge-price-max-input" placeholder=" " inputmode="numeric" aria-label="Maksimumspris" />' +
+							'<label for="ge-price-max-input">Til</label>' +
+							'<span aria-hidden="true">kr</span>' +
 						'</div>' +
 					'</div>' +
 					'<div class="ge-slider-track-wrap">' +
 						'<div class="ge-slider-base-bar"></div>' +
 						'<div id="ge-slider-fill-bar" class="ge-slider-fill-bar"></div>' +
-						'<input type="range" id="ge-slider-min" min="' + state.absMinPrice + '" max="' + state.absMaxPrice + '" class="dual-range-thumb" style="z-index: 3;" />' +
-						'<input type="range" id="ge-slider-max" min="' + state.absMinPrice + '" max="' + state.absMaxPrice + '" class="dual-range-thumb" style="z-index: 4;" />' +
+						'<input type="range" id="ge-slider-min" min="' + state.absMinPrice + '" max="' + state.absMaxPrice + '" class="dual-range-thumb" aria-label="Minimumspris" style="z-index: 3;" />' +
+						'<input type="range" id="ge-slider-max" min="' + state.absMinPrice + '" max="' + state.absMaxPrice + '" class="dual-range-thumb" aria-label="Maksimumspris" style="z-index: 4;" />' +
 					'</div>' +
 				'</div>' +
 
@@ -2132,7 +2199,7 @@
 				'<button type="button" id="ge-filter-reset-btn" class="ge-filter-reset-btn">Tøm filtre</button>' +
 				'<button type="button" id="ge-filter-apply-btn" class="ge-filter-apply-btn">Vis treff</button>' +
 			'</div>' +
-		'</div>' +
+		'</aside>' +
 
 		// Results Counter
 		'<div id="ge-comp-results-count" class="ge-comp-results-count"></div>' +

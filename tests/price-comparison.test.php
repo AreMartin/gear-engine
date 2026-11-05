@@ -166,6 +166,10 @@ $js_content  = file_get_contents( GEAR_ENGINE_PATH . 'modules/price-comparison/a
 assert_test( strpos( $css_content, 'ge-comp-view-toggle-wrap' ) !== false, 'CSS contains .ge-comp-view-toggle-wrap' );
 assert_test( strpos( $css_content, 'ge-savings-chip' ) !== false, 'CSS contains .ge-savings-chip styling' );
 assert_test( strpos( $css_content, 'ge-comp-quick-filters' ) !== false, 'CSS contains .ge-comp-quick-filters' );
+assert_test( strpos( $css_content, '.ge-comp-filter-panel.is-open' ) !== false && strpos( $css_content, 'transform: translateY(100%)' ) !== false, 'Filter sheet opens from the bottom on compact layouts' );
+assert_test( strpos( $css_content, '@container ge-price-comp-root (min-width: 840px)' ) !== false && strpos( $css_content, 'transform: translateX(100%)' ) !== false, 'Filter sheet opens from the side on desktop' );
+assert_test( strpos( $css_content, 'border-radius: 9999px;' ) !== false && strpos( $css_content, '.ge-filter-pill-btn.is-active' ) !== false, 'Filter chips use rounded Material 3 shapes and selected states' );
+assert_test( strpos( $css_content, '@container ge-price-comp-root (max-width: 599px)' ) !== false, 'Quick filters move into the filter sheet on mobile' );
 assert_test( strpos( $css_content, 'border-radius: 9999px !important;' ) !== false, 'Search input is forced to pill shape' );
 assert_test( strpos( $css_content, '.ge-card-grid-img-wrap .ge-discount-badge' ) !== false && strpos( $css_content, 'var(--md-sys-color-error-container, #FFDAD6)' ) !== false, 'Product discount badges use the prototype red tone' );
 assert_test( strpos( $css_content, 'width: auto !important;' ) !== false, 'List view call-to-action keeps its compact prototype width on mobile' );
@@ -180,6 +184,10 @@ assert_test( strpos( $js_content, 'ge-list-compare-box' ) !== false && strpos( $
 assert_test( strpos( $js_content, 'Til butikk ' ) !== false, 'JS uses prototype list-card call-to-action' );
 assert_test( strpos( $js_content, 'Rutenett' ) !== false, 'JS contains labeled Rutenett view button' );
 assert_test( strpos( $js_content, 'Liste' ) !== false, 'JS contains labeled Liste view button' );
+assert_test( strpos( $js_content, 'ge-filter-close-btn' ) !== false && strpos( $js_content, 'ge-comp-filter-scrim' ) !== false, 'JS renders modal filter sheet close and scrim controls' );
+assert_test( strpos( $js_content, "filterScrim.addEventListener('click'" ) !== false && strpos( $js_content, "e.key === 'Escape'" ) !== false, 'JS closes filter sheet with backdrop and Escape key' );
+assert_test( strpos( $js_content, 'root.clientWidth <= 599' ) !== false && strpos( $js_content, 'new ResizeObserver(syncQuickFiltersPlacement)' ) !== false, 'JS relocates mobile quick filters based on container width' );
+assert_test( strpos( $js_content, 'ge-price-comp-filter-host-open' ) !== false && strpos( $css_content, '.ge-price-comp-wrapper.ge-price-comp-filter-host-open' ) !== false, 'Open filter sheet stacks above surrounding page content' );
 
 // 6. Del 2: Specifications in fallback products
 assert_test( isset( $fallback[0]['specs'] ) && is_array( $fallback[0]['specs'] ), 'Concept2 fallback product has specs array' );
