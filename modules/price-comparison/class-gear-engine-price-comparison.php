@@ -66,19 +66,14 @@ class Gear_Engine_Price_Comparison {
 		$css_mtime = file_exists( $css_path ) ? filemtime( $css_path ) : false;
 		$js_mtime  = file_exists( $js_path ) ? filemtime( $js_path ) : false;
 
-		wp_register_style(
-			'gear-engine-font-inter',
-			'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-			array(),
-			null
-		);
+		// Note: 'gear-engine-google-sans' is registered centrally in gear_engine_register_shared_assets().
 
 		// Note: 'gear-engine-material-symbols' is registered centrally in gear_engine_register_shared_assets().
 
 		wp_register_style(
 			'gear-engine-price-comparison',
 			$base_url . 'css/price-comparison.css',
-			array( 'gear-engine-tokens', 'gear-engine-font-inter', 'gear-engine-material-symbols' ),
+			array( 'gear-engine-tokens', 'gear-engine-google-sans', 'gear-engine-material-symbols' ),
 			false !== $css_mtime ? (string) $css_mtime : GEAR_ENGINE_VERSION
 		);
 

@@ -48,6 +48,10 @@ function gear_engine_register_shared_assets(): void {
 	$ms_path = GEAR_ENGINE_PATH . 'assets/css/material-symbols.css';
 	$ms_ver  = file_exists( $ms_path ) ? (string) filemtime( $ms_path ) : GEAR_ENGINE_VERSION;
 	wp_register_style( 'gear-engine-material-symbols', GEAR_ENGINE_URL . 'assets/css/material-symbols.css', array(), $ms_ver );
+
+	$gs_path = GEAR_ENGINE_PATH . 'assets/css/google-sans.css';
+	$gs_ver  = file_exists( $gs_path ) ? (string) filemtime( $gs_path ) : GEAR_ENGINE_VERSION;
+	wp_register_style( 'gear-engine-google-sans', GEAR_ENGINE_URL . 'assets/css/google-sans.css', array(), $gs_ver );
 }
 
 /**
