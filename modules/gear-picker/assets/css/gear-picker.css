@@ -10,7 +10,7 @@
    ========================================================= */
 .gear-engine-picker {
 	box-sizing: border-box;
-	max-width: 760px;
+	max-width: 800px;
 	margin: 0 auto;
 	padding: 0 16px 40px;
 	color: var(--md-sys-color-on-surface, #0C2340);
@@ -936,7 +936,7 @@
 
 .gear-engine-hub {
 	box-sizing: border-box;
-	max-width: 1200px;
+	max-width: 800px;
 	margin: 0 auto;
 	padding: 0 16px 48px;
 	color: var(--md-sys-color-on-surface, #0C2340);
@@ -1365,7 +1365,7 @@
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	max-width: 760px;
+	max-width: 800px;
 	min-height: 56px;
 	margin: 0 auto 4px;
 	padding: 0 16px 0 4px;
