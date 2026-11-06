@@ -847,6 +847,27 @@
 /* =========================================================
    12. Gear Picker Hub (/kjopsveiledere/)
    ========================================================= */
+.gear-engine-hub .material-symbols-outlined {
+	font-family: 'Material Symbols Outlined', sans-serif;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 20px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	flex-shrink: 0;
+	user-select: none;
+	-webkit-font-smoothing: antialiased;
+	font-feature-settings: 'liga';
+	font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+	overflow: hidden;
+	text-rendering: optimizeLegibility;
+}
+
 .gear-engine-hub {
 	box-sizing: border-box;
 	max-width: 1200px;
