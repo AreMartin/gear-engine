@@ -339,8 +339,8 @@
 			var p = PRESETS[ key ] || PRESETS.budget;
 			Object.assign( filters, p );
 			saveSession();
-			// Walk into quiz at Step 1 with preset values pre-selected so all questions remain accessible and adjustable
-			go( 1, 'forward' );
+			// Jump straight to recommended results for this preset
+			go( steps.length + 1, 'forward' );
 		}
 
 		function openDeals() {
@@ -1099,6 +1099,9 @@
 					}
 					if ( state.view === 'deals' ) {
 						state.view = 'quiz';
+						go( 0, 'backward' );
+					} else if ( state.presetApplied && state.step > steps.length ) {
+						state.presetApplied = false;
 						go( 0, 'backward' );
 					} else if ( state.step > 0 ) {
 						go( state.step - 1, 'backward' );
