@@ -61,41 +61,58 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 				: '#';
 			?>
 			<div class="gear-engine-hub__card<?php echo ! $is_available ? ' gear-engine-hub__card--upcoming' : ''; ?>"
-				data-category="<?php echo esc_attr( $item['category'] ); ?>">
-				<div class="gear-engine-hub__card-top">
-					<span class="gear-engine-hub__card-cat-pill">
-						<?php echo esc_html( $item['category_name'] ); ?>
-					</span>
-					<?php if ( ! empty( $item['badge'] ) ) : ?>
-						<span class="gear-engine-hub__card-badge<?php echo ! $is_available ? ' gear-engine-hub__card-badge--muted' : ''; ?>">
-							<?php echo esc_html( $item['badge'] ); ?>
-						</span>
-					<?php endif; ?>
-				</div>
-
-				<div class="gear-engine-hub__card-body">
-					<div class="gear-engine-hub__card-icon-box">
-						<?php echo Gear_Engine_Gear_Picker::get_hub_icon( (string) ( $item['icon'] ?? '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- hardcoded clean SVG helper ?>
-					</div>
-					<h3 class="gear-engine-hub__card-title"><?php echo esc_html( $item['title'] ); ?></h3>
-					<p class="gear-engine-hub__card-desc"><?php echo esc_html( $item['desc'] ); ?></p>
-				</div>
-
-				<div class="gear-engine-hub__card-footer">
-					<span class="gear-engine-hub__card-time">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-						<?php echo esc_html( $item['time'] ); ?>
-					</span>
-					<?php if ( $is_available ) : ?>
-						<a href="<?php echo esc_url( $card_href ); ?>" class="gear-engine-hub__card-action-btn">
-							<span><?php esc_html_e( 'Ta testen', 'gear-engine' ); ?></span>
-							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
-						</a>
+				data-category="<?php echo esc_attr( $item['category'] ); ?>"
+				<?php if ( $is_available ) : ?>
+					onclick="window.location.href='<?php echo esc_url( $card_href ); ?>';"
+					role="link"
+					tabindex="0"
+					style="cursor: pointer;"
+					onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='<?php echo esc_url( $card_href ); ?>';}"
+				<?php endif; ?>>
+				<div class="gear-engine-hub__card-media">
+					<?php if ( ! empty( $item['image'] ) ) : ?>
+						<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" class="gear-engine-hub__card-img" loading="lazy" />
 					<?php else : ?>
-						<span class="gear-engine-hub__card-action-muted">
-							<?php esc_html_e( 'Kommer snart', 'gear-engine' ); ?>
-						</span>
+						<div class="gear-engine-hub__card-img-placeholder">
+							<div class="gear-engine-hub__card-icon-box">
+								<?php echo Gear_Engine_Gear_Picker::get_hub_icon( (string) ( $item['icon'] ?? '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- hardcoded clean SVG helper ?>
+							</div>
+						</div>
 					<?php endif; ?>
+					<div class="gear-engine-hub__card-overlays">
+						<span class="gear-engine-hub__card-cat-pill">
+							<?php echo esc_html( $item['category_name'] ); ?>
+						</span>
+						<?php if ( ! empty( $item['badge'] ) ) : ?>
+							<span class="gear-engine-hub__card-badge<?php echo ! $is_available ? ' gear-engine-hub__card-badge--muted' : ''; ?>">
+								<?php echo esc_html( $item['badge'] ); ?>
+							</span>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				<div class="gear-engine-hub__card-content">
+					<div class="gear-engine-hub__card-body">
+						<h3 class="gear-engine-hub__card-title"><?php echo esc_html( $item['title'] ); ?></h3>
+						<p class="gear-engine-hub__card-desc"><?php echo esc_html( $item['desc'] ); ?></p>
+					</div>
+
+					<div class="gear-engine-hub__card-footer">
+						<span class="gear-engine-hub__card-time">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+							<?php echo esc_html( $item['time'] ); ?>
+						</span>
+						<?php if ( $is_available ) : ?>
+							<a href="<?php echo esc_url( $card_href ); ?>" class="gear-engine-hub__card-action-btn" onclick="event.stopPropagation();">
+								<span><?php esc_html_e( 'Ta testen', 'gear-engine' ); ?></span>
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+							</a>
+						<?php else : ?>
+							<span class="gear-engine-hub__card-action-muted">
+								<?php esc_html_e( 'Kommer snart', 'gear-engine' ); ?>
+							</span>
+						<?php endif; ?>
+					</div>
 				</div>
 			</div>
 		<?php endforeach; ?>
