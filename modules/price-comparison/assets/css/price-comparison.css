@@ -419,9 +419,14 @@ body.ge-m3-sheet-open {
 		color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
+.ge-m3-dept-btn:not(.is-active):hover,
+.ge-dept-btn:not(.is-active):hover {
+	background: #F4F7FA;
+}
+
 .ge-m3-dept-btn.is-active,
 .ge-dept-btn.is-active {
-	background: var(--md-sys-color-surface-container-high);
+	background: #E7E8EE;
 	color: var(--md-sys-color-on-surface);
 }
 
@@ -633,7 +638,7 @@ body.ge-m3-sheet-open {
 }
 
 .ge-m3-cats-bar .ge-m3-chip:hover:not(.is-active) {
-	background: var(--md-sys-color-surface-container-low);
+	background: #F4F7FA;
 	box-shadow: 0 2px 5px rgba(12, 35, 64, 0.1);
 }
 
@@ -665,14 +670,14 @@ body.ge-m3-sheet-open {
 
 .ge-m3-quick-filters .ge-m3-qchip:hover:not(.is-active) {
 	border-color: var(--md-sys-color-outline);
-	background: var(--md-sys-color-surface-container-low);
+	background: #F4F7FA;
 }
 
 .ge-m3-quick-filters .ge-m3-qchip.is-active {
 	padding: 0 12px;
 	border-color: transparent;
-	background: var(--md-sys-color-secondary-container);
-	color: var(--md-sys-color-on-secondary-container);
+	background: #E7E8EE;
+	color: var(--md-sys-color-on-surface, #0C2340);
 	box-shadow: none;
 }
 
@@ -682,8 +687,8 @@ body.ge-m3-sheet-open {
 .ge-filter-pill-btn.is-active {
 	padding-left: 8px;
 	border-color: transparent;
-	background: var(--md-sys-color-secondary-container);
-	color: var(--md-sys-color-on-secondary-container);
+	background: #E7E8EE;
+	color: var(--md-sys-color-on-surface, #0C2340);
 }
 
 .ge-m3-filter-pill-shop {
@@ -706,14 +711,14 @@ body.ge-m3-sheet-open {
 
 #ge-comp-filter-panel .ge-m3-filter-pill:hover:not(.is-active) {
 	border-color: var(--md-sys-color-outline);
-	background: var(--md-sys-color-surface-container-low);
+	background: #F4F7FA;
 }
 
 #ge-comp-filter-panel .ge-m3-filter-pill.is-active {
 	padding: 0 14px;
 	border-color: transparent;
-	background: var(--md-sys-color-secondary-container);
-	color: var(--md-sys-color-on-secondary-container);
+	background: #E7E8EE;
+	color: var(--md-sys-color-on-surface, #0C2340);
 	box-shadow: none;
 }
 
@@ -1262,16 +1267,29 @@ body.ge-m3-sheet-open {
 }
 
 .ge-m3-view-btn:not(.is-active):hover {
-	background: #F2F4F7;
+	background: #F4F7FA;
 }
 
 .ge-m3-view-btn.is-active {
-	background: var(--ge-control-ink);
-	color: #fff;
+	background: #E7E8EE;
+	color: var(--md-sys-color-on-surface, #0C2340);
 }
 
 .ge-m3-view-btn.is-active:hover {
-	background: #183655;
+	background: #E7E8EE;
+}
+
+.ge-m3-dept-btn:hover::after,
+.ge-m3-filter-btn:hover::after,
+.ge-m3-view-btn:not(.is-active):hover::after,
+.ge-m3-chip:not(.is-active):hover::after,
+.ge-m3-qchip:not(.is-active):hover::after,
+.ge-m3-filter-pill:not(.is-active):hover::after,
+.ge-m3-view-btn.is-active:hover::after,
+.ge-m3-chip.is-active:hover::after,
+.ge-m3-qchip.is-active:hover::after,
+.ge-m3-filter-pill.is-active:hover::after {
+	opacity: 0;
 }
 
 .ge-m3-view-btn.is-active .ge-m3-seg-check {
@@ -1687,10 +1705,10 @@ body.ge-m3-sheet-open {
 	align-items: center;
 	height: 26px;
 	padding: 0 10px;
-	border: 1px solid var(--ge-amber-deal-border, #FDE68A);
-	border-radius: var(--md-sys-shape-corner-full);
-	background: var(--md-custom-color-deal-container);
-	color: var(--md-custom-color-on-deal-container);
+	border: none;
+	border-radius: var(--md-sys-shape-corner-full, 9999px);
+	background: var(--md-sys-color-tertiary, #005236);
+	color: #FFFFFF;
 	font: var(--md-sys-typescale-label-medium);
 	font-weight: 700;
 	letter-spacing: 0.1px;
@@ -1700,9 +1718,9 @@ body.ge-m3-sheet-open {
 .ge-card-grid-img-wrap .ge-discount-badge {
 	top: 14px;
 	left: 14px;
-	background: var(--md-sys-color-error-container, #FFDAD6);
-	border-color: transparent;
-	color: var(--md-sys-color-on-error-container, #410002);
+	background: var(--md-sys-color-tertiary, #005236);
+	border: none;
+	color: #FFFFFF;
 }
 
 [data-theme="dark"] .ge-m3-deal-chip {
@@ -2219,9 +2237,9 @@ body.ge-m3-sheet-open {
 .ge-m3-list-img-wrap .ge-m3-deal-chip {
 	top: 14px;
 	left: 14px;
-	background: var(--md-sys-color-error-container);
-	border-color: transparent;
-	color: var(--md-sys-color-on-error-container);
+	background: var(--md-sys-color-tertiary, #005236);
+	border: none;
+	color: #FFFFFF;
 }
 
 .ge-m3-list-content {
