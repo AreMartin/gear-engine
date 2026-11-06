@@ -2984,13 +2984,14 @@ body.ge-m3-sheet-open {
 	z-index: 100;
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
 	max-width: calc(100vw - 32px);
-	padding: 8px 8px 8px 20px;
-	background: #0C2340;
-	color: #FFFFFF;
+	padding: 8px 10px 8px 20px;
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
 	border-radius: var(--md-sys-shape-corner-full);
-	box-shadow: var(--md-sys-elevation-3);
+	box-shadow: 0 10px 32px rgba(12, 35, 64, 0.18), 0 2px 6px rgba(12, 35, 64, 0.08);
 	transform: translateX(-50%);
 	animation: ge-slideup var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
 }
@@ -3004,19 +3005,36 @@ body.ge-m3-sheet-open {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	margin-right: 8px;
+	margin-right: 4px;
+	color: var(--md-sys-color-primary, #0C2340);
 	font: var(--md-sys-typescale-label-large);
+	font-weight: 600;
 	letter-spacing: 0.1px;
 	white-space: nowrap;
 }
 
 .ge-m3-cmp-bar .ge-m3-btn--filled {
-	background: #FFFFFF;
-	color: #0C2340;
+	background: var(--md-sys-color-primary, #0C2340);
+	color: #FFFFFF !important;
+	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.16);
+	transition: background-color 0.2s, transform 0.15s;
+}
+
+.ge-m3-cmp-bar .ge-m3-btn--filled:hover {
+	background: #143154;
+	color: #FFFFFF !important;
+	transform: translateY(-1px);
 }
 
 .ge-m3-cmp-bar .ge-m3-btn--text {
-	color: #FFFFFF;
+	color: var(--ge-text-muted, #667085);
+	text-decoration: none;
+	font-weight: 500;
+	transition: color 0.15s;
+}
+
+.ge-m3-cmp-bar .ge-m3-btn--text:hover {
+	color: var(--md-sys-color-primary, #0C2340);
 	text-decoration: underline;
 }
 
@@ -3028,7 +3046,7 @@ body.ge-m3-sheet-open {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	margin-right: 8px;
+	margin-right: 4px;
 }
 
 .ge-m3-cmp-bar-product {
@@ -3036,9 +3054,10 @@ body.ge-m3-sheet-open {
 	width: 36px;
 	height: 36px;
 	object-fit: contain;
-	border: 1px solid rgba(255, 255, 255, 0.55);
+	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
 	border-radius: 50%;
-	background: #fff;
+	background: #FFFFFF;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.06);
 }
 
 @media (max-width: 599px) {
