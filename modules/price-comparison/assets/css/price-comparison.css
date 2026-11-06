@@ -13,6 +13,9 @@
    ========================================================= */
 .ge-price-comp-wrapper {
 	position: relative;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
 	color: var(--md-sys-color-on-surface);
 	font: var(--md-sys-typescale-body-large);
 	-webkit-font-smoothing: antialiased;
@@ -1638,8 +1641,9 @@ body.ge-m3-sheet-open {
 	box-shadow: var(--ge-card-shadow);
 }
 
-.ge-m3-card-grid .ge-m3-img-wrap {
+.ge-price-comp-wrapper .ge-m3-card-grid .ge-m3-img-wrap {
 	height: 220px;
+	width: calc(100% + 2px);
 	margin: -1px -1px 0;
 	padding: 24px;
 	border: 0;
@@ -1663,10 +1667,14 @@ body.ge-m3-sheet-open {
 	height: 200px;
 }
 
-.ge-m3-product-img {
-	max-width: 100%;
-	max-height: 100%;
+.ge-price-comp-wrapper .ge-m3-product-img {
+	width: 100% !important;
+	height: 100% !important;
+	max-width: 100% !important;
+	max-height: 100% !important;
+	margin: 0 !important;
 	object-fit: contain;
+	object-position: center;
 	mix-blend-mode: multiply;
 }
 
@@ -2171,27 +2179,37 @@ body.ge-m3-sheet-open {
 	box-shadow: var(--ge-card-shadow);
 }
 
-.ge-m3-list-main-row {
+.ge-price-comp-wrapper .ge-m3-list-main-row {
 	display: flex;
+	flex-direction: row;
 	align-items: stretch;
 	min-height: 216px;
 }
 
 /* Full-bleed photo on the left edge of the card */
-.ge-m3-list-img-wrap {
-	flex: 0 0 clamp(180px, 28%, 300px);
+.ge-price-comp-wrapper .ge-m3-list-img-wrap {
+	flex: 0 0 clamp(180px, 32%, 280px);
+	width: clamp(180px, 32%, 280px);
+	height: auto;
+	min-height: 216px;
+	align-self: stretch;
 	padding: 0;
+	margin: 0;
 	border: 0;
 	border-radius: 0;
+	overflow: hidden;
 	background: var(--ge-media-bg);
 }
 
-.ge-m3-list-img-wrap .ge-m3-product-img {
+.ge-price-comp-wrapper .ge-m3-list-img-wrap .ge-m3-product-img {
 	position: absolute;
 	inset: 0;
-	width: 100%;
-	height: 100%;
-	padding: 20px;
+	width: 100% !important;
+	height: 100% !important;
+	max-width: none !important;
+	max-height: none !important;
+	margin: 0 !important;
+	padding: 18px;
 	box-sizing: border-box;
 	object-fit: contain;
 	object-position: center;
@@ -2637,13 +2655,19 @@ body.ge-m3-sheet-open {
 	white-space: nowrap;
 }
 
-/* Medium list cards (two columns): smaller type */
+/* Medium list cards (two columns): smaller type, preserve full-bleed side-by-side image */
 @container ge-m3-lcard (max-width: 700px) {
-	.ge-m3-list-main-row {
-		min-height: 190px;
+	.ge-price-comp-wrapper .ge-m3-list-main-row {
+		flex-direction: row;
+		min-height: 196px;
 	}
-	.ge-m3-list-img-wrap {
-		flex-basis: clamp(140px, 30%, 200px);
+	.ge-price-comp-wrapper .ge-m3-list-img-wrap {
+		flex: 0 0 clamp(165px, 33%, 230px);
+		width: clamp(165px, 33%, 230px);
+		min-height: 196px;
+	}
+	.ge-price-comp-wrapper .ge-m3-list-img-wrap .ge-m3-product-img {
+		padding: 14px;
 	}
 	.ge-m3-list-content {
 		padding: 18px 20px;
@@ -2690,41 +2714,23 @@ body.ge-m3-sheet-open {
 	}
 }
 
-/* Narrow list cards: photo on top */
-@container ge-m3-lcard (max-width: 480px) {
-	.ge-m3-list-main-row {
-		flex-direction: column;
-		min-height: 0;
-	}
-	.ge-m3-list-img-wrap {
-		flex: 0 0 auto;
-		height: 180px;
-	}
-	.ge-m3-list-content .ge-m3-card-title {
-		min-height: 44px;
-	}
-	.ge-m3-list-action-row {
-		align-items: center;
-	}
-}
-
 @container ge-m3-comp (max-width: 599px) {
 	.ge-m3-card-list {
 		border-radius: var(--md-sys-shape-corner-large);
 	}
-	.ge-m3-list-main-row {
+	.ge-price-comp-wrapper .ge-m3-list-main-row {
 		flex-direction: row;
 		min-height: 124px;
 	}
-	.ge-m3-list-img-wrap {
-		flex: 0 0 92px;
-		width: 92px;
+	.ge-price-comp-wrapper .ge-m3-list-img-wrap {
+		flex: 0 0 112px;
+		width: 112px;
 		min-height: 124px;
 		height: auto;
 		align-self: stretch;
 		background: var(--ge-media-bg);
 	}
-	.ge-m3-list-img-wrap .ge-m3-product-img {
+	.ge-price-comp-wrapper .ge-m3-list-img-wrap .ge-m3-product-img {
 		padding: 10px;
 	}
 	.ge-m3-list-img-wrap .ge-m3-deal-chip {
@@ -3655,6 +3661,10 @@ body.ge-m3-sheet-open {
 .ge-m3-img-wrap[data-detail-id],
 .ge-m3-list-img-wrap[data-detail-id] {
 	cursor: pointer;
+}
+
+.ge-m3-img-wrap[data-detail-id] .ge-m3-product-img,
+.ge-m3-list-img-wrap[data-detail-id] .ge-m3-product-img {
 	transition: transform 180ms ease;
 }
 
@@ -3663,25 +3673,12 @@ body.ge-m3-sheet-open {
 	transform: scale(1.04);
 }
 
-.ge-price-comp-wrapper .ge-m3-card-title-btn {
-	appearance: none;
-	border: 0;
-	background: transparent;
-	padding: 0;
-	margin: 0;
-	font: inherit;
-	color: inherit;
-	text-align: left;
+.ge-price-comp-wrapper .ge-m3-card-title[data-detail-id] {
 	cursor: pointer;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
-	width: 100%;
 	transition: color 140ms ease;
 }
 
-.ge-price-comp-wrapper .ge-m3-card-title-btn:hover {
+.ge-price-comp-wrapper .ge-m3-card-title[data-detail-id]:hover {
 	color: var(--md-sys-color-primary);
 	text-decoration: underline;
 }

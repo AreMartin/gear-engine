@@ -149,6 +149,8 @@ class Gear_Engine_Price_Comparison {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_fallback_products(): array {
+		$mock_img_base = GEAR_ENGINE_URL . 'modules/price-comparison/assets/images/mock-products/';
+
 		return array(
 			array(
 				'id'            => 1,
@@ -162,7 +164,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Fjellsport',
 				'otherShops'    => 3,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80',
+				'image'         => $mock_img_base . 'rowing-machine.png',
 				'url'           => '#',
 				'stores'        => array(
 					array( 'shop' => 'Fjellsport', 'price' => 12490, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
@@ -190,7 +192,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Treningspartner',
 				'otherShops'    => 2,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80',
+				'image'         => $mock_img_base . 'treadmill.png',
 				'url'           => '#',
 				'stores'        => array(
 					array( 'shop' => 'Treningspartner', 'price' => 24900, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
@@ -218,7 +220,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'X-Life',
 				'otherShops'    => 1,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'stores'        => array(
 					array( 'shop' => 'X-Life', 'price' => 899, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
@@ -242,7 +244,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Treningspartner',
 				'otherShops'    => 0,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Maksbelastning' => '300 kg',
@@ -263,7 +265,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Gymgrossisten',
 				'otherShops'    => 0,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Vekt'           => '20 kg',
@@ -284,7 +286,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Anton Sport',
 				'otherShops'    => 0,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Slaglengde' => '16 mm',
@@ -305,7 +307,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Fjellsport',
 				'otherShops'    => 2,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'stores'        => array(
 					array( 'shop' => 'Fjellsport', 'price' => 2999, 'inStock' => true, 'isBest' => true, 'url' => '#' ),
@@ -330,7 +332,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Fjellsport',
 				'otherShops'    => 1,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Type'          => 'Aktiv støtte',
@@ -350,7 +352,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'Treningspartner',
 				'otherShops'    => 0,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Motstand'  => 'Lett, Medium, Hard',
@@ -370,7 +372,7 @@ class Gear_Engine_Price_Comparison {
 				'shop'          => 'X-Life',
 				'otherShops'    => 1,
 				'inStock'       => true,
-				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80',
+				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&h=400&q=80',
 				'url'           => '#',
 				'specs'         => array(
 					'Lengde'         => '33 cm',

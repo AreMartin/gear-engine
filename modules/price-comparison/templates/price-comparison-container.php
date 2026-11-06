@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 ?>
-<div class="ge-price-comp-wrapper">
+<div class="ge-price-comp-wrapper alignwide">
 	<div
 		id="fysionett-prissok-root"
 		class="ge-m3-comp-wrapper"

@@ -970,13 +970,13 @@
 		return '' +
 		'<div class="ge-m3-card-grid ge-card-grid">' +
 			compareToggleHtml(p, isChecked) +
-			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap" data-detail-id="' + p.id + '" role="button" tabindex="0" aria-label="Vis produktdetaljer for ' + escapeHtml(p.name) + '" title="Vis produktdetaljer og spesifikasjoner">' +
+			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
 				(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
 				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 			'</div>' +
 			'<div class="ge-m3-card-content">' +
 				'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
-				'<h3 class="ge-m3-card-title"><button type="button" class="ge-m3-card-title-btn" data-detail-id="' + p.id + '">' + escapeHtml(p.name) + '</button></h3>' +
+				'<h3 class="ge-m3-card-title" data-detail-id="' + p.id + '" tabindex="0">' + escapeHtml(p.name) + '</h3>' +
 				'<div class="ge-m3-card-bottom">' +
 					priceRowHtml(p, showSavings, save) +
 					shopRowHtml(p, storeCount, isOpen, 'Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker', false) +
@@ -1003,7 +1003,7 @@
 		return '' +
 		'<div class="ge-m3-card-list ge-card-list">' +
 			'<div class="ge-m3-list-main-row ge-list-main-row">' +
-				'<div class="ge-m3-list-img-wrap" data-detail-id="' + p.id + '" role="button" tabindex="0" aria-label="Vis produktdetaljer for ' + escapeHtml(p.name) + '" title="Vis produktdetaljer og spesifikasjoner">' +
+				'<div class="ge-m3-list-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
 					(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
 					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 				'</div>' +
@@ -1012,7 +1012,7 @@
 						'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
 						compareToggleHtml(p, isChecked) +
 					'</div>' +
-					'<h3 class="ge-m3-card-title"><button type="button" class="ge-m3-card-title-btn" data-detail-id="' + p.id + '">' + escapeHtml(p.name) + '</button></h3>' +
+					'<h3 class="ge-m3-card-title" data-detail-id="' + p.id + '" tabindex="0">' + escapeHtml(p.name) + '</h3>' +
 					'<div class="ge-m3-list-action-row">' +
 						priceRowHtml(p, showSavings, save) +
 						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener sponsored" class="ge-m3-cta-btn ge-m3-btn ge-m3-btn--filled ge-m3-list-cta m3-sl">' +
