@@ -42,9 +42,6 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 					data-category="<?php echo esc_attr( $cat_id ); ?>"
 					role="tab"
 					aria-pressed="<?php echo $cat_id === $initial_category || ( '' === $initial_category && 'all' === $cat_id ) ? 'true' : 'false'; ?>">
-					<?php if ( ! empty( $cat['emoji'] ) ) : ?>
-						<span class="gear-engine-hub__chip-emoji"><?php echo esc_html( $cat['emoji'] ); ?></span>
-					<?php endif; ?>
 					<span><?php echo esc_html( $cat['label'] ); ?></span>
 				</button>
 			<?php endforeach; ?>
