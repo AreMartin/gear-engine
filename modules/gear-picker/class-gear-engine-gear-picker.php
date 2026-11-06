@@ -61,7 +61,7 @@ class Gear_Engine_Gear_Picker {
 		$css_mtime = file_exists( $base_path . 'css/gear-picker.css' ) ? filemtime( $base_path . 'css/gear-picker.css' ) : false;
 		$js_mtime  = file_exists( $base_path . 'js/gear-picker.js' ) ? filemtime( $base_path . 'js/gear-picker.js' ) : false;
 
-		wp_register_style( 'gear-engine-gear-picker', $base . 'css/gear-picker.css', array( 'gear-engine-tokens' ), false !== $css_mtime ? (string) $css_mtime : GEAR_ENGINE_VERSION );
+		wp_register_style( 'gear-engine-gear-picker', $base . 'css/gear-picker.css', array( 'gear-engine-tokens', 'gear-engine-material-symbols' ), false !== $css_mtime ? (string) $css_mtime : GEAR_ENGINE_VERSION );
 		wp_register_script( 'gear-engine-gear-picker-scoring', $base . 'js/gear-picker-scoring.js', array(), false !== $js_mtime ? (string) $js_mtime : GEAR_ENGINE_VERSION, true );
 		wp_register_script( 'gear-engine-gear-picker', $base . 'js/gear-picker.js', array( 'gear-engine-gear-picker-scoring' ), false !== $js_mtime ? (string) $js_mtime : GEAR_ENGINE_VERSION, true );
 		wp_register_script( 'gear-engine-gear-picker-hub', $base . 'js/gear-picker-hub.js', array(), false !== $js_mtime ? (string) $js_mtime : GEAR_ENGINE_VERSION, true );

@@ -96,13 +96,13 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 
 					<div class="gear-engine-hub__card-footer">
 						<span class="gear-engine-hub__card-time">
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+							<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 16px; line-height: 1;">schedule</span>
 							<?php echo esc_html( $item['time'] ); ?>
 						</span>
 						<?php if ( $is_available ) : ?>
 							<a href="<?php echo esc_url( $card_href ); ?>" class="gear-engine-hub__card-action-btn" onclick="event.stopPropagation();">
 								<span><?php esc_html_e( 'Ta testen', 'gear-engine' ); ?></span>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+								<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 18px; line-height: 1;">arrow_forward</span>
 							</a>
 						<?php else : ?>
 							<span class="gear-engine-hub__card-action-muted">
@@ -119,10 +119,7 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 	<aside class="gear-engine-hub__price-banner" aria-label="<?php esc_attr_e( 'Prissammenligning', 'gear-engine' ); ?>">
 		<div class="gear-engine-hub__price-banner-content">
 			<div class="gear-engine-hub__price-banner-icon">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<line x1="12" y1="1" x2="12" y2="23"></line>
-					<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-				</svg>
+				<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 22px; line-height: 1;">sell</span>
 			</div>
 			<div class="gear-engine-hub__price-banner-text">
 				<strong><?php esc_html_e( 'Vet du allerede hva du leter etter?', 'gear-engine' ); ?></strong>
@@ -131,21 +128,18 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 		</div>
 		<a href="<?php echo esc_url( function_exists( 'home_url' ) ? home_url( '/priser/' ) : '/priser/' ); ?>" class="gear-engine-hub__price-banner-btn">
 			<span><?php esc_html_e( 'Gå til Prissammenligning', 'gear-engine' ); ?></span>
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-				<line x1="5" y1="12" x2="19" y2="12"></line>
-				<polyline points="12 5 19 12 12 19"></polyline>
-			</svg>
+			<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 18px; line-height: 1;">arrow_forward</span>
 		</a>
 	</aside>
 
 	<!-- Trust Signals Footer -->
 	<div class="gear-engine-hub__trust-banner">
 		<div class="gear-engine-hub__trust-item">
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+			<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 20px; line-height: 1; color: var(--ge-green-800, #005236);">verified</span>
 			<span><strong><?php esc_html_e( '100% uavhengig scoring:', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Rådene styres av dine fysiske forutsetninger, ikke butikkfortjeneste.', 'gear-engine' ); ?></span>
 		</div>
 		<div class="gear-engine-hub__trust-item">
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+			<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 20px; line-height: 1; color: var(--ge-green-800, #005236);">update</span>
 			<span><strong><?php esc_html_e( 'Daglige prisoppdateringer:', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Vi sjekker lagerstatus og rabatter automatisk på tvers av ledende forhandlere.', 'gear-engine' ); ?></span>
 		</div>
 	</div>

@@ -44,6 +44,13 @@ function gear_engine_register_shared_assets(): void {
 	$tokens_path = GEAR_ENGINE_PATH . 'assets/css/gear-engine-tokens.css';
 	$tokens_ver  = file_exists( $tokens_path ) ? (string) filemtime( $tokens_path ) : GEAR_ENGINE_VERSION;
 	wp_register_style( 'gear-engine-tokens', GEAR_ENGINE_URL . 'assets/css/gear-engine-tokens.css', array(), $tokens_ver );
+
+	wp_register_style(
+		'gear-engine-material-symbols',
+		'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+		array(),
+		null
+	);
 }
 
 /**
