@@ -453,7 +453,7 @@
 					var disc = d.old > d.price ? Math.round( ( ( d.old - d.price ) / d.old ) * 100 ) : 0;
 
 					h += '<div class="card elevated stack">' +
-						'<div class="art" style="height:140px">' +
+						'<div class="art" style="height:150px">' +
 							( disc ? '<span class="pill err disc">−' + disc + '%</span>' : '' ) +
 							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
@@ -762,7 +762,7 @@
 							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
 							'<span class="pill tert num">' + o.matchPercentage + '% Match</span>' +
 						'</div>' +
-						'<div class="art" style="height:120px">' +
+						'<div class="art" style="height:150px">' +
 							( o.isBestOffer ? '<span class="pill deal badge-top-left">Beste tilbud</span>' : '' ) +
 							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
 							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
@@ -905,7 +905,7 @@
 							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
 							( oSave ? '<span class="pill sec num" style="font-weight:600;font-size:11.5px;color:var(--md-sys-color-primary,#0C2340)">Spar ' + money( oSave, o.cur ) + '</span>' : '' ) +
 						'</div>' +
-						'<div class="art" style="height:120px">' +
+						'<div class="art" style="height:150px">' +
 							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
 							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +

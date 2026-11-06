@@ -526,23 +526,32 @@
 	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
 	position: relative;
 	color: var(--md-sys-color-primary, #0C2340);
-	padding: 16px;
+	padding: 10px 14px;
 	box-sizing: border-box;
-	min-height: 180px;
+	min-height: 150px;
 	height: 100%;
 	overflow: hidden;
 }
+.gear-engine-picker .best-grid .art {
+	min-height: 190px;
+	padding: 12px 16px;
+}
 .gear-engine-picker .art svg,
 .gear-engine-picker .art img {
+	width: 100%;
+	height: 100%;
 	max-width: 100%;
 	max-height: 100%;
 	object-fit: contain;
-	height: auto;
+	object-position: center;
+	mix-blend-mode: multiply;
+	display: block;
 }
 .gear-engine-picker .art .disc {
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	z-index: 2;
 	background: var(--md-sys-color-error-container, #FDE8E8);
 	color: var(--md-sys-color-on-error-container, #9B1C1C);
 	font-weight: 700;
@@ -555,6 +564,7 @@
 	position: absolute;
 	top: 10px;
 	left: 10px;
+	z-index: 2;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
