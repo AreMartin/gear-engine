@@ -1085,8 +1085,11 @@ body.ge-m3-sheet-open {
 }
 
 .ge-price-comp-wrapper .ge-m3-sort-select {
-	height: 48px;
-	padding-left: 44px;
+	height: 38px;
+	padding-left: 38px;
+	padding-right: 32px;
+	font-size: 13.5px;
+	font-weight: 500;
 	border-color: var(--md-sys-color-outline-variant);
 	border-radius: var(--md-sys-shape-corner-full);
 	box-shadow: var(--ge-control-shadow);
@@ -1162,17 +1165,22 @@ body.ge-m3-sheet-open {
 .ge-m3-sort-arrow {
 	position: absolute;
 	top: 50%;
-	right: 12px;
+	right: 10px;
 	display: flex;
 	color: var(--ge-control-ink);
 	pointer-events: none;
 	transform: translateY(-50%);
 }
 
+.ge-m3-sort-arrow .material-symbols-outlined,
+.ge-m3-sort-icon .material-symbols-outlined {
+	font-size: 18px;
+}
+
 .ge-m3-sort-icon {
 	position: absolute;
 	top: 50%;
-	left: 12px;
+	left: 11px;
 	display: flex;
 	color: var(--ge-control-ink);
 	pointer-events: none;
@@ -1180,18 +1188,21 @@ body.ge-m3-sheet-open {
 }
 
 .ge-price-comp-wrapper .ge-m3-filter-btn {
-	height: 48px;
-	padding: 0 20px;
+	height: 38px;
+	padding: 0 16px;
+	gap: 6px;
 	background: #fff;
 	color: var(--ge-control-ink);
 	box-shadow: inset 0 0 0 1px var(--ge-control-border), var(--ge-control-shadow);
-	font: var(--md-sys-typescale-label-large);
+	font-size: 13.5px;
+	font-weight: 500;
+	letter-spacing: 0.01em;
 	transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
 		box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 .ge-price-comp-wrapper .ge-m3-filter-btn .material-symbols-outlined {
-	font-size: 20px;
+	font-size: 18px;
 }
 
 .ge-price-comp-wrapper .ge-m3-filter-btn:hover {
@@ -1231,7 +1242,7 @@ body.ge-m3-sheet-open {
 
 .ge-m3-view-toggle {
 	display: inline-flex;
-	height: 48px;
+	height: 38px;
 	border: 1px solid var(--ge-control-ink);
 	border-radius: var(--md-sys-shape-corner-full);
 	box-shadow: var(--ge-control-shadow);
@@ -1242,12 +1253,14 @@ body.ge-m3-sheet-open {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
-	padding: 0 16px;
+	gap: 6px;
+	padding: 0 14px;
 	border: 0;
 	background: #fff;
 	color: var(--ge-control-ink);
-	font: var(--md-sys-typescale-label-large);
+	font-size: 13.5px;
+	font-weight: 500;
+	letter-spacing: 0.01em;
 	letter-spacing: 0.1px;
 	cursor: pointer;
 	white-space: nowrap;
@@ -1318,17 +1331,17 @@ body.ge-m3-sheet-open {
 		flex: initial;
 	}
 	.ge-price-comp-wrapper .ge-m3-sort-select {
-		height: 40px;
-		padding-right: 36px;
-		padding-left: 40px;
-		font: 400 13px/18px var(--md-ref-typeface);
+		height: 38px;
+		padding-right: 32px;
+		padding-left: 36px;
+		font: 500 13px/18px var(--md-ref-typeface);
 		letter-spacing: 0.25px;
 	}
 	.ge-price-comp-wrapper .ge-m3-filter-btn {
-		height: 40px;
+		height: 38px;
 		gap: 6px;
 		padding: 0 12px;
-		font: 400 13px/18px var(--md-ref-typeface);
+		font: 500 13px/18px var(--md-ref-typeface);
 	}
 	.ge-price-comp-wrapper .ge-m3-filter-btn .material-symbols-outlined {
 		font-size: 18px;
@@ -1338,7 +1351,7 @@ body.ge-m3-sheet-open {
 		height: 20px;
 	}
 	.ge-m3-view-toggle {
-		height: 40px;
+		height: 38px;
 	}
 	.ge-m3-view-btn {
 		gap: 6px;
