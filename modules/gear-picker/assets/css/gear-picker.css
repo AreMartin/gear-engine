@@ -167,6 +167,72 @@
 	transform: scale(1.15);
 }
 
+/* Intro header (individual guide): same pattern as the hub header */
+.gear-engine-picker .intro-head { padding: 4px 0 8px; }
+.gear-engine-picker .intro-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 12px;
+	margin-bottom: 12px;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
+	border-radius: 999px;
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 12px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
+}
+.gear-engine-picker .intro-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--md-sys-color-tertiary, #005236);
+	display: inline-block;
+}
+.gear-engine-picker .intro-title {
+	margin: 0 0 6px;
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 1.85rem;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.02em;
+}
+.gear-engine-picker .intro-ingress {
+	margin: 0;
+	max-width: 64ch;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	font-size: 1rem;
+	line-height: 1.6;
+}
+.gear-engine-picker .intro-actions { margin-top: 20px; }
+.gear-engine-picker .intro-cta {
+	height: 48px;
+	padding: 0 24px;
+	font-size: 15px;
+	font-weight: 600;
+}
+.gear-engine-picker .intro-quick {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-top: 20px;
+}
+.gear-engine-picker .intro-quick-label {
+	margin-right: 4px;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	font-size: 13px;
+	font-weight: 500;
+}
+/* Soft grey hover (matches the rest of the site); no dark state layer on these chips. */
+.gear-engine-picker .intro-quick .chip:hover { background: #F4F7FA; }
+.gear-engine-picker .intro-quick .chip.sl:hover::after { opacity: 0; }
+@media (max-width: 600px) {
+	.gear-engine-picker .intro-title { font-size: 1.5rem; }
+	.gear-engine-picker .intro-cta { width: 100%; justify-content: center; }
+}
+
 /* Badges & Pills */
 .gear-engine-picker .pill {
 	display: inline-flex;
@@ -1294,32 +1360,55 @@
 	transform: translateY(-1px);
 }
 
+/* M3 small top app bar: leading navigation icon + current screen title */
 .gear-engine-hub__back-bar {
+	display: flex;
+	align-items: center;
+	gap: 4px;
 	max-width: 760px;
-	margin: 0 auto 16px;
-	padding: 0 16px;
+	min-height: 56px;
+	margin: 0 auto 4px;
+	padding: 0 16px 0 4px;
 }
 
 .gear-engine-hub__back-btn {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	padding: 8px 16px;
-	border-radius: var(--ge-r-full, 9999px);
-	background: var(--md-sys-color-primary-container, #EAF0F6);
-	border: 1px solid var(--ge-navy-border, #D5E1ED);
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: transparent;
 	color: var(--md-sys-color-primary, #0C2340);
-	font-size: 13.5px;
-	font-weight: 600;
 	text-decoration: none;
-	transition: all 0.18s ease;
 }
 
-.gear-engine-hub__back-btn:hover {
+/* State layer: hover 8 %, pressed 10 % */
+.gear-engine-hub__back-btn::after {
+	content: "";
+	position: absolute;
+	inset: 4px;
+	border-radius: 50%;
 	background: var(--md-sys-color-primary, #0C2340);
-	border-color: var(--md-sys-color-primary, #0C2340);
-	color: #FFFFFF;
-	transform: translateY(-1px);
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.gear-engine-hub__back-btn:hover::after { opacity: 0.08; }
+.gear-engine-hub__back-btn:active::after { opacity: 0.10; }
+
+.gear-engine-hub__back-btn .material-symbols-outlined {
+	position: relative;
+	z-index: 1;
+	font-size: 24px;
+}
+
+.gear-engine-hub__back-title {
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.4;
 }
 
 @media (max-width: 640px) {

@@ -52,6 +52,26 @@
 		return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
 	}
 
+	/* Material Symbols (ligature font, self-hosted subset). Maps config icon keys to symbol names. */
+	var MS_ICONS = {
+		tag:       'sell',
+		sliders:   'tune',
+		fold:      'apartment',
+		speedHigh: 'speed',
+		medical:   'medical_services',
+		shield:    'shield',
+		zap:       'bolt',
+		flame:     'local_fire_department',
+		activity:  'monitor_heart',
+		target:    'target',
+		chevR:     'arrow_forward'
+	};
+
+	function ms( name, size ) {
+		var sym = MS_ICONS[ name ] || name || 'tune';
+		return '<span class="material-symbols-outlined" aria-hidden="true" style="font-size:' + ( size || 18 ) + 'px">' + sym + '</span>';
+	}
+
 	function decodeEntities( s ) {
 		if ( typeof s !== 'string' || s.indexOf( '&' ) === -1 ) {
 			return s;
@@ -422,29 +442,29 @@
 			} );
 			var deals = sortedByDiscount.slice( 0, 2 );
 
-			var h = '<div style="padding-top:16px">' +
-				'<div class="overline">Kjøpsguide</div>' +
-				'<h1 class="headline-l" style="margin-top:4px">' + esc( config.label || 'Treningsutstyr' ) + '</h1>' +
-				'<p class="body-m muted" style="margin-top:8px">Sammenlign spesifikasjoner, egenskaper og dagspriser fra ' + ( uniqueShops.length || 6 ) + ' norske butikker.</p>' +
-				'<div class="chips-row" style="margin-top:16px">' +
-					'<button type="button" class="chip sl sel" data-action="deals">' + ic( 'tag', 18 ) + 'Dagens tilbud</button>';
+			/* Top section mirrors the hub header: badge → H1 → ingress → actions → quick chips. */
+			var introTitle = String( intro.title || ( 'Finn riktig ' + ( config.label || 'utstyr' ).toLowerCase() ) ).replace( /\.\s*$/, '' );
+
+			var h = '<header class="intro-head">' +
+				'<div class="intro-badge"><span class="intro-dot"></span>Kjøpsveileder · 1 minutt</div>' +
+				'<h1 class="intro-title">' + esc( introTitle ) + '</h1>' +
+				'<p class="intro-ingress">' + esc( intro.desc || 'Svar på noen enkle spørsmål om behov og budsjett. Vår algoritme finner de beste modellene for deg.' ) + '</p>' +
+				'<div class="intro-actions">' +
+					'<button type="button" class="btn filled primary sl intro-cta" data-action="start">' +
+					esc( intro.start || 'Start kjøpsveileder' ) + ms( 'chevR', 18 ) + '</button>' +
+				'</div>' +
+				'<div class="intro-quick">' +
+					'<span class="intro-quick-label">Eller hopp rett til:</span>' +
+					'<button type="button" class="chip sl" data-action="deals">' + ms( 'tag', 18 ) + 'Dagens tilbud</button>';
 
 			if ( config.presets && config.presets.length ) {
 				config.presets.slice( 0, 2 ).forEach( function ( pr ) {
 					h += '<button type="button" class="chip sl" data-action="quick" data-preset="' + esc( pr.key ) + '">' +
-						ic( pr.icon || 'sliders', 18 ) + esc( pr.label ) + '</button>';
+						ms( pr.icon || 'sliders', 18 ) + esc( pr.label ) + '</button>';
 				} );
 			}
 
-			h += '</div></div>';
-
-			h += '<div class="card xl" style="margin-top:18px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;box-shadow:var(--md-sys-elevation-1,0 1px 3px rgba(0,0,0,0.06))">' +
-				'<span class="pill" style="background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);border:1px solid #D0DBE5;font-weight:600;box-shadow:0 1px 2px rgba(12,35,64,0.04);gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--md-sys-color-tertiary,#005236)"></span>Smart kjøpsveileder · 1 min</span>' +
-				'<h2 class="headline-s" style="margin:14px 0 8px;color:var(--md-sys-color-primary,#0C2340)">' + esc( intro.title || 'Usikker på hvilken modell du bør velge?' ) + '</h2>' +
-				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' + esc( intro.desc || 'Svar på noen enkle spørsmål om behov og budsjett. Vår algoritme finner de beste modellene for deg.' ) + '</p>' +
-				'<button type="button" class="btn filled primary sl" style="margin-top:20px;height:48px;font-size:15px;font-weight:600;padding:0 24px" data-action="start">' +
-				esc( intro.start || 'Start kjøpsveileder' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
-				'</div>';
+			h += '</div></header>';
 
 			if ( deals.length ) {
 				h += '<div class="sec-head"><h3 class="title-l">Mest populære tilbud</h3><button type="button" class="btn text sl" data-action="deals">Se alle</button></div>';

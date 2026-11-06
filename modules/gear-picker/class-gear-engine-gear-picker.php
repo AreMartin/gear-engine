@@ -737,12 +737,12 @@ class Gear_Engine_Gear_Picker {
 
 			if ( ! is_wp_error( $type_config ) ) {
 				$back_url = esc_url( remove_query_arg( 'type' ) );
-				$output   = '<div class="gear-engine-hub__back-bar">'
-					. '<a href="' . $back_url . '" class="gear-engine-hub__back-btn">'
-					. '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="var(--ge-icon-stroke, 1.75px)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m7 7l-7-7 7-7"/></svg>'
-					. '<span>' . esc_html__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '</span>'
+				$output   = '<nav class="gear-engine-hub__back-bar" aria-label="' . esc_attr__( 'Navigasjon', 'gear-engine' ) . '">'
+					. '<a href="' . $back_url . '" class="gear-engine-hub__back-btn" aria-label="' . esc_attr__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '" title="' . esc_attr__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '">'
+					. '<span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>'
 					. '</a>'
-					. '</div>';
+					. '<span class="gear-engine-hub__back-title">' . esc_html( (string) ( $type_config['label'] ?? '' ) ) . '</span>'
+					. '</nav>';
 				$output .= $this->render( array( 'type' => $selected_type ) );
 				return $output;
 			}
