@@ -73,12 +73,7 @@ class Gear_Engine_Price_Comparison {
 			null
 		);
 
-		wp_register_style(
-			'gear-engine-material-symbols',
-			'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0,0&icon_names=arrow_forward,category,check,close,compare_arrows,expand_more,explore,fact_check,fitness_center,grid_view,health_and_safety,info,schedule,search,sell,shopping_bag,sort,storefront,tune,update,verified,view_list&display=swap',
-			array(),
-			null
-		);
+		// Note: 'gear-engine-material-symbols' is registered centrally in gear_engine_register_shared_assets().
 
 		wp_register_style(
 			'gear-engine-price-comparison',

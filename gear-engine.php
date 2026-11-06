@@ -45,12 +45,9 @@ function gear_engine_register_shared_assets(): void {
 	$tokens_ver  = file_exists( $tokens_path ) ? (string) filemtime( $tokens_path ) : GEAR_ENGINE_VERSION;
 	wp_register_style( 'gear-engine-tokens', GEAR_ENGINE_URL . 'assets/css/gear-engine-tokens.css', array(), $tokens_ver );
 
-	wp_register_style(
-		'gear-engine-material-symbols',
-		'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0,0&icon_names=arrow_forward,category,check,close,compare_arrows,expand_more,explore,fact_check,fitness_center,grid_view,health_and_safety,info,schedule,search,sell,shopping_bag,sort,storefront,tune,update,verified,view_list&display=swap',
-		array(),
-		null
-	);
+	$ms_path = GEAR_ENGINE_PATH . 'assets/css/material-symbols.css';
+	$ms_ver  = file_exists( $ms_path ) ? (string) filemtime( $ms_path ) : GEAR_ENGINE_VERSION;
+	wp_register_style( 'gear-engine-material-symbols', GEAR_ENGINE_URL . 'assets/css/material-symbols.css', array(), $ms_ver );
 }
 
 /**
