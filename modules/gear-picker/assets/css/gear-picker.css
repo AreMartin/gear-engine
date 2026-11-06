@@ -849,7 +849,7 @@
    ========================================================= */
 .gear-engine-hub {
 	box-sizing: border-box;
-	max-width: 840px;
+	max-width: 1200px;
 	margin: 0 auto;
 	padding: 0 16px 48px;
 	color: var(--md-sys-color-on-surface, #0C2340);
@@ -974,8 +974,22 @@
 
 .gear-engine-hub__grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 20px;
+}
+
+@media (max-width: 960px) {
+	.gear-engine-hub__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+	}
+}
+
+@media (max-width: 600px) {
+	.gear-engine-hub__grid {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
 }
 
 .gear-engine-hub__card {
@@ -984,19 +998,16 @@
 	padding: 0;
 	overflow: hidden;
 	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
-	border-radius: var(--ge-r-lg, 20px);
+	border-radius: var(--ge-r-lg, 18px);
 	background: var(--md-sys-color-surface, #FFFFFF);
 	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.05);
-	transition: border-color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-	            box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-	            transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 	position: relative;
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) {
 	border-color: #CBD7E6;
-	box-shadow: 0 8px 24px rgba(12, 35, 64, 0.10), 0 2px 6px rgba(12, 35, 64, 0.04);
-	transform: translateY(-2px);
+	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.08);
 }
 
 .gear-engine-hub__card--upcoming {
@@ -1009,7 +1020,7 @@
 .gear-engine-hub__card-media {
 	position: relative;
 	width: 100%;
-	height: 180px;
+	height: 145px;
 	background: #EEF2F6;
 	overflow: hidden;
 	display: flex;
@@ -1022,11 +1033,6 @@
 	height: 100%;
 	object-fit: cover;
 	display: block;
-	transition: transform 0.3s ease;
-}
-
-.gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-img {
-	transform: scale(1.03);
 }
 
 .gear-engine-hub__card-img-placeholder {
@@ -1040,9 +1046,9 @@
 
 .gear-engine-hub__card-overlays {
 	position: absolute;
-	top: 12px;
-	left: 12px;
-	right: 12px;
+	top: 10px;
+	left: 10px;
+	right: 10px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -1052,28 +1058,28 @@
 
 .gear-engine-hub__card-cat-pill {
 	display: inline-block;
-	padding: 4px 10px;
-	background: rgba(255, 255, 255, 0.90);
+	padding: 3px 8px;
+	background: rgba(255, 255, 255, 0.92);
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
 	border: 1px solid rgba(255, 255, 255, 0.8);
 	border-radius: var(--ge-r-full, 9999px);
 	color: var(--md-sys-color-primary, #0C2340);
-	font-size: 11.5px;
+	font-size: 11px;
 	font-weight: 600;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .gear-engine-hub__card-badge {
 	display: inline-block;
-	padding: 4px 10px;
+	padding: 3px 8px;
 	background: var(--ge-amber-deal-bg, #FEF3C7);
 	border: 1px solid var(--ge-amber-deal-border, #FDE68A);
 	border-radius: var(--ge-r-full, 9999px);
 	color: var(--ge-amber-deal-text, #92400E);
-	font-size: 11.5px;
+	font-size: 11px;
 	font-weight: 600;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .gear-engine-hub__card-badge--muted {
@@ -1083,15 +1089,15 @@
 }
 
 .gear-engine-hub__card-icon-box {
-	width: 52px;
-	height: 52px;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
 	background: #FFFFFF;
 	color: var(--md-sys-color-primary, #0C2340);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 2px 8px rgba(12, 35, 64, 0.08);
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
 }
 
 /* Card Content & Footer */
@@ -1099,7 +1105,7 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	padding: 20px;
+	padding: 14px 16px 16px;
 	flex: 1 1 auto;
 }
 
@@ -1108,9 +1114,9 @@
 }
 
 .gear-engine-hub__card-title {
-	margin: 0 0 6px;
+	margin: 0 0 4px;
 	color: var(--md-sys-color-primary, #0C2340);
-	font-size: 1.25rem;
+	font-size: 1.12rem;
 	font-weight: 700;
 	line-height: 1.3;
 }
@@ -1118,25 +1124,25 @@
 .gear-engine-hub__card-desc {
 	margin: 0;
 	color: var(--md-sys-color-on-surface-variant, #475467);
-	font-size: 0.92rem;
-	line-height: 1.55;
+	font-size: 0.88rem;
+	line-height: 1.5;
 }
 
 .gear-engine-hub__card-footer {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-top: 18px;
-	padding-top: 14px;
+	margin-top: 14px;
+	padding-top: 12px;
 	border-top: 1px solid var(--ge-grey-100, #F0F2F5);
 }
 
 .gear-engine-hub__card-time {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
+	gap: 5px;
 	color: var(--ge-grey-500, #667085);
-	font-size: 12.5px;
+	font-size: 12px;
 	font-weight: 500;
 }
 
@@ -1144,32 +1150,30 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	height: 38px;
-	padding: 0 16px;
+	height: 34px;
+	padding: 0 14px;
 	border-radius: var(--ge-r-full, 9999px);
 	background: var(--md-sys-color-primary, #0C2340);
 	color: #FFFFFF !important;
-	font-size: 13.5px;
+	font-size: 13px;
 	font-weight: 600;
 	text-decoration: none;
-	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.16);
-	transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.12);
+	transition: background-color 0.18s ease;
 }
 
 .gear-engine-hub__card-action-btn:hover {
 	background: var(--ge-navy-800, #143154);
 	color: #FFFFFF !important;
-	transform: translateY(-1px);
-	box-shadow: var(--ge-shadow-1);
 }
 
 .gear-engine-hub__card-action-muted {
 	display: inline-block;
-	padding: 4px 12px;
+	padding: 3px 10px;
 	border-radius: var(--ge-r-full, 9999px);
 	background: var(--ge-grey-100, #F0F2F5);
 	color: var(--ge-grey-400, #98A2B3);
-	font-size: 12.5px;
+	font-size: 12px;
 	font-weight: 500;
 }
 
