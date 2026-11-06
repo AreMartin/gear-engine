@@ -202,7 +202,8 @@
 }
 .gear-engine-picker .card.outlined {
 	border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
-	background: transparent;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(12, 35, 64, 0.04));
 }
 .gear-engine-picker .card.filled {
 	background: var(--md-sys-color-surface-container-low, #F5F7FA);
@@ -296,23 +297,29 @@
 	display: flex;
 	align-items: center;
 	gap: 14px;
+	width: 100%;
 	padding: 16px 18px;
-	border: 1px solid var(--md-sys-color-outline-variant, #D5DCE4);
+	border: 1.5px solid var(--md-sys-color-outline-variant, #D5DCE4);
 	border-radius: var(--md-sys-shape-md, 14px);
 	background: var(--md-sys-color-surface, #FFFFFF);
 	color: var(--md-sys-color-on-surface, #0C2340);
 	text-align: left;
+	box-sizing: border-box;
+	cursor: pointer;
+	font-family: inherit;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.03);
 	transition: border-color 0.18s, background-color 0.18s, box-shadow 0.18s, transform 0.15s;
 }
 .gear-engine-picker .opt:hover {
 	border-color: var(--md-sys-color-primary, #0C2340);
-	background: var(--md-sys-color-surface-container-low, #F5F7FA);
+	background: var(--md-sys-color-surface-container-low, #F8FAFC);
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
 }
 .gear-engine-picker .opt[aria-pressed=true],
 .gear-engine-picker .opt.is-active {
 	border-color: var(--md-sys-color-primary, #0C2340);
 	background: var(--ge-navy-selected-bg, #F0F4F8);
-	box-shadow: 0 0 0 1.5px var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 0 0 1.5px var(--md-sys-color-primary, #0C2340), 0 2px 8px rgba(12, 35, 64, 0.08);
 	transform: scale(0.995);
 }
 .gear-engine-picker .opt .oi {
@@ -321,7 +328,7 @@
 	border-radius: 50%;
 	display: grid;
 	place-items: center;
-	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+	background: var(--md-sys-color-primary-container, #EAF0F6);
 	color: var(--md-sys-color-primary, #0C2340);
 	flex: none;
 	transition: background 0.2s, color 0.2s;

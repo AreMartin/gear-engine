@@ -251,54 +251,7 @@
 		var STORAGE_KEY = 'gear_engine_picker_' + ( config.id || 'default' );
 
 		function saveSession() {
-			try {
-				if ( ! window.sessionStorage ) {
-					return;
-				}
-				if ( state.step === 0 && state.view === 'quiz' ) {
-					window.sessionStorage.removeItem( STORAGE_KEY );
-				} else {
-					window.sessionStorage.setItem( STORAGE_KEY, JSON.stringify( {
-						filters: filters,
-						step: state.step,
-						view: state.view,
-						dealSort: state.dealSort || 'pct',
-						presetApplied: !! state.presetApplied
-					} ) );
-				}
-			} catch ( e ) {}
-		}
-
-		function loadSession() {
-			try {
-				if ( ! window.sessionStorage ) {
-					return false;
-				}
-				var raw = window.sessionStorage.getItem( STORAGE_KEY );
-				if ( ! raw ) {
-					return false;
-				}
-				var saved = JSON.parse( raw );
-				if ( saved && typeof saved === 'object' ) {
-					if ( saved.filters && typeof saved.filters === 'object' ) {
-						Object.assign( filters, saved.filters );
-					}
-					if ( typeof saved.step === 'number' ) {
-						state.step = saved.step;
-					}
-					if ( saved.view ) {
-						state.view = saved.view;
-					}
-					if ( saved.dealSort ) {
-						state.dealSort = saved.dealSort;
-					}
-					if ( saved.presetApplied != null ) {
-						state.presetApplied = saved.presetApplied;
-					}
-					return true;
-				}
-			} catch ( e ) {}
-			return false;
+			// In-memory state only: session storage persistence disabled to ensure the quiz always starts fresh from Step 0
 		}
 
 		function clearSession() {
@@ -1325,7 +1278,7 @@
 			renderSheetOverlay();
 		}
 
-		loadSession();
+		clearSession();
 		render();
 	}
 
