@@ -118,12 +118,12 @@
 	/* Material 3 Direct Mapping & Extended System Tokens */
 	--md-sys-color-primary:                    #0C2340;
 	--md-sys-color-on-primary:                 #FFFFFF;
-	--md-sys-color-primary-container:          #D5E1ED;
+	--md-sys-color-primary-container:          #EAF0F6;
 	--md-sys-color-on-primary-container:       #0C2340;
-	--md-sys-color-secondary:                  #585F6B;
+	--md-sys-color-secondary:                  #143154;
 	--md-sys-color-on-secondary:               #FFFFFF;
-	--md-sys-color-secondary-container:        #DCE2F2;
-	--md-sys-color-on-secondary-container:     #151C27;
+	--md-sys-color-secondary-container:        #EAF0F6;
+	--md-sys-color-on-secondary-container:     #0C2340;
 	--md-sys-color-tertiary:                   #005236;
 	--md-sys-color-on-tertiary:                #FFFFFF;
 	--md-sys-color-tertiary-container:         #DCF5E8;
@@ -132,16 +132,16 @@
 	--md-sys-color-on-error:                   #FFFFFF;
 	--md-sys-color-error-container:            #FFDAD6;
 	--md-sys-color-on-error-container:         #410002;
-	--md-sys-color-surface:                    #F4F6F9;
-	--md-sys-color-on-surface:                 #191C20;
-	--md-sys-color-on-surface-variant:         #424751;
+	--md-sys-color-surface:                    #FFFFFF;
+	--md-sys-color-on-surface:                 #101828;
+	--md-sys-color-on-surface-variant:         #475467;
 	--md-sys-color-surface-container-lowest:   #FFFFFF;
-	--md-sys-color-surface-container-low:      #F3F3FA;
-	--md-sys-color-surface-container:          #EDEDF4;
-	--md-sys-color-surface-container-high:     #E7E8EE;
-	--md-sys-color-surface-container-highest:  #E1E2E9;
-	--md-sys-color-outline:                    #727782;
-	--md-sys-color-outline-variant:            #C2C6D2;
+	--md-sys-color-surface-container-low:      #F8FAFC;
+	--md-sys-color-surface-container:          #F5F7FA;
+	--md-sys-color-surface-container-high:     #F0F2F5;
+	--md-sys-color-surface-container-highest:  #E4E7EC;
+	--md-sys-color-outline:                    #D0D5DD;
+	--md-sys-color-outline-variant:            #E4E7EC;
 	--md-sys-color-inverse-surface:            #2E3035;
 	--md-sys-color-inverse-on-surface:         #F0F0F7;
 	--md-sys-color-inverse-primary:            #AEC8F4;
@@ -172,9 +172,9 @@
 	--md-sys-shape-corner-full:                9999px;
 
 	/* Material 3 Elevation Levels 1-3 */
-	--md-sys-elevation-1:                      0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-	--md-sys-elevation-2:                      0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-	--md-sys-elevation-3:                      0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+	--md-sys-elevation-1:                      0 1px 3px rgba(12, 35, 64, 0.05), 0 1px 2px rgba(12, 35, 64, 0.03);
+	--md-sys-elevation-2:                      0 6px 16px -4px rgba(12, 35, 64, 0.08), 0 2px 6px rgba(12, 35, 64, 0.04);
+	--md-sys-elevation-3:                      0 16px 32px -8px rgba(12, 35, 64, 0.12);
 
 	/* Material 3 Motion */
 	--md-sys-motion-easing-standard:           cubic-bezier(0.2, 0, 0, 1);
