@@ -14,7 +14,7 @@
 	margin: 0 auto;
 	padding: 0 16px 40px;
 	color: var(--md-sys-color-on-surface, #0C2340);
-	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+	font-family: var(--ge-font-family, 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif);
 	line-height: 1.5;
 	position: relative;
 }
@@ -940,7 +940,7 @@
 	margin: 0 auto;
 	padding: 0 16px 48px;
 	color: var(--md-sys-color-on-surface, #0C2340);
-	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+	font-family: var(--ge-font-family, 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif);
 	line-height: 1.5;
 	position: relative;
 }
