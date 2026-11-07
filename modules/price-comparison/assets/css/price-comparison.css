@@ -1840,8 +1840,8 @@ body.ge-m3-sheet-open {
 .ge-card-grid-img-wrap .ge-discount-badge {
 	top: 14px;
 	left: 14px;
-	background: var(--md-sys-color-error-container);
-	color: var(--md-sys-color-on-error-container);
+	background: var(--md-sys-color-tertiary, #005236); /* theme: var(--md-sys-color-error-container) */
+	color: #FFFFFF;
 	border: none;
 }
 
