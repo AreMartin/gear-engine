@@ -1318,13 +1318,12 @@
 			searchInput.value = state.searchQuery;
 		}
 
-		// Responsive placement: header search on desktop (>= 600px), stacked on mobile (< 600px)
+		// Placement: search is always positioned in header slot directly beneath title and subtitle
 		function syncSearchPlacement() {
-			if (!searchBox || !mobileSearchSlot) return;
-			var isMobile = root.clientWidth <= 599;
-			var searchTarget = isMobile ? mobileSearchSlot : (headerSearchSlot || mobileSearchSlot);
-			if (searchBox.parentNode !== searchTarget) {
-				searchTarget.appendChild(searchBox);
+			if (!searchBox) return;
+			var target = headerSearchSlot || root.querySelector('#ge-header-search-slot');
+			if (target && searchBox.parentNode !== target) {
+				target.appendChild(searchBox);
 			}
 		}
 
@@ -1337,7 +1336,7 @@
 			}
 		}
 
-		// Render Level 1: Main Department Tabs
+		// Render Level 1: Main Department Tabs with text indicator underline
 		function renderDepartmentTabs() {
 			if (!deptTrack) return;
 			deptTrack.innerHTML = '';
@@ -1355,17 +1354,22 @@
 				btn.setAttribute('data-department', dept.id);
 				btn.setAttribute('role', 'tab');
 				btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				if (count === 0 && !isActive) {
+					btn.disabled = true;
+					btn.setAttribute('aria-disabled', 'true');
+				}
 				btn.innerHTML = '<span>' + escapeHtml(dept.name) + '</span>' +
-					'<span class="ge-m3-dept-badge ge-dept-badge">' + count + '</span>';
+					(count > 0 ? '<span class="ge-m3-dept-count ge-dept-badge">' + count + '</span>' : '');
 
 				btn.addEventListener('click', function () {
+					if (state.activeDepartment === dept.id) return;
 					switchDepartment(dept.id);
 				});
 				deptTrack.appendChild(btn);
 			});
 		}
 
-		// Render Level 2: Sub-category Chips for Active Department
+		// Render Level 2: Sub-category Chips for Active Department with counts
 		function renderCategoryChips() {
 			if (!catsBar) return;
 			catsBar.innerHTML = '';
@@ -1384,14 +1388,27 @@
 				}
 			});
 
+			function countFor(cat) {
+				return state.products.filter(function (p) {
+					var d = p.department || inferDepartment(p);
+					return d === state.activeDepartment && (cat === 'Alle' || p.category === cat);
+				}).length;
+			}
+
 			cats.forEach(function (cat) {
 				var isActive = state.activeCategory === cat;
+				var count = countFor(cat);
+				if (count === 0 && cat !== 'Alle' && !isActive) {
+					return;
+				}
+
 				var chip = document.createElement('button');
 				chip.type = 'button';
-				chip.className = 'ge-m3-chip ge-cat-pill m3-sl' + (isActive ? ' is-active' : '');
+				chip.className = 'ge-m3-chip ge-cat-pill ge-m3-cat-link m3-sl' + (isActive ? ' is-active' : '');
 				chip.setAttribute('data-category', cat);
 				chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-				chip.innerHTML = CHIP_CHECK + '<span>' + escapeHtml(cat) + '</span>';
+				chip.innerHTML = '<span>' + escapeHtml(cat) + '</span>' +
+					(count > 0 || cat === 'Alle' ? '<span class="ge-m3-cat-count">' + count + '</span>' : '');
 
 				chip.addEventListener('click', function () {
 					switchCategory(cat);
