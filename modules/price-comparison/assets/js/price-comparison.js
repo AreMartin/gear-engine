@@ -1278,9 +1278,7 @@
 		var headerSearchSlot = root.querySelector('#ge-header-search-slot');
 		var mobileSearchSlot = root.querySelector('#ge-mobile-search-slot');
 		var controls = root.querySelector('.ge-m3-controls');
-		var actionsRow = root.querySelector('.ge-m3-actions-row');
 		var resultsCountWrap = root.querySelector('.ge-m3-results-count');
-		var quickFiltersSlot = root.querySelector('#ge-comp-quick-filters-slot');
 		var searchInput = root.querySelector('#ge-search-input');
 		var searchClear = root.querySelector('#ge-search-clear');
 		var sortSelect = root.querySelector('#ge-sort-select');
@@ -1320,7 +1318,7 @@
 			searchInput.value = state.searchQuery;
 		}
 
-		// Responsive placement: header search + inline results count on desktop (>= 600px), stacked on mobile (< 600px)
+		// Responsive placement: header search on desktop (>= 600px), stacked on mobile (< 600px)
 		function syncSearchPlacement() {
 			if (!searchBox || !mobileSearchSlot) return;
 			var isMobile = root.clientWidth <= 599;
@@ -1328,25 +1326,14 @@
 			if (searchBox.parentNode !== searchTarget) {
 				searchTarget.appendChild(searchBox);
 			}
-			if (resultsCountWrap && controls && actionsRow) {
-				if (isMobile) {
-					if (resultsCountWrap.parentNode !== root) {
-						root.insertBefore(resultsCountWrap, cardsContainer);
-					}
-				} else if (resultsCountWrap.parentNode !== controls) {
-					controls.insertBefore(resultsCountWrap, actionsRow);
-				}
-			}
 		}
 
 		function syncQuickFiltersPlacement() {
 			syncSearchPlacement();
-			if (!quickFiltersWrap || !quickFiltersSlot || !quickFiltersPanelSlot) return;
 			var isMobileLayout = root.clientWidth <= 599;
 			root.classList.toggle('is-mobile-layout', isMobileLayout);
-			var target = isMobileLayout ? quickFiltersPanelSlot : quickFiltersSlot;
-			if (quickFiltersWrap.parentNode !== target) {
-				target.appendChild(quickFiltersWrap);
+			if (quickFiltersWrap && quickFiltersPanelSlot && quickFiltersWrap.parentNode !== quickFiltersPanelSlot) {
+				quickFiltersPanelSlot.appendChild(quickFiltersWrap);
 			}
 		}
 
@@ -2815,6 +2802,12 @@
 	function renderSkeleton(root, state) {
 		var showGuide = root.getAttribute('data-show-guide') !== 'false';
 		var guideUrl = root.getAttribute('data-guide-url') || '/kjopsveiledere/';
+		var showSearchAttr = root.getAttribute('data-show-search');
+		var showSearch = showSearchAttr !== 'false';
+		var hasStandaloneSearch = !!document.querySelector('.ge-m3-standalone-search');
+		if (showSearchAttr === 'false' || (hasStandaloneSearch && showSearchAttr === null)) {
+			showSearch = false;
+		}
 		var filterHost = root.closest('.ge-price-comp-wrapper') || root;
 
 		root.innerHTML = '' +
@@ -2846,30 +2839,42 @@
 				'<h1 class="ge-m3-title">Prissammenligning</h1>' +
 				'<p class="ge-m3-subtitle">Sammenlign priser og tilbud fra flere butikker.</p>' +
 			'</div>' +
-			'<div class="ge-m3-header-search-slot" id="ge-header-search-slot">' +
-				'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
-					'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
-					'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter symptomer, program eller utstyr..." aria-label="Søk etter symptomer, program eller utstyr" aria-autocomplete="list" aria-controls="ge-search-suggest" aria-expanded="false" autocomplete="off" enterkeyhint="search" />' +
-					'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
-						'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
-					'</button>' +
-					'<div id="ge-search-suggest" class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
-				'</div>' +
-			'</div>' +
+			(showSearch ? (
+				'<div class="ge-m3-header-search-slot" id="ge-header-search-slot">' +
+					'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
+						'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
+						'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter symptomer, program eller utstyr..." aria-label="Søk etter symptomer, program eller utstyr" aria-autocomplete="list" aria-controls="ge-search-suggest" aria-expanded="false" autocomplete="off" enterkeyhint="search" />' +
+						'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
+							'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+						'</button>' +
+						'<div id="ge-search-suggest" class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
+					'</div>' +
+				'</div>'
+			) : '') +
 		'</header>' +
 
-		'<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot"></div>' +
+		(showSearch ? '<div class="ge-m3-mobile-search-slot" id="ge-mobile-search-slot"></div>' : '') +
 
 		'<div class="ge-m3-nav-section ge-dept-section">' +
 			'<div class="ge-m3-dept-track ge-dept-track" id="ge-dept-track" role="tablist" aria-label="Velg avdeling"></div>' +
 			'<div class="ge-m3-cats-bar" id="ge-comp-cats-bar" role="group" aria-label="Velg kategori"></div>' +
-			'<div class="ge-m3-quick-filters-slot" id="ge-comp-quick-filters-slot"></div>' +
 		'</div>' +
 
 		'<div id="ge-dept-alert" role="status" style="display: none;"></div>' +
 
-		'<div class="ge-m3-controls">' +
-			'<div class="ge-m3-actions-row">' +
+		'<div class="ge-m3-controls ge-m3-toolbar">' +
+			'<div class="ge-m3-toolbar-left">' +
+				'<button type="button" id="ge-filter-toggle" class="ge-m3-filter-btn ge-m3-btn ge-m3-btn--outlined ge-m3-btn--m m3-sl" aria-haspopup="dialog" aria-controls="ge-comp-filter-panel" aria-expanded="false">' +
+					'<span class="material-symbols-outlined" aria-hidden="true">tune</span>' +
+					'<span>Filter</span>' +
+					'<span id="ge-comp-filter-badge" class="ge-m3-filter-badge" style="display: none;">0</span>' +
+				'</button>' +
+				'<div class="ge-m3-results-count" aria-live="polite">' +
+					'<span id="ge-comp-results-count">Viser produkter</span>' +
+				'</div>' +
+			'</div>' +
+
+			'<div class="ge-m3-toolbar-right">' +
 				'<div class="ge-m3-sort-wrap">' +
 					'<span class="ge-m3-sort-icon"><span class="material-symbols-outlined" aria-hidden="true">sort</span></span>' +
 					'<select id="ge-sort-select" class="ge-m3-select ge-m3-sort-select" aria-label="Sorter etter">' +
@@ -2882,31 +2887,19 @@
 					'<span class="ge-m3-sort-arrow"><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></span>' +
 				'</div>' +
 
-				'<button type="button" id="ge-filter-toggle" class="ge-m3-filter-btn ge-m3-btn ge-m3-btn--outlined ge-m3-btn--m m3-sl" aria-haspopup="dialog" aria-controls="ge-comp-filter-panel" aria-expanded="false">' +
-					'<span class="material-symbols-outlined" aria-hidden="true">tune</span>' +
-					'<span>Filter</span>' +
-					'<span id="ge-comp-filter-badge" class="ge-m3-filter-badge" style="display: none;">0</span>' +
-				'</button>' +
-
 				'<div class="ge-m3-view-toggle-wrap ge-comp-view-toggle-wrap">' +
 					'<div class="ge-m3-view-toggle" role="group" aria-label="Velg visning">' +
-						'<button type="button" id="ge-view-grid-btn" class="ge-m3-view-btn m3-sl' + (state.viewMode === 'grid' ? ' is-active' : '') + '" title="Vis som rutenett" aria-pressed="' + (state.viewMode === 'grid' ? 'true' : 'false') + '">' +
-							'<span class="material-symbols-outlined ge-m3-seg-check" aria-hidden="true">check</span>' +
+						'<button type="button" id="ge-view-grid-btn" class="ge-m3-view-btn m3-sl' + (state.viewMode === 'grid' ? ' is-active' : '') + '" title="Vis som rutenett" aria-label="Vis som rutenett" aria-pressed="' + (state.viewMode === 'grid' ? 'true' : 'false') + '">' +
 							'<span class="material-symbols-outlined ge-m3-seg-icon" aria-hidden="true">grid_view</span>' +
-							'<span class="ge-m3-view-text">Rutenett</span>' +
+							'<span class="ge-m3-sr-only">Rutenett</span>' +
 						'</button>' +
-						'<button type="button" id="ge-view-list-btn" class="ge-m3-view-btn m3-sl' + (state.viewMode === 'list' ? ' is-active' : '') + '" title="Vis som liste" aria-pressed="' + (state.viewMode === 'list' ? 'true' : 'false') + '">' +
-							'<span class="material-symbols-outlined ge-m3-seg-check" aria-hidden="true">check</span>' +
+						'<button type="button" id="ge-view-list-btn" class="ge-m3-view-btn m3-sl' + (state.viewMode === 'list' ? ' is-active' : '') + '" title="Vis som liste" aria-label="Vis som liste" aria-pressed="' + (state.viewMode === 'list' ? 'true' : 'false') + '">' +
 							'<span class="material-symbols-outlined ge-m3-seg-icon" aria-hidden="true">view_list</span>' +
-							'<span class="ge-m3-view-text">Liste</span>' +
+							'<span class="ge-m3-sr-only">Liste</span>' +
 						'</button>' +
 					'</div>' +
 				'</div>' +
 			'</div>' +
-		'</div>' +
-
-		'<div class="ge-m3-results-count" aria-live="polite">' +
-			'<span id="ge-comp-results-count">Viser produkter</span>' +
 		'</div>' +
 
 		'<div id="ge-comp-cards-container" class="' + (state.viewMode === 'grid' ? 'ge-m3-grid ge-comp-grid' : 'ge-m3-list ge-comp-list') + '"></div>' +

@@ -1055,9 +1055,10 @@ class Gear_Engine_Price_Comparison {
 				'department' => '',
 				'group'      => '',
 				'category'   => 'Alle',
-				'view'       => 'grid',
-				'limit'      => 12,
-				'show_guide' => 'true',
+				'view'        => 'grid',
+				'limit'       => 12,
+				'show_guide'  => 'true',
+				'show_search' => 'true',
 			),
 			$atts,
 			self::SHORTCODE_TAG
@@ -1097,6 +1098,7 @@ class Gear_Engine_Price_Comparison {
 		$initial_view    = in_array( $atts['view'], array( 'grid', 'list' ), true ) ? $atts['view'] : 'grid';
 		$initial_limit   = max( 4, min( 48, absint( $atts['limit'] ) ) );
 		$show_guide_link = 'false' !== strtolower( (string) $atts['show_guide'] );
+		$show_search     = 'false' !== strtolower( (string) $atts['show_search'] );
 
 		ob_start();
 		$template_path = GEAR_ENGINE_PATH . 'modules/price-comparison/templates/price-comparison-container.php';

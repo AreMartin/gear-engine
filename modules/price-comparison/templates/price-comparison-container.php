@@ -10,6 +10,7 @@
  * @var string $initial_view       Default view mode (grid or list).
  * @var int    $initial_limit      Initial number of items visible.
  * @var bool   $show_guide_link    Whether to render the cross-link banner to Kjøpsveilederne.
+ * @var bool   $show_search        Whether to render the in-content search bar.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		data-initial-view="<?php echo esc_attr( $initial_view ); ?>"
 		data-initial-limit="<?php echo esc_attr( (string) $initial_limit ); ?>"
 		data-show-guide="<?php echo esc_attr( $show_guide_link ? 'true' : 'false' ); ?>"
+		data-show-search="<?php echo esc_attr( ( $show_search ?? true ) ? 'true' : 'false' ); ?>"
 		data-guide-url="<?php echo esc_url( home_url( '/kjopsveiledere/' ) ); ?>"
 	>
 		<p class="ge-m3-affiliate-disclosure">
