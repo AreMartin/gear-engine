@@ -845,6 +845,7 @@ body.ge-m3-sheet-open {
 	position: relative;
 	flex: 1 1 auto;
 	min-width: 0;
+	margin: 0;
 }
 
 .ge-m3-search-icon {

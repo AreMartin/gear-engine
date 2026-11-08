@@ -320,7 +320,7 @@
 	};
 
 	function parseSearchIndexAttr(el) {
-		var raw = el ? el.getAttribute('data-search-index') : '';
+		var raw = el ? (typeof el === 'string' ? el : (typeof el.getAttribute === 'function' ? el.getAttribute('data-search-index') : '')) : '';
 		if (raw) {
 			try {
 				var parsed = JSON.parse(decodeURIComponent(raw));
@@ -332,19 +332,53 @@
 		return DEFAULT_SEARCH_INDEX;
 	}
 
+	function parseFeedAttr(el) {
+		var raw = el ? (typeof el === 'string' ? el : (typeof el.getAttribute === 'function' ? el.getAttribute('data-feed') : '')) : '';
+		if (raw) {
+			try {
+				var parsed = JSON.parse(decodeURIComponent(raw));
+				if (Array.isArray(parsed) && parsed.length > 0) {
+					return parsed;
+				}
+			} catch (e) {
+				console.error('[Gear Engine] Feil ved parsing av feed:', e);
+			}
+		}
+		return typeof fallbackData !== 'undefined' ? fallbackData : [];
+	}
+
 	function attachOmniSearch(opts) {
+		opts = opts || {};
 		var searchBox = opts.searchBox;
-		var searchInput = opts.searchInput;
-		var searchClear = opts.searchClear;
+		var searchInput = opts.searchInput || opts.inputEl;
+		var searchClear = opts.searchClear || opts.clearBtnEl;
 		var suggestEl = opts.suggestEl;
-		var products = opts.products || fallbackProducts;
+		var products = opts.products || (typeof opts.getProducts === 'function' ? opts.getProducts() : null) || (typeof fallbackData !== 'undefined' ? fallbackData : []);
 		var searchIndex = opts.searchIndex || DEFAULT_SEARCH_INDEX;
 		var priserUrl = searchIndex.priserUrl || '/priser/';
+
+		if (!searchBox && searchInput) {
+			searchBox = searchInput.closest('.ge-m3-search-box') || searchInput.parentElement;
+		}
 
 		if (!searchBox || !searchInput || !suggestEl) return;
 
 		var activeIdx = -1;
 		var currentActions = [];
+
+		if (searchClear) {
+			searchClear.addEventListener('click', function () {
+				searchInput.value = '';
+				searchClear.hidden = true;
+				closeSuggest();
+				if (opts.onInputChange) {
+					opts.onInputChange('');
+				}
+				if (typeof searchInput.focus === 'function') {
+					searchInput.focus();
+				}
+			});
+		}
 
 		function closeSuggest() {
 			suggestEl.hidden = true;
@@ -547,6 +581,9 @@
 		}
 
 		searchInput.addEventListener('input', function () {
+			if (searchClear) {
+				searchClear.hidden = (searchInput.value || '').length === 0;
+			}
 			if (opts.onInputChange) {
 				opts.onInputChange(searchInput.value);
 			}
@@ -560,6 +597,16 @@
 		});
 
 		searchInput.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') {
+				if (!suggestEl.hidden && activeIdx >= 0 && currentActions[activeIdx]) {
+					e.preventDefault();
+					currentActions[activeIdx]();
+				} else if (opts.onSearchSubmit) {
+					e.preventDefault();
+					opts.onSearchSubmit(searchInput.value);
+				}
+				return;
+			}
 			if (suggestEl.hidden || currentActions.length === 0) return;
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
@@ -569,9 +616,6 @@
 				e.preventDefault();
 				activeIdx = activeIdx <= 0 ? currentActions.length - 1 : activeIdx - 1;
 				updateActiveOption();
-			} else if (e.key === 'Enter' && activeIdx >= 0 && currentActions[activeIdx]) {
-				e.preventDefault();
-				currentActions[activeIdx]();
 			} else if (e.key === 'Escape') {
 				closeSuggest();
 			}
@@ -2995,25 +3039,48 @@
 			node.dataset.geInitialized = '1';
 
 			var placeholder = node.getAttribute('data-placeholder') || 'Søk i utstyr, programmer og symptomsjekk...';
-			var products = parseFeedAttr(node.getAttribute('data-feed'));
-			var searchIndex = parseSearchIndexAttr(node.getAttribute('data-search-index'));
+			var products = parseFeedAttr(node);
+			var searchIndex = parseSearchIndexAttr(node);
+			var priserUrl = (searchIndex && searchIndex.priserUrl) ? searchIndex.priserUrl : '/priser/';
 
-			node.innerHTML =
-				'<div class="ge-m3-search-box">' +
-					'<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>' +
-					'<input type="search" class="ge-m3-search-input" autocomplete="off" placeholder="' + escapeHtml(placeholder) + '" aria-label="Søk på hele nettstedet">' +
-					'<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="Tøm søk" hidden>' +
-						'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
-					'</button>' +
-					'<div class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
-				'</div>';
+			var searchBox = node.querySelector('.ge-m3-search-box');
+			if (!searchBox) {
+				node.innerHTML =
+					'<form class="ge-m3-search-box" role="search" method="get" action="' + escapeHtml(priserUrl) + '">' +
+						'<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>' +
+						'<input type="search" name="q" class="ge-m3-search-input" autocomplete="off" placeholder="' + escapeHtml(placeholder) + '" aria-label="Søk på hele nettstedet">' +
+						'<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="Tøm søk" hidden>' +
+							'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+						'</button>' +
+						'<div class="ge-m3-search-suggest" role="listbox" aria-label="Søkeforslag" hidden></div>' +
+					'</form>';
+				searchBox = node.querySelector('.ge-m3-search-box');
+			}
+
+			var searchInput = node.querySelector('.ge-m3-search-input');
+			var searchClear = node.querySelector('.ge-m3-search-clear');
+			var suggestEl = node.querySelector('.ge-m3-search-suggest');
+
+			if (searchBox && searchBox.tagName === 'FORM') {
+				searchBox.addEventListener('submit', function (e) {
+					var q = searchInput ? (searchInput.value || '').trim() : '';
+					if (!q) {
+						e.preventDefault();
+					}
+				});
+			}
 
 			attachOmniSearch({
-				inputEl: node.querySelector('.ge-m3-search-input'),
-				clearBtnEl: node.querySelector('.ge-m3-search-clear'),
-				suggestEl: node.querySelector('.ge-m3-search-suggest'),
-				getProducts: function () { return products; },
-				searchIndex: searchIndex
+				searchBox: searchBox,
+				searchInput: searchInput,
+				searchClear: searchClear,
+				suggestEl: suggestEl,
+				products: products,
+				searchIndex: searchIndex,
+				onSearchSubmit: function (q) {
+					var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+					window.location.href = priserUrl + sep + 'q=' + encodeURIComponent((q || '').trim());
+				}
 			});
 		});
 	}

@@ -96,6 +96,7 @@ class Gear_Engine_Price_Comparison {
 		add_shortcode( self::SHORTCODE_ALIAS, array( $this, 'render' ) );
 		add_shortcode( self::SEARCH_SHORTCODE_TAG, array( $this, 'render_search_shortcode' ) );
 		add_shortcode( self::SEARCH_SHORTCODE_ALIAS, array( $this, 'render_search_shortcode' ) );
+		add_shortcode( 'gear_search', array( $this, 'render_search_shortcode' ) );
 	}
 
 	/**
@@ -1025,9 +1026,11 @@ class Gear_Engine_Price_Comparison {
 
 		$feed_data            = self::get_feed();
 		$encoded_feed         = rawurlencode( (string) wp_json_encode( $feed_data ) );
-		$encoded_search_index = rawurlencode( (string) wp_json_encode( self::get_global_search_index() ) );
+		$search_index         = self::get_global_search_index();
+		$encoded_search_index = rawurlencode( (string) wp_json_encode( $search_index ) );
 		$placeholder          = sanitize_text_field( (string) $atts['placeholder'] );
 		$max_width            = sanitize_text_field( (string) $atts['max_width'] );
+		$priser_url           = ! empty( $search_index['priserUrl'] ) ? (string) $search_index['priserUrl'] : ( function_exists( 'home_url' ) ? home_url( '/priser/' ) : '/priser/' );
 
 		ob_start();
 		?>
@@ -1037,7 +1040,16 @@ class Gear_Engine_Price_Comparison {
 				data-feed="<?php echo esc_attr( $encoded_feed ); ?>"
 				data-search-index="<?php echo esc_attr( $encoded_search_index ); ?>"
 				data-placeholder="<?php echo esc_attr( $placeholder ); ?>"
-			></div>
+			>
+				<form class="ge-m3-search-box" role="search" method="get" action="<?php echo esc_url( $priser_url ); ?>">
+					<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>
+					<input type="search" name="q" class="ge-m3-search-input" autocomplete="off" placeholder="<?php echo esc_attr( $placeholder ); ?>" aria-label="<?php esc_attr_e( 'Søk på hele nettstedet', 'gear-engine' ); ?>">
+					<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="<?php esc_attr_e( 'Tøm søk', 'gear-engine' ); ?>" hidden>
+						<span class="material-symbols-outlined" aria-hidden="true">close</span>
+					</button>
+					<div class="ge-m3-search-suggest" role="listbox" aria-label="<?php esc_attr_e( 'Søkeforslag', 'gear-engine' ); ?>" hidden></div>
+				</form>
+			</div>
 		</div>
 		<?php
 		return (string) ob_get_clean();
