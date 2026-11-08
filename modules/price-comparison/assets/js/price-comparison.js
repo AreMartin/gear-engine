@@ -462,6 +462,7 @@
 				var toolsHtml = matchedTools.map(function (t) {
 					var idx = currentActions.length;
 					currentActions.push(function () {
+						closeSuggest();
 						window.location.href = t.url;
 					});
 					var badgeLabel = t.type === 'triage' ? 'Symptomsjekk' : 'Veileder';
@@ -481,6 +482,7 @@
 				var progHtml = matchedPrograms.map(function (p) {
 					var idx = currentActions.length;
 					currentActions.push(function () {
+						closeSuggest();
 						window.location.href = p.url;
 					});
 					return '<a href="' + escapeHtml(p.url) + '" class="ge-m3-suggest-item m3-sl" role="option" data-suggest-idx="' + idx + '">' +
@@ -500,9 +502,9 @@
 					var idx = currentActions.length;
 					var catUrl = buildCategoryUrl(c.deptId, c.category);
 					currentActions.push(function () {
+						closeSuggest();
 						if (opts.onSelectCategory) {
 							opts.onSelectCategory(c.deptId, c.category);
-							closeSuggest();
 						} else {
 							window.location.href = catUrl;
 						}
@@ -525,9 +527,9 @@
 					var prodUrl = buildProductUrl(p);
 					var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
 					currentActions.push(function () {
+						closeSuggest();
 						if (opts.onSelectProduct) {
 							opts.onSelectProduct(p);
-							closeSuggest();
 						} else {
 							window.location.href = prodUrl;
 						}
@@ -558,17 +560,35 @@
 			suggestEl.hidden = false;
 			searchInput.setAttribute('aria-expanded', 'true');
 			activeIdx = -1;
-
-			suggestEl.querySelectorAll('[data-suggest-idx]').forEach(function (itemEl) {
-				itemEl.addEventListener('click', function (e) {
-					var i = parseInt(itemEl.getAttribute('data-suggest-idx'), 10);
-					if (currentActions[i]) {
-						e.preventDefault();
-						currentActions[i]();
-					}
-				});
-			});
 		}
+
+		// Prevent mousedown inside suggestions from blurring the input / causing premature teardown
+		suggestEl.addEventListener('mousedown', function (e) {
+			e.preventDefault();
+		});
+
+		// Delegate click handling for all suggestion items
+		suggestEl.addEventListener('click', function (e) {
+			var itemEl = e.target.closest('[data-suggest-idx]');
+			if (!itemEl) return;
+
+			var idx = parseInt(itemEl.getAttribute('data-suggest-idx'), 10);
+			var href = itemEl.getAttribute('href');
+
+			// If modified click (Ctrl/Cmd/middle click), allow native new tab handling
+			if (e.metaKey || e.ctrlKey || e.shiftKey || e.which === 2 || e.button === 1) {
+				return;
+			}
+
+			e.preventDefault();
+
+			if (!isNaN(idx) && currentActions[idx]) {
+				currentActions[idx]();
+			} else if (href) {
+				closeSuggest();
+				window.location.href = href;
+			}
+		});
 
 		function updateActiveOption() {
 			var items = suggestEl.querySelectorAll('[data-suggest-idx]');
