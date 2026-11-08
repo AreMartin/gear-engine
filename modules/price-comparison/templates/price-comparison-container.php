@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		data-initial-view="<?php echo esc_attr( $initial_view ); ?>"
 		data-initial-limit="<?php echo esc_attr( (string) $initial_limit ); ?>"
 		data-show-guide="<?php echo esc_attr( $show_guide_link ? 'true' : 'false' ); ?>"
-		data-show-search="<?php echo esc_attr( ( $show_search ?? true ) ? 'true' : 'false' ); ?>"
+		data-show-search="<?php echo esc_attr( $show_search_attr ?? ( ( $show_search ?? true ) ? 'auto' : 'false' ) ); ?>"
 		data-guide-url="<?php echo esc_url( home_url( '/kjopsveiledere/' ) ); ?>"
 	>
 		<p class="ge-m3-affiliate-disclosure">

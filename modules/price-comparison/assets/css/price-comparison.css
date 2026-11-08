@@ -1017,6 +1017,13 @@ body.ge-m3-sheet-open {
 	max-width: 100%;
 }
 
+/* Auto-hide redundant in-content catalog search when a standalone search (e.g. in header) is present */
+body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search="force"]):not([data-show-search="always"]) #ge-header-search-slot,
+body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search="force"]):not([data-show-search="always"]) #ge-mobile-search-slot,
+body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search="force"]):not([data-show-search="always"]) #ge-search-box {
+	display: none !important;
+}
+
 /* ==========================================================================
    Material 3 Search View (Anno 2026 Guidelines - Docked & Full-Screen)
    ========================================================================== */

@@ -2877,16 +2877,37 @@
 		if (state.activeProductId) {
 			openProductModal(state.activeProductId);
 		}
+
+		window.GearEnginePriceComp = {
+			openModal: openProductModal,
+			closeModal: closeProductModal,
+			switchDept: switchDepartment,
+			switchCat: switchCategory,
+			setSearchQuery: function (q) {
+				state.searchQuery = q || '';
+				state.visibleCount = initialLimit;
+				if (searchInput) searchInput.value = q || '';
+				updateUrlState();
+				updateUI();
+			}
+		};
 	}
 
 	// Initial DOM skeleton constructor matching scratch/price-comparison-material3-prototype.html
 	function renderSkeleton(root, state) {
 		var showGuide = root.getAttribute('data-show-guide') !== 'false';
 		var guideUrl = root.getAttribute('data-guide-url') || '/kjopsveiledere/';
-		var showSearchAttr = root.getAttribute('data-show-search');
-		var showSearch = showSearchAttr !== 'false';
+		var showSearchAttr = (root.getAttribute('data-show-search') || 'auto').toLowerCase();
 		var hasStandaloneSearch = !!document.querySelector('.ge-m3-standalone-search');
-		if (showSearchAttr === 'false' || (hasStandaloneSearch && showSearchAttr === null)) {
+		var showSearch = true;
+
+		if (showSearchAttr === 'false') {
+			showSearch = false;
+		} else if (showSearchAttr === 'force' || showSearchAttr === 'always') {
+			showSearch = true;
+		} else if (hasStandaloneSearch) {
+			// Standalone search shortcode (e.g. in the site header) is active on the page:
+			// hide the redundant in-content search bar inside the price comparison catalog.
 			showSearch = false;
 		}
 		var filterHost = root.closest('.ge-price-comp-wrapper') || root;
@@ -3097,9 +3118,43 @@
 				suggestEl: suggestEl,
 				products: products,
 				searchIndex: searchIndex,
+				onInputChange: function (val) {
+					if (window.GearEnginePriceComp && typeof window.GearEnginePriceComp.setSearchQuery === 'function') {
+						window.GearEnginePriceComp.setSearchQuery(val);
+					}
+				},
+				onSelectCategory: function (deptId, catName) {
+					if (window.GearEnginePriceComp && typeof window.GearEnginePriceComp.switchCat === 'function') {
+						window.GearEnginePriceComp.switchDept(deptId);
+						window.GearEnginePriceComp.switchCat(catName);
+						var catalogRoot = document.getElementById('fysionett-prissok-root');
+						if (catalogRoot && catalogRoot.scrollIntoView) {
+							catalogRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+						}
+					} else {
+						var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+						window.location.href = priserUrl + sep + 'dept=' + encodeURIComponent(deptId) + '&cat=' + encodeURIComponent(catName);
+					}
+				},
+				onSelectProduct: function (prod) {
+					if (window.GearEnginePriceComp && typeof window.GearEnginePriceComp.openModal === 'function') {
+						window.GearEnginePriceComp.openModal(prod.id);
+					} else {
+						var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+						window.location.href = priserUrl + sep + 'dept=' + encodeURIComponent(prod.department || inferDepartment(prod)) + '&q=' + encodeURIComponent(prod.name) + '&open=' + encodeURIComponent(prod.id);
+					}
+				},
 				onSearchSubmit: function (q) {
-					var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
-					window.location.href = priserUrl + sep + 'q=' + encodeURIComponent((q || '').trim());
+					if (window.GearEnginePriceComp && typeof window.GearEnginePriceComp.setSearchQuery === 'function') {
+						window.GearEnginePriceComp.setSearchQuery(q);
+						var catalogRoot = document.getElementById('fysionett-prissok-root');
+						if (catalogRoot && catalogRoot.scrollIntoView) {
+							catalogRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+						}
+					} else {
+						var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
+						window.location.href = priserUrl + sep + 'q=' + encodeURIComponent((q || '').trim());
+					}
 				}
 			});
 		});
