@@ -1013,7 +1013,7 @@ class Gear_Engine_Price_Comparison {
 	public function render_search_shortcode( $atts = array() ): string {
 		$atts = shortcode_atts(
 			array(
-				'placeholder' => __( 'Søk etter symptomer, treningsprogram eller utstyr...', 'gear-engine' ),
+				'placeholder' => __( 'Søk produkter og veileder...', 'gear-engine' ),
 				'max_width'   => '560px',
 			),
 			$atts,

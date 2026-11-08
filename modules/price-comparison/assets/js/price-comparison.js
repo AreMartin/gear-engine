@@ -474,7 +474,7 @@
 						'<span class="ge-m3-suggest-badge">' + badgeLabel + '</span>' +
 					'</a>';
 				}).join('');
-				addSection('Symptomsjekk & Veiledning', toolsHtml);
+				addSection('Symptomsjekk og veiledning', toolsHtml);
 			}
 
 			if (matchedPrograms.length > 0) {
@@ -513,7 +513,7 @@
 							'<span class="ge-m3-suggest-title">' + escapeHtml(c.category) + '</span>' +
 							'<span class="ge-m3-suggest-sub">Kategori i ' + escapeHtml(c.deptName) + (c.count ? ' · ' + c.count + ' modeller' : '') + '</span>' +
 						'</span>' +
-						'<span class="ge-m3-suggest-badge">Kategori</span>' +
+						'<span class="ge-m3-suggest-badge is-category">Kategori</span>' +
 					'</a>';
 				}).join('');
 				addSection('Produktkategorier', catHtml);
@@ -546,7 +546,7 @@
 						'</span>' +
 					'</a>';
 				}).join('');
-				addSection('Produkter (Prissammenligning)', prodHtml);
+				addSection('Produkter', prodHtml);
 			}
 
 			if (!html) {
@@ -3038,7 +3038,7 @@
 			if (node.dataset.geInitialized === '1') return;
 			node.dataset.geInitialized = '1';
 
-			var placeholder = node.getAttribute('data-placeholder') || 'Søk i utstyr, programmer og symptomsjekk...';
+			var placeholder = node.getAttribute('data-placeholder') || 'Søk produkter og veileder...';
 			var products = parseFeedAttr(node);
 			var searchIndex = parseSearchIndexAttr(node);
 			var priserUrl = (searchIndex && searchIndex.priserUrl) ? searchIndex.priserUrl : '/priser/';
