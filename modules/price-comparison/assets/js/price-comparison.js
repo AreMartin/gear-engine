@@ -3047,7 +3047,7 @@
 			if (!searchBox) {
 				node.innerHTML =
 					'<form class="ge-m3-search-box" role="search" method="get" action="' + escapeHtml(priserUrl) + '">' +
-						'<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>' +
+						'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
 						'<input type="search" name="q" class="ge-m3-search-input" autocomplete="off" placeholder="' + escapeHtml(placeholder) + '" aria-label="Søk på hele nettstedet">' +
 						'<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="Tøm søk" hidden>' +
 							'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +

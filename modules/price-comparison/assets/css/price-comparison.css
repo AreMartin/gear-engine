@@ -841,61 +841,151 @@ body.ge-m3-sheet-open {
 	margin: 8px 0 16px;
 }
 
+/* Disable native WebKit/Blink search clear and decoration buttons to prevent duplicate "X" */
+.ge-price-comp-wrapper input[type="search"]::-webkit-search-cancel-button,
+.ge-price-comp-wrapper input[type="search"]::-webkit-search-decoration,
+.ge-price-comp-wrapper input[type="search"]::-webkit-search-results-button,
+.ge-price-comp-wrapper input[type="search"]::-webkit-search-results-decoration,
+.ge-m3-search-box input[type="search"]::-webkit-search-cancel-button,
+.ge-m3-search-box input[type="search"]::-webkit-search-decoration {
+	-webkit-appearance: none;
+	appearance: none;
+	display: none !important;
+}
+
+.ge-price-comp-wrapper input[type="search"]::-ms-clear,
+.ge-m3-search-box input[type="search"]::-ms-clear {
+	display: none !important;
+	width: 0 !important;
+	height: 0 !important;
+}
+
+.ge-price-comp-wrapper .ge-m3-search-box,
 .ge-m3-search-box {
-	position: relative;
-	flex: 1 1 auto;
+	position: relative !important;
+	display: block !important;
+	width: 100% !important;
+	height: 56px !important;
 	min-width: 0;
-	margin: 0;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	box-sizing: border-box !important;
 }
 
-.ge-m3-search-icon {
-	position: absolute;
-	top: 50%;
-	left: 16px;
-	display: flex;
-	color: var(--ge-control-text);
-	pointer-events: none;
-	transform: translateY(-50%);
+.ge-price-comp-wrapper .ge-m3-search-icon,
+.ge-m3-search-box .ge-m3-search-icon {
+	position: absolute !important;
+	top: 50% !important;
+	left: 18px !important;
+	right: auto !important;
+	bottom: auto !important;
+	width: 24px !important;
+	height: 24px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	color: var(--ge-control-text, #19212F) !important;
+	pointer-events: none !important;
+	transform: translateY(-50%) !important;
+	z-index: 2 !important;
+	line-height: 1 !important;
 }
 
-.ge-price-comp-wrapper .ge-m3-search-input {
-	width: 100%;
-	height: 56px;
-	padding: 0 56px;
-	border: 1px solid rgba(12, 35, 64, 0.08);
+.ge-price-comp-wrapper .ge-m3-search-icon .material-symbols-outlined,
+.ge-m3-search-box .ge-m3-search-icon .material-symbols-outlined,
+.ge-m3-search-icon.material-symbols-outlined {
+	font-size: 24px !important;
+	width: 24px !important;
+	height: 24px !important;
+	line-height: 24px !important;
+}
+
+.ge-price-comp-wrapper .ge-m3-search-input,
+.ge-m3-search-box .ge-m3-search-input {
+	width: 100% !important;
+	height: 56px !important;
+	line-height: normal !important;
+	padding: 0 52px 0 56px !important;
+	border: 1px solid rgba(12, 35, 64, 0.08) !important;
 	border-radius: var(--md-sys-shape-corner-full);
-	background: #fff;
-	color: var(--ge-control-text);
-	box-shadow: var(--ge-control-shadow);
-	font: var(--md-sys-typescale-body-large);
-	letter-spacing: 0.5px;
+	background: #fff !important;
+	color: var(--ge-control-text, #19212F) !important;
+	box-shadow: var(--ge-control-shadow) !important;
+	font: var(--md-sys-typescale-body-large) !important;
+	letter-spacing: 0.5px !important;
+	box-sizing: border-box !important;
 	transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
 		box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
-.ge-price-comp-wrapper .ge-m3-search-input::placeholder {
-	color: #596273;
-	opacity: 1;
+.ge-price-comp-wrapper .ge-m3-search-input::placeholder,
+.ge-m3-search-box .ge-m3-search-input::placeholder {
+	color: #596273 !important;
+	opacity: 1 !important;
 }
 
-.ge-price-comp-wrapper .ge-m3-search-input:focus {
-	outline: none;
-	border-color: var(--ge-control-ink);
+.ge-price-comp-wrapper .ge-m3-search-input:focus,
+.ge-m3-search-box .ge-m3-search-input:focus {
+	outline: none !important;
+	border-color: var(--ge-control-ink) !important;
 }
 
-.ge-price-comp-wrapper .ge-m3-search-input:focus-visible {
-	outline: 3px solid var(--ge-control-ink);
-	outline-offset: 2px;
+.ge-price-comp-wrapper .ge-m3-search-input:focus-visible,
+.ge-m3-search-box .ge-m3-search-input:focus-visible {
+	outline: 3px solid var(--ge-control-ink) !important;
+	outline-offset: 2px !important;
 }
 
-.ge-m3-search-clear {
-	position: absolute;
-	top: 8px;
-	right: 8px;
+.ge-price-comp-wrapper .ge-m3-search-clear,
+.ge-price-comp-wrapper button.ge-m3-search-clear,
+.ge-m3-search-box .ge-m3-search-clear,
+.ge-m3-search-box button.ge-m3-search-clear {
+	position: absolute !important;
+	top: 50% !important;
+	right: 12px !important;
+	left: auto !important;
+	bottom: auto !important;
+	transform: translateY(-50%) !important;
+	width: 36px !important;
+	height: 36px !important;
+	min-width: 36px !important;
+	min-height: 36px !important;
+	max-width: 36px !important;
+	max-height: 36px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: var(--md-sys-shape-corner-full) !important;
+	background: transparent !important;
+	color: var(--md-sys-color-on-surface-variant, #43474E) !important;
+	box-shadow: none !important;
+	cursor: pointer !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	flex-shrink: 0 !important;
+	z-index: 3 !important;
+	line-height: 1 !important;
+	outline: none !important;
+	transition: background-color var(--md-sys-motion-duration-short4, 0.15s) var(--md-sys-motion-easing-standard, ease) !important;
 }
 
-.ge-m3-search-clear[hidden] {
-	display: none;
+.ge-price-comp-wrapper .ge-m3-search-clear:hover,
+.ge-m3-search-box .ge-m3-search-clear:hover {
+	background-color: rgba(12, 35, 64, 0.08) !important;
+	color: var(--md-sys-color-on-surface, #191C1E) !important;
+}
+
+.ge-price-comp-wrapper .ge-m3-search-clear[hidden],
+.ge-price-comp-wrapper button.ge-m3-search-clear[hidden],
+.ge-m3-search-box .ge-m3-search-clear[hidden],
+.ge-m3-search-box button.ge-m3-search-clear[hidden] {
+	display: none !important;
 }
 
 .ge-m3-standalone-search-wrapper {

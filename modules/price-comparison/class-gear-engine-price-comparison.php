@@ -1042,7 +1042,7 @@ class Gear_Engine_Price_Comparison {
 				data-placeholder="<?php echo esc_attr( $placeholder ); ?>"
 			>
 				<form class="ge-m3-search-box" role="search" method="get" action="<?php echo esc_url( $priser_url ); ?>">
-					<span class="material-symbols-outlined ge-m3-search-icon" aria-hidden="true">search</span>
+					<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>
 					<input type="search" name="q" class="ge-m3-search-input" autocomplete="off" placeholder="<?php echo esc_attr( $placeholder ); ?>" aria-label="<?php esc_attr_e( 'Søk på hele nettstedet', 'gear-engine' ); ?>">
 					<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="<?php esc_attr_e( 'Tøm søk', 'gear-engine' ); ?>" hidden>
 						<span class="material-symbols-outlined" aria-hidden="true">close</span>
