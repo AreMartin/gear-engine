@@ -827,13 +827,97 @@ class Gear_Engine_Price_Comparison {
 	}
 
 	/**
+	 * Dynamically resolve a feature page's actual URL on the WordPress site.
+	 *
+	 * Checks candidate page slugs first, then searches published pages for associated shortcodes,
+	 * ensuring links never break if the user used a different slug or permalink structure.
+	 *
+	 * @param string             $default_slug   Primary expected slug.
+	 * @param array<int, string> $slug_aliases   Alternative slugs to test.
+	 * @param array<int, string> $shortcode_tags Associated shortcodes to search for.
+	 * @return string
+	 */
+	public static function resolve_page_url( string $default_slug, array $slug_aliases = array(), array $shortcode_tags = array() ): string {
+		$candidates = array_merge( array( $default_slug ), $slug_aliases );
+
+		foreach ( $candidates as $slug ) {
+			$clean = trim( (string) $slug, '/' );
+			if ( '' === $clean ) {
+				continue;
+			}
+			$page = get_page_by_path( $clean );
+			if ( $page instanceof WP_Post && 'publish' === $page->post_status ) {
+				return (string) get_permalink( $page->ID );
+			}
+		}
+
+		if ( ! empty( $shortcode_tags ) ) {
+			foreach ( $shortcode_tags as $tag ) {
+				if ( class_exists( 'Gear_Engine_Shortcode_Guide' ) ) {
+					$ids = Gear_Engine_Shortcode_Guide::find_pages_with_shortcode( (string) $tag );
+					if ( ! empty( $ids ) ) {
+						return (string) get_permalink( $ids[0] );
+					}
+				} else {
+					$posts = get_posts(
+						array(
+							'post_type'      => array( 'page', 'post' ),
+							'post_status'    => 'publish',
+							's'              => '[' . $tag,
+							'posts_per_page' => 1,
+							'no_found_rows'  => true,
+						)
+					);
+					if ( ! empty( $posts ) && has_shortcode( (string) $posts[0]->post_content, (string) $tag ) ) {
+						return (string) get_permalink( $posts[0]->ID );
+					}
+				}
+			}
+		}
+
+		return home_url( '/' . trim( $default_slug, '/' ) . '/' );
+	}
+
+	/**
 	 * Build global omni-search index for tools (triage, chat, guides) and training programs.
 	 *
 	 * @return array<string, mixed>
 	 */
 	public static function get_global_search_index(): array {
-		$triage_base = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::get_base_path() : 'symptomsjekk';
+		$triage_base  = class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::get_base_path() : 'symptomsjekk';
 		$program_base = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::get_page_path() : 'treningsprogram';
+
+		$hub_url = self::resolve_page_url(
+			'kjopsveiledere',
+			array( 'kjopsveileder', 'utstyrsvelger', 'kjopsguide', 'veiledere', 'kjopshjelp' ),
+			array( 'gear_engine_gear_picker_hub', 'gear_engine_gear_picker', 'fysionett_kjopsveileder' )
+		);
+		$hub_url = (string) apply_filters( 'gear_engine_hub_url', $hub_url );
+
+		$chat_url = self::resolve_page_url(
+			'digital-fysio',
+			array( 'fysio-chat', 'ai-chat', 'chat' ),
+			array( 'gae_physio_chat' )
+		);
+
+		$triage_url = self::resolve_page_url(
+			$triage_base,
+			array( 'symptomsjekk', 'symptom-sjekk', 'triage' ),
+			array( class_exists( 'Gear_Engine_Triage' ) ? Gear_Engine_Triage::PICKER_SHORTCODE_TAG : 'gear_engine_triage_picker' )
+		);
+
+		$priser_url = self::resolve_page_url(
+			'priser',
+			array( 'sammenlign-priser', 'pris-sammenligning', 'prissammenligning', 'prisguide' ),
+			array( self::SHORTCODE_TAG, self::SHORTCODE_ALIAS )
+		);
+		$priser_url = (string) apply_filters( 'gear_engine_priser_url', $priser_url );
+
+		$programs_url = self::resolve_page_url(
+			$program_base,
+			array( 'treningsprogram', 'rehabilitering', 'ovelser' ),
+			array( class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::SHORTCODE_TAG : 'gear_engine_protocols' )
+		);
 
 		$tools = array(
 			array(
@@ -842,7 +926,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Spør fysio-assistenten om plager, øvelser og utstyr', 'gear-engine' ),
 				'keywords' => 'chat ai fysioterapeut spørsmål råd veiledning smerter',
 				'icon'     => 'forum',
-				'url'      => home_url( '/digital-fysio/' ),
+				'url'      => $chat_url,
 			),
 			array(
 				'type'     => 'tool',
@@ -850,7 +934,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Interaktiv kartlegging av ledd- og muskelsmerter', 'gear-engine' ),
 				'keywords' => 'symptomsjekk triage vondt smerte skade sjekk',
 				'icon'     => 'medical_services',
-				'url'      => home_url( '/' . trim( $triage_base, '/' ) . '/' ),
+				'url'      => $triage_url,
 			),
 			array(
 				'type'     => 'tool',
@@ -858,7 +942,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Interaktive guider tilpasset leddbelastning, plass og budsjett', 'gear-engine' ),
 				'keywords' => 'kjøpsveileder guide anbefaling velger utstyr',
 				'icon'     => 'explore',
-				'url'      => home_url( '/kjopsveiledere/' ),
+				'url'      => $hub_url,
 			),
 			array(
 				'type'     => 'tool',
@@ -866,7 +950,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Finn riktig demping, motorstyrke og løpeflate', 'gear-engine' ),
 				'keywords' => 'tredemølle kjøpsveileder løpebånd kondisjon',
 				'icon'     => 'directions_run',
-				'url'      => home_url( '/kjopsveiledere/?type=treadmill' ),
+				'url'      => add_query_arg( 'type', 'treadmill', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
@@ -874,7 +958,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Sammenlign luft-, vann- og magnetmotstand', 'gear-engine' ),
 				'keywords' => 'romaskin kjøpsveileder roing kondisjon',
 				'icon'     => 'rowing',
-				'url'      => home_url( '/kjopsveiledere/?type=romaskin' ),
+				'url'      => add_query_arg( 'type', 'romaskin', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
@@ -882,7 +966,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Skånsom trening for kne og hofte med lavt innsteg', 'gear-engine' ),
 				'keywords' => 'ergometersykkel treningssykkel sykkel kjøpsveileder kne',
 				'icon'     => 'pedal_bike',
-				'url'      => home_url( '/kjopsveiledere/?type=ergometersykkel' ),
+				'url'      => add_query_arg( 'type', 'ergometersykkel', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
@@ -890,7 +974,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => __( 'Støtter, strikker og hjelpemidler ved skade og opptrening', 'gear-engine' ),
 				'keywords' => 'rehab rehabilitering hjelpemidler støtte kjøpsveileder',
 				'icon'     => 'healing',
-				'url'      => home_url( '/kjopsveiledere/?type=rehab-guide' ),
+				'url'      => add_query_arg( 'type', 'rehab-guide', $hub_url ),
 			),
 		);
 
@@ -916,7 +1000,7 @@ class Gear_Engine_Price_Comparison {
 				'subtitle' => $subtitle,
 				'keywords' => 'symptomsjekk triage smerter vondt ' . mb_strtolower( $label . ' ' . $subtitle, 'UTF-8' ),
 				'icon'     => 'clinical_notes',
-				'url'      => home_url( '/' . trim( $triage_base, '/' ) . '/' . $region_slug . '/' ),
+				'url'      => trailingslashit( $triage_url ) . $region_slug . '/',
 			);
 		}
 
@@ -991,14 +1075,14 @@ class Gear_Engine_Price_Comparison {
 					'subtitle' => $dp['subtitle'],
 					'keywords' => 'treningsprogram øvelser opptrening ' . $dp['keywords'],
 					'icon'     => 'fitness_center',
-					'url'      => rtrim( home_url( '/' . trim( $program_base, '/' ) . '/' ), '/' ) . '/?program=' . rawurlencode( $dp['slug'] ),
+					'url'      => rtrim( $programs_url, '/' ) . '/?program=' . rawurlencode( $dp['slug'] ),
 				);
 			}
 		}
 
 		return array(
-			'priserUrl'   => home_url( '/priser/' ),
-			'programsUrl' => home_url( '/' . trim( $program_base, '/' ) . '/' ),
+			'priserUrl'   => $priser_url,
+			'programsUrl' => $programs_url,
 			'tools'       => $tools,
 			'programs'    => $programs,
 		);
