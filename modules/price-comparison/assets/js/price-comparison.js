@@ -352,6 +352,7 @@
 		var searchBox = opts.searchBox;
 		var searchInput = opts.searchInput || opts.inputEl;
 		var searchClear = opts.searchClear || opts.clearBtnEl;
+		var searchMic = opts.searchMic || opts.micBtnEl;
 		var suggestEl = opts.suggestEl;
 		var products = opts.products || (typeof opts.getProducts === 'function' ? opts.getProducts() : null) || (typeof fallbackData !== 'undefined' ? fallbackData : []);
 		var searchIndex = opts.searchIndex || DEFAULT_SEARCH_INDEX;
@@ -361,15 +362,115 @@
 			searchBox = searchInput.closest('.ge-m3-search-box') || searchInput.parentElement;
 		}
 
+		if (!searchClear && searchBox) {
+			searchClear = searchBox.querySelector('.ge-m3-search-clear');
+		}
+
+		if (!searchMic && searchBox) {
+			searchMic = searchBox.querySelector('.ge-m3-search-mic');
+		}
+
 		if (!searchBox || !searchInput || !suggestEl) return;
 
 		var activeIdx = -1;
 		var currentActions = [];
 
+		var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+		var recognition = null;
+		var isListening = false;
+
+		function updateTrailingIcons() {
+			var hasText = (searchInput.value || '').trim().length > 0;
+			if (searchClear) {
+				searchClear.hidden = !hasText || isListening;
+			}
+			if (searchMic && SpeechRec) {
+				searchMic.hidden = hasText && !isListening;
+			}
+		}
+
+		if (SpeechRec && searchMic) {
+			try {
+				recognition = new SpeechRec();
+				recognition.lang = 'nb-NO';
+				recognition.interimResults = false;
+				recognition.maxAlternatives = 1;
+
+				recognition.onstart = function () {
+					isListening = true;
+					searchMic.classList.add('is-listening');
+					searchMic.setAttribute('aria-pressed', 'true');
+					searchMic.setAttribute('aria-label', 'Lytter... Klikk for å stoppe');
+					searchMic.hidden = false;
+					if (searchClear) searchClear.hidden = true;
+					searchInput.setAttribute('data-orig-placeholder', searchInput.placeholder || '');
+					searchInput.placeholder = 'Lytter... Snakk nå';
+				};
+
+				recognition.onresult = function (event) {
+					var transcript = '';
+					if (event.results && event.results.length > 0 && event.results[0][0]) {
+						transcript = event.results[0][0].transcript || '';
+					}
+					if (transcript) {
+						searchInput.value = transcript;
+						var inputEvt = new Event('input', { bubbles: true });
+						searchInput.dispatchEvent(inputEvt);
+						if (typeof searchInput.focus === 'function') {
+							searchInput.focus();
+						}
+					}
+				};
+
+				recognition.onerror = function () {
+					stopListening();
+				};
+
+				recognition.onend = function () {
+					stopListening();
+				};
+
+				function stopListening() {
+					isListening = false;
+					if (searchMic) {
+						searchMic.classList.remove('is-listening');
+						searchMic.setAttribute('aria-pressed', 'false');
+						searchMic.setAttribute('aria-label', 'Søk med stemmen');
+					}
+					var orig = searchInput.getAttribute('data-orig-placeholder');
+					if (orig) {
+						searchInput.placeholder = orig;
+					}
+					updateTrailingIcons();
+				}
+
+				searchMic.addEventListener('click', function (e) {
+					e.preventDefault();
+					if (isListening) {
+						try { recognition.stop(); } catch (err) {}
+					} else {
+						try {
+							recognition.start();
+						} catch (err) {
+							stopListening();
+						}
+					}
+				});
+
+				updateTrailingIcons();
+			} catch (e) {
+				if (searchMic) searchMic.hidden = true;
+			}
+		} else if (searchMic) {
+			searchMic.hidden = true;
+		}
+
+		updateTrailingIcons();
+
 		if (searchClear) {
 			searchClear.addEventListener('click', function () {
 				searchInput.value = '';
-				searchClear.hidden = true;
+				updateTrailingIcons();
 				closeSuggest();
 				if (opts.onInputChange) {
 					opts.onInputChange('');
@@ -601,9 +702,7 @@
 		}
 
 		searchInput.addEventListener('input', function () {
-			if (searchClear) {
-				searchClear.hidden = (searchInput.value || '').length === 0;
-			}
+			updateTrailingIcons();
 			if (opts.onInputChange) {
 				opts.onInputChange(searchInput.value);
 			}
@@ -1345,6 +1444,7 @@
 		var resultsCountWrap = root.querySelector('.ge-m3-results-count');
 		var searchInput = root.querySelector('#ge-search-input');
 		var searchClear = root.querySelector('#ge-search-clear');
+		var searchMic = root.querySelector('#ge-search-mic');
 		var sortSelect = root.querySelector('#ge-sort-select');
 		var filterToggleBtn = root.querySelector('#ge-filter-toggle');
 		var filterBadge = root.querySelector('#ge-comp-filter-badge');
@@ -2644,6 +2744,7 @@
 			searchBox: searchBox,
 			searchInput: searchInput,
 			searchClear: searchClear,
+			searchMic: searchMic,
 			suggestEl: searchSuggest,
 			products: state.products,
 			searchIndex: searchIndex,
@@ -2946,6 +3047,9 @@
 					'<div class="ge-m3-search-box" id="ge-search-box" role="search">' +
 						'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
 						'<input type="text" id="ge-search-input" class="ge-m3-search-input" placeholder="Søk etter symptomer, program eller utstyr..." aria-label="Søk etter symptomer, program eller utstyr" aria-autocomplete="list" aria-controls="ge-search-suggest" aria-expanded="false" autocomplete="off" enterkeyhint="search" />' +
+						'<button type="button" id="ge-search-mic" class="ge-m3-icon-btn ge-m3-search-mic m3-sl" aria-label="Søk med stemmen" title="Søk med stemmen" hidden>' +
+							'<span class="material-symbols-outlined" aria-hidden="true">mic</span>' +
+						'</button>' +
 						'<button type="button" id="ge-search-clear" class="ge-m3-icon-btn ge-m3-search-clear m3-sl" aria-label="Tøm søk" title="Tøm søk" hidden>' +
 							'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
 						'</button>' +
@@ -3090,6 +3194,9 @@
 					'<form class="ge-m3-search-box" role="search" method="get" action="' + escapeHtml(priserUrl) + '">' +
 						'<span class="ge-m3-search-icon"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>' +
 						'<input type="search" name="q" class="ge-m3-search-input" autocomplete="off" placeholder="' + escapeHtml(placeholder) + '" aria-label="Søk på hele nettstedet">' +
+						'<button type="button" class="ge-m3-search-mic ge-m3-icon-btn m3-sl" aria-label="Søk med stemmen" title="Søk med stemmen" hidden>' +
+							'<span class="material-symbols-outlined" aria-hidden="true">mic</span>' +
+						'</button>' +
 						'<button type="button" class="ge-m3-search-clear ge-m3-icon-btn m3-sl" aria-label="Tøm søk" hidden>' +
 							'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
 						'</button>' +
@@ -3100,6 +3207,7 @@
 
 			var searchInput = node.querySelector('.ge-m3-search-input');
 			var searchClear = node.querySelector('.ge-m3-search-clear');
+			var searchMic = node.querySelector('.ge-m3-search-mic');
 			var suggestEl = node.querySelector('.ge-m3-search-suggest');
 
 			if (searchBox && searchBox.tagName === 'FORM') {
@@ -3115,6 +3223,7 @@
 				searchBox: searchBox,
 				searchInput: searchInput,
 				searchClear: searchClear,
+				searchMic: searchMic,
 				suggestEl: suggestEl,
 				products: products,
 				searchIndex: searchIndex,

@@ -963,7 +963,11 @@ body.ge-m3-sheet-open {
 .ge-price-comp-wrapper .ge-m3-search-clear,
 .ge-price-comp-wrapper button.ge-m3-search-clear,
 .ge-m3-search-box .ge-m3-search-clear,
-.ge-m3-search-box button.ge-m3-search-clear {
+.ge-m3-search-box button.ge-m3-search-clear,
+.ge-price-comp-wrapper .ge-m3-search-mic,
+.ge-price-comp-wrapper button.ge-m3-search-mic,
+.ge-m3-search-box .ge-m3-search-mic,
+.ge-m3-search-box button.ge-m3-search-mic {
 	position: absolute !important;
 	top: 50% !important;
 	right: 12px !important;
@@ -992,19 +996,56 @@ body.ge-m3-sheet-open {
 	line-height: 1 !important;
 	outline: none !important;
 	transition: background-color var(--md-sys-motion-duration-short4, 0.15s) var(--md-sys-motion-easing-standard, ease),
-		color var(--md-sys-motion-duration-short4, 0.15s) var(--md-sys-motion-easing-standard, ease) !important;
+		color var(--md-sys-motion-duration-short4, 0.15s) var(--md-sys-motion-easing-standard, ease),
+		transform 150ms ease !important;
+}
+
+.ge-price-comp-wrapper .ge-m3-search-clear .material-symbols-outlined,
+.ge-m3-search-box .ge-m3-search-clear .material-symbols-outlined,
+.ge-price-comp-wrapper .ge-m3-search-mic .material-symbols-outlined,
+.ge-m3-search-box .ge-m3-search-mic .material-symbols-outlined {
+	font-size: 20px !important;
+	line-height: 1 !important;
 }
 
 .ge-price-comp-wrapper .ge-m3-search-clear:hover,
-.ge-m3-search-box .ge-m3-search-clear:hover {
+.ge-m3-search-box .ge-m3-search-clear:hover,
+.ge-price-comp-wrapper .ge-m3-search-mic:hover,
+.ge-m3-search-box .ge-m3-search-mic:hover {
 	background-color: rgba(12, 35, 64, 0.08) !important;
 	color: var(--md-sys-color-on-surface, #101828) !important;
+}
+
+.ge-price-comp-wrapper .ge-m3-search-mic.is-listening,
+.ge-m3-search-box .ge-m3-search-mic.is-listening {
+	background-color: rgba(186, 26, 26, 0.14) !important;
+	color: #ba1a1a !important;
+	animation: ge-mic-pulse 1.2s infinite ease-in-out !important;
+}
+
+@keyframes ge-mic-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(186, 26, 26, 0.35);
+		transform: translateY(-50%) scale(1);
+	}
+	50% {
+		box-shadow: 0 0 0 7px rgba(186, 26, 26, 0);
+		transform: translateY(-50%) scale(1.08);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(186, 26, 26, 0);
+		transform: translateY(-50%) scale(1);
+	}
 }
 
 .ge-price-comp-wrapper .ge-m3-search-clear[hidden],
 .ge-price-comp-wrapper button.ge-m3-search-clear[hidden],
 .ge-m3-search-box .ge-m3-search-clear[hidden],
-.ge-m3-search-box button.ge-m3-search-clear[hidden] {
+.ge-m3-search-box button.ge-m3-search-clear[hidden],
+.ge-price-comp-wrapper .ge-m3-search-mic[hidden],
+.ge-price-comp-wrapper button.ge-m3-search-mic[hidden],
+.ge-m3-search-box .ge-m3-search-mic[hidden],
+.ge-m3-search-box button.ge-m3-search-mic[hidden] {
 	display: none !important;
 }
 
