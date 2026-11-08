@@ -1008,6 +1008,16 @@ body.ge-m3-sheet-open {
 	line-height: 1 !important;
 }
 
+.ge-price-comp-wrapper .ge-m3-search-mic svg,
+.ge-m3-search-box .ge-m3-search-mic svg,
+.ge-m3-search-mic svg {
+	width: 20px !important;
+	height: 20px !important;
+	display: block !important;
+	fill: currentColor !important;
+	flex-shrink: 0 !important;
+}
+
 .ge-price-comp-wrapper .ge-m3-search-clear:hover,
 .ge-m3-search-box .ge-m3-search-clear:hover,
 .ge-price-comp-wrapper .ge-m3-search-mic:hover,
