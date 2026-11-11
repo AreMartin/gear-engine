@@ -1242,11 +1242,11 @@
 			return '<button type="button" class="ge-m3-shop-compare-trigger m3-sl' + listCls + (isOpen ? ' is-open' : '') + '" data-id="' + p.id + '" aria-expanded="' + (isOpen ? 'true' : 'false') + '" title="' + escapeHtml(titleText) + '">' +
 				'<span class="ge-m3-shop-name">' +
 					renderMerchantLogoHtml(p.shop) +
-					'<span class="ge-m3-shop-line"><span class="ge-m3-shop-prefix">Best pris:</span> <b>' + escapeHtml(p.shop || 'Nettbutikk') + '</b></span>' +
+					(isList ? '<span class="ge-m3-shop-line"><span class="ge-m3-shop-prefix">Best pris:</span> <b>' + escapeHtml(p.shop || 'Nettbutikk') + '</b></span>' : '<b>' + escapeHtml(p.shop || 'Nettbutikk') + '</b>') +
 				'</span>' +
 				(isList
 					? '<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp') : ic('arrowDown')) + '</span>'
-					: '<span class="ge-m3-compare-badge" title="' + storeCount + ' butikker" aria-label="' + storeCount + ' butikker">' + storeCount + (isOpen ? ic('arrowUp') : ic('arrowDown')) + '</span>') +
+					: '<span class="ge-m3-compare-badge" title="' + storeCount + ' butikker" aria-label="' + storeCount + ' butikker">' + storeCount + ' ' + ic('expand_more') + '</span>') +
 			'</button>';
 		}
 		return '<div class="ge-m3-single-shop-row' + listCls + '">' +
@@ -1273,7 +1273,7 @@
 		'<div class="ge-m3-card-grid ge-card-grid">' +
 			compareToggleHtml(p, isChecked) +
 			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
-				(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
+				(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + ' %</span>' : '') +
 				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 			'</div>' +
 			'<div class="ge-m3-card-content">' +
@@ -1283,9 +1283,14 @@
 					priceRowHtml(p, showSavings, save) +
 					shopRowHtml(p, storeCount, isOpen, 'Klikk for å sammenligne priser fra alle ' + storeCount + ' butikker', false) +
 					(isOpen && storeCount > 1 && p.stores && p.stores.length > 1 ? renderStoresDrawer(p, true) : '') +
-					'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener sponsored" class="ge-m3-grid-cta" aria-label="Se tilbud hos ' + escapeHtml(p.shop || 'butikk') + '">' +
-						'Til butikk ' + ic('ext') +
-					'</a>' +
+					'<div class="ge-m3-card-action-row">' +
+						'<button type="button" class="ge-m3-details-btn m3-sl" data-detail-id="' + p.id + '">' +
+							'Detaljer ' + ic('chevron_right') +
+						'</button>' +
+						'<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener sponsored" class="ge-m3-grid-cta" aria-label="Se tilbud hos ' + escapeHtml(p.shop || 'butikk') + '">' +
+							'Til butikk ' + ic('ext') +
+						'</a>' +
+					'</div>' +
 				'</div>' +
 			'</div>' +
 		'</div>';
@@ -1585,7 +1590,7 @@
 				chip.className = 'ge-m3-chip ge-cat-pill ge-m3-cat-link m3-sl' + (isActive ? ' is-active' : '');
 				chip.setAttribute('data-category', cat);
 				chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-				chip.innerHTML = '<span>' + escapeHtml(cat) + '</span>' +
+				chip.innerHTML = CHIP_CHECK + '<span>' + escapeHtml(cat) + '</span>' +
 					(count > 0 || cat === 'Alle' ? '<span class="ge-m3-cat-count">' + count + '</span>' : '');
 
 				chip.addEventListener('click', function () {
