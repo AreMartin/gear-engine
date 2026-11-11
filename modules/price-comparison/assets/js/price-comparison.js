@@ -1238,6 +1238,8 @@
 	function shopRowHtml(p, storeCount, isOpen, titleText, isList) {
 		var listCls = isList ? ' ge-m3-shop-row--list ge-list-shop-row' : '';
 		var hasStores = storeCount > 1 && p.stores && p.stores.length > 1;
+		var chevronDownSvg = '<svg class="ge-m3-chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+		var chevronUpSvg = '<svg class="ge-m3-chevron-up" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>';
 		if (hasStores) {
 			return '<button type="button" class="ge-m3-shop-compare-trigger m3-sl' + listCls + (isOpen ? ' is-open' : '') + '" data-id="' + p.id + '" aria-expanded="' + (isOpen ? 'true' : 'false') + '" title="' + escapeHtml(titleText) + '">' +
 				'<span class="ge-m3-shop-name">' +
@@ -1245,8 +1247,8 @@
 					(isList ? '<span class="ge-m3-shop-line"><span class="ge-m3-shop-prefix">Best pris:</span> <b>' + escapeHtml(p.shop || 'Nettbutikk') + '</b></span>' : '<b>' + escapeHtml(p.shop || 'Nettbutikk') + '</b>') +
 				'</span>' +
 				(isList
-					? '<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? ic('arrowUp') : ic('arrowDown')) + '</span>'
-					: '<span class="ge-m3-compare-badge" title="' + storeCount + ' butikker" aria-label="' + storeCount + ' butikker">' + storeCount + ' ' + ic('expand_more') + '</span>') +
+					? '<span class="ge-m3-compare-badge">' + storeCount + ' butikker ' + (isOpen ? chevronUpSvg : chevronDownSvg) + '</span>'
+					: '<span class="ge-m3-compare-badge" title="' + storeCount + ' butikker" aria-label="' + storeCount + ' butikker">' + storeCount + ' ' + chevronDownSvg + '</span>') +
 			'</button>';
 		}
 		return '<div class="ge-m3-single-shop-row' + listCls + '">' +
@@ -1264,8 +1266,10 @@
 		var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
 		var isOpen = !!(state.openStores && state.openStores[p.id]);
 		var isChecked = state.selectedForCompare.indexOf(p.id) !== -1;
-		var save = (p.originalPrice && p.originalPrice > p.currentPrice) ? (p.originalPrice - p.currentPrice) : 0;
-		var showSavings = state.sortBy === 'savings_desc' && save > 0;
+		var origP = (p.originalPrice !== undefined && p.originalPrice !== null) ? Number(p.originalPrice) : ((p.old !== undefined && p.old !== null) ? Number(p.old) : ((p.oldPrice !== undefined && p.oldPrice !== null) ? Number(p.oldPrice) : 0));
+		var currP = Number(p.currentPrice || p.price || 0);
+		var save = (origP && origP > currP) ? (origP - currP) : 0;
+		var showSavings = (state.sortBy === 'savings_desc' || state.sortBy === 'save') && save > 0;
 		var safeUrl = p.url || '#';
 		var safeImg = p.image && p.image.length > 5 ? p.image : '';
 
@@ -1302,8 +1306,10 @@
 		var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
 		var isOpen = !!(state.openStores && state.openStores[p.id]);
 		var isChecked = state.selectedForCompare.indexOf(p.id) !== -1;
-		var save = (p.originalPrice && p.originalPrice > p.currentPrice) ? (p.originalPrice - p.currentPrice) : 0;
-		var showSavings = state.sortBy === 'savings_desc' && save > 0;
+		var origP = (p.originalPrice !== undefined && p.originalPrice !== null) ? Number(p.originalPrice) : ((p.old !== undefined && p.old !== null) ? Number(p.old) : ((p.oldPrice !== undefined && p.oldPrice !== null) ? Number(p.oldPrice) : 0));
+		var currP = Number(p.currentPrice || p.price || 0);
+		var save = (origP && origP > currP) ? (origP - currP) : 0;
+		var showSavings = (state.sortBy === 'savings_desc' || state.sortBy === 'save') && save > 0;
 		var safeUrl = p.url || '#';
 		var safeImg = p.image && p.image.length > 5 ? p.image : '';
 
@@ -1311,7 +1317,7 @@
 		'<div class="ge-m3-card-list ge-card-list">' +
 			'<div class="ge-m3-list-main-row ge-list-main-row">' +
 				'<div class="ge-m3-list-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
-					(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
+					(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + ' %</span>' : '') +
 					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
 				'</div>' +
 				'<div class="ge-m3-list-content">' +
@@ -1358,6 +1364,16 @@
 			if (!p.department) {
 				p.department = inferDepartment(p);
 			}
+			if (p.currentPrice === undefined && p.price !== undefined) {
+				p.currentPrice = Number(p.price);
+			}
+			if (p.originalPrice === undefined || p.originalPrice === null) {
+				if (p.old !== undefined && p.old !== null) p.originalPrice = Number(p.old);
+				else if (p.oldPrice !== undefined && p.oldPrice !== null) p.originalPrice = Number(p.oldPrice);
+			}
+			if (!p.discount && p.originalPrice && p.currentPrice && p.originalPrice > p.currentPrice) {
+				p.discount = Math.round(((p.originalPrice - p.currentPrice) / p.originalPrice) * 100);
+			}
 			ensureProductSpecs(p);
 			if (!Array.isArray(p.stores) || p.stores.length === 0) {
 				p.stores = [
@@ -1385,6 +1401,7 @@
 		var initialCat = (urlParams && urlParams.get('cat')) ? urlParams.get('cat') : initialCatAttr;
 		var initialQ = (urlParams && urlParams.get('q')) ? urlParams.get('q') : '';
 		var initialOpenId = (urlParams && urlParams.get('open')) ? parseInt(urlParams.get('open'), 10) : 0;
+		var initialSort = (urlParams && (urlParams.get('sort') || urlParams.get('sortBy'))) ? (urlParams.get('sort') || urlParams.get('sortBy')) : 'relevant';
 
 		// If category set without department, infer department from category
 		if (initialCat !== 'Alle' && (!urlParams || !urlParams.get('dept')) && !root.getAttribute('data-initial-department')) {
@@ -1421,7 +1438,7 @@
 			maxPrice: '',
 			absMinPrice: 0,
 			absMaxPrice: 100000,
-			sortBy: 'relevant',
+			sortBy: initialSort,
 			visibleCount: initialLimit,
 			showFilters: false
 		};
@@ -1707,6 +1724,12 @@
 					url.searchParams.set('open', String(state.activeProductId));
 				} else {
 					url.searchParams.delete('open');
+				}
+
+				if (state.sortBy && state.sortBy !== 'relevant') {
+					url.searchParams.set('sort', state.sortBy);
+				} else {
+					url.searchParams.delete('sort');
 				}
 
 				if (url.toString() !== window.location.href) {
@@ -2271,7 +2294,7 @@
 					'<div class="ge-prod-modal-hero">' +
 						'<div class="ge-prod-modal-visual">' +
 							'<div class="ge-prod-modal-img-card">' +
-								(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + '%</span>' : '') +
+								(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + ' %</span>' : '') +
 								stockHtml(p.inStock !== false, 'ge-m3-stock-badge ge-prod-modal-stock') +
 								(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-prod-modal-img" onerror="this.style.display=\'none\';" />' : '') +
 							'</div>' +
@@ -2527,10 +2550,16 @@
 				if (state.sortBy === 'price_asc') return a.currentPrice - b.currentPrice;
 				if (state.sortBy === 'price_desc') return b.currentPrice - a.currentPrice;
 				if (state.sortBy === 'discount_desc') return ((b.discount || 0) - (a.discount || 0)) || (a.currentPrice - b.currentPrice);
-				if (state.sortBy === 'savings_desc') {
-					var savA = (a.originalPrice && a.originalPrice > a.currentPrice) ? (a.originalPrice - a.currentPrice) : 0;
-					var savB = (b.originalPrice && b.originalPrice > b.currentPrice) ? (b.originalPrice - b.currentPrice) : 0;
-					return (savB - savA) || (a.currentPrice - b.currentPrice);
+				if (state.sortBy === 'savings_desc' || state.sortBy === 'save') {
+					var origA = (a.originalPrice !== undefined && a.originalPrice !== null) ? Number(a.originalPrice) : ((a.old !== undefined) ? Number(a.old) : 0);
+					var currA = Number(a.currentPrice || a.price || 0);
+					var savA = (origA && origA > currA) ? (origA - currA) : 0;
+
+					var origB = (b.originalPrice !== undefined && b.originalPrice !== null) ? Number(b.originalPrice) : ((b.old !== undefined) ? Number(b.old) : 0);
+					var currB = Number(b.currentPrice || b.price || 0);
+					var savB = (origB && origB > currB) ? (origB - currB) : 0;
+
+					return (savB - savA) || (currA - currB);
 				}
 				return 0;
 			});
@@ -2812,10 +2841,14 @@
 			});
 		}
 
-		sortSelect.addEventListener('change', function (e) {
-			state.sortBy = e.target.value;
-			updateUI();
-		});
+		if (sortSelect) {
+			sortSelect.value = state.sortBy;
+			sortSelect.addEventListener('change', function (e) {
+				state.sortBy = e.target.value;
+				updateUrlState();
+				updateUI();
+			});
+		}
 
 		filterToggleBtn.addEventListener('click', function () {
 			setFiltersOpen(!state.showFilters);

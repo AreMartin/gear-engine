@@ -2169,6 +2169,54 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	color: #E6EDF3;
 }
 
+[data-theme="dark"] .ge-m3-card-list {
+	background: #12151A;
+	border-color: #2D333B;
+}
+
+[data-theme="dark"] .ge-m3-card-list .ge-m3-cmp-toggle {
+	background: #191C20;
+	border-color: #2D333B;
+	color: #E6EDF3;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .ge-m3-card-list .ge-m3-cmp-box {
+	background: #191C20;
+	border-color: #6E7681;
+}
+
+[data-theme="dark"] .ge-m3-shop-row--list,
+[data-theme="dark"] .ge-m3-card-list .ge-m3-single-shop-row {
+	background: #12151A;
+	border-top-color: #2D333B;
+}
+
+[data-theme="dark"] .ge-m3-shop-row--list.is-open {
+	background: #1A1F26;
+}
+
+[data-theme="dark"] .ge-m3-shop-row--list .ge-m3-compare-badge {
+	background: #1E242B;
+	border-color: #38404A;
+	color: #E6EDF3;
+}
+
+[data-theme="dark"] .ge-m3-list-drawer-wrap {
+	background: #12151A;
+	border-top-color: #38404A;
+}
+
+[data-theme="dark"] .ge-m3-ldrow.is-best-deal {
+	background: rgba(0, 168, 107, 0.12);
+	border-color: rgba(0, 168, 107, 0.3);
+}
+
+[data-theme="dark"] .ge-m3-ldrow .ge-m3-store-tag {
+	background: rgba(0, 168, 107, 0.25);
+	color: #24B784;
+}
+
 /* Compare selection: input chip with checkbox */
 .ge-m3-cmp-toggle,
 .ge-card-cmp-label {
@@ -2384,26 +2432,20 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	text-decoration: line-through;
 	font-variant-numeric: tabular-nums;
 }
-	font: var(--md-sys-typescale-body-medium);
-	letter-spacing: 0;
-	font-weight: 500;
-	color: var(--ge-text-muted);
-	text-decoration: line-through;
-	font-variant-numeric: tabular-nums;
-}
 
 .ge-m3-savings-chip,
 .ge-savings-chip {
 	display: inline-flex;
 	align-items: center;
 	height: 24px;
-	padding: 0 8px;
+	padding: 0 10px;
 	border: 1px solid var(--ge-green-200, #BEE3D0);
-	border-radius: var(--md-sys-shape-corner-small);
+	border-radius: 9999px;
 	background: var(--ge-green-50, #F1F8F4);
 	color: var(--ge-green-800, #005236);
-	font: var(--md-sys-typescale-label-medium);
-	letter-spacing: 0.5px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.2px;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
@@ -2761,11 +2803,16 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	background: var(--ge-card-bg);
-	color: var(--md-sys-color-on-surface);
-	border: 1px solid var(--ge-card-border);
-	border-radius: var(--md-sys-shape-corner-extra-large);
-	box-shadow: var(--ge-card-shadow);
+	background: #FFFFFF;
+	color: var(--md-sys-color-on-surface, #191C20);
+	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
+	border-radius: 20px;
+	box-shadow: none;
+	transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.ge-m3-card-list:hover {
+	border-color: #D0D5DD;
 }
 
 .ge-price-comp-wrapper .ge-m3-list-main-row {
@@ -2787,7 +2834,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	border: 0;
 	border-radius: 0;
 	overflow: hidden;
-	background: var(--ge-media-bg);
+	background: var(--ge-media-bg, #ECEEF2);
+	position: relative;
 }
 
 .ge-price-comp-wrapper .ge-m3-list-img-wrap .ge-m3-product-img {
@@ -2806,11 +2854,17 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 }
 
 .ge-m3-list-img-wrap .ge-m3-deal-chip {
-	top: 14px;
-	left: 14px;
-	background: var(--md-sys-color-tertiary, #005236);
+	top: 12px;
+	left: 12px;
+	height: 24px;
+	padding: 0 10px;
 	border: none;
+	border-radius: 9999px;
+	background: var(--ge-green-600, #00A86B);
 	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
 }
 
 .ge-m3-list-content {
@@ -2861,36 +2915,131 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	flex-shrink: 0;
 }
 
-/* Compare toggle in list cards: plain checkbox, no chip */
-.ge-m3-card-list .ge-m3-cmp-toggle,
-.ge-m3-card-list .ge-m3-cmp-toggle:has(input:checked) {
-	height: 28px;
-	padding: 0;
-	border: 0;
-	background: transparent;
-	color: var(--ge-text-muted);
+/* Compare toggle in list cards: hvit pille som i prototype og grid */
+.ge-m3-card-list .ge-m3-cmp-toggle {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 32px;
+	padding: 0 13px 0 10px;
+	border-radius: 9999px;
+	background: #FFFFFF;
+	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
+	color: var(--md-sys-color-on-surface, #191C20);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0;
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* Retailer row spans the card, drawer opens below it */
+.ge-m3-card-list .ge-m3-cmp-toggle:hover {
+	background: #F9FAFB;
+	border-color: #CBD5E1;
+}
+
+.ge-m3-card-list .ge-m3-cmp-box {
+	position: relative;
+	width: 16px;
+	height: 16px;
+	border: 1.5px solid #94A3B8;
+	border-radius: 4px;
+	background: #FFFFFF;
+	flex-shrink: 0;
+	transition: all 0.15s ease;
+}
+
+.ge-m3-card-list .ge-m3-cmp-toggle:has(input:checked) {
+	border-color: var(--ge-navy-900, #0C2340);
+	color: var(--ge-navy-900, #0C2340);
+	background: #FFFFFF;
+}
+
+.ge-m3-card-list .ge-m3-cmp-chk:checked + .ge-m3-cmp-box {
+	border-color: var(--ge-navy-900, #0C2340);
+	background: var(--ge-navy-900, #0C2340);
+}
+
+.ge-m3-card-list .ge-m3-cmp-chk:checked + .ge-m3-cmp-box::after {
+	content: "";
+	position: absolute;
+	left: 4.5px;
+	top: 1.5px;
+	width: 4px;
+	height: 8px;
+	border: solid #FFFFFF;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+/* Retailer disclosure row in list cards (flere butikker) - heltrukket border mot øvre del */
 .ge-m3-shop-row--list {
-	min-height: 46px;
-	padding: 6px 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 52px;
+	padding: 10px 24px;
 	border: 0;
-	border-top: 1px solid var(--ge-card-border);
+	border-top: 1px solid var(--ge-hairline-strong, #E4E7EC); /* Heltrukket border som skiller nedre seksjon */
 	border-radius: 0;
-	background: transparent;
-	color: var(--md-sys-color-primary);
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	cursor: pointer;
+	box-shadow: none;
+	text-align: left;
+	transition: background-color 0.15s ease;
+}
+
+.ge-m3-shop-row--list:hover {
+	background: #F9FAFB;
 }
 
 .ge-m3-shop-row--list.is-open {
-	background: transparent;
-	color: var(--md-sys-color-primary);
+	background: #F2F4F8; /* Subtil lys bakgrunn når åpen som på Bilde 1 */
+	color: var(--md-sys-color-primary, #0C2340);
 }
 
-.ge-m3-shop-row--list .ge-m3-merchant-logo {
+/* Enkeltbutikk-rad i listekort (1 butikk - Bilde 2) - heltrukket border mot øvre del */
+.ge-m3-card-list .ge-m3-single-shop-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 52px;
+	padding: 10px 24px;
+	border: 0;
+	border-top: 1px solid var(--ge-hairline-strong, #E4E7EC); /* Heltrukket border som skiller nedre seksjon */
+	border-radius: 0 0 20px 20px;
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	cursor: default;
+	box-shadow: none;
+}
+
+.ge-m3-shop-row--list .ge-m3-merchant-logo,
+.ge-m3-card-list .ge-m3-single-shop-row .ge-m3-merchant-logo {
 	width: 22px;
 	height: 22px;
 	flex-basis: 22px;
+}
+
+.ge-m3-shop-row--list .ge-m3-shop-name,
+.ge-m3-card-list .ge-m3-single-shop-row .ge-m3-shop-name {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--md-sys-color-on-surface, #191C20);
+}
+
+.ge-m3-shop-row--list .ge-m3-shop-name b,
+.ge-m3-card-list .ge-m3-single-shop-row .ge-m3-shop-name b {
+	font-weight: 600;
+	color: #191C20;
 }
 
 .ge-m3-shop-line {
@@ -2899,8 +3048,43 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 }
 
 .ge-m3-shop-line b {
-	color: var(--md-sys-color-primary);
+	color: var(--md-sys-color-primary, #0C2340);
 	font-weight: 700;
+}
+
+.ge-m3-shop-row--list .ge-m3-compare-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 34px;
+	padding: 0 14px;
+	border: 1px solid #D0D5DD;
+	border-radius: 9999px;
+	background: #FFFFFF;
+	color: var(--ge-navy-900, #0C2340);
+	font-size: 13px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ge-m3-shop-row--list:hover .ge-m3-compare-badge {
+	background: #F9FAFB;
+	border-color: #94A3B8;
+}
+
+.ge-m3-shop-row--list.is-open .ge-m3-compare-badge {
+	background: #FFFFFF;
+	border-color: #CBD5E1;
+}
+
+.ge-m3-shop-row--list .ge-m3-chevron-down,
+.ge-m3-shop-row--list .ge-m3-chevron-up {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	color: currentColor;
+	flex-shrink: 0;
 }
 
 .ge-m3-card-grid .ge-m3-shop-prefix {
@@ -2981,24 +3165,13 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	font-size: 18px;
 }
 
-.ge-m3-shop-row--list .ge-m3-compare-badge {
-	height: 32px;
-	padding: 0 12px 0 16px;
-	border: 1px solid var(--md-sys-color-outline-variant);
-	border-radius: var(--md-sys-shape-corner-full);
-	background: var(--ge-card-bg);
-	color: var(--md-sys-color-primary);
-	font: var(--md-sys-typescale-label-large);
-	font-weight: 700;
-}
-
 .ge-m3-list-drawer-wrap {
-	border-top: 1px dashed var(--md-sys-color-outline-variant);
-	background: var(--ge-drawer-bg);
+	border-top: 1px dashed #D0D5DD; /* Stiplet linje som på Bilde 1 */
+	background: #FFFFFF;
 }
 
 .ge-m3-ldrawer {
-	padding: 28px;
+	padding: 24px 28px 28px;
 	animation: ge-expand var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate);
 }
 
@@ -3007,8 +3180,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: 16px;
-	padding-bottom: 20px;
-	border-bottom: 1px solid var(--md-sys-color-outline-variant);
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--ge-hairline-strong, #E4E7EC);
 }
 
 .ge-m3-ldrawer-info {
@@ -3016,34 +3189,65 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	flex-direction: column;
 	gap: 2px;
 	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.ge-m3-ldrawer-info .ge-m3-brand {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+	color: var(--md-sys-color-on-surface-variant, #596273);
+	margin-bottom: 2px;
 }
 
 .ge-price-comp-wrapper .ge-m3-ldrawer-title {
-	margin: 0 0 6px;
-	font-family: var(--md-ref-typeface);
+	margin: 0 0 4px;
+	font-family: var(--md-ref-typeface, inherit);
 	font-size: 18px;
 	line-height: 24px;
-	font-weight: 600;
-	color: var(--md-sys-color-on-surface);
+	font-weight: 700;
+	color: var(--md-sys-color-on-surface, #191C20);
 }
 
 .ge-m3-ldrawer-meta {
-	font: var(--md-sys-typescale-body-medium);
-	color: var(--md-sys-color-on-surface-variant);
+	font-size: 13.5px;
+	color: var(--md-sys-color-on-surface-variant, #596273);
 }
 
 .ge-m3-ldrawer-range {
-	margin-top: 6px;
-	font: var(--md-sys-typescale-label-large);
+	margin-top: 4px;
+	font-size: 15px;
 	font-weight: 700;
-	color: var(--md-sys-color-tertiary);
+	color: var(--ge-green-800, #005236);
+}
+
+.ge-m3-ldrawer-head .ge-m3-icon-btn {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background: transparent;
+	color: var(--md-sys-color-on-surface-variant, #596273);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	flex-shrink: 0;
+	margin-top: 14px;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ge-m3-ldrawer-head .ge-m3-icon-btn:hover {
+	background: #F2F4F8;
+	color: #191C20;
 }
 
 .ge-m3-ldrawer-rows {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
-	padding-top: 28px;
+	gap: 8px;
+	padding-top: 20px;
 }
 
 .ge-m3-ldrow {
@@ -3052,31 +3256,33 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	min-height: 68px;
-	padding: 12px 16px;
-	border-radius: var(--md-sys-shape-corner-large);
-	font: var(--md-sys-typescale-body-large);
+	min-height: 60px;
+	padding: 12px 18px;
+	border-radius: 12px;
+	border: 1px solid transparent;
+	background: transparent;
+	transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 .ge-m3-ldrow.is-best-deal {
-	border: 1px solid var(--ge-green-200, #C8E8D7);
-	background: var(--ge-green-50, #F1F8F4);
+	border: 1px solid #C8E8D5;
+	background: #F2FAF5;
+	margin-top: 8px;
 }
 
 .ge-price-comp-wrapper .ge-m3-ldrow-link {
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
-	transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 .ge-price-comp-wrapper .ge-m3-ldrow-link:not(.is-best-deal):hover {
-	background: #F4F7FA;
+	background: #F8FAFC;
 	text-decoration: none;
 }
 
 .ge-price-comp-wrapper .ge-m3-ldrow-link.is-best-deal:hover {
-	background: #EAF4EF;
+	background: #EAF7EF;
 	text-decoration: none;
 }
 
@@ -3086,50 +3292,81 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 }
 
 .ge-m3-ldrow .ge-m3-store-tag {
-	left: 14px;
+	position: absolute;
+	top: -10px;
+	left: 16px;
+	padding: 2px 8px;
+	border-radius: 4px;
+	background: #D9F2E3;
+	color: #005236;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	line-height: 14px;
 }
 
 .ge-m3-ldrow-name {
 	display: inline-flex;
 	align-items: center;
-	gap: 14px;
+	gap: 12px;
 	min-width: 0;
+	font-size: 15px;
 	font-weight: 500;
+	color: #191C20;
 }
 
 .ge-m3-ldrow-dot {
-	width: 10px;
-	height: 10px;
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
 	flex-shrink: 0;
+	margin-left: -4px;
 }
 
 .ge-m3-ldrow-dot.is-in-stock {
-	background: var(--ge-green-700, #007A50);
+	background: var(--ge-green-600, #00A86B);
 }
 
 .ge-m3-ldrow-dot.is-out-of-stock {
-	background: var(--md-sys-color-outline-variant);
+	background: #94A3B8;
 }
 
 .ge-m3-ldrow-right {
 	display: inline-flex;
 	align-items: center;
-	gap: 20px;
+	gap: 18px;
 	flex-shrink: 0;
 }
 
 .ge-m3-ldrow-price {
-	font: var(--md-sys-typescale-title-medium);
+	font-size: 16px;
 	font-weight: 700;
+	color: #191C20;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
 
 .ge-m3-ldrow .ge-m3-store-btn {
-	height: 40px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 36px;
 	padding: 0 20px;
-	font-weight: 700;
+	border-radius: 9999px;
+	background: var(--ge-navy-900, #0C2340);
+	color: #FFFFFF;
+	font-size: 13px;
+	font-weight: 600;
+	border: none;
+	cursor: pointer;
+	text-decoration: none;
+	transition: filter 0.15s ease;
+}
+
+.ge-m3-ldrow .ge-m3-store-btn:hover {
+	filter: brightness(1.15);
+	color: #FFFFFF;
 }
 
 /* Grid overlay uses the list drawer's retailer rows, scaled to fit one card. */
