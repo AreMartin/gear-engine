@@ -1219,8 +1219,8 @@
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-media {
-	background: var(--ge-green-100, #DCF5E8);
-	box-shadow: 0 4px 16px rgba(0, 82, 54, 0.08);
+	background: var(--md-sys-color-surface-container-highest, #E4E7EC);
+	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.05);
 }
 
 .gear-engine-hub__card-img {
@@ -1232,7 +1232,7 @@
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-img {
-	transform: scale(1.06);
+	transform: scale(1.04);
 }
 
 .gear-engine-hub__card-icon-box {
@@ -1252,12 +1252,8 @@
 	transition: transform 0.25s ease;
 }
 
-.gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-icon-box {
-	color: var(--ge-green-800, #005236);
-}
-
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-icon-box svg {
-	transform: scale(1.08);
+	transform: scale(1.04);
 }
 
 .gear-engine-hub__card-title {
@@ -1268,10 +1264,6 @@
 	color: var(--md-sys-color-primary, #0C2340);
 	transition: color 0.2s ease;
 	letter-spacing: -0.2px;
-}
-
-.gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-title {
-	color: var(--ge-green-800, #005236);
 }
 
 .gear-engine-hub__card-sub {
