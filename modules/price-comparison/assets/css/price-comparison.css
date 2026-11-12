@@ -552,15 +552,6 @@ body.ge-m3-sheet-open {
 		font: 600 16px/24px var(--ge-font-family, var(--md-ref-typeface, inherit));
 	}
 }
-	justify-content: center;
-	min-width: 20px;
-	height: 20px;
-	padding: 0 6px;
-	border-radius: var(--md-sys-shape-corner-full);
-	background: var(--md-sys-color-secondary-container);
-	color: var(--md-sys-color-on-secondary-container);
-	font: var(--md-sys-typescale-label-small);
-}
 
 .ge-m3-dept-btn.is-active .ge-m3-dept-badge,
 .ge-dept-btn.is-active .ge-dept-badge {
@@ -680,8 +671,8 @@ body.ge-m3-sheet-open {
 }
 
 .ge-m3-cats-bar .ge-m3-chip:hover:not(.is-active) {
-	border-color: #727782;
-	background: #F4F7FA;
+	border-color: transparent;
+	background: #F2F4F7;
 	box-shadow: none;
 }
 
@@ -691,6 +682,12 @@ body.ge-m3-sheet-open {
 	background: var(--ge-green-100, #DCF5E8);
 	color: var(--ge-green-800, #005236);
 	font-weight: 600;
+	box-shadow: none;
+}
+
+.ge-m3-cats-bar .ge-m3-chip.is-active:hover {
+	border-color: transparent;
+	background: #D5F1E2;
 	box-shadow: none;
 }
 
@@ -1423,7 +1420,7 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 }
 
 .ge-price-comp-wrapper .ge-m3-sort-select:hover {
-	border-color: #727782;
+	border-color: var(--ge-hairline-strong, #E4E7EC);
 }
 
 .ge-price-comp-wrapper .ge-m3-sort-select:focus {
@@ -1543,8 +1540,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 }
 
 .ge-price-comp-wrapper .ge-m3-filter-btn:hover {
-	background: #F4F7FA;
-	border-color: #727782;
+	background: #F8FAFC;
+	border-color: var(--ge-hairline-strong, #E4E7EC);
 	box-shadow: none;
 }
 
@@ -2028,7 +2025,7 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	padding: 0;
 	background: var(--ge-card-bg, #FFFFFF);
 	color: var(--md-sys-color-on-surface, #191C20);
-	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
+	border: 1px solid rgba(12, 35, 64, 0.08);
 	border-radius: 20px;
 	box-shadow: none;
 	transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
@@ -2036,7 +2033,7 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 
 .ge-m3-card-grid:hover,
 .ge-card-grid:hover {
-	border-color: #D0D5DD;
+	border-color: rgba(12, 35, 64, 0.14);
 }
 
 .ge-price-comp-wrapper .ge-m3-card-grid .ge-m3-img-wrap {
@@ -2805,14 +2802,14 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	overflow: hidden;
 	background: #FFFFFF;
 	color: var(--md-sys-color-on-surface, #191C20);
-	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
+	border: 1px solid rgba(12, 35, 64, 0.08);
 	border-radius: 20px;
 	box-shadow: none;
 	transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 .ge-m3-card-list:hover {
-	border-color: #D0D5DD;
+	border-color: rgba(12, 35, 64, 0.14);
 }
 
 .ge-price-comp-wrapper .ge-m3-list-main-row {
@@ -2983,7 +2980,7 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	min-height: 52px;
 	padding: 10px 24px;
 	border: 0;
-	border-top: 1px solid var(--ge-hairline-strong, #E4E7EC); /* Heltrukket border som skiller nedre seksjon */
+	border-top: 1px solid rgba(12, 35, 64, 0.08); /* Heltrukket border som skiller nedre seksjon */
 	border-radius: 0;
 	background: #FFFFFF;
 	color: var(--md-sys-color-primary, #0C2340);
@@ -3011,7 +3008,7 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	min-height: 52px;
 	padding: 10px 24px;
 	border: 0;
-	border-top: 1px solid var(--ge-hairline-strong, #E4E7EC); /* Heltrukket border som skiller nedre seksjon */
+	border-top: 1px solid rgba(12, 35, 64, 0.08); /* Heltrukket border som skiller nedre seksjon */
 	border-radius: 0 0 20px 20px;
 	background: #FFFFFF;
 	color: var(--md-sys-color-primary, #0C2340);
