@@ -706,14 +706,22 @@ class Gear_Engine_Gear_Picker {
 		);
 
 		foreach ( $items as &$item ) {
-			$slug    = (string) $item['slug'];
-			$img_url = '';
-			$exts    = array( 'webp', 'png', 'jpg', 'jpeg' );
-			foreach ( $exts as $ext ) {
-				$candidate_file = GEAR_ENGINE_PATH . 'modules/gear-picker/assets/images/' . $slug . '.' . $ext;
-				if ( file_exists( $candidate_file ) ) {
-					$img_url = GEAR_ENGINE_URL . 'modules/gear-picker/assets/images/' . $slug . '.' . $ext;
-					break;
+			$slug            = (string) $item['slug'];
+			$img_url         = '';
+			$exts            = array( 'webp', 'png', 'jpg', 'jpeg' );
+			$slug_candidates = array( $slug );
+			if ( 'treadmill' === $slug ) {
+				$slug_candidates[] = 'tredemolle';
+			} elseif ( 'tredemolle' === $slug ) {
+				$slug_candidates[] = 'treadmill';
+			}
+			foreach ( $slug_candidates as $cand_slug ) {
+				foreach ( $exts as $ext ) {
+					$candidate_file = GEAR_ENGINE_PATH . 'modules/gear-picker/assets/images/' . $cand_slug . '.' . $ext;
+					if ( file_exists( $candidate_file ) ) {
+						$img_url = GEAR_ENGINE_URL . 'modules/gear-picker/assets/images/' . $cand_slug . '.' . $ext;
+						break 2;
+					}
 				}
 			}
 			/**
