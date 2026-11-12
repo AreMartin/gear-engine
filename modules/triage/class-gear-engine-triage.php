@@ -222,7 +222,16 @@ class Gear_Engine_Triage {
 			$page_id   = self::get_region_page_id( $region );
 			$image_url = '';
 			if ( ! empty( $config['image'] ) ) {
-				$image_url = esc_url_raw( (string) $config['image'] );
+				$img_val = (string) $config['image'];
+				if ( preg_match( '#^https?://#i', $img_val ) || 0 === strpos( $img_val, '//' ) ) {
+					$image_url = esc_url_raw( $img_val );
+				} else {
+					$rel = ltrim( $img_val, '/' );
+					if ( 0 !== strpos( $rel, 'modules/triage/' ) && 0 !== strpos( $rel, 'assets/' ) ) {
+						$rel = 'modules/triage/assets/images/' . $rel;
+					}
+					$image_url = GEAR_ENGINE_URL . $rel;
+				}
 			} elseif ( $page_id && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $page_id ) && function_exists( 'get_the_post_thumbnail_url' ) ) {
 				$thumb = get_the_post_thumbnail_url( $page_id, 'medium_large' );
 				if ( $thumb ) {

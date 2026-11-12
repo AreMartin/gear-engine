@@ -3,6 +3,7 @@
   "summary": "Skuldersmerter, stivhet og ustabilitet",
   "order": 20,
   "icon": "shoulder",
+  "image": "shoulder.webp",
   "version": "1.0.0",
   "title": "Symptomsjekk: Skulder",
   "description": "Svar på noen raske spørsmål under for å få et skreddersydd opplegg for din skulder, basert på anerkjent forskning.",

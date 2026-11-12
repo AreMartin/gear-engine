@@ -3,6 +3,7 @@
   "summary": "Ankelskader, hælsmerter og akillessene",
   "order": 40,
   "icon": "foot",
+  "image": "foot-ankle.webp",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
   "title": "Symptomsjekk: Fot og ankel",

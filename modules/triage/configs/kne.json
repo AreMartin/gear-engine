@@ -3,6 +3,7 @@
   "summary": "Kneskader, smerter foran i kneet og slitasje",
   "order": 30,
   "icon": "knee",
+  "image": "knee.webp",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
   "title": "Symptomsjekk: Kne",

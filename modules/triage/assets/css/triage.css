@@ -447,7 +447,8 @@
 .gear-engine-triage-picker .region-tile.is-text-only {
 	display: grid;
 	place-items: center;
-	height: 104px;
+	min-height: 104px;
+	height: 100%;
 	border-radius: 20px;
 	background: var(--md-sys-color-surface-container-high, #F2F4F7);
 	border: none;
