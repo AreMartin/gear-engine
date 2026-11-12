@@ -1050,7 +1050,6 @@
 	user-select: none;
 }
 
-.gear-engine-hub__chip:hover,
 .gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) {
 	border-color: var(--ge-hairline-strong, #E4E7EC);
 	background: #F2F4F7 !important;
@@ -1058,12 +1057,11 @@
 	box-shadow: none;
 }
 
-.gear-engine-hub__chip:hover .gear-engine-hub__chip-label,
-.gear-engine-hub__chip:hover span {
+.gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) .gear-engine-hub__chip-label {
 	color: var(--md-sys-color-on-surface, #191C20) !important;
 }
 
-.gear-engine-hub__chip:hover .gear-engine-hub__chip-count {
+.gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) .gear-engine-hub__chip-count {
 	color: var(--md-sys-color-on-surface-variant, #424751) !important;
 }
 
@@ -1087,12 +1085,8 @@
 
 .gear-engine-hub__chip--active .gear-engine-hub__chip-label,
 .gear-engine-hub__chip--active:hover .gear-engine-hub__chip-label,
-.gear-engine-hub__chip--active span,
-.gear-engine-hub__chip--active:hover span,
 .gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-label,
-.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-label,
-.gear-engine-hub__chip[aria-pressed="true"] span,
-.gear-engine-hub__chip[aria-pressed="true"]:hover span {
+.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-label {
 	color: var(--ge-green-800, #005236) !important;
 }
 
@@ -1113,18 +1107,22 @@
 	opacity: 0.75;
 }
 
+/* Checkmark: strictly hidden on inactive chips */
+.gear-engine-hub .gear-engine-hub__chip .gear-engine-hub__chip-check,
+.gear-engine-hub__chip .gear-engine-hub__chip-check,
 .gear-engine-hub__chip-check {
-	display: none;
+	display: none !important;
 	font-size: 18px;
 	line-height: 1;
 	color: var(--ge-green-800, #005236) !important;
 }
 
+/* Checkmark: visible ONLY on active chips */
+.gear-engine-hub .gear-engine-hub__chip--active .gear-engine-hub__chip-check,
+.gear-engine-hub .gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check,
 .gear-engine-hub__chip--active .gear-engine-hub__chip-check,
-.gear-engine-hub__chip--active:hover .gear-engine-hub__chip-check,
-.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check,
-.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-check {
-	display: inline-flex;
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check {
+	display: inline-flex !important;
 	align-items: center;
 	justify-content: center;
 	width: 18px;
