@@ -20,28 +20,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="region-grid">
 		<?php foreach ( $cards as $card ) : ?>
-			<a class="region-card sl" href="<?php echo esc_url( $card['url'] ); ?>">
-				<div class="rc-top">
-					<div class="rc-title-row">
-						<b><?php echo esc_html( $card['label'] ); ?></b>
-						<?php if ( ! empty( $card['badge'] ) ) : ?>
-							<span class="rc-badge"><?php echo esc_html( $card['badge'] ); ?></span>
-						<?php endif; ?>
-					</div>
-					<span class="rc-action" aria-hidden="true">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-					</span>
+			<a class="region-tile region-card" href="<?php echo esc_url( $card['url'] ); ?>">
+				<div class="tile-media">
+					<?php if ( ! empty( $card['badge'] ) ) : ?>
+						<span class="tile-badge rc-badge"><?php echo esc_html( $card['badge'] ); ?></span>
+					<?php endif; ?>
+					<?php
+					if ( ! empty( $card['image_url'] ) ) {
+						$media_html = '<img src="' . esc_url( $card['image_url'] ) . '" alt="' . esc_attr( $card['label'] ) . '" class="tile-image" loading="lazy">';
+					} else {
+						$media_html = Gear_Engine_Triage::get_icon_svg( $card['icon'] );
+					}
+					/**
+					 * Filters the media HTML rendered inside a region tile.
+					 *
+					 * @param string $media_html Media markup (image or SVG).
+					 * @param array  $card       Card metadata.
+					 */
+					echo apply_filters( 'gear_engine_triage_region_card_media', $media_html, $card ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					?>
 				</div>
-				<?php if ( ! empty( $card['summary'] ) ) : ?>
-					<p><?php echo esc_html( $card['summary'] ); ?></p>
-				<?php endif; ?>
-				<?php if ( ! empty( $card['chips'] ) && is_array( $card['chips'] ) ) : ?>
-					<div class="rc-chips">
-						<?php foreach ( $card['chips'] as $chip ) : ?>
-							<span class="rc-chip"><?php echo esc_html( $chip ); ?></span>
-						<?php endforeach; ?>
-					</div>
-				<?php endif; ?>
+				<div class="tile-body">
+					<div class="tile-label"><?php echo esc_html( $card['label'] ); ?></div>
+					<?php if ( ! empty( $card['summary'] ) ) : ?>
+						<div class="tile-sub"><?php echo esc_html( $card['summary'] ); ?></div>
+					<?php elseif ( ! empty( $card['chips'] ) && is_array( $card['chips'] ) ) : ?>
+						<div class="tile-sub"><?php echo esc_html( implode( ' · ', $card['chips'] ) ); ?></div>
+					<?php endif; ?>
+				</div>
 			</a>
 		<?php endforeach; ?>
 	</div>

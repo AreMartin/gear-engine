@@ -219,15 +219,27 @@ class Gear_Engine_Triage {
 				}
 			}
 
+			$page_id   = self::get_region_page_id( $region );
+			$image_url = '';
+			if ( ! empty( $config['image'] ) ) {
+				$image_url = esc_url_raw( (string) $config['image'] );
+			} elseif ( $page_id && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $page_id ) && function_exists( 'get_the_post_thumbnail_url' ) ) {
+				$thumb = get_the_post_thumbnail_url( $page_id, 'medium_large' );
+				if ( $thumb ) {
+					$image_url = (string) $thumb;
+				}
+			}
+
 			$cards[] = array(
-				'region'  => $region,
-				'label'   => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
-				'summary' => isset( $config['summary'] ) ? (string) $config['summary'] : '',
-				'chips'   => $chips,
-				'badge'   => 'rygg' === $region ? 'Vanligst' : '',
-				'order'   => isset( $config['order'] ) ? (int) $config['order'] : 100,
-				'icon'    => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
-				'url'     => self::get_region_url( $region ),
+				'region'    => $region,
+				'label'     => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
+				'summary'   => isset( $config['summary'] ) ? (string) $config['summary'] : '',
+				'chips'     => $chips,
+				'badge'     => 'rygg' === $region ? 'Vanligst' : '',
+				'order'     => isset( $config['order'] ) ? (int) $config['order'] : 100,
+				'icon'      => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
+				'image_url' => $image_url,
+				'url'       => self::get_region_url( $region ),
 			);
 		}
 		usort(
@@ -272,7 +284,7 @@ class Gear_Engine_Triage {
 	public static function get_icon_svg( string $name ): string {
 		$icons = self::get_icon_paths();
 		$body  = $icons[ $name ] ?? ( $icons['activity'] ?? '' );
-		return '<svg class="gear-engine-triage-picker__icon" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $body . '</svg>';
+		return '<svg class="gear-engine-triage-picker__icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $body . '</svg>';
 	}
 
 	/**
