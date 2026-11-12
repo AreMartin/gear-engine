@@ -89,7 +89,72 @@ class Gear_Engine_Triage {
 	 * @return string
 	 */
 	public static function get_section_url(): string {
-		return trailingslashit( home_url( self::get_base_path() ) );
+		$base_path   = self::get_base_path();
+		$parent_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $base_path ) : null;
+
+		if ( $parent_page && ! empty( $parent_page->ID ) && function_exists( 'get_permalink' ) ) {
+			$url = (string) get_permalink( $parent_page->ID );
+		} else {
+			$url = trailingslashit( home_url( $base_path ) );
+		}
+
+		/**
+		 * Filters the section URL.
+		 *
+		 * @param string $url Section URL.
+		 */
+		return (string) apply_filters( 'gear_engine_triage_section_url', $url );
+	}
+
+	/**
+	 * Find the page ID for a specific triage region.
+	 *
+	 * Checks nested path, direct slug, prefixed slug, or shortcode content.
+	 *
+	 * @param string $region Region slug.
+	 * @return int|null
+	 */
+	public static function get_region_page_id( string $region ): ?int {
+		$region    = sanitize_key( $region );
+		$base_path = self::get_base_path();
+
+		if ( function_exists( 'get_page_by_path' ) ) {
+			// 1. Check nested under base path (e.g. "symptomsjekker/rygg").
+			$child_path = $base_path . '/' . $region;
+			$page       = get_page_by_path( $child_path );
+			if ( $page && ! empty( $page->ID ) ) {
+				return (int) $page->ID;
+			}
+
+			// 2. Check top-level slug (e.g. "rygg").
+			$page = get_page_by_path( $region );
+			if ( $page && ! empty( $page->ID ) ) {
+				return (int) $page->ID;
+			}
+
+			// 3. Check prefixed slug (e.g. "symptomsjekk-rygg").
+			$page = get_page_by_path( 'symptomsjekk-' . $region );
+			if ( $page && ! empty( $page->ID ) ) {
+				return (int) $page->ID;
+			}
+		}
+
+		// 4. Query pages that contain the triage shortcode for this region.
+		if ( function_exists( 'get_posts' ) ) {
+			$found_posts = get_posts(
+				array(
+					'post_type'      => 'page',
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+					's'              => '[' . self::SHORTCODE_TAG . ' region="' . $region . '"',
+				)
+			);
+			if ( ! empty( $found_posts[0]->ID ) ) {
+				return (int) $found_posts[0]->ID;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -99,8 +164,14 @@ class Gear_Engine_Triage {
 	 * @return string
 	 */
 	public static function get_region_url( string $region ): string {
-		$region = sanitize_key( $region );
-		$url    = trailingslashit( home_url( self::get_base_path() . '/' . $region ) );
+		$region  = sanitize_key( $region );
+		$page_id = self::get_region_page_id( $region );
+
+		if ( $page_id && function_exists( 'get_permalink' ) ) {
+			$url = (string) get_permalink( $page_id );
+		} else {
+			$url = trailingslashit( home_url( self::get_base_path() . '/' . $region ) );
+		}
 
 		/**
 		 * Filters the page URL a region card links to.
@@ -267,8 +338,7 @@ class Gear_Engine_Triage {
 			$config     = self::get_config( $region );
 			$label      = ( ! is_wp_error( $config ) && ! empty( $config['label'] ) ) ? $config['label'] : ucfirst( $region );
 			$child_path = $base_path . '/' . $region;
-			$child_page = function_exists( 'get_page_by_path' ) ? get_page_by_path( $child_path ) : null;
-			$child_id   = ( $child_page && ! empty( $child_page->ID ) ) ? (int) $child_page->ID : null;
+			$child_id   = self::get_region_page_id( $region );
 
 			$exists = ( null !== $child_id );
 			if ( ! $exists ) {

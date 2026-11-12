@@ -91,17 +91,17 @@
 
 /* Top App Bar */
 .gear-engine-triage .appbar {
-	position: sticky;
+	position: relative;
 	top: 0;
 	z-index: 10;
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	height: 60px;
-	margin: 0 -16px 12px;
-	padding: 0 16px;
-	background: var(--md-sys-color-surface, #FFFFFF);
-	border-bottom: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	height: 48px;
+	margin: 0 0 12px;
+	padding: 0;
+	background: transparent;
+	border-bottom: none;
 }
 .gear-engine-triage .appbar .title-l { flex: 1; font-size: 18px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); }
 .gear-engine-triage .ibtn {
@@ -181,6 +181,7 @@
 	margin-top: auto;
 	padding-top: 18px;
 	border-top: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	background: transparent;
 }
 .gear-engine-triage .dock--auto {
 	justify-content: flex-start;
@@ -221,15 +222,15 @@
 	transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 .gear-engine-triage .opt:hover {
-	border-color: var(--md-sys-color-primary, #0C2340);
-	background: var(--ge-navy-selected-bg, #F0F4F8);
+	border-color: var(--ge-green-600, #00A86B);
+	background: var(--ge-green-50, #F1F8F4);
 	transform: translateY(-1px);
 }
 .gear-engine-triage .opt.is-active,
 .gear-engine-triage .opt[aria-pressed=true] {
-	background: var(--ge-navy-selected-bg, #F0F4F8);
-	border-color: var(--md-sys-color-primary, #0C2340);
-	box-shadow: 0 0 0 1.5px var(--md-sys-color-primary, #0C2340);
+	background: var(--ge-green-50, #F1F8F4);
+	border-color: var(--ge-green-600, #00A86B);
+	box-shadow: 0 0 0 1.5px var(--ge-green-600, #00A86B);
 	transform: scale(0.99);
 }
 .gear-engine-triage .opt .oi {
@@ -245,11 +246,15 @@
 }
 .gear-engine-triage .opt.is-active .oi,
 .gear-engine-triage .opt[aria-pressed=true] .oi {
-	background: var(--md-sys-color-primary, #0C2340);
+	background: var(--ge-green-600, #00A86B);
 	color: #FFFFFF;
 }
 .gear-engine-triage .opt .ot { flex: 1; min-width: 0; }
 .gear-engine-triage .opt .ot b { display: block; font-size: 15.5px; line-height: 22px; font-weight: 600; }
+.gear-engine-triage .opt.is-active .ot b,
+.gear-engine-triage .opt[aria-pressed=true] .ot b {
+	color: var(--ge-green-800, #005236) !important;
+}
 .gear-engine-triage .opt .ot small { display: block; font-size: 13.5px; line-height: 19px; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 2px; }
 .gear-engine-triage .opt .ctl {
 	width: 22px;
@@ -264,8 +269,8 @@
 .gear-engine-triage .opt.multi .ctl { border-radius: 4px; }
 .gear-engine-triage .opt.is-active .ctl,
 .gear-engine-triage .opt[aria-pressed=true] .ctl {
-	background: var(--md-sys-color-primary, #0C2340);
-	border-color: var(--md-sys-color-primary, #0C2340);
+	background: var(--ge-green-600, #00A86B);
+	border-color: var(--ge-green-600, #00A86B);
 }
 
 /* Pain Slider Card */

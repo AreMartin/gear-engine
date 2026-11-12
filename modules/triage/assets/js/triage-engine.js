@@ -621,7 +621,7 @@
 		return '<button type="button" class="' + cls + '" data-action="' + (multi ? 'multi' : 'single') +
 			'" data-step="' + esc(step.id) + '" data-option="' + esc(opt.id) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
 			'<span class="oi">' + icon(opt.icon || (isFlags && !isNone ? 'AlertTriangle' : 'Activity'), 20) + '</span>' +
-			'<span class="ot"><b style="color:var(--md-sys-color-on-surface,#0C2340)">' + esc(opt.title) + '</b>' +
+			'<span class="ot"><b>' + esc(opt.title) + '</b>' +
 			(opt.subtitle ? '<small>' + esc(opt.subtitle) + '</small>' : '') + '</span>' +
 			'<span class="ctl">' + (active ? icon('Check', 14) : '') + '</span>' +
 			'</button>';
