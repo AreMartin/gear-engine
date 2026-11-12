@@ -703,14 +703,14 @@ body.ge-m3-sheet-open {
 }
 
 .ge-m3-cats-bar .ge-m3-chip .ge-m3-chip-check {
-	display: none;
+	display: none !important;
 	font-size: 18px;
 	line-height: 1;
 	color: var(--ge-green-800, #005236);
 }
 
 .ge-m3-cats-bar .ge-m3-chip.is-active .ge-m3-chip-check {
-	display: inline-flex;
+	display: inline-flex !important;
 	align-items: center;
 	justify-content: center;
 	width: 18px;

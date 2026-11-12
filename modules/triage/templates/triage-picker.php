@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</a>
 			<?php else : ?>
 				<a class="region-tile region-card is-text-only" href="<?php echo esc_url( $card['url'] ); ?>">
-					<span><?php echo esc_html( $card['label'] ); ?></span>
+					<span class="region-tile__label"><?php echo esc_html( $card['label'] ); ?></span>
 				</a>
 			<?php endif; ?>
 		<?php endforeach; ?>

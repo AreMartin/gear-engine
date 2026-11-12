@@ -467,6 +467,7 @@
 	outline: 2px solid var(--md-sys-color-primary, #0C2340);
 	outline-offset: 3px;
 }
+.gear-engine-triage-picker .region-tile.is-text-only .region-tile__label,
 .gear-engine-triage-picker .region-tile.is-text-only span {
 	font-size: 17.5px;
 	font-weight: 600;
@@ -475,6 +476,7 @@
 	transition: color 0.2s ease;
 	letter-spacing: -0.2px;
 }
+.gear-engine-triage-picker .region-tile.is-text-only:hover .region-tile__label,
 .gear-engine-triage-picker .region-tile.is-text-only:hover span {
 	color: var(--ge-green-800, #005236);
 }
