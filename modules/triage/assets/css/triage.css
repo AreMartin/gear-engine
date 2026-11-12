@@ -500,6 +500,43 @@
 	object-fit: contain;
 }
 
+/* Editorial Fallback C */
+.gear-engine-triage-picker .tile-fallback {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+.gear-engine-triage-picker .tile-num {
+	font-size: 38px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -0.04em;
+	color: rgba(12, 35, 64, 0.14);
+	transition: color 0.22s ease, transform 0.25s ease;
+}
+.gear-engine-triage-picker .tile-action-dot {
+	position: absolute;
+	bottom: 14px;
+	right: 14px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 1px 4px rgba(12, 35, 64, 0.08);
+	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.gear-engine-triage-picker .tile-action-dot svg {
+	width: 15px;
+	height: 15px;
+}
+
 /* Tile Hover State (M3 Tonal State Layer) */
 .gear-engine-triage-picker .region-tile:hover .tile-media {
 	background: var(--ge-green-50, #EBF5F0);
@@ -512,6 +549,15 @@
 }
 .gear-engine-triage-picker .region-tile:hover .tile-media .tile-image {
 	transform: scale(1.04);
+}
+.gear-engine-triage-picker .region-tile:hover .tile-num {
+	color: var(--ge-green-600, #00A86B);
+	transform: scale(1.08);
+}
+.gear-engine-triage-picker .region-tile:hover .tile-action-dot {
+	background: var(--ge-green-600, #00A86B);
+	color: #FFFFFF;
+	transform: translate(2px, -2px);
 }
 .gear-engine-triage-picker .region-tile:hover .tile-label {
 	color: var(--ge-green-800, #005236);

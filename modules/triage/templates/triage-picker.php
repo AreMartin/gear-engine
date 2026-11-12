@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="region-grid">
-		<?php foreach ( $cards as $card ) : ?>
+		<?php foreach ( $cards as $index => $card ) : ?>
 			<a class="region-tile region-card" href="<?php echo esc_url( $card['url'] ); ?>">
 				<div class="tile-media">
 					<?php if ( ! empty( $card['badge'] ) ) : ?>
@@ -29,12 +29,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 					if ( ! empty( $card['image_url'] ) ) {
 						$media_html = '<img src="' . esc_url( $card['image_url'] ) . '" alt="' . esc_attr( $card['label'] ) . '" class="tile-image" loading="lazy">';
 					} else {
-						$media_html = Gear_Engine_Triage::get_icon_svg( $card['icon'] );
+						$num_str    = sprintf( '%02d', (int) $index + 1 );
+						$media_html = '<div class="tile-fallback">' .
+							'<span class="tile-num">' . esc_html( $num_str ) . '</span>' .
+							'<span class="tile-action-dot" aria-hidden="true">' .
+							'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l10-10M7 7h10v10"/></svg>' .
+							'</span>' .
+							'</div>';
 					}
 					/**
 					 * Filters the media HTML rendered inside a region tile.
 					 *
-					 * @param string $media_html Media markup (image or SVG).
+					 * @param string $media_html Media markup (image or fallback).
 					 * @param array  $card       Card metadata.
 					 */
 					echo apply_filters( 'gear_engine_triage_region_card_media', $media_html, $card ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
