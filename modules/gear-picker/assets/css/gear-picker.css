@@ -1196,7 +1196,7 @@
 	box-shadow: none;
 	text-align: center;
 	position: relative;
-	transition: transform 0.2s ease;
+	transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .gear-engine-hub__card:focus-visible .gear-engine-hub__card-media {
@@ -1215,7 +1215,8 @@
 	border: none;
 	box-sizing: border-box;
 	padding: 18px;
-	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+	transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
+	will-change: background-color;
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-media {
@@ -1228,7 +1229,8 @@
 	height: 100%;
 	object-fit: contain;
 	mix-blend-mode: multiply;
-	transition: transform 0.25s ease;
+	transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
+	will-change: transform;
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-img {
@@ -1241,7 +1243,7 @@
 	width: 100%;
 	height: 100%;
 	color: var(--md-sys-color-primary, #0C2340);
-	transition: transform 0.25s ease, color 0.2s ease;
+	transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .gear-engine-hub__card-icon-box svg {
@@ -1249,7 +1251,7 @@
 	height: 52px;
 	stroke: currentColor;
 	stroke-width: 1.5px;
-	transition: transform 0.25s ease;
+	transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-icon-box svg {
