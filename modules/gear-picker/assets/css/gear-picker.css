@@ -155,6 +155,7 @@
 }
 .gear-engine-picker .chip:hover {
 	background: var(--md-sys-color-surface-container-high, #F0F4F8);
+	color: var(--md-sys-color-primary, #0C2340);
 }
 .gear-engine-picker .chip .chip-edit {
 	display: inline-flex;
@@ -229,7 +230,7 @@
 	font-weight: 500;
 }
 /* Soft grey hover (matches the rest of the site); no dark state layer on these chips. */
-.gear-engine-picker .intro-quick .chip:hover { background: #F4F7FA; }
+.gear-engine-picker .intro-quick .chip:hover { background: #F4F7FA; color: var(--md-sys-color-primary, #0C2340); }
 .gear-engine-picker .intro-quick .chip.sl:hover::after { opacity: 0; }
 @media (max-width: 600px) {
 	.gear-engine-picker .intro-title { font-size: 1.5rem; }
@@ -1036,7 +1037,7 @@
 	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
 	border-radius: var(--ge-r-full, 9999px);
 	background: #FFFFFF;
-	color: var(--md-sys-color-on-surface, #191C20);
+	color: var(--md-sys-color-on-surface, #191C20) !important;
 	font-family: var(--ge-font-family, var(--md-ref-typeface, inherit));
 	font-size: 15px;
 	font-weight: 500;
@@ -1049,10 +1050,21 @@
 	user-select: none;
 }
 
+.gear-engine-hub__chip:hover,
 .gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) {
-	border-color: transparent;
-	background: #F2F4F7;
+	border-color: var(--ge-hairline-strong, #E4E7EC);
+	background: #F2F4F7 !important;
+	color: var(--md-sys-color-on-surface, #191C20) !important;
 	box-shadow: none;
+}
+
+.gear-engine-hub__chip:hover .gear-engine-hub__chip-label,
+.gear-engine-hub__chip:hover span {
+	color: var(--md-sys-color-on-surface, #191C20) !important;
+}
+
+.gear-engine-hub__chip:hover .gear-engine-hub__chip-count {
+	color: var(--md-sys-color-on-surface-variant, #424751) !important;
 }
 
 .gear-engine-hub__chip--active,
@@ -1073,6 +1085,17 @@
 	box-shadow: none;
 }
 
+.gear-engine-hub__chip--active .gear-engine-hub__chip-label,
+.gear-engine-hub__chip--active:hover .gear-engine-hub__chip-label,
+.gear-engine-hub__chip--active span,
+.gear-engine-hub__chip--active:hover span,
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-label,
+.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-label,
+.gear-engine-hub__chip[aria-pressed="true"] span,
+.gear-engine-hub__chip[aria-pressed="true"]:hover span {
+	color: var(--ge-green-800, #005236) !important;
+}
+
 .gear-engine-hub__chip-count {
 	color: var(--md-sys-color-on-surface-variant, #424751);
 	font-size: 12px;
@@ -1083,8 +1106,10 @@
 }
 
 .gear-engine-hub__chip--active .gear-engine-hub__chip-count,
-.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-count {
-	color: var(--ge-green-800, #005236);
+.gear-engine-hub__chip--active:hover .gear-engine-hub__chip-count,
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-count,
+.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-count {
+	color: var(--ge-green-800, #005236) !important;
 	opacity: 0.75;
 }
 
@@ -1092,17 +1117,20 @@
 	display: none;
 	font-size: 18px;
 	line-height: 1;
-	color: var(--ge-green-800, #005236);
+	color: var(--ge-green-800, #005236) !important;
 }
 
 .gear-engine-hub__chip--active .gear-engine-hub__chip-check,
-.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check {
+.gear-engine-hub__chip--active:hover .gear-engine-hub__chip-check,
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check,
+.gear-engine-hub__chip[aria-pressed="true"]:hover .gear-engine-hub__chip-check {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	width: 18px;
 	margin-right: 2px;
 	opacity: 1;
+	color: var(--ge-green-800, #005236) !important;
 }
 
 [data-theme="dark"] .gear-engine-hub__chip {
