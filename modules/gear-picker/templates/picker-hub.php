@@ -35,14 +35,29 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 		</p>
 
 		<!-- Category Filter Chips -->
+		<?php
+		$counts = array( 'all' => count( $items ) );
+		foreach ( $items as $it ) {
+			$c = $it['category'] ?? '';
+			if ( $c ) {
+				$counts[ $c ] = ( $counts[ $c ] ?? 0 ) + 1;
+			}
+		}
+		?>
 		<div class="gear-engine-hub__chips" role="tablist" aria-label="<?php esc_attr_e( 'Filtrer etter treningskategori', 'gear-engine' ); ?>">
 			<?php foreach ( $categories as $cat_id => $cat ) : ?>
+				<?php
+				$is_active = ( $cat_id === $initial_category || ( '' === $initial_category && 'all' === $cat_id ) );
+				$count     = $counts[ $cat_id ] ?? 0;
+				?>
 				<button type="button"
-					class="gear-engine-hub__chip<?php echo $cat_id === $initial_category || ( '' === $initial_category && 'all' === $cat_id ) ? ' gear-engine-hub__chip--active' : ''; ?>"
+					class="gear-engine-hub__chip fp-chip<?php echo $is_active ? ' gear-engine-hub__chip--active' : ''; ?>"
 					data-category="<?php echo esc_attr( $cat_id ); ?>"
 					role="tab"
-					aria-pressed="<?php echo $cat_id === $initial_category || ( '' === $initial_category && 'all' === $cat_id ) ? 'true' : 'false'; ?>">
-					<span><?php echo esc_html( $cat['label'] ); ?></span>
+					aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
+					<span class="gear-engine-hub__chip-check chip-check material-symbols-outlined" aria-hidden="true">check</span>
+					<span class="gear-engine-hub__chip-label"><?php echo esc_html( $cat['label'] ); ?></span>
+					<span class="gear-engine-hub__chip-count chip-count"><?php echo esc_html( (string) $count ); ?></span>
 				</button>
 			<?php endforeach; ?>
 		</div>

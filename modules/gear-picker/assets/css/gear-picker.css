@@ -1031,32 +1031,102 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	height: 36px;
-	padding: 0 16px;
+	height: 40px;
+	padding: 0 20px;
+	border: 1px solid var(--ge-hairline-strong, #E4E7EC);
 	border-radius: var(--ge-r-full, 9999px);
-	border: 1px solid transparent;
-	background: var(--md-sys-color-surface-container-high, #F2F4F7);
-	color: var(--md-sys-color-primary, #0C2340);
-	font-family: inherit;
-	font-size: 13.5px;
+	background: #FFFFFF;
+	color: var(--md-sys-color-on-surface, #191C20);
+	font-family: var(--ge-font-family, var(--md-ref-typeface, inherit));
+	font-size: 15px;
 	font-weight: 500;
-	letter-spacing: -0.1px;
+	line-height: 20px;
+	letter-spacing: 0.1px;
 	cursor: pointer;
 	box-shadow: none;
-	transition: background-color 0.2s ease, color 0.2s ease;
+	white-space: nowrap;
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 	user-select: none;
 }
 
-.gear-engine-hub__chip:hover {
-	background: var(--ge-green-50, #EBF5F0);
+.gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) {
+	border-color: transparent;
+	background: #F2F4F7;
+	box-shadow: none;
+}
+
+.gear-engine-hub__chip--active,
+.gear-engine-hub__chip[aria-pressed="true"] {
+	padding: 0 18px 0 14px;
+	border-color: transparent !important;
+	background: var(--ge-green-100, #DCF5E8) !important;
+	color: var(--ge-green-800, #005236) !important;
+	font-weight: 600;
+	box-shadow: none;
+}
+
+.gear-engine-hub__chip--active:hover,
+.gear-engine-hub__chip[aria-pressed="true"]:hover {
+	border-color: transparent !important;
+	background: #D5F1E2 !important;
+	color: var(--ge-green-800, #005236) !important;
+	box-shadow: none;
+}
+
+.gear-engine-hub__chip-count {
+	color: var(--md-sys-color-on-surface-variant, #424751);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 16px;
+	margin-left: 4px;
+	transition: color 0.2s ease;
+}
+
+.gear-engine-hub__chip--active .gear-engine-hub__chip-count,
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-count {
+	color: var(--ge-green-800, #005236);
+	opacity: 0.75;
+}
+
+.gear-engine-hub__chip-check {
+	display: none;
+	font-size: 18px;
+	line-height: 1;
 	color: var(--ge-green-800, #005236);
 }
 
-.gear-engine-hub__chip--active {
-	background: var(--md-sys-color-primary, #0C2340) !important;
-	border-color: var(--md-sys-color-primary, #0C2340) !important;
-	color: #FFFFFF !important;
-	font-weight: 600;
+.gear-engine-hub__chip--active .gear-engine-hub__chip-check,
+.gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	margin-right: 2px;
+	opacity: 1;
+}
+
+[data-theme="dark"] .gear-engine-hub__chip {
+	background: var(--md-sys-color-surface-container-high, #1F2328);
+	border-color: var(--md-sys-color-outline-variant, #30363D);
+	color: var(--md-sys-color-on-surface, #E6EDF3);
+}
+
+[data-theme="dark"] .gear-engine-hub__chip:hover:not(.gear-engine-hub__chip--active):not([aria-pressed="true"]) {
+	background: #282E33;
+}
+
+[data-theme="dark"] .gear-engine-hub__chip--active,
+[data-theme="dark"] .gear-engine-hub__chip[aria-pressed="true"] {
+	background: var(--ge-green-100, rgba(0, 168, 107, 0.22)) !important;
+	color: var(--ge-green-500, #24B784) !important;
+	border-color: transparent !important;
+}
+
+[data-theme="dark"] .gear-engine-hub__chip--active .gear-engine-hub__chip-check,
+[data-theme="dark"] .gear-engine-hub__chip--active .gear-engine-hub__chip-count,
+[data-theme="dark"] .gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-check,
+[data-theme="dark"] .gear-engine-hub__chip[aria-pressed="true"] .gear-engine-hub__chip-count {
+	color: var(--ge-green-500, #24B784) !important;
 }
 
 .gear-engine-hub__chip-emoji {
