@@ -185,9 +185,19 @@ class Gear_Engine_Triage {
 	/**
 	 * Regions with display metadata, sorted by "order" then label. Invalid configs are skipped.
 	 *
-	 * @return array<int, array{region:string,label:string,summary:string,order:int,icon:string,url:string}>
+	 * @param bool|null $show_images Whether to resolve and attach image URLs. When null, uses the 'gear_engine_triage_show_images' filter (defaults to false for pure typography).
+	 * @return array<int, array{region:string,label:string,summary:string,order:int,icon:string,image_url:string,image_position:string,url:string}>
 	 */
-	public static function get_region_cards(): array {
+	public static function get_region_cards( ?bool $show_images = null ): array {
+		if ( null === $show_images ) {
+			/**
+			 * Filters whether region cards in the picker render images or pure minimal typography.
+			 *
+			 * @param bool $show Default false (pure typography).
+			 */
+			$show_images = (bool) apply_filters( 'gear_engine_triage_show_images', false );
+		}
+
 		$cards = array();
 		foreach ( self::get_regions() as $region ) {
 			$config = self::get_config( $region );
@@ -221,21 +231,23 @@ class Gear_Engine_Triage {
 
 			$page_id   = self::get_region_page_id( $region );
 			$image_url = '';
-			if ( ! empty( $config['image'] ) ) {
-				$img_val = (string) $config['image'];
-				if ( preg_match( '#^https?://#i', $img_val ) || 0 === strpos( $img_val, '//' ) ) {
-					$image_url = esc_url_raw( $img_val );
-				} else {
-					$rel = ltrim( $img_val, '/' );
-					if ( 0 !== strpos( $rel, 'modules/triage/' ) && 0 !== strpos( $rel, 'assets/' ) ) {
-						$rel = 'modules/triage/assets/images/' . $rel;
+			if ( $show_images ) {
+				if ( ! empty( $config['image'] ) ) {
+					$img_val = (string) $config['image'];
+					if ( preg_match( '#^https?://#i', $img_val ) || 0 === strpos( $img_val, '//' ) ) {
+						$image_url = esc_url_raw( $img_val );
+					} else {
+						$rel = ltrim( $img_val, '/' );
+						if ( 0 !== strpos( $rel, 'modules/triage/' ) && 0 !== strpos( $rel, 'assets/' ) ) {
+							$rel = 'modules/triage/assets/images/' . $rel;
+						}
+						$image_url = GEAR_ENGINE_URL . $rel;
 					}
-					$image_url = GEAR_ENGINE_URL . $rel;
-				}
-			} elseif ( $page_id && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $page_id ) && function_exists( 'get_the_post_thumbnail_url' ) ) {
-				$thumb = get_the_post_thumbnail_url( $page_id, 'medium_large' );
-				if ( $thumb ) {
-					$image_url = (string) $thumb;
+				} elseif ( $page_id && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $page_id ) && function_exists( 'get_the_post_thumbnail_url' ) ) {
+					$thumb = get_the_post_thumbnail_url( $page_id, 'medium_large' );
+					if ( $thumb ) {
+						$image_url = (string) $thumb;
+					}
 				}
 			}
 			$image_pos = 'center center';
@@ -707,10 +719,24 @@ class Gear_Engine_Triage {
 	/**
 	 * Render the region picker grid.
 	 *
+	 * @param array|string $atts Shortcode attributes.
 	 * @return string
 	 */
-	public function render_picker(): string {
-		$cards = self::get_region_cards();
+	public function render_picker( $atts = array() ): string {
+		$atts = shortcode_atts(
+			array(
+				'images' => '',
+			),
+			is_array( $atts ) ? $atts : array(),
+			self::PICKER_SHORTCODE_TAG
+		);
+
+		$show_images = null;
+		if ( '' !== $atts['images'] ) {
+			$show_images = filter_var( $atts['images'], FILTER_VALIDATE_BOOLEAN );
+		}
+
+		$cards = self::get_region_cards( $show_images );
 		if ( ! $cards ) {
 			return '';
 		}

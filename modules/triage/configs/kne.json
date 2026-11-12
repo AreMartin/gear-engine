@@ -1,7 +1,7 @@
 {
   "label": "Kne",
   "summary": "Kneskader, smerter foran i kneet og slitasje",
-  "order": 30,
+  "order": 50,
   "icon": "knee",
   "image": "knee.webp",
   "version": "0.1.0",

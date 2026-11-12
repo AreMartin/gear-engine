@@ -1,7 +1,7 @@
 {
   "label": "Hofte",
   "summary": "Smerter i lyske, utsiden av hoften og sete",
-  "order": 50,
+  "order": 40,
   "icon": "hip",
   "image": "hip.webp",
   "version": "0.1.0",
