@@ -726,7 +726,6 @@ class Gear_Engine_Gear_Picker {
 			$item['image'] = (string) apply_filters( 'gear_engine_picker_hub_item_image', $img_url, $slug, $item );
 		}
 		unset( $item );
-		);
 
 		return apply_filters(
 			'gear_engine_gear_picker_hub_data',
