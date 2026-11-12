@@ -1,0 +1,398 @@
+{
+	"id": "multigym",
+	"label": "Multigym",
+	"match": {
+		"include": [
+			"multigym",
+			"multi-gym",
+			"hjemmegym",
+			"treningsstasjon",
+			"kabeltrekk",
+			"cable crossover",
+			"kraftstasjon",
+			"smith-maskin",
+			"smithmaskin",
+			"home gym"
+		],
+		"include_category": [
+			"multigym",
+			"treningsstasjon",
+			"hjemmegym",
+			"styrkeapparater",
+			"styrke"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"treningssykkel",
+			"ellipsetrener",
+			"håndtak",
+			"kabel",
+			"triceps-tau",
+			"tau til",
+			"karabinkrok",
+			"matte",
+			"underlag"
+		],
+		"exclude_patterns": [
+			"/(kabel|vaier|wire|trinse|håndtak|tau|stang|grep|pute|sete)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 3000
+	},
+	"specs": {
+		"stack_weight": {
+			"type": "number",
+			"min": 20,
+			"max": 200,
+			"patterns": [
+				"/(?:vektmagasin|magasin|weight\\s*stack|vektblokk)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 18000,
+					"value": 90
+				},
+				{
+					"gt": 10000,
+					"value": 70
+				},
+				{
+					"value": 50
+				}
+			]
+		},
+		"user_weight": {
+			"type": "number",
+			"min": 60,
+			"max": 250,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|personvekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 15000,
+					"value": 150
+				},
+				{
+					"value": 120
+				}
+			]
+		},
+		"cable_pulley": {
+			"type": "flag",
+			"keywords": [
+				"nedtrekk",
+				"kabel",
+				"trinse",
+				"lat pull",
+				"roing",
+				"butterfly",
+				"cable",
+				"crossover"
+			],
+			"estimate": [
+				{
+					"gte": 5000,
+					"value": true
+				}
+			]
+		},
+		"leg_press": {
+			"type": "flag",
+			"keywords": [
+				"beinpress",
+				"benpress",
+				"leg press",
+				"leggpress"
+			]
+		},
+		"smith": {
+			"type": "flag",
+			"keywords": [
+				"smith",
+				"smith-maskin",
+				"smithmaskin",
+				"knebøy"
+			]
+		},
+		"compact": {
+			"type": "flag",
+			"keywords": [
+				"kompakt",
+				"plassbesparende",
+				"hjørne",
+				"wall-mounted",
+				"veggmontert"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "stack_weight",
+			"text": "Vektmagasin: {v} kg"
+		},
+		{
+			"field": "user_weight",
+			"text": "Maks brukervekt: {v} kg"
+		},
+		{
+			"field": "cable_pulley",
+			"text": "Kabel & Nedtrekk"
+		},
+		{
+			"field": "leg_press",
+			"text": "Beinpress"
+		},
+		{
+			"field": "smith",
+			"text": "Smith-stang"
+		},
+		{
+			"field": "compact",
+			"text": "Plassbesparende"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig multigym.",
+		"desc": "Svar på noen raske spørsmål om øvelser, vektmagasin og plass, så finner vi den beste treningsstasjonen for ditt hjemmegym.",
+		"benefits": [
+			"Matcher vektmagasin og øvelsesutvalg til ditt nivå",
+			"Tar hensyn til plassbehov og brukervekt",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "goal",
+			"type": "choice",
+			"title": "Hva er viktigst for deg med et multigym?",
+			"options": [
+				{
+					"val": "allround",
+					"title": "Allsidig kabel & nedtrekk",
+					"desc": "Klassisk multigym for bryst, rygg, skuldre og armer.",
+					"require": [
+						{
+							"field": "cable_pulley",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "heavy",
+					"title": "Tungt vektmagasin (80+ kg)",
+					"desc": "For deg som vil ha rikelig med motstand over tid.",
+					"require": [
+						{
+							"field": "stack_weight",
+							"op": "gte",
+							"value": 80
+						}
+					]
+				},
+				{
+					"val": "legpress",
+					"title": "Med beinpress-stasjon",
+					"desc": "Ønsker egen modul for tung og trygg beintrening.",
+					"require": [
+						{
+							"field": "leg_press",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alt",
+					"desc": "Vis de beste modellene uavhengig av funksjon."
+				}
+			]
+		},
+		{
+			"id": "space",
+			"type": "choice",
+			"title": "Hvor mye plass har du?",
+			"options": [
+				{
+					"val": "compact",
+					"title": "Begrenset plass / Hjørnemodell",
+					"desc": "Kompakt fotavtrykk som passer i mindre rom eller hjørner.",
+					"require": [
+						{
+							"field": "compact",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "God plass",
+					"desc": "Kan ha en fullverdig treningsstasjon."
+				}
+			]
+		},
+		{
+			"id": "w",
+			"type": "slider",
+			"title": "Hva er din omtrentlige vekt?",
+			"min": 50,
+			"max": 180,
+			"step": 5,
+			"default": 80,
+			"unit": "kg",
+			"rules": [
+				{
+					"field": "user_weight",
+					"op": "gte",
+					"ref": "w"
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 4000,
+			"max": 45000,
+			"step": 1000,
+			"default": 15000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		},
+		{
+			"field": "user_weight",
+			"op": "gte",
+			"ref": "w"
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "stack_weight",
+				"from": {
+					"value": 50
+				},
+				"per": 0.15,
+				"cap": 6
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for komplett og trygg styrketrening av hele kroppen hjemme.",
+		"best_offer": "Godt priskutt på en solid treningsstasjon akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "cable_pulley",
+					"op": "is",
+					"value": true
+				},
+				"text": "Kabeltrekk og trinser gir jevn motstand og stort utvalg av øvelser."
+			},
+			{
+				"when": {
+					"field": "leg_press",
+					"op": "is",
+					"value": true
+				},
+				"text": "Integrert beinpress gir skikkelig beintrening uten behov for fritt knebøystativ."
+			},
+			{
+				"when": {
+					"field": "smith",
+					"op": "is",
+					"value": true
+				},
+				"text": "Smith-stang gir trygg styring av løftebanen når du trener alene."
+			},
+			{
+				"when": {
+					"field": "compact",
+					"op": "is",
+					"value": true
+				},
+				"text": "Smart konstruksjon som utnytter gulvplassen effektivt."
+			}
+		],
+		"generic": [
+			"Alt-i-ett treningsstasjon som gjør det trygt og enkelt å trene hele kroppen alene.",
+			"Robust ramme bygget for stabilitet og jevne kabelbevegelser.",
+			"Svært god funksjonalitet per kvadratmeter hjemme."
+		]
+	},
+	"presets": [
+		{
+			"key": "compact",
+			"label": "Kompakt hjemmegym",
+			"icon": "shield",
+			"lead": "Plassbesparende treningsstasjon for god styrke i mindre rom.",
+			"badge": "Kompakt",
+			"answers": {
+				"goal": "allround",
+				"space": "compact",
+				"w": 80,
+				"b": 10000
+			}
+		},
+		{
+			"key": "allround",
+			"label": "Allsidig med kabel & nedtrekk",
+			"icon": "zap",
+			"lead": "Komplett stasjon med mange øvelser for overkropp og ben.",
+			"badge": "Mest populær",
+			"answers": {
+				"goal": "allround",
+				"space": "any",
+				"w": 85,
+				"b": 16000
+			}
+		},
+		{
+			"key": "pro",
+			"label": "Tung kraftstasjon (80+ kg)",
+			"icon": "flame",
+			"lead": "Stort vektmagasin og maksimal stabilitet for seriøs styrketrening.",
+			"badge": "Tung styrke",
+			"answers": {
+				"goal": "heavy",
+				"space": "any",
+				"w": 90,
+				"b": 30000
+			}
+		}
+	]
+}

@@ -1,0 +1,334 @@
+{
+	"id": "balanse",
+	"label": "Balanse og Stabilitet",
+	"match": {
+		"include": [
+			"balansebrett",
+			"balansepute",
+			"bosu",
+			"balanseball",
+			"vippebrett",
+			"stabilitetspute",
+			"balansetrener",
+			"balansebom",
+			"balansematte"
+		],
+		"include_category": [
+			"balanse",
+			"rehab",
+			"stabilitet",
+			"yoga",
+			"hjelpemidler"
+		],
+		"exclude": [
+			"reservedel",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"sykkel",
+			"balansesykkel",
+			"sparkesykkel",
+			"hoverboard"
+		],
+		"exclude_patterns": [
+			"/(pumpe|nål|trekk|veske|bag)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 149
+	},
+	"specs": {
+		"weight": {
+			"type": "number",
+			"min": 50,
+			"max": 300,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|tåler|belastning)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 1000,
+					"value": 150
+				},
+				{
+					"value": 120
+				}
+			]
+		},
+		"bosu": {
+			"type": "flag",
+			"keywords": [
+				"bosu",
+				"balanseball",
+				"halvball",
+				"dome",
+				"balance trainer"
+			]
+		},
+		"board": {
+			"type": "flag",
+			"keywords": [
+				"balansebrett",
+				"vippebrett",
+				"wobble",
+				"rocker",
+				"trebrett"
+			]
+		},
+		"pad": {
+			"type": "flag",
+			"keywords": [
+				"balansepute",
+				"stabilitetspute",
+				"skumpute",
+				"airex",
+				"balansematte",
+				"pute"
+			]
+		},
+		"nonslip": {
+			"type": "flag",
+			"keywords": [
+				"sklisikker",
+				"antiskli",
+				"anti-skli",
+				"tekstur",
+				"gummi",
+				"non-slip"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "bosu",
+			"text": "Halvball / BOSU"
+		},
+		{
+			"field": "board",
+			"text": "Balansebrett"
+		},
+		{
+			"field": "pad",
+			"text": "Balansepute"
+		},
+		{
+			"field": "nonslip",
+			"text": "Sklisikker overflate"
+		},
+		{
+			"field": "weight",
+			"text": "Maks belastning: {v} kg"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Rehab & Helse",
+		"title": "Finn riktig utstyr for balanse og stabilitet.",
+		"desc": "Svar på noen raske spørsmål om formål og vanskelighetsgrad, så finner vi riktig balansepute, brett eller halvball til best dagspris.",
+		"benefits": [
+			"Skiller mellom myke balanseputer, vippebrett og BOSU-baller",
+			"Tilpasset alt fra ankelopptrening til kjernestyrke",
+			"Viser beste dagspriser og tilgjengelige modeller"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "equipment_type",
+			"type": "choice",
+			"title": "Hva slags balanseutstyr ser du etter?",
+			"options": [
+				{
+					"val": "pad",
+					"title": "Balansepute / Skummatte",
+					"desc": "Myk og skånsom – perfekt for opptrening etter overtråkk, kneplager og fallforebygging.",
+					"require": [
+						{
+							"field": "pad",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "board",
+					"title": "Balansebrett / Vippebrett",
+					"desc": "Fast brett for aktiv ankelstabilitet, kjernemuskulatur og reaksjonsevne.",
+					"require": [
+						{
+							"field": "board",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "bosu",
+					"title": "Balanseball / BOSU (Halvball)",
+					"desc": "Svært allsidig til både balanse, knebøy, planke og rehabilitering.",
+					"require": [
+						{
+							"field": "bosu",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alle typer",
+					"desc": "Vis de beste alternativene uavhengig av type."
+				}
+			]
+		},
+		{
+			"id": "goal",
+			"type": "choice",
+			"title": "Hva er hovedmålet med treningen?",
+			"options": [
+				{
+					"val": "rehab",
+					"title": "Opptrening av ankel, kne eller fallforebygging",
+					"desc": "Fokus på trygg og kontrollert stabilisering."
+				},
+				{
+					"val": "core",
+					"title": "Kjernestyrke og generell stabilitet",
+					"desc": "Utfordrende øvelser for mage, rygg og hofter."
+				},
+				{
+					"val": "any",
+					"title": "Litt av begge deler",
+					"desc": "Allsidig bruk i hverdagen."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 200,
+			"max": 3500,
+			"step": 100,
+			"default": 1000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.25
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "weight",
+				"from": {
+					"value": 100
+				},
+				"per": 0.05,
+				"cap": 4
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for effektiv og trygg balansetrening hjemme.",
+		"best_offer": "Godt tilbud på populært balanseutstyr akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "pad",
+					"op": "is",
+					"value": true
+				},
+				"text": "Myk balansepute gir trygg og kontrollert trening for ankler og knær."
+			},
+			{
+				"when": {
+					"field": "board",
+					"op": "is",
+					"value": true
+				},
+				"text": "Balansebrett utfordrer leddsans og støttemuskulatur i 360 grader."
+			},
+			{
+				"when": {
+					"field": "bosu",
+					"op": "is",
+					"value": true
+				},
+				"text": "Halvballen kan brukes på begge sider for både styrke og balanse."
+			},
+			{
+				"when": {
+					"field": "nonslip",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sklisikker overflate gir tryggere fotfeste under trening."
+			}
+		],
+		"generic": [
+			"Enkelt og effektivt hjelpemiddel for å styrke dype støttemuskler.",
+			"Tar minimalt med plass og kan brukes foran TV-en eller på kontoret.",
+			"God holdbarhet og fin balanse mellom pris og kvalitet."
+		]
+	},
+	"presets": [
+		{
+			"key": "ankle_rehab",
+			"label": "Balansepute til ankel & kne",
+			"icon": "shield",
+			"lead": "Skånsom pute for opptrening etter overtråkk og fallforebygging.",
+			"badge": "Opptrening",
+			"answers": {
+				"equipment_type": "pad",
+				"goal": "rehab",
+				"b": 800
+			}
+		},
+		{
+			"key": "wobble",
+			"label": "Balansebrett for stabilitet",
+			"icon": "activity",
+			"lead": "Klassisk vippebrett for aktiv ankel- og kjernetrening.",
+			"badge": "Forebyggende",
+			"answers": {
+				"equipment_type": "board",
+				"goal": "rehab",
+				"b": 700
+			}
+		},
+		{
+			"key": "bosu",
+			"label": "Allsidig BOSU / Halvball",
+			"icon": "zap",
+			"lead": "Komplett balansetrener for hele kroppen og kjernemuskulatur.",
+			"badge": "Mest allsidig",
+			"answers": {
+				"equipment_type": "bosu",
+				"goal": "core",
+				"b": 2000
+			}
+		}
+	]
+}

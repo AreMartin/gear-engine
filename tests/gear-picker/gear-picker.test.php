@@ -231,8 +231,7 @@ t( 'hub: categories present', isset( $hub_data['categories']['kondisjon'], $hub_
 $hub_slugs = array_column( $hub_data['items'], 'slug' );
 t( 'hub: treadmill and romaskin in items', in_array( 'treadmill', $hub_slugs, true ) && in_array( 'romaskin', $hub_slugs, true ) && in_array( 'rehab-guide', $hub_slugs, true ) );
 $items_by_slug = array_column( $hub_data['items'], null, 'slug' );
-t( 'hub: bundled configs are available', true === $items_by_slug['treadmill']['available'] && true === $items_by_slug['romaskin']['available'] && true === $items_by_slug['ergometersykkel']['available'] && true === $items_by_slug['rehab-guide']['available'] );
-t( 'hub: future configs marked upcoming', false === $items_by_slug['ellipsetrener']['available'] && false === $items_by_slug['manualer']['available'] );
+t( 'hub: all 12 bundled configs are available', ! array_filter( $hub_data['items'], function ( $item ) { return true !== $item['available']; } ) );
 
 $picker_instance = new Gear_Engine_Gear_Picker();
 $hub_html_first  = $picker_instance->render_hub();

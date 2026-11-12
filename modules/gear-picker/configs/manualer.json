@@ -1,0 +1,376 @@
+{
+	"id": "manualer",
+	"label": "Justerbare Manualer",
+	"match": {
+		"include": [
+			"justerbare manualer",
+			"justerbar manual",
+			"manualsett",
+			"hantler",
+			"hantelsett",
+			"dumbbell",
+			"dumbbells",
+			"bowflex",
+			"powerblock",
+			"nuobell",
+			"manualer"
+		],
+		"include_category": [
+			"manualer",
+			"hantler",
+			"vekter",
+			"frivekter",
+			"styrke"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør"
+		],
+		"exclude_title": [
+			"stativ for manualer",
+			"manualstativ",
+			"rack for manualer",
+			"tredemølle",
+			"romaskin",
+			"sykkel",
+			"treningsbenk",
+			"kettlebell",
+			"vektstang",
+			"vektskive",
+			"strikker",
+			"matte"
+		],
+		"exclude_patterns": [
+			"/(stativ|rack|hylle|koffert|grep|lås)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 300
+	},
+	"specs": {
+		"max_weight": {
+			"type": "number",
+			"min": 2,
+			"max": 60,
+			"patterns": [
+				"/(?:opptil|maks|max|fra\\s*\\d+\\s*(?:til|-)\\s*)(\\d{1,2}(?:[.,]\\d+)?)\\s*kg/iu",
+				"/(?:vekt|justerbar)[^0-9]{0,20}?(\\d{1,2}(?:[.,]\\d+)?)\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 5000,
+					"value": 32
+				},
+				{
+					"gt": 2500,
+					"value": 24
+				},
+				{
+					"value": 15
+				}
+			]
+		},
+		"pair": {
+			"type": "flag",
+			"keywords": [
+				"par",
+				"2 stk",
+				"sett",
+				"2x",
+				"2 x",
+				"pair"
+			]
+		},
+		"quick_adjust": {
+			"type": "flag",
+			"keywords": [
+				"justerbar",
+				"hurtigjustering",
+				"vrihåndtak",
+				"dial",
+				"selecttech",
+				"nuobell",
+				"powerblock",
+				"klikk",
+				"spinlock"
+			]
+		},
+		"stand_included": {
+			"type": "flag",
+			"keywords": [
+				"med stativ",
+				"inkludert stativ",
+				"inkl. stativ",
+				"stativ følger med"
+			]
+		},
+		"compact": {
+			"type": "flag",
+			"keywords": [
+				"kompakt",
+				"plassbesparende",
+				"compact"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "max_weight",
+			"text": "Maks vekt: {v} kg"
+		},
+		{
+			"field": "pair",
+			"text": "Selges som par"
+		},
+		{
+			"field": "quick_adjust",
+			"text": "Hurtigjustering"
+		},
+		{
+			"field": "stand_included",
+			"text": "Inkl. stativ"
+		},
+		{
+			"field": "compact",
+			"text": "Kompakt design"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktige justerbare manualer.",
+		"desc": "Svar på noen raske spørsmål om styrkenivå og budsjett, så finner vi plassbesparende manualsett med best brukervennlighet og pris.",
+		"benefits": [
+			"Tilpasser maksvekt etter ditt treningsnivå",
+			"Skiller mellom enkle manualer og komplette par",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "level",
+			"type": "choice",
+			"title": "Hvor tunge vekter trenger du?",
+			"options": [
+				{
+					"val": "light",
+					"title": "Lett til moderat (opptil ca. 20 kg)",
+					"desc": "Passer fint til fitness, skuldre, armer og vedlikeholdstrening.",
+					"require": [
+						{
+							"field": "max_weight",
+							"op": "lte",
+							"value": 22
+						}
+					]
+				},
+				{
+					"val": "medium",
+					"title": "Allsidig styrke (20–26 kg)",
+					"desc": "Dekker de fleste øvelser for bryst, rygg og ben hjemme.",
+					"require": [
+						{
+							"field": "max_weight",
+							"op": "gte",
+							"value": 20
+						}
+					]
+				},
+				{
+					"val": "heavy",
+					"title": "Tung styrke (30+ kg)",
+					"desc": "For deg som løfter tungt i press- og roøvelser.",
+					"require": [
+						{
+							"field": "max_weight",
+							"op": "gte",
+							"value": 30
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alt",
+					"desc": "Vis de beste settene uavhengig av maksvekt."
+				}
+			]
+		},
+		{
+			"id": "adjust",
+			"type": "choice",
+			"title": "Hvordan vil du bytte vekt?",
+			"options": [
+				{
+					"val": "quick",
+					"title": "Rask hurtigjustering (vri/klikk)",
+					"desc": "Bytt vekt på sekunder mellom settene uten å skru.",
+					"require": [
+						{
+							"field": "quick_adjust",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Spiller ingen rolle",
+					"desc": "Både hurtigjustering og klassiske skrulåser fungerer."
+				}
+			]
+		},
+		{
+			"id": "set_type",
+			"type": "choice",
+			"title": "Ønsker du komplett par?",
+			"options": [
+				{
+					"val": "pair",
+					"title": "Ja, sett med 2 manualer",
+					"desc": "Komplett par for trening med begge armer samtidig.",
+					"require": [
+						{
+							"field": "pair",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Vis både enkle og par",
+					"desc": "Inkluder også enkeltmanualer i sammenligningen."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 500,
+			"max": 15000,
+			"step": 250,
+			"default": 4500,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "max_weight",
+				"from": {
+					"value": 15
+				},
+				"per": 0.4,
+				"cap": 6
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for komplett styrketrening på minimal gulvplass.",
+		"best_offer": "Svært god pris per kilo akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "quick_adjust",
+					"op": "is",
+					"value": true
+				},
+				"text": "Rask vektjustering lar deg skifte motstand på et par sekunder mellom øvelser."
+			},
+			{
+				"when": {
+					"field": "pair",
+					"op": "is",
+					"value": true
+				},
+				"text": "Leveres som komplett par så du er klar for både press- og roøvelser."
+			},
+			{
+				"when": {
+					"field": "stand_included",
+					"op": "is",
+					"value": true
+				},
+				"text": "Medfølgende stativ gir god arbeidshøyde og ryddig oppbevaring."
+			},
+			{
+				"when": {
+					"field": "compact",
+					"op": "is",
+					"value": true
+				},
+				"text": "Tar brøkdelen av plassen til et tradisjonelt manualstativ."
+			}
+		],
+		"generic": [
+			"Solid og plassbesparende løsning som erstatter et helt stativ med manualer.",
+			"Gir høy fleksibilitet for både isolasjonsøvelser og baseøvelser hjemme.",
+			"Et sterkt kjøp med god balanse mellom pris og vektkapasitet."
+		]
+	},
+	"presets": [
+		{
+			"key": "beginner",
+			"label": "Kompakt allround (opptil 20 kg)",
+			"icon": "shield",
+			"lead": "Smidige manualer for fitness, kjernemuskulatur og overkropp.",
+			"badge": "Kompakt",
+			"answers": {
+				"level": "light",
+				"adjust": "quick",
+				"set_type": "any",
+				"b": 3500
+			}
+		},
+		{
+			"key": "homegym",
+			"label": "Komplett hjemmegym (24+ kg)",
+			"icon": "zap",
+			"lead": "Par med hurtigjustering for komplett helkroppstrening.",
+			"badge": "Mest populær",
+			"answers": {
+				"level": "medium",
+				"adjust": "quick",
+				"set_type": "pair",
+				"b": 6500
+			}
+		},
+		{
+			"key": "heavy",
+			"label": "Tung styrke (32+ kg)",
+			"icon": "flame",
+			"lead": "Maksimal vektkapasitet for deg som vil løfte tungt hjemme.",
+			"badge": "Tung styrke",
+			"answers": {
+				"level": "heavy",
+				"adjust": "quick",
+				"set_type": "any",
+				"b": 10000
+			}
+		}
+	]
+}

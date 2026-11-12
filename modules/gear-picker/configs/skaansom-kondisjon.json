@@ -1,0 +1,387 @@
+{
+	"id": "skaansom-kondisjon",
+	"label": "Skånsom Kondisjon",
+	"match": {
+		"include": [
+			"sittesykkel",
+			"recumbent",
+			"lavt innsteg",
+			"ergometersykkel",
+			"ellipsetrener",
+			"gåbånd",
+			"walking pad",
+			"romaskin",
+			"pedaltrener",
+			"rehabiliteringssykkel"
+		],
+		"include_category": [
+			"treningssykkel",
+			"ergometersykkel",
+			"ellipsetrener",
+			"rehab",
+			"kondisjon",
+			"skånsom"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"spinningsykkel",
+			"boksesekk",
+			"knebøystativ",
+			"vektstang",
+			"manualer",
+			"matte",
+			"underlag",
+			"spray",
+			"pulsbelte"
+		],
+		"exclude_patterns": [
+			"/(sete|pedal|reim|rem|skjerm|adapter|lader)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 1000
+	},
+	"specs": {
+		"weight": {
+			"type": "number",
+			"min": 50,
+			"max": 250,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 10000,
+					"value": 135
+				},
+				{
+					"gt": 5000,
+					"value": 120
+				},
+				{
+					"value": 105
+				}
+			]
+		},
+		"low_step": {
+			"type": "flag",
+			"keywords": [
+				"lavt innsteg",
+				"lav innstigning",
+				"enkel påstigning",
+				"åpen ramme",
+				"step-through",
+				"gjennomsteg",
+				"sittesykkel",
+				"recumbent",
+				"pedaltrener",
+				"gåbånd"
+			]
+		},
+		"back_support": {
+			"type": "flag",
+			"keywords": [
+				"ryggstøtte",
+				"rygglene",
+				"sittesykkel",
+				"recumbent",
+				"liggesykkel"
+			]
+		},
+		"magnetic": {
+			"type": "flag",
+			"keywords": [
+				"magnetisk",
+				"magnetmotstand",
+				"elektromagnetisk",
+				"stillegående"
+			],
+			"estimate": [
+				{
+					"gte": 5000,
+					"value": true
+				}
+			]
+		},
+		"no_impact": {
+			"type": "flag",
+			"keywords": [
+				"ellipsetrener",
+				"crosstrainer",
+				"sittesykkel",
+				"recumbent",
+				"ergometersykkel",
+				"treningssykkel",
+				"romaskin",
+				"pedaltrener",
+				"skånsom"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "low_step",
+			"text": "Lavt innsteg"
+		},
+		{
+			"field": "back_support",
+			"text": "Med ryggstøtte"
+		},
+		{
+			"field": "weight",
+			"text": "Maks brukervekt: {v} kg"
+		},
+		{
+			"field": "magnetic",
+			"text": "Myk magnetmotstand"
+		},
+		{
+			"field": "no_impact",
+			"text": "Uten støtbelastning"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Rehab & Helse",
+		"title": "Finn riktig apparat for skånsom kondisjon.",
+		"desc": "Svar på noen raske spørsmål om sittestilling, innsteg og leddplager, så finner vi leddvennlige apparater med trygg og myk motstand.",
+		"benefits": [
+			"Fokuserer på lavt innsteg, ryggstøtte og null støt",
+			"Tilpasser stabilitet og brukervekt til dine behov",
+			"Viser beste dagspriser fra ledende butikker"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "posture",
+			"type": "choice",
+			"title": "Hvilken treningsstilling føles tryggest for deg?",
+			"options": [
+				{
+					"val": "back",
+					"title": "Sittende med ryggstøtte (Sittesykkel)",
+					"desc": "Maksimal støtte for korsrygg, hofter og balanse.",
+					"require": [
+						{
+							"field": "back_support",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "low_step",
+					"title": "Oppreist med lavt innsteg",
+					"desc": "Enkel påstigning uten å løfte benet høyt.",
+					"require": [
+						{
+							"field": "low_step",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "standing",
+					"title": "Helkropp uten støt (Ellipse / Romaskin)",
+					"desc": "Aktiverer både armer og ben med myke bevegelser.",
+					"require": [
+						{
+							"field": "no_impact",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alle skånsomme apparater",
+					"desc": "Vis de beste valgene uavhengig av stilling."
+				}
+			]
+		},
+		{
+			"id": "joint_focus",
+			"type": "choice",
+			"title": "Hva er hovedmålet med treningen?",
+			"options": [
+				{
+					"val": "knees",
+					"title": "Skåne knær og hofter (artrose / opptrening)",
+					"desc": "Jevn, sirkulær bevegelse uten støtbelastning.",
+					"require": [
+						{
+							"field": "no_impact",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "balance",
+					"title": "Trygghet og enkel av-/påstigning",
+					"desc": "Stabil ramme og lav terskel for å komme i gang.",
+					"require": [
+						{
+							"field": "low_step",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Generell hjerte- og lungetrim",
+					"desc": "God kondisjon med lav skaderisiko."
+				}
+			]
+		},
+		{
+			"id": "w",
+			"type": "slider",
+			"title": "Hva er din omtrentlige vekt?",
+			"min": 50,
+			"max": 180,
+			"step": 5,
+			"default": 80,
+			"unit": "kg",
+			"rules": [
+				{
+					"field": "weight",
+					"op": "gte",
+					"ref": "w"
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 1500,
+			"max": 25000,
+			"step": 500,
+			"default": 8000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		},
+		{
+			"field": "weight",
+			"op": "gte",
+			"ref": "w"
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "weight",
+				"from": {
+					"ref": "w"
+				},
+				"per": 0.1,
+				"cap": 4
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for trygg, leddvennlig og effektiv kondisjon hjemme.",
+		"best_offer": "Godt tilbud på et svært skånsomt treningsapparat akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "back_support",
+					"op": "is",
+					"value": true
+				},
+				"text": "Ergonomisk ryggstøtte avlaster korsryggen og gir trygg sittestilling."
+			},
+			{
+				"when": {
+					"field": "low_step",
+					"op": "is",
+					"value": true
+				},
+				"text": "Lavt innsteg gjør det trygt og enkelt å stige av og på apparatet."
+			},
+			{
+				"when": {
+					"field": "magnetic",
+					"op": "is",
+					"value": true
+				},
+				"text": "Magnetisk motstand sikrer en jevn, myk og stillegående bevegelse."
+			}
+		],
+		"generic": [
+			"Utviklet for skånsom sirkulasjon og kondisjon uten støt mot leddene.",
+			"Stabil og trygg modell som gjør det lett å trene regelmessig hjemme.",
+			"God ergonomi og brukervennlig betjening."
+		]
+	},
+	"presets": [
+		{
+			"key": "back_relief",
+			"label": "Sittesykkel med ryggstøtte",
+			"icon": "shield",
+			"lead": "Komfortabel sittestilling med maksimal støtte for rygg og hofter.",
+			"badge": "Leddskånsom",
+			"answers": {
+				"posture": "back",
+				"joint_focus": "knees",
+				"w": 80,
+				"b": 10000
+			}
+		},
+		{
+			"key": "easy_access",
+			"label": "Lavt innsteg",
+			"icon": "activity",
+			"lead": "Enkel påstigning og trygg stabilitet for opptrening og hverdagstrim.",
+			"badge": "Trygg start",
+			"answers": {
+				"posture": "low_step",
+				"joint_focus": "balance",
+				"w": 80,
+				"b": 8000
+			}
+		},
+		{
+			"key": "whole_body",
+			"label": "Støtfri helkropp",
+			"icon": "zap",
+			"lead": "Skånsom kondisjon som styrker hjerte og lunger uten leddsmerter.",
+			"badge": "Allsidig",
+			"answers": {
+				"posture": "standing",
+				"joint_focus": "knees",
+				"w": 80,
+				"b": 12000
+			}
+		}
+	]
+}

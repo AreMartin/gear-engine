@@ -1,0 +1,379 @@
+{
+	"id": "treningsbenk",
+	"label": "Treningsbenk",
+	"match": {
+		"include": [
+			"treningsbenk",
+			"vektbenk",
+			"skråbenk",
+			"flatbenk",
+			"benkpress",
+			"justerbar benk",
+			"ryggbenk",
+			"weight bench"
+		],
+		"include_category": [
+			"treningsbenk",
+			"vektbenk",
+			"benk",
+			"styrke"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"sykkel",
+			"knebøystativ",
+			"power rack",
+			"manualer",
+			"vektstang",
+			"vektskiver",
+			"hagebenk",
+			"entrebenk",
+			"sittebenk"
+		],
+		"exclude_patterns": [
+			"/(pute|trekk|feste|bencurl|leg\\s*extension|bicepspute)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 600
+	},
+	"specs": {
+		"max_load": {
+			"type": "number",
+			"min": 100,
+			"max": 600,
+			"patterns": [
+				"/(?:maks\\s*belastning|tåler|kapasitet|brukervekt|max\\s*load)[^0-9]{0,25}?(\\d{3})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 4000,
+					"value": 300
+				},
+				{
+					"gt": 2000,
+					"value": 250
+				},
+				{
+					"value": 180
+				}
+			]
+		},
+		"adjustable": {
+			"type": "flag",
+			"keywords": [
+				"justerbar",
+				"skråbenk",
+				"incline",
+				"decline",
+				"posisjoner",
+				"vinkel",
+				"regulerbar"
+			],
+			"estimate": [
+				{
+					"gte": 1500,
+					"value": true
+				}
+			]
+		},
+		"decline": {
+			"type": "flag",
+			"keywords": [
+				"decline",
+				"negativ",
+				"magebenk",
+				"sit-up",
+				"situps"
+			]
+		},
+		"foldable": {
+			"type": "flag",
+			"keywords": [
+				"sammenleggbar",
+				"foldbar",
+				"foldable"
+			]
+		},
+		"wheels": {
+			"type": "flag",
+			"keywords": [
+				"transporthjul",
+				"hjul"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "max_load",
+			"text": "Maks belastning: {v} kg"
+		},
+		{
+			"field": "adjustable",
+			"text": "Justerbar rygg/sete"
+		},
+		{
+			"field": "decline",
+			"text": "Negativ vinkel (Decline)"
+		},
+		{
+			"field": "foldable",
+			"text": "Sammenleggbar"
+		},
+		{
+			"field": "wheels",
+			"text": "Transporthjul"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig treningsbenk.",
+		"desc": "Svar på noen raske spørsmål om justeringsmuligheter, vektkapasitet og plass, så finner vi en stabil benk til best dagspris.",
+		"benefits": [
+			"Matcher belastningskapasitet til din vekt + vekter",
+			"Skiller mellom flatbenk, skråbenk og sammenleggbare benker",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "bench_type",
+			"type": "choice",
+			"title": "Hvilken type treningsbenk trenger du?",
+			"options": [
+				{
+					"val": "adjustable",
+					"title": "Justerbar skråbenk",
+					"desc": "Flest øvelser – kan brukes flatt, skrått (incline) og rett opp (skulderpress).",
+					"require": [
+						{
+							"field": "adjustable",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "decline",
+					"title": "Med negativ vinkel (Decline)",
+					"desc": "Ekstra mulighet for nedre bryst og sit-ups med benstøtte.",
+					"require": [
+						{
+							"field": "decline",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alt (inkl. flatbenk)",
+					"desc": "Vis både flate og justerbare benker."
+				}
+			]
+		},
+		{
+			"id": "load",
+			"type": "choice",
+			"title": "Hvor tungt skal du løfte på benken? (din vekt + vekter)",
+			"options": [
+				{
+					"val": "normal",
+					"title": "Lett til moderat (opptil 180 kg totalt)",
+					"desc": "Passer godt for vanlig manualtrening hjemme.",
+					"require": [
+						{
+							"field": "max_load",
+							"op": "gte",
+							"value": 150
+						}
+					]
+				},
+				{
+					"val": "heavy",
+					"title": "Tung trening (250+ kg kapasitet)",
+					"desc": "Ekstra bred ramme og høy stabilitet for tunge løft.",
+					"require": [
+						{
+							"field": "max_load",
+							"op": "gte",
+							"value": 250
+						}
+					]
+				},
+				{
+					"val": "pro",
+					"title": "Maksimal stabilitet (300+ kg)",
+					"desc": "Kommersiell klasse for seriøst hjemmegym.",
+					"require": [
+						{
+							"field": "max_load",
+							"op": "gte",
+							"value": 300
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "space",
+			"type": "choice",
+			"title": "Må benken kunne legges sammen?",
+			"options": [
+				{
+					"val": "foldable",
+					"title": "Ja, sammenleggbar",
+					"desc": "Kan skyves under sengen eller settes i skapet.",
+					"require": [
+						{
+							"field": "foldable",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Nei, den kan stå fremme",
+					"desc": "Fast konstruksjon uten hengsler gir ofte enda bedre stivhet."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 800,
+			"max": 10000,
+			"step": 200,
+			"default": 3000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "max_load",
+				"from": {
+					"value": 180
+				},
+				"per": 0.04,
+				"cap": 6
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for stabil og allsidig styrketrening hjemme.",
+		"best_offer": "Godt tilbud på en solid treningsbenk akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "adjustable",
+					"op": "is",
+					"value": true
+				},
+				"text": "Justerbar rygg og sete gir riktig vinkel for både skråbenk, flatbenk og skulderpress."
+			},
+			{
+				"when": {
+					"field": "decline",
+					"op": "is",
+					"value": true
+				},
+				"text": "Negativ vinkel gir ekstra muligheter for mageøvelser og nedre bryst."
+			},
+			{
+				"when": {
+					"field": "foldable",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sammenleggbar ramme sparer plass i stuen eller på soverommet."
+			},
+			{
+				"when": {
+					"field": "wheels",
+					"op": "is",
+					"value": true
+				},
+				"text": "Integrerte transporthjul gjør den enkel å flytte inn og ut av knebøystativet."
+			}
+		],
+		"generic": [
+			"Stødig konstruksjon med god polstring for komfortabel støtte under løft.",
+			"Et allsidig basisprodukt som passer perfekt sammen med manualer eller rack.",
+			"Svært god stabilitet og levetid i denne prisklassen."
+		]
+	},
+	"presets": [
+		{
+			"key": "compact",
+			"label": "Sammenleggbar benk til stuen",
+			"icon": "shield",
+			"lead": "Smidig og plassbesparende skråbenk for lett til moderat trening.",
+			"badge": "Kompakt",
+			"answers": {
+				"bench_type": "adjustable",
+				"load": "normal",
+				"space": "foldable",
+				"b": 2200
+			}
+		},
+		{
+			"key": "allround",
+			"label": "Justerbar allrounder",
+			"icon": "zap",
+			"lead": "Stabil skråbenk med høy vektkapasitet for de fleste hjemmegym.",
+			"badge": "Mest populær",
+			"answers": {
+				"bench_type": "adjustable",
+				"load": "heavy",
+				"space": "any",
+				"b": 3500
+			}
+		},
+		{
+			"key": "heavy",
+			"label": "Tung kraftbenk (300+ kg)",
+			"icon": "flame",
+			"lead": "Ekstremt stødig benk i proffklasse for tunge stangløft.",
+			"badge": "Tung styrke",
+			"answers": {
+				"bench_type": "adjustable",
+				"load": "pro",
+				"space": "any",
+				"b": 6000
+			}
+		}
+	]
+}

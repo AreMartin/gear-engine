@@ -1,0 +1,389 @@
+{
+	"id": "kneboystativ",
+	"label": "Knebøystativ og Rack",
+	"match": {
+		"include": [
+			"knebøystativ",
+			"squat rack",
+			"power rack",
+			"half rack",
+			"squat stand",
+			"vektstativ",
+			"stativ for vektstang",
+			"knebøy stativ",
+			"power cage"
+		],
+		"include_category": [
+			"knebøystativ",
+			"power rack",
+			"rack",
+			"stativ",
+			"styrke"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"sykkel",
+			"manualstativ",
+			"kettlebellstativ",
+			"skivestativ",
+			"vektskivestativ",
+			"j-hooks",
+			"sikkerhetsarmer",
+			"dip-bar",
+			"landmine"
+		],
+		"exclude_patterns": [
+			"/(j-hook|j-cup|sikkerhetsarm|dip|landmine|bolt|skrue|feste)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 1200
+	},
+	"specs": {
+		"max_load": {
+			"type": "number",
+			"min": 80,
+			"max": 1000,
+			"patterns": [
+				"/(?:maks\\s*belastning|tåler|kapasitet|max\\s*load|belastning)[^0-9]{0,25}?(\\d{3,4})\\s*kg/iu"
+			],
+			"estimate": [
+				{
+					"gt": 7000,
+					"value": 350
+				},
+				{
+					"gt": 3500,
+					"value": 250
+				},
+				{
+					"value": 150
+				}
+			]
+		},
+		"power_rack": {
+			"type": "flag",
+			"keywords": [
+				"power rack",
+				"full rack",
+				"bur",
+				"cage",
+				"4 stolper",
+				"fire stolper"
+			]
+		},
+		"pullup_bar": {
+			"type": "flag",
+			"keywords": [
+				"pull-up",
+				"pullup",
+				"chin-up",
+				"chins",
+				"kroppsheving",
+				"hangups",
+				"chinstang",
+				"pull up"
+			]
+		},
+		"spotter_arms": {
+			"type": "flag",
+			"keywords": [
+				"sikkerhetsarmer",
+				"spotter",
+				"sikkerhetsstang",
+				"safety",
+				"sikringsarmer"
+			]
+		},
+		"pulley": {
+			"type": "flag",
+			"keywords": [
+				"nedtrekk",
+				"kabel",
+				"trinse",
+				"lat",
+				"roing"
+			]
+		},
+		"foldable": {
+			"type": "flag",
+			"keywords": [
+				"sammenleggbar",
+				"veggmontert",
+				"foldbar",
+				"folding",
+				"wall-mount"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "max_load",
+			"text": "Maks belastning: {v} kg"
+		},
+		{
+			"field": "power_rack",
+			"text": "Power Rack / Bur"
+		},
+		{
+			"field": "pullup_bar",
+			"text": "Pull-up stang"
+		},
+		{
+			"field": "spotter_arms",
+			"text": "Sikkerhetsarmer"
+		},
+		{
+			"field": "pulley",
+			"text": "Med kabeltrekk"
+		},
+		{
+			"field": "foldable",
+			"text": "Veggmontert / Foldbar"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig knebøystativ & rack.",
+		"desc": "Svar på noen raske spørsmål om sikkerhet, belastning og plass, så finner vi det beste stativet for knebøy og benkpress hjemme.",
+		"benefits": [
+			"Skiller mellom kompakte stativ og lukkede Power Racks",
+			"Sjekker sikkerhetsarmer, pull-up stang og kabeltrekk",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "rack_type",
+			"type": "choice",
+			"title": "Hvilken type stativ passer best hos deg?",
+			"options": [
+				{
+					"val": "power",
+					"title": "Power Rack / Bur (4 stolper)",
+					"desc": "Maksimal sikkerhet når du trener tungt alene.",
+					"require": [
+						{
+							"field": "power_rack",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "foldable",
+					"title": "Veggmontert / Foldbart rack",
+					"desc": "Felles inn mot veggen når det ikke er i bruk – ideelt for garasje.",
+					"require": [
+						{
+							"field": "foldable",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for alle typer (inkl. Half Rack / Stativ)",
+					"desc": "Vis de beste stativene uavhengig av konstruksjon."
+				}
+			]
+		},
+		{
+			"id": "features",
+			"type": "choice",
+			"title": "Hvilke tilleggsfunksjoner ønsker du?",
+			"options": [
+				{
+					"val": "pullup",
+					"title": "Integrert pull-up stang",
+					"desc": "For kroppshevinger, chins og hengende mageøvelser.",
+					"require": [
+						{
+							"field": "pullup_bar",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "pulley",
+					"title": "Med kabeltrekk / nedtrekk",
+					"desc": "Kombiner frie vekter med kabeløvelser for rygg og armer.",
+					"require": [
+						{
+							"field": "pulley",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Standard stativ holder",
+					"desc": "Fokus på rent knebøy- og benkpressstativ."
+				}
+			]
+		},
+		{
+			"id": "safety",
+			"type": "choice",
+			"title": "Trener du alene uten spotter?",
+			"options": [
+				{
+					"val": "yes",
+					"title": "Ja, vil ha sikkerhetsarmer inkludert",
+					"desc": "Sikkerhetsstenger fanger stangen om du ikke klarer siste repetisjon.",
+					"require": [
+						{
+							"field": "spotter_arms",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Ikke et krav",
+					"desc": "Vis også modeller uten sikkerhetsarmer."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 1500,
+			"max": 25000,
+			"step": 500,
+			"default": 7000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "max_load",
+				"from": {
+					"value": 150
+				},
+				"per": 0.03,
+				"cap": 6
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for trygg og solid trening i baseøvelser hjemme.",
+		"best_offer": "Svært godt tilbud på et robust stativ akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "power_rack",
+					"op": "is",
+					"value": true
+				},
+				"text": "Fullt Power Rack gir trygg ramme rundt deg for tunge knebøy og benkpress alene."
+			},
+			{
+				"when": {
+					"field": "spotter_arms",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sikkerhetsarmer lar deg presse deg trygt uten treningspartner."
+			},
+			{
+				"when": {
+					"field": "pullup_bar",
+					"op": "is",
+					"value": true
+				},
+				"text": "Innebygget pull-up stang utvider øvelsesutvalget betraktelig."
+			},
+			{
+				"when": {
+					"field": "pulley",
+					"op": "is",
+					"value": true
+				},
+				"text": "Kabeltrekk gir mulighet for nedtrekk, roing og tricepspress i samme stativ."
+			}
+		],
+		"generic": [
+			"Solid stålkonstruksjon bygget for å tåle mange års tung bruk.",
+			"Fleksible høydejusteringer som passer til både knebøy, skulderpress og benkpress.",
+			"Et sterkt valg som gir trygg progresjon i hjemmegymmet."
+		]
+	},
+	"presets": [
+		{
+			"key": "home",
+			"label": "Sikkert hjemmerack med spotter",
+			"icon": "shield",
+			"lead": "Trygt stativ med sikkerhetsarmer for trening alene.",
+			"badge": "Trygg trening",
+			"answers": {
+				"rack_type": "any",
+				"features": "pullup",
+				"safety": "yes",
+				"b": 7000
+			}
+		},
+		{
+			"key": "compact",
+			"label": "Plassbesparende stativ",
+			"icon": "zap",
+			"lead": "Smidig og kompakt løsning for garasje eller gjesterom.",
+			"badge": "Plassbesparende",
+			"answers": {
+				"rack_type": "foldable",
+				"features": "any",
+				"safety": "any",
+				"b": 6000
+			}
+		},
+		{
+			"key": "heavy",
+			"label": "Power Rack for tung styrke",
+			"icon": "flame",
+			"lead": "Kraftig bur med høy vektkapasitet og pull-up stang.",
+			"badge": "Tung styrke",
+			"answers": {
+				"rack_type": "power",
+				"features": "pullup",
+				"safety": "any",
+				"b": 12000
+			}
+		}
+	]
+}

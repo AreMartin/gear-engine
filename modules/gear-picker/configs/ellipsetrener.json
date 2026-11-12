@@ -1,0 +1,514 @@
+{
+	"id": "ellipsetrener",
+	"label": "Ellipsetrener",
+	"match": {
+		"include": [
+			"ellipsetrener",
+			"crosstrainer",
+			"cross trainer",
+			"elliptical",
+			"elipsetrener"
+		],
+		"include_category": [
+			"ellipsetrener",
+			"crosstrainer",
+			"kondisjon"
+		],
+		"exclude": [
+			"reservedel",
+			"vedlikehold",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"spinningsykkel",
+			"ergometersykkel",
+			"treningssykkel",
+			"matte",
+			"underlag",
+			"beskyttelse",
+			"spray",
+			"smøre",
+			"silikon",
+			"pulsbelte",
+			"pedal",
+			"reim"
+		],
+		"exclude_patterns": [
+			"/(pedal|reim|rem|skjerm|display|adapter|strømforsyning|deksel)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 2000
+	},
+	"specs": {
+		"weight": {
+			"type": "number",
+			"min": 50,
+			"max": 250,
+			"patterns": [
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt|tåler)[^0-9]{0,25}?(\\d{2,3})\\s*kg/iu",
+				"/(?:brukervekt|maks\\s*vekt|personvekt|maksimal\\s*vekt)[^0-9]{0,25}?(\\d{2,3})/iu"
+			],
+			"estimate": [
+				{
+					"gt": 12000,
+					"value": 150
+				},
+				{
+					"gt": 7000,
+					"value": 130
+				},
+				{
+					"value": 110
+				}
+			]
+		},
+		"stride": {
+			"type": "number",
+			"min": 25,
+			"max": 60,
+			"patterns": [
+				"/(?:steglengde|stride|skrittlengde)[^0-9]{0,25}?(\\d{2}(?:[.,]\\d+)?)\\s*cm/iu",
+				"/(?:steglengde|stride|skrittlengde)[^0-9]{0,25}?(\\d{2}(?:[.,]\\d+)?)/iu"
+			],
+			"estimate": [
+				{
+					"gt": 14000,
+					"value": 50
+				},
+				{
+					"gt": 8000,
+					"value": 40
+				},
+				{
+					"value": 33
+				}
+			]
+		},
+		"flywheel": {
+			"type": "number",
+			"min": 2,
+			"max": 35,
+			"patterns": [
+				"/(?:svinghjul|flywheel|svingvekt)[^0-9]{0,25}?(\\d{1,2}(?:[.,]\\d+)?)\\s*kg/iu",
+				"/(?:svinghjul|flywheel)[^0-9]{0,25}?(\\d{1,2}(?:[.,]\\d+)?)/iu"
+			],
+			"estimate": [
+				{
+					"gt": 14000,
+					"value": 14
+				},
+				{
+					"gt": 8000,
+					"value": 9
+				},
+				{
+					"value": 6
+				}
+			]
+		},
+		"front_drive": {
+			"type": "flag",
+			"keywords": [
+				"forhjulsdrevet",
+				"frontdrevet",
+				"front-drive",
+				"front drive",
+				"foran"
+			]
+		},
+		"magnetic": {
+			"type": "flag",
+			"keywords": [
+				"magnetisk",
+				"magnetmotstand",
+				"elektromagnetisk",
+				"induksjon",
+				"magnet"
+			],
+			"estimate": [
+				{
+					"gte": 6000,
+					"value": true
+				}
+			]
+		},
+		"incline": {
+			"type": "flag",
+			"keywords": [
+				"stigning",
+				"incline",
+				"helling",
+				"motorisert stigning"
+			],
+			"estimate": [
+				{
+					"gte": 13000,
+					"value": true
+				}
+			]
+		},
+		"foldable": {
+			"type": "flag",
+			"keywords": [
+				"sammenleggbar",
+				"foldbar",
+				"foldable"
+			]
+		},
+		"app": {
+			"type": "flag",
+			"keywords": [
+				"bluetooth",
+				"kinomap",
+				"zwift",
+				"ifit",
+				"blåtann",
+				" app"
+			],
+			"estimate": [
+				{
+					"gte": 10000,
+					"value": true
+				}
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "stride",
+			"text": "Steglengde: {v} cm"
+		},
+		{
+			"field": "flywheel",
+			"text": "Svinghjul: {v} kg"
+		},
+		{
+			"field": "weight",
+			"text": "Maks brukervekt: {v} kg"
+		},
+		{
+			"field": "front_drive",
+			"text": "Forhjulsdrevet"
+		},
+		{
+			"field": "magnetic",
+			"text": "Magnetisk motstand"
+		},
+		{
+			"field": "incline",
+			"text": "Justerbar stigning"
+		},
+		{
+			"field": "foldable",
+			"text": "Sammenleggbar"
+		},
+		{
+			"field": "app",
+			"text": "App / Bluetooth"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Kjøpsguide",
+		"title": "Finn riktig ellipsetrener.",
+		"desc": "Svar på noen raske spørsmål. Vi finner riktig steglengde, svinghjul og stabilitet tilpasset din kropp og beste dagspris.",
+		"benefits": [
+			"Tilpasser steglengde og svinghjul til din treningsmengde",
+			"Skiller mellom kompakte modeller og forhjulsdrevne apparater",
+			"Finner de beste tilbudene og laveste dagspriser"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "use",
+			"type": "choice",
+			"title": "Hvor mye og intenst planlegger du å trene?",
+			"options": [
+				{
+					"val": "gentle",
+					"title": "Rolig mosjon & opptrening (1–2 økter/uke)",
+					"desc": "Skånsom helkroppsbevegelse uten støt mot knær og hofter."
+				},
+				{
+					"val": "active",
+					"title": "Regelmessig trening (3–4 økter/uke)",
+					"desc": "God steglengde og jevn tråkkfølelse for effektiv kondisjon.",
+					"require": [
+						{
+							"field": "stride",
+							"op": "gte",
+							"value": 38
+						},
+						{
+							"field": "flywheel",
+							"op": "gte",
+							"value": 7
+						}
+					]
+				},
+				{
+					"val": "heavy",
+					"title": "Mye og hard trening (4+ økter/uke)",
+					"desc": "Lang steglengde og tungt svinghjul for stabilitet i høyt tempo.",
+					"require": [
+						{
+							"field": "stride",
+							"op": "gte",
+							"value": 45
+						},
+						{
+							"field": "flywheel",
+							"op": "gte",
+							"value": 10
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "drive",
+			"type": "choice",
+			"title": "Foretrekker du forhjulsdrevet ellipsetrener?",
+			"options": [
+				{
+					"val": "front",
+					"title": "Ja, forhjulsdrevet",
+					"desc": "Gir flatere, mer naturlig løpesteg og smalere avstand mellom pedalene.",
+					"require": [
+						{
+							"field": "front_drive",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Spiller ingen rolle",
+					"desc": "Både bakhjulsdrevet (kompakt) og forhjulsdrevet fungerer fint."
+				}
+			]
+		},
+		{
+			"id": "space",
+			"type": "choice",
+			"title": "Trenger du å kunne legge den sammen?",
+			"options": [
+				{
+					"val": "foldable",
+					"title": "Ja, helst sammenleggbar",
+					"desc": "Enklere å sette bort etter trening i mindre rom.",
+					"require": [
+						{
+							"field": "foldable",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Nei, den kan stå fremme",
+					"desc": "Fast ramme gir ofte best stabilitet."
+				}
+			]
+		},
+		{
+			"id": "tech",
+			"type": "choice",
+			"title": "Ønsker du app-tilkobling?",
+			"options": [
+				{
+					"val": "app",
+					"title": "Bluetooth / App-støtte",
+					"desc": "Koble til Kinomap, Zwift eller treningsapper.",
+					"require": [
+						{
+							"field": "app",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "none",
+					"title": "Standard treningscomputer",
+					"desc": "Grunnleggende visning av tid, distanse, puls og watt holder."
+				}
+			]
+		},
+		{
+			"id": "w",
+			"type": "slider",
+			"title": "Hva er din omtrentlige vekt?",
+			"min": 50,
+			"max": 180,
+			"step": 5,
+			"default": 80,
+			"unit": "kg",
+			"rules": [
+				{
+					"field": "weight",
+					"op": "gte",
+					"ref": "w"
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 2500,
+			"max": 35000,
+			"step": 500,
+			"default": 10000,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.2
+		},
+		{
+			"field": "weight",
+			"op": "gte",
+			"ref": "w"
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [
+			{
+				"field": "weight",
+				"from": {
+					"ref": "w"
+				},
+				"per": 0.1,
+				"cap": 4
+			},
+			{
+				"field": "stride",
+				"from": {
+					"value": 38
+				},
+				"per": 0.4,
+				"cap": 5
+			}
+		],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling basert på dine kriterier. God kombinasjon av steglengde, stabilitet og pris.",
+		"best_offer": "Godt tilbud akkurat nå innenfor ditt budsjett.",
+		"pool": [
+			{
+				"when": {
+					"field": "front_drive",
+					"op": "is",
+					"value": true
+				},
+				"text": "Forhjulsdrevet konstruksjon gir et flatt og ergonomisk steg som skåner knærne."
+			},
+			{
+				"when": {
+					"field": "magnetic",
+					"op": "is",
+					"value": true
+				},
+				"text": "Stillegående magnetisk motstand som egner seg godt til hjemmebruk."
+			},
+			{
+				"when": {
+					"field": "incline",
+					"op": "is",
+					"value": true
+				},
+				"text": "Justerbar stigning gir ekstra variasjon og aktivering av sete- og lårmuskulatur."
+			},
+			{
+				"when": {
+					"field": "foldable",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sammenleggbar ramme sparer gulvplass når apparatet ikke er i bruk."
+			},
+			{
+				"when": {
+					"field": "app",
+					"op": "is",
+					"value": true
+				},
+				"text": "Bluetooth-støtte gjør det enkelt å logge økter og trene med virtuelle løyper."
+			}
+		],
+		"generic": [
+			"Et driftssikkert og solid valg for effektiv helkroppstrening hjemme.",
+			"Gir svært god verdi for pengene i denne prisklassen.",
+			"Stabil konstruksjon med gode muligheter for progresjon."
+		]
+	},
+	"presets": [
+		{
+			"key": "gentle",
+			"label": "Skånsom hjemmemosjon",
+			"icon": "shield",
+			"lead": "Stillegående og leddvennlig modell for jevn hverdagsaktivitet.",
+			"badge": "Skånsom",
+			"answers": {
+				"use": "gentle",
+				"drive": "any",
+				"space": "any",
+				"w": 80,
+				"b": 8000
+			}
+		},
+		{
+			"key": "popular",
+			"label": "Mest populære allrounder",
+			"icon": "zap",
+			"lead": "God steglengde og stabilitet for 3–4 ukentlige kondisjonsøkter.",
+			"badge": "Mest populær",
+			"answers": {
+				"use": "active",
+				"drive": "any",
+				"space": "any",
+				"w": 80,
+				"b": 12000
+			}
+		},
+		{
+			"key": "performance",
+			"label": "Lang steglengde & trening",
+			"icon": "flame",
+			"lead": "Forhjulsdrevet kraftplugg bygget for høy intensitet og lang levetid.",
+			"badge": "Proff",
+			"answers": {
+				"use": "heavy",
+				"drive": "front",
+				"space": "any",
+				"w": 85,
+				"b": 20000
+			}
+		}
+	]
+}

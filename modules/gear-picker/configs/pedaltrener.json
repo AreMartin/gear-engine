@@ -1,0 +1,332 @@
+{
+	"id": "pedaltrener",
+	"label": "Pedaltrener",
+	"match": {
+		"include": [
+			"pedaltrener",
+			"sirkulasjonstrener",
+			"minisykkel",
+			"mini-sykkel",
+			"mini sykkel",
+			"stolsykkel",
+			"seniorsykkel",
+			"arm- og bentrener",
+			"pedaltrainer",
+			"desk cycle"
+		],
+		"include_category": [
+			"pedaltrener",
+			"sirkulasjonstrener",
+			"rehab",
+			"hjelpemidler",
+			"treningssykkel"
+		],
+		"exclude": [
+			"reservedel",
+			"tilbehør",
+			"manual"
+		],
+		"exclude_title": [
+			"tredemølle",
+			"romaskin",
+			"spinningsykkel",
+			"ellipsetrener",
+			"fotpedal til",
+			"sykkelpedal"
+		],
+		"exclude_patterns": [
+			"/(pedal|reim|stropp|matte|adapter|batteri)\\s+(til|for)\\b/iu"
+		],
+		"min_price": 299
+	},
+	"specs": {
+		"electric": {
+			"type": "flag",
+			"keywords": [
+				"elektrisk",
+				"motorisert",
+				"motor",
+				"strøm",
+				"fjernkontroll"
+			]
+		},
+		"magnetic": {
+			"type": "flag",
+			"keywords": [
+				"magnetisk",
+				"magnetmotstand",
+				"stillegående",
+				"lydløs"
+			]
+		},
+		"display": {
+			"type": "flag",
+			"keywords": [
+				"display",
+				"skjerm",
+				"lcd",
+				"teller",
+				"kalorier",
+				"tid",
+				"distanse"
+			],
+			"estimate": [
+				{
+					"gte": 500,
+					"value": true
+				}
+			]
+		},
+		"foldable": {
+			"type": "flag",
+			"keywords": [
+				"sammenleggbar",
+				"foldbar",
+				"kompakt"
+			]
+		},
+		"arms_legs": {
+			"type": "flag",
+			"keywords": [
+				"armer og ben",
+				"arm og ben",
+				"hender og føtter",
+				"bord",
+				"armtrening"
+			]
+		}
+	},
+	"pills": [
+		{
+			"field": "electric",
+			"text": "Motorisert / Elektrisk"
+		},
+		{
+			"field": "magnetic",
+			"text": "Magnetisk & Stillegående"
+		},
+		{
+			"field": "display",
+			"text": "Med LCD-display"
+		},
+		{
+			"field": "foldable",
+			"text": "Sammenleggbar"
+		},
+		{
+			"field": "arms_legs",
+			"text": "For både armer & ben"
+		}
+	],
+	"limit": 4,
+	"intro": {
+		"eyebrow": "Rehab & Helse",
+		"title": "Finn riktig pedaltrener.",
+		"desc": "Svar på noen raske spørsmål om bruk og motstand, så finner vi en stabil og skånsom pedaltrener for stol, sofa eller hjemmekontor.",
+		"benefits": [
+			"Skiller mellom manuelle, magnetiske og motoriserte modeller",
+			"Fokus på skånsom sirkulasjon uten fallrisiko",
+			"Viser beste dagspriser fra ledende butikker"
+		],
+		"start": "Start veiledning"
+	},
+	"steps": [
+		{
+			"id": "drive_type",
+			"type": "choice",
+			"title": "Foretrekker du manuell eller motorisert pedaltrener?",
+			"options": [
+				{
+					"val": "manual",
+					"title": "Manuell motstand (du tråkker selv)",
+					"desc": "Enkel, lett og rimelig – justerbar motstand med skrue eller magnet."
+				},
+				{
+					"val": "electric",
+					"title": "Elektrisk / Motorisert",
+					"desc": "Motoren hjelper bena rundt – supert ved svært stive ledd eller opptrening.",
+					"require": [
+						{
+							"field": "electric",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Åpen for begge",
+					"desc": "Vis både manuelle og elektriske modeller."
+				}
+			]
+		},
+		{
+			"id": "usage",
+			"type": "choice",
+			"title": "Hva skal du bruke pedaltreneren til?",
+			"options": [
+				{
+					"val": "both",
+					"title": "Både armer og ben",
+					"desc": "Kan settes på gulvet for bena eller på et bord for skånsom armtrening.",
+					"require": [
+						{
+							"field": "arms_legs",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Først og fremst for bena (stol / kontorpult)",
+					"desc": "Øke blodsirkulasjonen og holde leddene i gang mens du sitter."
+				}
+			]
+		},
+		{
+			"id": "storage",
+			"type": "choice",
+			"title": "Er det viktig at den er enkel å legge bort?",
+			"options": [
+				{
+					"val": "foldable",
+					"title": "Ja, sammenleggbar eller ekstra kompakt",
+					"desc": "Lett å skyve under sofaen eller sette i et skap.",
+					"require": [
+						{
+							"field": "foldable",
+							"op": "is",
+							"value": true
+						}
+					]
+				},
+				{
+					"val": "any",
+					"title": "Ikke viktig",
+					"desc": "Kan stå fremme ved favorittstolen."
+				}
+			]
+		},
+		{
+			"id": "b",
+			"type": "slider",
+			"title": "Maks budsjett?",
+			"min": 400,
+			"max": 5000,
+			"step": 100,
+			"default": 1500,
+			"unit": "kr",
+			"format": true,
+			"rules": [
+				{
+					"field": "price",
+					"op": "lte",
+					"ref": "b"
+				}
+			]
+		}
+	],
+	"fallback": [
+		{
+			"field": "price",
+			"op": "lte",
+			"ref": "b",
+			"mul": 1.25
+		}
+	],
+	"scoring": {
+		"base": 80,
+		"fallback_score": 70,
+		"price_margin": {
+			"ref": "b",
+			"factor": 10
+		},
+		"margins": [],
+		"min_offer_discount": 5
+	},
+	"notes": {
+		"best_match": "Vår toppanbefaling for enkel og skånsom sirkulasjonstrening sittende.",
+		"best_offer": "Svært god pris på en populær pedaltrener akkurat nå.",
+		"pool": [
+			{
+				"when": {
+					"field": "electric",
+					"op": "is",
+					"value": true
+				},
+				"text": "Motorisert drift gir skånsom og passiv bevegelse for stive ledd."
+			},
+			{
+				"when": {
+					"field": "magnetic",
+					"op": "is",
+					"value": true
+				},
+				"text": "Magnetisk motstand gir svært jevnt og stillegående tråkk foran TV eller pult."
+			},
+			{
+				"when": {
+					"field": "display",
+					"op": "is",
+					"value": true
+				},
+				"text": "Oversiktlig display holder styr på tid, omdreininger og kalorier."
+			},
+			{
+				"when": {
+					"field": "foldable",
+					"op": "is",
+					"value": true
+				},
+				"text": "Sammenleggbar ramme gjør den superenkel å oppbevare når den ikke er i bruk."
+			}
+		],
+		"generic": [
+			"Kompakt og trygg måte å få daglig bevegelse på rett fra godstolen.",
+			"Sklisikre føtter og justerbare pedalstropper gir stabil bruk.",
+			"Et prisgunstig og effektivt hjelpemiddel for bedre blodsirkulasjon."
+		]
+	},
+	"presets": [
+		{
+			"key": "simple",
+			"label": "Enkel & kompakt pedaltrener",
+			"icon": "shield",
+			"lead": "Lett og sammenleggbar modell for daglig sirkulasjon i stuen.",
+			"badge": "Kompakt",
+			"answers": {
+				"drive_type": "manual",
+				"usage": "any",
+				"storage": "foldable",
+				"b": 1000
+			}
+		},
+		{
+			"key": "quiet",
+			"label": "Stillegående under skrivebordet",
+			"icon": "activity",
+			"lead": "Jevn og stillegående tråkkfølelse for hjemmekontor og sofa.",
+			"badge": "Mest populær",
+			"answers": {
+				"drive_type": "manual",
+				"usage": "any",
+				"storage": "any",
+				"b": 2000
+			}
+		},
+		{
+			"key": "electric",
+			"label": "Motorisert for opptrening",
+			"icon": "zap",
+			"lead": "Elektrisk hjelp til bevegelse for deg som trenger ekstra skånsom start.",
+			"badge": "Motorisert",
+			"answers": {
+				"drive_type": "electric",
+				"usage": "both",
+				"storage": "any",
+				"b": 3500
+			}
+		}
+	]
+}
