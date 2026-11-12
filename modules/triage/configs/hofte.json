@@ -3,6 +3,7 @@
   "summary": "Smerter i lyske, utsiden av hoften og sete",
   "order": 50,
   "icon": "hip",
+  "image": "hip.webp",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
   "title": "Symptomsjekk: Hofte",

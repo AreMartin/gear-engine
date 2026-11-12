@@ -498,7 +498,7 @@
 }
 .gear-engine-triage-picker .tile-img-box {
 	width: 100%;
-	aspect-ratio: 1.15 / 1;
+	aspect-ratio: 1 / 1;
 	border-radius: 20px;
 	background: var(--md-sys-color-surface-container-high, #F2F4F7);
 	overflow: hidden;

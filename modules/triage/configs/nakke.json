@@ -3,6 +3,7 @@
   "summary": "Nakkesmerter, nakkelås og utstråling til armen",
   "order": 60,
   "icon": "neck",
+  "image": "neck.webp",
   "version": "0.1.0",
   "reviewStatus": "draft-unreviewed",
   "title": "Symptomsjekk: Nakke",

@@ -3,6 +3,7 @@
   "summary": "Korsryggsmerter, isjias og hekseskudd",
   "order": 10,
   "icon": "back",
+  "image": "back.webp",
   "version": "1.0.0",
   "title": "Symptomsjekk: Rygg",
   "description": "Korsryggsmerter er svært vanlig. Svar på spørsmålene under for å kartlegge om det er snakk om klassisk kink, isjias, eller noe som krever videre sjekk.",
