@@ -57,61 +57,42 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 				? esc_url( add_query_arg( 'type', $item['slug'] ) )
 				: '#';
 			?>
-			<div class="gear-engine-hub__card<?php echo ! $is_available ? ' gear-engine-hub__card--upcoming' : ''; ?>"
-				data-category="<?php echo esc_attr( $item['category'] ); ?>"
-				<?php if ( $is_available ) : ?>
-					onclick="window.location.href='<?php echo esc_url( $card_href ); ?>';"
-					role="link"
-					tabindex="0"
-					style="cursor: pointer;"
-					onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='<?php echo esc_url( $card_href ); ?>';}"
-				<?php endif; ?>>
-				<div class="gear-engine-hub__card-media">
-					<?php if ( ! empty( $item['image'] ) ) : ?>
-						<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" class="gear-engine-hub__card-img" loading="lazy" />
-					<?php else : ?>
-						<div class="gear-engine-hub__card-img-placeholder">
-							<div class="gear-engine-hub__card-icon-box">
-								<?php echo Gear_Engine_Gear_Picker::get_hub_icon( (string) ( $item['icon'] ?? '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- hardcoded clean SVG helper ?>
-							</div>
-						</div>
-					<?php endif; ?>
-					<div class="gear-engine-hub__card-overlays">
-						<span class="gear-engine-hub__card-cat-pill">
-							<?php echo esc_html( $item['category_name'] ); ?>
-						</span>
-						<?php if ( ! empty( $item['badge'] ) ) : ?>
-							<span class="gear-engine-hub__card-badge<?php echo ! $is_available ? ' gear-engine-hub__card-badge--muted' : ''; ?>">
-								<?php echo esc_html( $item['badge'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
-				</div>
-
-				<div class="gear-engine-hub__card-content">
-					<div class="gear-engine-hub__card-body">
-						<h3 class="gear-engine-hub__card-title"><?php echo esc_html( $item['title'] ); ?></h3>
-						<p class="gear-engine-hub__card-desc"><?php echo esc_html( $item['desc'] ); ?></p>
-					</div>
-
-					<div class="gear-engine-hub__card-footer">
-						<span class="gear-engine-hub__card-time">
-							<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 16px; line-height: 1;">schedule</span>
-							<?php echo esc_html( $item['time'] ); ?>
-						</span>
-						<?php if ( $is_available ) : ?>
-							<a href="<?php echo esc_url( $card_href ); ?>" class="gear-engine-hub__card-action-btn" onclick="event.stopPropagation();">
-								<span><?php esc_html_e( 'Ta testen', 'gear-engine' ); ?></span>
-								<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 18px; line-height: 1;">arrow_forward</span>
-							</a>
+			<?php if ( $is_available ) : ?>
+				<a class="gear-engine-hub__card fp-tile"
+					href="<?php echo esc_url( $card_href ); ?>"
+					data-category="<?php echo esc_attr( $item['category'] ); ?>"
+					aria-label="<?php echo esc_attr( $item['title'] ); ?>">
+					<div class="gear-engine-hub__card-media tile-media">
+						<?php if ( ! empty( $item['image'] ) ) : ?>
+							<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" class="gear-engine-hub__card-img tile-image" loading="lazy" />
 						<?php else : ?>
-							<span class="gear-engine-hub__card-action-muted">
-								<?php esc_html_e( 'Kommer snart', 'gear-engine' ); ?>
-							</span>
+							<div class="gear-engine-hub__card-icon-box">
+								<?php echo Gear_Engine_Gear_Picker::get_hub_icon( (string) ( $item['icon'] ?? '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
 						<?php endif; ?>
 					</div>
+					<div class="gear-engine-hub__card-title tile-label"><?php echo esc_html( $item['title'] ); ?></div>
+				</a>
+			<?php else : ?>
+				<div class="gear-engine-hub__card gear-engine-hub__card--upcoming fp-tile upcoming"
+					data-category="<?php echo esc_attr( $item['category'] ); ?>"
+					tabindex="0"
+					role="button"
+					aria-disabled="true"
+					aria-label="<?php echo esc_attr( $item['title'] . ' (' . __( 'Kommer snart', 'gear-engine' ) . ')' ); ?>">
+					<div class="gear-engine-hub__card-media tile-media">
+						<?php if ( ! empty( $item['image'] ) ) : ?>
+							<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" class="gear-engine-hub__card-img tile-image" loading="lazy" />
+						<?php else : ?>
+							<div class="gear-engine-hub__card-icon-box">
+								<?php echo Gear_Engine_Gear_Picker::get_hub_icon( (string) ( $item['icon'] ?? '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+						<?php endif; ?>
+					</div>
+					<div class="gear-engine-hub__card-title tile-label"><?php echo esc_html( $item['title'] ); ?></div>
+					<div class="gear-engine-hub__card-sub tile-sub"><?php esc_html_e( 'Kommer snart', 'gear-engine' ); ?></div>
 				</div>
-			</div>
+			<?php endif; ?>
 		<?php endforeach; ?>
 	</div>
 
@@ -135,11 +116,11 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 	<!-- Trust Signals Footer -->
 	<div class="gear-engine-hub__trust-banner">
 		<div class="gear-engine-hub__trust-item">
-			<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 20px; line-height: 1; color: var(--ge-green-800, #005236);">verified</span>
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 			<span><strong><?php esc_html_e( '100% uavhengig scoring:', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Rådene styres av dine fysiske forutsetninger, ikke butikkfortjeneste.', 'gear-engine' ); ?></span>
 		</div>
 		<div class="gear-engine-hub__trust-item">
-			<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 20px; line-height: 1; color: var(--ge-green-800, #005236);">update</span>
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
 			<span><strong><?php esc_html_e( 'Daglige prisoppdateringer:', 'gear-engine' ); ?></strong> <?php esc_html_e( 'Vi sjekker lagerstatus og rabatter automatisk på tvers av ledende forhandlere.', 'gear-engine' ); ?></span>
 		</div>
 	</div>

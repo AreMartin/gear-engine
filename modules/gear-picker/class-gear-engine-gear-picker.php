@@ -563,7 +563,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Riktig motor, demping og løpeflate for din vekt og fart.', 'gear-engine' ),
 				'badge'         => __( 'Mest populær', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'treadmill',
 				'available'     => in_array( 'treadmill', $available_types, true ),
 			),
@@ -575,7 +575,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Vann, luft eller magnet tilpasset støynivå og rygg.', 'gear-engine' ),
 				'badge'         => __( 'Mest effektiv', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'rower',
 				'available'     => in_array( 'romaskin', $available_types, true ),
 			),
@@ -587,7 +587,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Skånsom kondisjon og sittestilling for knær og hofter.', 'gear-engine' ),
 				'badge'         => __( 'Leddvennlig', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'bike',
 				'available'     => in_array( 'ergometersykkel', $available_types, true ),
 			),
@@ -599,7 +599,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Effektiv helkroppstrening uten støt mot leddene.', 'gear-engine' ),
 				'badge'         => __( 'Skånsom', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'ellipse',
 				'available'     => in_array( 'ellipsetrener', $available_types, true ),
 			),
@@ -613,7 +613,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Kompakte vektsystemer for komplett hjemmestyrke.', 'gear-engine' ),
 				'badge'         => __( 'Plassbesparende', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'dumbbell',
 				'available'     => in_array( 'manualer', $available_types, true ),
 			),
@@ -625,7 +625,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Alt-i-ett treningsstasjon med magasin og kabler.', 'gear-engine' ),
 				'badge'         => __( 'Helkropp', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'multigym',
 				'available'     => in_array( 'multigym', $available_types, true ),
 			),
@@ -637,7 +637,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Sikker trening i knebøy, benkpress og baseøvelser.', 'gear-engine' ),
 				'badge'         => __( 'Tung styrke', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'rack',
 				'available'     => in_array( 'kneboystativ', $available_types, true ),
 			),
@@ -649,7 +649,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Stabile flat- og skråbenker med god vektkapasitet.', 'gear-engine' ),
 				'badge'         => __( 'Basisutstyr', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'bench',
 				'available'     => in_array( 'treningsbenk', $available_types, true ),
 			),
@@ -663,7 +663,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Finn riktig støtte, sirkulasjon og avlastning for dine ledd.', 'gear-engine' ),
 				'badge'         => __( 'Anbefalt start', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'shield',
 				'available'     => in_array( 'rehab-guide', $available_types, true ),
 			),
@@ -675,7 +675,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Lavt innsteg, oppreist sittestilling og myk motstand.', 'gear-engine' ),
 				'badge'         => __( 'Leddskånsom', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'shield',
 				'available'     => in_array( 'skaansom-kondisjon', $available_types, true ),
 			),
@@ -687,7 +687,7 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Puter og brett for stabilitet og leddopptrening.', 'gear-engine' ),
 				'badge'         => __( 'Forebyggende', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'target',
 				'available'     => in_array( 'balanse', $available_types, true ),
 			),
@@ -699,10 +699,33 @@ class Gear_Engine_Gear_Picker {
 				'desc'          => __( 'Sirkulasjonstrening fra stol og sofa i stuen.', 'gear-engine' ),
 				'badge'         => __( 'Kompakt', 'gear-engine' ),
 				'time'          => __( '1 min test', 'gear-engine' ),
-				'image'         => 'https://images.unsplash.com/photo-1434596922112-19c563067271?w=700&auto=format&fit=crop&q=80',
+				'image'         => '',
 				'icon'          => 'activity',
 				'available'     => in_array( 'pedaltrener', $available_types, true ),
 			),
+		);
+
+		foreach ( $items as &$item ) {
+			$slug    = (string) $item['slug'];
+			$img_url = '';
+			$exts    = array( 'webp', 'png', 'jpg', 'jpeg' );
+			foreach ( $exts as $ext ) {
+				$candidate_file = GEAR_ENGINE_PATH . 'modules/gear-picker/assets/images/' . $slug . '.' . $ext;
+				if ( file_exists( $candidate_file ) ) {
+					$img_url = GEAR_ENGINE_URL . 'modules/gear-picker/assets/images/' . $slug . '.' . $ext;
+					break;
+				}
+			}
+			/**
+			 * Filters the image URL for a gear picker hub card.
+			 *
+			 * @param string $img_url Resolved local image URL, or empty string.
+			 * @param string $slug    Picker slug.
+			 * @param array  $item    Item metadata.
+			 */
+			$item['image'] = (string) apply_filters( 'gear_engine_picker_hub_item_image', $img_url, $slug, $item );
+		}
+		unset( $item );
 		);
 
 		return apply_filters(
