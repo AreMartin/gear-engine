@@ -229,17 +229,24 @@ class Gear_Engine_Triage {
 					$image_url = (string) $thumb;
 				}
 			}
+			$image_pos = 'center center';
+			if ( ! empty( $config['imagePosition'] ) ) {
+				$image_pos = sanitize_text_field( (string) $config['imagePosition'] );
+			} elseif ( ! empty( $config['image_position'] ) ) {
+				$image_pos = sanitize_text_field( (string) $config['image_position'] );
+			}
 
 			$cards[] = array(
-				'region'    => $region,
-				'label'     => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
-				'summary'   => isset( $config['summary'] ) ? (string) $config['summary'] : '',
-				'chips'     => $chips,
-				'badge'     => 'rygg' === $region ? 'Vanligst' : '',
-				'order'     => isset( $config['order'] ) ? (int) $config['order'] : 100,
-				'icon'      => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
-				'image_url' => $image_url,
-				'url'       => self::get_region_url( $region ),
+				'region'         => $region,
+				'label'          => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
+				'summary'        => isset( $config['summary'] ) ? (string) $config['summary'] : '',
+				'chips'          => $chips,
+				'badge'          => 'rygg' === $region ? 'Vanligst' : '',
+				'order'          => isset( $config['order'] ) ? (int) $config['order'] : 100,
+				'icon'           => isset( $config['icon'] ) ? sanitize_key( $config['icon'] ) : 'activity',
+				'image_url'      => $image_url,
+				'image_position' => $image_pos,
+				'url'            => self::get_region_url( $region ),
 			);
 		}
 		usort(

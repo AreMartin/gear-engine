@@ -448,8 +448,8 @@
 	}
 }
 
-/* Region Tile */
-.gear-engine-triage-picker .region-tile {
+/* Region Tile: Has Image */
+.gear-engine-triage-picker .region-tile.has-image {
 	display: flex;
 	flex-direction: column;
 	text-decoration: none;
@@ -462,7 +462,7 @@
 	padding: 0;
 	box-shadow: none;
 }
-.gear-engine-triage-picker .region-tile:focus-visible .tile-media {
+.gear-engine-triage-picker .region-tile.has-image:focus-visible .tile-media {
 	outline: 2px solid var(--md-sys-color-primary, #0C2340);
 	outline-offset: 3px;
 }
@@ -480,13 +480,6 @@
 	color: var(--md-sys-color-primary, #0C2340);
 	transition: background-color 0.22s ease, box-shadow 0.22s ease;
 }
-.gear-engine-triage-picker .tile-media svg,
-.gear-engine-triage-picker .tile-media .gear-engine-triage-picker__icon {
-	width: 48px;
-	height: 48px;
-	transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), stroke 0.2s ease;
-	stroke: var(--md-sys-color-primary, #0C2340);
-}
 .gear-engine-triage-picker .tile-media .tile-image {
 	width: 100%;
 	height: 100%;
@@ -494,72 +487,117 @@
 	border-radius: 24px;
 	transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
-.gear-engine-triage-picker .tile-media .tile-image.contain {
-	width: 72%;
-	height: 72%;
-	object-fit: contain;
+.gear-engine-triage-picker .region-tile.has-image:hover .tile-media {
+	background: var(--ge-green-50, #EBF5F0);
+	box-shadow: 0 4px 18px rgba(0, 82, 54, 0.06);
+}
+.gear-engine-triage-picker .region-tile.has-image:hover .tile-media .tile-image {
+	transform: scale(1.04);
+}
+.gear-engine-triage-picker .region-tile.has-image:hover .tile-label {
+	color: var(--ge-green-800, #005236);
 }
 
-/* Editorial Fallback C */
-.gear-engine-triage-picker .tile-fallback {
+/* Region Tile: Pure Typography (Fallback when no image) */
+.gear-engine-triage-picker .region-tile.is-typographic {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
+	justify-content: space-between;
+	aspect-ratio: 1.08 / 1;
+	min-height: 180px;
+	padding: 20px;
+	border-radius: 24px;
+	background: var(--md-sys-color-surface-container-high, #F2F4F7);
+	border: none;
+	text-decoration: none;
+	text-align: left;
 	position: relative;
+	cursor: pointer;
+	outline: none;
+	box-shadow: none;
+	transition: background-color 0.22s ease, box-shadow 0.22s ease;
 }
-.gear-engine-triage-picker .tile-num {
-	font-size: 38px;
-	font-weight: 700;
-	line-height: 1;
-	letter-spacing: -0.04em;
-	color: rgba(12, 35, 64, 0.14);
-	transition: color 0.22s ease, transform 0.25s ease;
+.gear-engine-triage-picker .region-tile.is-typographic:hover {
+	background: var(--ge-green-50, #EBF5F0);
+	box-shadow: 0 4px 18px rgba(0, 82, 54, 0.06);
 }
-.gear-engine-triage-picker .tile-action-dot {
-	position: absolute;
-	bottom: 14px;
-	right: 14px;
-	width: 32px;
-	height: 32px;
+.gear-engine-triage-picker .region-tile.is-typographic:focus-visible {
+	outline: 2px solid var(--md-sys-color-primary, #0C2340);
+	outline-offset: 3px;
+}
+.gear-engine-triage-picker .typo-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+.gear-engine-triage-picker .typo-badge {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	padding: 3px 8px;
+	border-radius: 9999px;
+	background: #FFFFFF;
+	color: var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.08);
+}
+.gear-engine-triage-picker .typo-action {
+	width: 30px;
+	height: 30px;
 	border-radius: 50%;
 	display: grid;
 	place-items: center;
 	background: #FFFFFF;
 	color: var(--md-sys-color-primary, #0C2340);
-	box-shadow: 0 1px 4px rgba(12, 35, 64, 0.08);
+	margin-left: auto;
+	box-shadow: 0 1px 3px rgba(12, 35, 64, 0.08);
 	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.gear-engine-triage-picker .tile-action-dot svg {
-	width: 15px;
-	height: 15px;
+.gear-engine-triage-picker .typo-action svg {
+	width: 14px;
+	height: 14px;
 }
-
-/* Tile Hover State (M3 Tonal State Layer) */
-.gear-engine-triage-picker .region-tile:hover .tile-media {
-	background: var(--ge-green-50, #EBF5F0);
-	box-shadow: 0 4px 18px rgba(0, 82, 54, 0.06);
-}
-.gear-engine-triage-picker .region-tile:hover .tile-media svg,
-.gear-engine-triage-picker .region-tile:hover .tile-media .gear-engine-triage-picker__icon {
-	stroke: var(--ge-green-600, #00A86B);
-	transform: scale(1.06);
-}
-.gear-engine-triage-picker .region-tile:hover .tile-media .tile-image {
-	transform: scale(1.04);
-}
-.gear-engine-triage-picker .region-tile:hover .tile-num {
-	color: var(--ge-green-600, #00A86B);
-	transform: scale(1.08);
-}
-.gear-engine-triage-picker .region-tile:hover .tile-action-dot {
+.gear-engine-triage-picker .region-tile.is-typographic:hover .typo-action {
 	background: var(--ge-green-600, #00A86B);
 	color: #FFFFFF;
 	transform: translate(2px, -2px);
 }
-.gear-engine-triage-picker .region-tile:hover .tile-label {
+.gear-engine-triage-picker .typo-mid {
+	margin: 12px 0 8px;
+}
+.gear-engine-triage-picker .typo-title {
+	font-size: 20px;
+	line-height: 26px;
+	font-weight: 700;
+	color: var(--md-sys-color-primary, #0C2340);
+	transition: color 0.2s ease;
+}
+.gear-engine-triage-picker .region-tile.is-typographic:hover .typo-title {
+	color: var(--ge-green-800, #005236);
+}
+.gear-engine-triage-picker .typo-sub {
+	font-size: 13px;
+	line-height: 18px;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	margin-top: 4px;
+}
+.gear-engine-triage-picker .typo-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: auto;
+}
+.gear-engine-triage-picker .typo-chip {
+	font-size: 11.5px;
+	font-weight: 500;
+	padding: 3px 8px;
+	border-radius: 8px;
+	background: rgba(12, 35, 64, 0.05);
+	color: var(--md-sys-color-on-surface-variant, #475467);
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+.gear-engine-triage-picker .region-tile.is-typographic:hover .typo-chip {
+	background: #FFFFFF;
 	color: var(--ge-green-800, #005236);
 }
 
