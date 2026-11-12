@@ -460,8 +460,8 @@
 	transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 .gear-engine-triage-picker .region-tile.is-text-only:hover {
-	background: var(--ge-green-50, #EBF5F0);
-	box-shadow: 0 4px 16px rgba(0, 82, 54, 0.06);
+	background: var(--ge-green-100, #DCF5E8);
+	box-shadow: 0 4px 16px rgba(0, 82, 54, 0.08);
 }
 .gear-engine-triage-picker .region-tile.is-text-only:focus-visible {
 	outline: 2px solid var(--md-sys-color-primary, #0C2340);

@@ -1193,8 +1193,8 @@
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-media {
-	background: var(--ge-green-50, #EBF5F0);
-	box-shadow: 0 4px 16px rgba(0, 82, 54, 0.06);
+	background: var(--ge-green-100, #DCF5E8);
+	box-shadow: 0 4px 16px rgba(0, 82, 54, 0.08);
 }
 
 .gear-engine-hub__card-img {
