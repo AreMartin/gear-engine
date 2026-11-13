@@ -2436,69 +2436,23 @@
 				searchClear.hidden = state.searchQuery === '';
 			}
 
-			// Cross-Department Search Alert Check
+			// Omnisearch: when a search query is active, search globally across all departments & categories
+			var trimmedSearch = state.searchQuery.trim().toLowerCase();
+			var hasSearch = trimmedSearch !== '';
+			var searchWords = hasSearch ? trimmedSearch.split(/\s+/).filter(Boolean) : [];
+
 			if (deptAlert) {
-				var trimmedQ = state.searchQuery.trim().toLowerCase();
-				if (trimmedQ !== '') {
-					var currHits = state.products.filter(function (p) {
-						var d = p.department || inferDepartment(p);
-						var text = (p.name + ' ' + (p.brand || '') + ' ' + (p.category || '')).toLowerCase();
-						return d === state.activeDepartment && text.indexOf(trimmedQ) !== -1;
-					});
-
-					if (currHits.length === 0) {
-						var otherDeptMatches = {};
-						state.products.forEach(function (p) {
-							var d = p.department || inferDepartment(p);
-							if (d !== state.activeDepartment) {
-								var text = (p.name + ' ' + (p.brand || '') + ' ' + (p.category || '')).toLowerCase();
-								if (text.indexOf(trimmedQ) !== -1) {
-									otherDeptMatches[d] = (otherDeptMatches[d] || 0) + 1;
-								}
-							}
-						});
-
-						var otherDepts = Object.keys(otherDeptMatches);
-						if (otherDepts.length > 0) {
-							otherDepts.sort(function (a, b) { return otherDeptMatches[b] - otherDeptMatches[a]; });
-							var targetDeptId = otherDepts[0];
-							var targetDeptObj = DEPARTMENTS.filter(function (d) { return d.id === targetDeptId; })[0];
-							var targetDeptName = targetDeptObj ? targetDeptObj.name : targetDeptId;
-							var matchCount = otherDeptMatches[targetDeptId];
-
-							deptAlert.className = 'ge-m3-dept-alert ge-dept-alert';
-							deptAlert.innerHTML = ic('search') +
-								'<div class="ge-m3-dept-alert-text">Fant <strong>' + matchCount + ' treff</strong> i <strong>' + escapeHtml(targetDeptName) + '</strong> for «' + escapeHtml(state.searchQuery.trim()) + '»</div>' +
-								'<button type="button" class="ge-m3-dept-switch-btn ge-dept-switch-btn ge-m3-btn ge-m3-btn--text m3-sl" id="ge-dept-switch-btn">Bytt til ' + escapeHtml(targetDeptName) + '</button>';
-							deptAlert.style.display = 'flex';
-
-							var switchBtn = deptAlert.querySelector('#ge-dept-switch-btn');
-							if (switchBtn) {
-								switchBtn.addEventListener('click', function () {
-									switchDepartment(targetDeptId);
-								});
-							}
-						} else {
-							deptAlert.style.display = 'none';
-							deptAlert.innerHTML = '';
-						}
-					} else {
-						deptAlert.style.display = 'none';
-						deptAlert.innerHTML = '';
-					}
-				} else {
-					deptAlert.style.display = 'none';
-					deptAlert.innerHTML = '';
-				}
+				deptAlert.style.display = 'none';
+				deptAlert.innerHTML = '';
 			}
 
 			// A. Base filter (Department, Category, Search) for dynamic brand/shop options
 			var baseFiltered = state.products.filter(function (product) {
 				var prodDept = product.department || inferDepartment(product);
-				var matchesDept = prodDept === state.activeDepartment;
+				var matchesDept = hasSearch || prodDept === state.activeDepartment;
 				var searchTarget = (product.name + ' ' + (product.brand || '') + ' ' + (product.category || '')).toLowerCase();
-				var matchesSearch = searchTarget.indexOf(state.searchQuery.toLowerCase()) !== -1;
-				var matchesCategory = state.activeCategory === 'Alle' || product.category === state.activeCategory;
+				var matchesSearch = !hasSearch || searchWords.every(function (w) { return searchTarget.indexOf(w) !== -1; });
+				var matchesCategory = hasSearch || state.activeCategory === 'Alle' || product.category === state.activeCategory;
 				return matchesDept && matchesSearch && matchesCategory;
 			});
 
@@ -2521,10 +2475,10 @@
 			var allQuickDefs = (QUICK_FILTER_DEFS.universal || []).concat(QUICK_FILTER_DEFS[state.activeDepartment] || []);
 			var filtered = state.products.filter(function (product) {
 				var prodDept = product.department || inferDepartment(product);
-				var matchesDept = prodDept === state.activeDepartment;
+				var matchesDept = hasSearch || prodDept === state.activeDepartment;
 				var searchTarget = (product.name + ' ' + (product.brand || '') + ' ' + (product.category || '')).toLowerCase();
-				var matchesSearch = searchTarget.indexOf(state.searchQuery.toLowerCase()) !== -1;
-				var matchesCategory = state.activeCategory === 'Alle' || product.category === state.activeCategory;
+				var matchesSearch = !hasSearch || searchWords.every(function (w) { return searchTarget.indexOf(w) !== -1; });
+				var matchesCategory = hasSearch || state.activeCategory === 'Alle' || product.category === state.activeCategory;
 
 				var matchesShop = state.activeShops.length === 0;
 				if (!matchesShop && product.stores && product.stores.length > 0) {
@@ -2728,10 +2682,9 @@
 				var activeQuery = state.searchQuery.trim();
 				var hasOtherFilters = state.activeCategory !== 'Alle' || activeFilterCount > 0;
 				if (activeQuery !== '') {
-					var catSuffix = state.activeCategory !== 'Alle' ? ' i ' + escapeHtml(state.activeCategory) : '';
 					cardsContainer.innerHTML =
 						'<div class="ge-m3-empty ge-comp-empty">' +
-							'<p>Ingen treff for «<strong>' + escapeHtml(activeQuery) + '</strong>»' + catSuffix + '.</p>' +
+							'<p>Ingen treff for «<strong>' + escapeHtml(activeQuery) + '</strong>».</p>' +
 							'<div class="ge-comp-empty-actions" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">' +
 								'<button type="button" class="ge-m3-btn ge-m3-btn--tonal m3-sl" id="ge-empty-clear-search-btn">Nullstill søk</button>' +
 								(hasOtherFilters ? '<button type="button" class="ge-m3-btn ge-m3-btn--text m3-sl" id="ge-empty-reset-btn">Fjern alle filtre</button>' : '') +
