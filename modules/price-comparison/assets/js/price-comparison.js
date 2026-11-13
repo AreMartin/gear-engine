@@ -1261,7 +1261,8 @@
 	}
 
 	// RENDER 1: GRID CARD
-	function renderGridCardHtml(p, state) {
+	function renderGridCardHtml(p, state, cardIdx) {
+		var imgLoading = (typeof cardIdx === 'number' && cardIdx < 6) ? 'eager' : 'lazy';
 		var hasDisc = p.discount && p.discount > 0;
 		var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
 		var isOpen = !!(state.openStores && state.openStores[p.id]);
@@ -1278,7 +1279,7 @@
 			compareToggleHtml(p, isChecked) +
 			'<div class="ge-m3-img-wrap ge-card-grid-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
 				(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + ' %</span>' : '') +
-				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
+				(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" loading="' + imgLoading + '" decoding="async" onerror="this.style.display=\'none\';" />' : '') +
 			'</div>' +
 			'<div class="ge-m3-card-content">' +
 				'<span class="ge-m3-brand">' + escapeHtml(p.brand || 'UTSTYR') + '</span>' +
@@ -1301,7 +1302,8 @@
 	}
 
 	// RENDER 2: LIST CARD (2-column responsive card layout)
-	function renderListCardHtml(p, state) {
+	function renderListCardHtml(p, state, cardIdx) {
+		var imgLoading = (typeof cardIdx === 'number' && cardIdx < 6) ? 'eager' : 'lazy';
 		var hasDisc = p.discount && p.discount > 0;
 		var storeCount = (p.stores && p.stores.length > 0) ? p.stores.length : ((p.otherShops || 0) + 1);
 		var isOpen = !!(state.openStores && state.openStores[p.id]);
@@ -1318,7 +1320,7 @@
 			'<div class="ge-m3-list-main-row ge-list-main-row">' +
 				'<div class="ge-m3-list-img-wrap" data-detail-id="' + p.id + '" title="Vis produktdetaljer og spesifikasjoner">' +
 					(hasDisc ? '<span class="ge-m3-deal-chip ge-discount-badge">-' + p.discount + ' %</span>' : '') +
-					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" onerror="this.style.display=\'none\';" />' : '') +
+					(safeImg ? '<img src="' + escapeHtml(safeImg) + '" alt="' + escapeHtml(p.name) + '" class="ge-m3-product-img" loading="' + imgLoading + '" decoding="async" onerror="this.style.display=\'none\';" />' : '') +
 				'</div>' +
 				'<div class="ge-m3-list-content">' +
 					'<div class="ge-m3-list-top">' +
@@ -1478,6 +1480,14 @@
 		var mobileSearchSlot = root.querySelector('#ge-mobile-search-slot');
 		var controls = root.querySelector('.ge-m3-controls');
 		var resultsCountWrap = root.querySelector('.ge-m3-results-count');
+		var activeFiltersEl = document.createElement('div');
+		activeFiltersEl.className = 'ge-comp-active-filters';
+		activeFiltersEl.hidden = true;
+		if (resultsCountWrap && resultsCountWrap.parentNode) {
+			resultsCountWrap.parentNode.insertBefore(activeFiltersEl, resultsCountWrap.nextSibling);
+		}
+		var searchDebounceTimer = null;
+		var sliderDebounceTimer = null;
 		var searchInput = root.querySelector('#ge-search-input');
 		var searchClear = root.querySelector('#ge-search-clear');
 		var searchMic = root.querySelector('#ge-search-mic');
@@ -2594,20 +2604,118 @@
 				updateUI();
 			}, true);
 
+			if (catsBar) {
+				catsBar.classList.toggle('is-omnisearch-active', hasSearch);
+			}
+
 			filterApplyBtn.innerHTML = 'Vis ' + sorted.length + ' treff';
-			resultsCount.textContent = 'Viser ' + visibleProducts.length + ' av ' + sorted.length + ' produkter';
+			resultsCount.textContent = hasSearch
+				? 'Søker i alle kategorier · Viser ' + visibleProducts.length + ' av ' + sorted.length + ' treff'
+				: 'Viser ' + visibleProducts.length + ' av ' + sorted.length + ' produkter';
+
+			// E2. Render Active Filter Chips (only when drawer filters or search are active)
+			if (activeFiltersEl) {
+				var chips = [];
+				if (hasSearch) {
+					chips.push({
+						label: 'Søk: «' + state.searchQuery.trim() + '»',
+						onRemove: function () {
+							clearTimeout(searchDebounceTimer);
+							state.searchQuery = '';
+							if (searchInput) searchInput.value = '';
+							state.visibleCount = initialLimit;
+							updateUrlState();
+							updateUI();
+						}
+					});
+				}
+				state.activeBrands.forEach(function (b) {
+					chips.push({
+						label: 'Merke: ' + b,
+						onRemove: function () {
+							var idx = state.activeBrands.indexOf(b);
+							if (idx !== -1) state.activeBrands.splice(idx, 1);
+							state.visibleCount = initialLimit;
+							updateUI();
+						}
+					});
+				});
+				state.activeShops.forEach(function (s) {
+					chips.push({
+						label: 'Butikk: ' + s,
+						onRemove: function () {
+							var idx = state.activeShops.indexOf(s);
+							if (idx !== -1) state.activeShops.splice(idx, 1);
+							state.visibleCount = initialLimit;
+							updateUI();
+						}
+					});
+				});
+				if (isPriceChanged) {
+					chips.push({
+						label: 'Pris: ' + formatKr(curMin) + '–' + formatKr(curMax),
+						onRemove: function () {
+							state.minPrice = '';
+							state.maxPrice = '';
+							state.visibleCount = initialLimit;
+							updateUI();
+						}
+					});
+				}
+				Object.keys(state.activeQuickFilters).forEach(function (qId) {
+					if (!state.activeQuickFilters[qId]) return;
+					var def = allQuickDefs.filter(function (d) { return d.id === qId; })[0];
+					chips.push({
+						label: def ? def.label : qId,
+						onRemove: function () {
+							delete state.activeQuickFilters[qId];
+							state.visibleCount = initialLimit;
+							renderQuickFilters();
+							updateUI();
+						}
+					});
+				});
+
+				if (chips.length === 0) {
+					activeFiltersEl.hidden = true;
+					activeFiltersEl.innerHTML = '';
+				} else {
+					activeFiltersEl.hidden = false;
+					activeFiltersEl.innerHTML = '';
+					chips.forEach(function (c) {
+						var btn = document.createElement('button');
+						btn.type = 'button';
+						btn.className = 'ge-comp-active-chip';
+						btn.setAttribute('aria-label', 'Fjern filter ' + c.label);
+						btn.innerHTML = '<span>' + escapeHtml(c.label) + '</span><span class="ge-comp-active-chip-x" aria-hidden="true">✕</span>';
+						btn.addEventListener('click', c.onRemove);
+						activeFiltersEl.appendChild(btn);
+					});
+					if (chips.length > 1) {
+						var clearBtn = document.createElement('button');
+						clearBtn.type = 'button';
+						clearBtn.className = 'ge-comp-active-clear';
+						clearBtn.textContent = 'Nullstill alle';
+						clearBtn.addEventListener('click', function () {
+							clearTimeout(searchDebounceTimer);
+							resetAllFilters();
+						});
+						activeFiltersEl.appendChild(clearBtn);
+					}
+				}
+			}
 
 			// F. Render Cards
 			if (visibleProducts.length > 0) {
 				if (state.viewMode === 'grid') {
 					cardsContainer.className = 'ge-m3-grid ge-comp-grid';
-					cardsContainer.innerHTML = visibleProducts.map(function (prod) { return renderGridCardHtml(prod, state); }).join('');
+					cardsContainer.innerHTML = visibleProducts.map(function (prod, idx) { return renderGridCardHtml(prod, state, idx); }).join('');
 				} else {
 					cardsContainer.className = 'ge-m3-list ge-comp-list';
 					var columnSplit = Math.ceil(visibleProducts.length / 2);
 					cardsContainer.innerHTML =
-						'<div class="ge-m3-list-column ge-comp-list-column">' + visibleProducts.slice(0, columnSplit).map(function (prod) { return renderListCardHtml(prod, state); }).join('') + '</div>' +
-						'<div class="ge-m3-list-column ge-comp-list-column">' + visibleProducts.slice(columnSplit).map(function (prod) { return renderListCardHtml(prod, state); }).join('') + '</div>';
+						'<div class="ge-m3-list-column ge-comp-list-column">' + visibleProducts.slice(0, columnSplit).map(function (prod, idx) { return renderListCardHtml(prod, state, idx); }).join('') + '</div>' +
+						'<div class="ge-m3-list-column ge-comp-list-column">' + visibleProducts.slice(columnSplit).map(function (prod, idx) { return renderListCardHtml(prod, state, idx + columnSplit); }).join('') + '</div>';
 				}
 
 				// Attach product detail modal triggers (image & title)
@@ -2779,12 +2887,16 @@
 			products: state.products,
 			searchIndex: searchIndex,
 			onInputChange: function (val) {
-				state.searchQuery = val;
-				state.visibleCount = initialLimit;
-				updateUrlState();
-				updateUI();
+				clearTimeout(searchDebounceTimer);
+				searchDebounceTimer = setTimeout(function () {
+					state.searchQuery = val;
+					state.visibleCount = initialLimit;
+					updateUrlState();
+					updateUI();
+				}, 150);
 			},
 			onSelectCategory: function (deptId, catName) {
+				clearTimeout(searchDebounceTimer);
 				if (state.activeDepartment !== deptId) {
 					switchDepartment(deptId);
 				}
@@ -2796,6 +2908,7 @@
 				}
 			},
 			onSelectProduct: function (prod) {
+				clearTimeout(searchDebounceTimer);
 				var targetDept = prod.department || inferDepartment(prod);
 				if (state.activeDepartment !== targetDept) {
 					switchDepartment(targetDept);
@@ -2814,6 +2927,7 @@
 
 		if (searchClear) {
 			searchClear.addEventListener('click', function () {
+				clearTimeout(searchDebounceTimer);
 				state.searchQuery = '';
 				if (searchInput) {
 					searchInput.value = '';
@@ -2862,15 +2976,23 @@
 		sliderMin.addEventListener('input', function (e) {
 			var val = Math.min(Number(e.target.value), (state.maxPrice !== '' ? Number(state.maxPrice) : state.absMaxPrice) - 1);
 			state.minPrice = val;
-			state.visibleCount = initialLimit;
-			updateUI();
+			if (priceMinInput) priceMinInput.value = val;
+			clearTimeout(sliderDebounceTimer);
+			sliderDebounceTimer = setTimeout(function () {
+				state.visibleCount = initialLimit;
+				updateUI();
+			}, 150);
 		});
 
 		sliderMax.addEventListener('input', function (e) {
 			var val = Math.max(Number(e.target.value), (state.minPrice !== '' ? Number(state.minPrice) : state.absMinPrice) + 1);
 			state.maxPrice = val;
-			state.visibleCount = initialLimit;
-			updateUI();
+			if (priceMaxInput) priceMaxInput.value = val;
+			clearTimeout(sliderDebounceTimer);
+			sliderDebounceTimer = setTimeout(function () {
+				state.visibleCount = initialLimit;
+				updateUI();
+			}, 150);
 		});
 
 		priceMinInput.addEventListener('change', function (e) {
