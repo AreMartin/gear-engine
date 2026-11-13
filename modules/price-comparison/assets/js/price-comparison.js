@@ -1563,6 +1563,8 @@
 
 				btn.addEventListener('click', function () {
 					if (state.activeDepartment === dept.id) return;
+					state.searchQuery = '';
+					if (searchInput) searchInput.value = '';
 					switchDepartment(dept.id);
 				});
 				deptTrack.appendChild(btn);
@@ -1684,6 +1686,8 @@
 		// Navigation action: Switch Category
 		function switchCategory(cat) {
 			state.activeCategory = cat;
+			state.searchQuery = '';
+			if (searchInput) searchInput.value = '';
 			state.activeBrands = [];
 			state.activeShops = [];
 			state.activeQuickFilters = {};
@@ -2721,11 +2725,36 @@
 				});
 			} else {
 				cardsContainer.className = 'ge-m3-empty-wrap';
-				cardsContainer.innerHTML =
-					'<div class="ge-m3-empty ge-comp-empty">' +
-						'<p>Fant ingen produkter som matcher filteret.</p>' +
-						'<button type="button" class="ge-m3-btn ge-m3-btn--tonal m3-sl" id="ge-empty-reset-btn">Fjern alle filtre</button>' +
-					'</div>';
+				var activeQuery = state.searchQuery.trim();
+				var hasOtherFilters = state.activeCategory !== 'Alle' || activeFilterCount > 0;
+				if (activeQuery !== '') {
+					var catSuffix = state.activeCategory !== 'Alle' ? ' i ' + escapeHtml(state.activeCategory) : '';
+					cardsContainer.innerHTML =
+						'<div class="ge-m3-empty ge-comp-empty">' +
+							'<p>Ingen treff for «<strong>' + escapeHtml(activeQuery) + '</strong>»' + catSuffix + '.</p>' +
+							'<div class="ge-comp-empty-actions" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">' +
+								'<button type="button" class="ge-m3-btn ge-m3-btn--tonal m3-sl" id="ge-empty-clear-search-btn">Nullstill søk</button>' +
+								(hasOtherFilters ? '<button type="button" class="ge-m3-btn ge-m3-btn--text m3-sl" id="ge-empty-reset-btn">Fjern alle filtre</button>' : '') +
+							'</div>' +
+						'</div>';
+
+					var emptyClearSearchBtn = cardsContainer.querySelector('#ge-empty-clear-search-btn');
+					if (emptyClearSearchBtn) {
+						emptyClearSearchBtn.addEventListener('click', function () {
+							state.searchQuery = '';
+							if (searchInput) searchInput.value = '';
+							state.visibleCount = initialLimit;
+							updateUrlState();
+							updateUI();
+						});
+					}
+				} else {
+					cardsContainer.innerHTML =
+						'<div class="ge-m3-empty ge-comp-empty">' +
+							'<p>Fant ingen produkter som matcher filteret.</p>' +
+							'<button type="button" class="ge-m3-btn ge-m3-btn--tonal m3-sl" id="ge-empty-reset-btn">Fjern alle filtre</button>' +
+						'</div>';
+				}
 
 				var emptyResetBtn = cardsContainer.querySelector('#ge-empty-reset-btn');
 				if (emptyResetBtn) {
@@ -2818,10 +2847,13 @@
 				if (state.activeDepartment !== targetDept) {
 					switchDepartment(targetDept);
 				}
+				state.searchQuery = '';
+				if (searchInput) searchInput.value = '';
 				state.activeCategory = 'Alle';
 				state.openStores = {};
 				state.openStores[prod.id] = true;
 				renderCategoryChips();
+				updateUrlState();
 				updateUI();
 				openProductModal(prod.id);
 			}
@@ -3299,6 +3331,10 @@
 				},
 				onSelectProduct: function (prod) {
 					if (window.GearEnginePriceComp && typeof window.GearEnginePriceComp.openModal === 'function') {
+						if (typeof window.GearEnginePriceComp.setSearchQuery === 'function') {
+							window.GearEnginePriceComp.setSearchQuery('');
+						}
+						if (inputEl) inputEl.value = '';
 						window.GearEnginePriceComp.openModal(prod.id);
 					} else {
 						var sep = priserUrl.indexOf('?') !== -1 ? '&' : '?';
