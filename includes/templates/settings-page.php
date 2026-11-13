@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="gae-status-grid">
 			<div class="gae-status-item">
 				<span class="gae-status-label"><?php esc_html_e( 'Total Products in PIM', 'gear-engine' ); ?></span>
-				<span class="gae-status-value">
+				<span class="gae-status-value" id="gae-total-products-val">
 					<?php
 					echo esc_html( number_format_i18n( $published ) );
 					if ( $catalog_cap > 0 ) {
@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<div class="gae-status-item">
 				<span class="gae-status-label"><?php esc_html_e( 'Last Sync Activity', 'gear-engine' ); ?></span>
-				<span class="gae-status-value">
+				<span class="gae-status-value" id="gae-last-sync-val">
 					<?php
 					if ( ! empty( $last_report['time'] ) ) {
 						echo esc_html( human_time_diff( $last_report['time'] ) . ' ' . __( 'ago', 'gear-engine' ) );
@@ -61,7 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<?php if ( ! empty( $last_report ) ) : ?>
-			<div class="gae-sync-report-summary">
+			<div class="gae-sync-report-summary" id="gae-last-sync-report">
 				<strong><?php esc_html_e( 'Last Sync Report:', 'gear-engine' ); ?></strong>
 				<span><?php printf( esc_html__( 'Inserted: %d | Updated: %d | Skipped (Filtered): %d | Total Processed: %d', 'gear-engine' ), absint( $last_report['inserted'] ?? 0 ), absint( $last_report['updated'] ?? 0 ), absint( $last_report['skipped'] ?? 0 ), absint( $last_report['processed'] ?? 0 ) ); ?></span>
 				<?php if ( ! empty( $last_report['errors'] ) ) : ?>

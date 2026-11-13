@@ -463,6 +463,22 @@ class Gear_Engine_Sync_Engine {
 		$url = html_entity_decode( trim( $url ), ENT_QUOTES, 'UTF-8' );
 		$url = str_replace( '&amp;', '&', $url );
 
+		$cooldown_key = 'gear_engine_feed_429_' . md5( $url );
+		if ( function_exists( 'get_transient' ) ) {
+			$cooldown_until = (int) get_transient( $cooldown_key );
+			if ( $cooldown_until > time() ) {
+				$mins_left = max( 1, (int) ceil( ( $cooldown_until - time() ) / 60 ) );
+				return new \WP_Error(
+					'gae_http_429_cooldown',
+					sprintf(
+						/* translators: %d: minutes remaining in cooldown */
+						__( 'Rate-limited (HTTP 429) — paused for %d more min before retrying.', 'gear-engine' ),
+						$mins_left
+					)
+				);
+			}
+		}
+
 		// For Adtraction feeds: prefer gzip=1 so feeds are downloaded 10-20x smaller,
 		// and stream directly via compress.zlib:// with minimal memory and zero memory blowup.
 		if ( false !== stripos( $url, 'adtraction.com' ) ) {
@@ -515,6 +531,21 @@ class Gear_Engine_Sync_Engine {
 		if ( 200 !== (int) $status_code ) {
 			if ( file_exists( $tmp_file ) ) {
 				@unlink( $tmp_file ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			}
+			if ( 429 === (int) $status_code ) {
+				$retry_after = function_exists( 'wp_remote_retrieve_header' ) ? (int) wp_remote_retrieve_header( $response, 'retry-after' ) : 0;
+				$cooldown_sec = ( $retry_after >= 60 && $retry_after <= 3600 ) ? $retry_after : 600;
+				if ( function_exists( 'set_transient' ) ) {
+					set_transient( $cooldown_key, time() + $cooldown_sec, $cooldown_sec );
+				}
+				return new \WP_Error(
+					'gae_http_429',
+					sprintf(
+						/* translators: %d: cooldown duration in minutes */
+						__( 'Remote feed rate-limited (HTTP 429). Paused for %d min to let the server recover.', 'gear-engine' ),
+						max( 1, (int) ceil( $cooldown_sec / 60 ) )
+					)
+				);
 			}
 			return new \WP_Error( 'gae_http_error', sprintf( 'Remote feed returned HTTP %d', $status_code ) );
 		}

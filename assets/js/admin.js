@@ -461,9 +461,26 @@
 				.done(function(response) {
 					if (response.success) {
 						$syncStatus.css('color', '#16a34a').text(response.data.message || gaeAdminData.strings.syncSuccess);
-						setTimeout(function() {
-							window.location.reload();
-						}, 2500);
+						if (typeof response.data.total_products === 'number') {
+							var $totalEl = $('#gae-total-products-val');
+							if ($totalEl.length) {
+								var capHtml = $totalEl.find('span').prop('outerHTML') || '';
+								$totalEl.html(response.data.total_products.toLocaleString() + (capHtml ? ' ' + capHtml : ''));
+							}
+						}
+						$('#gae-last-sync-val').text('Just now');
+						if (response.data.report) {
+							var rep = response.data.report;
+							var $repEl = $('#gae-last-sync-report');
+							if ($repEl.length) {
+								var summaryText = 'Inserted: ' + (rep.inserted || 0) + ' | Updated: ' + (rep.updated || 0) + ' | Skipped (Filtered): ' + (rep.skipped || 0) + ' | Total Processed: ' + (rep.processed || 0);
+								$repEl.find('span').first().text(summaryText);
+								$repEl.find('.gae-report-errors').remove();
+								if (rep.errors && rep.errors.length) {
+									$('<div class="gae-report-errors" style="color:#ef4444; margin-top:4px;"></div>').text(rep.errors.join(' | ')).appendTo($repEl);
+								}
+							}
+						}
 					} else {
 						var err = (response.data && response.data.message) ? response.data.message : gaeAdminData.strings.syncFailed;
 						$syncStatus.css('color', '#ef4444').text(err);

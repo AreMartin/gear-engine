@@ -1087,9 +1087,12 @@ class Gear_Engine_Settings {
 			ob_end_clean();
 		}
 
+		$published_count = wp_count_posts( Gear_Engine_CPT::POST_TYPE );
+		$total_products  = (int) ( $published_count->publish ?? 0 );
+
 		wp_send_json_success(
 			array(
-				'message' => sprintf(
+				'message'        => sprintf(
 					/* translators: 1: Processed count, 2: Inserted, 3: Updated, 4: Skipped, 5: Cap notice, 6: Error notice */
 					__( 'Sync complete! Processed: %1$d (Inserted: %2$d, Updated: %3$d, Skipped: %4$d)%5$s%6$s', 'gear-engine' ),
 					absint( $report['processed'] ?? 0 ),
@@ -1099,7 +1102,8 @@ class Gear_Engine_Settings {
 					$cap_notice,
 					$err_notice
 				),
-				'report'  => $report,
+				'report'         => $report,
+				'total_products' => $total_products,
 			)
 		);
 	}
