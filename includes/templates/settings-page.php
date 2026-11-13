@@ -98,7 +98,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<input type="number" id="gae-quick-limit-input" value="<?php echo esc_attr( $sync_limit ); ?>" min="0" max="10000" class="small-text" title="<?php esc_attr_e( 'Custom product limit (0 = unlimited)', 'gear-engine' ); ?>" />
 					</div>
 					<p class="description" style="margin-top: 6px; font-size: 11px; color: #64748b;">
-						<?php printf( esc_html__( 'Total Catalog Cap: %d products maximum. Sync stops when cap is reached.', 'gear-engine' ), $catalog_cap ); ?>
+						<?php
+						if ( $catalog_cap <= 0 ) {
+							esc_html_e( 'Total Catalog Cap: Unlimited (0 = no cap).', 'gear-engine' );
+						} else {
+							printf( esc_html__( 'Total Catalog Cap: %d products maximum. Sync stops when cap is reached.', 'gear-engine' ), $catalog_cap );
+						}
+						?>
 					</p>
 				</div>
 
@@ -142,7 +148,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<!-- Populated dynamically by admin.js from current settings -->
 				</div>
 				<div class="gae-add-pill-row" style="margin-top: 8px; display: flex; gap: 8px;">
-					<input type="text" id="gae-new-cat-input" placeholder="<?php esc_attr_e( 'Add category keyword (e.g. Vektsett, Massasjepistol)...', 'gear-engine' ); ?>" class="regular-text" style="height: 30px; font-size: 12px; max-width: 320px;" />
+					<input type="text" id="gae-new-cat-input" placeholder="<?php esc_attr_e( 'Add category keyword (e.g. Vektsett)...', 'gear-engine' ); ?>" class="regular-text" style="height: 30px; font-size: 12px; max-width: 320px;" />
 					<button type="button" id="gae-add-cat-btn" class="button button-secondary"><?php esc_html_e( '+ Add Category', 'gear-engine' ); ?></button>
 				</div>
 			</div>

@@ -111,11 +111,26 @@
 			return active;
 		}
 
+		var filterAutoSaveTimer = null;
+		function autoSaveFiltersSilent() {
+			if (!gaeAdminData || !gaeAdminData.ajaxUrl || !gaeAdminData.syncNonce) return;
+			clearTimeout(filterAutoSaveTimer);
+			filterAutoSaveTimer = setTimeout(function() {
+				$.post(gaeAdminData.ajaxUrl, {
+					action: 'gae_save_dashboard_filters',
+					nonce: gaeAdminData.syncNonce,
+					categories: getActiveCategories().join(', '),
+					excluded_keywords: (typeof blockedKeywords !== 'undefined' ? blockedKeywords.join(', ') : '')
+				});
+			}, 300);
+		}
+
 		function syncCatTextarea() {
 			var active = getActiveCategories();
 			if ($catTextarea.length) {
 				$catTextarea.val(active.join(', '));
 			}
+			autoSaveFiltersSilent();
 		}
 
 		renderCategoryPills();
@@ -224,6 +239,7 @@
 			$('#gae-new-kw-input').val('');
 			renderKeywordChips();
 			syncKwTextarea();
+			autoSaveFiltersSilent();
 		});
 
 		$('#gae-new-kw-input').on('keypress', function(e) {
@@ -431,7 +447,8 @@
 					max_price: $('#gae-quick-max-price').val(),
 					min_discount_pct: $('#gae-quick-min-discount').val(),
 					categories: getActiveCategories().join(', '),
-					excluded_keywords: blockedKeywords.join(', ')
+					excluded_keywords: blockedKeywords.join(', '),
+					save_filters: 1
 				};
 
 				$.ajax({
@@ -521,7 +538,8 @@
 					max_price: $('#gae-quick-max-price').val(),
 					min_discount_pct: $('#gae-quick-min-discount').val(),
 					categories: getActiveCategories().join(', '),
-					excluded_keywords: blockedKeywords.join(', ')
+					excluded_keywords: blockedKeywords.join(', '),
+					save_filters: 1
 				};
 
 				$.ajax({
