@@ -12,6 +12,7 @@ define( 'GEAR_ENGINE_VERSION', '1.0.0' );
 $registered_assets = array();
 
 function add_action() {}
+function apply_filters( $hook_name, $value ) { return $value; }
 function add_shortcode() {}
 function wp_register_style( $handle, $src = '', $deps = array(), $version = false, $media = 'all' ) {
 	global $registered_assets;
@@ -35,6 +36,16 @@ function esc_html_e( $s ) { echo esc_html( $s ); }
 function esc_attr_e( $s ) { echo esc_attr( $s ); }
 function __( $s ) { return $s; }
 function home_url( $p = '' ) { return 'http://example.com' . $p; }
+function trailingslashit( $s ) { return rtrim( (string) $s, '/\\' ) . '/'; }
+function add_query_arg( $args, $url = '' ) {
+	if ( is_array( $args ) ) {
+		$sep = strpos( $url, '?' ) === false ? '?' : '&';
+		return $url . $sep . http_build_query( $args );
+	}
+	return $url;
+}
+function get_page_by_path( $page_path, $output = 'OBJECT', $post_type = 'page' ) { return null; }
+function get_posts( $args = null ) { return array(); }
 function sanitize_text_field( $s ) { return trim( strip_tags( (string) $s ) ); }
 function sanitize_key( $key ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) ); }
 function absint( $n ) { return abs( (int) $n ); }
