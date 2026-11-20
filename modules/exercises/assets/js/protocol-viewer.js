@@ -177,6 +177,25 @@
 				return;
 			}
 
+			// Hub category / area filter chip toggle.
+			var filterChip = target.closest( '.gear-engine-program__chip' );
+			if ( filterChip ) {
+				var selectedArea = filterChip.getAttribute( 'data-area' ) || 'all';
+				var allChips = root.querySelectorAll( '.gear-engine-program__chip' );
+				allChips.forEach( function ( c ) {
+					var isSelected = ( c === filterChip );
+					c.classList.toggle( 'gear-engine-program__chip--active', isSelected );
+					c.setAttribute( 'aria-pressed', isSelected ? 'true' : 'false' );
+				} );
+				var indexItems = root.querySelectorAll( '.gear-engine-program__index-item' );
+				indexItems.forEach( function ( item ) {
+					var itemArea = item.getAttribute( 'data-area' ) || '';
+					var showItem = ( 'all' === selectedArea || itemArea === selectedArea );
+					item.style.display = showItem ? '' : 'none';
+				} );
+				return;
+			}
+
 			// View mode toggle.
 			var modeBtn = target.closest( '.gear-engine-program__mode-btn' );
 			if ( modeBtn ) {

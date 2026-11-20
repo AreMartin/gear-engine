@@ -586,6 +586,96 @@ class Gear_Engine_Protocol_Viewer {
 	}
 
 	/**
+	 * Canonical anatomical body areas in top-to-toe order.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_area_labels(): array {
+		return array(
+			'nakke'     => __( 'Nakke', 'gear-engine' ),
+			'skulder'   => __( 'Skulder', 'gear-engine' ),
+			'rygg'      => __( 'Rygg', 'gear-engine' ),
+			'hofte'     => __( 'Hofte', 'gear-engine' ),
+			'kne'       => __( 'Kne', 'gear-engine' ),
+			'fot-ankel' => __( 'Fot og ankel', 'gear-engine' ),
+		);
+	}
+
+	/**
+	 * Resolve canonical area slug and label for a protocol from its exercises or metadata.
+	 *
+	 * @param array<string, mixed>             $protocol  Protocol data array.
+	 * @param array<int, array<string, mixed>> $exercises Exercises assigned to the protocol.
+	 * @return array{slug: string, label: string}
+	 */
+	public static function resolve_protocol_area( array $protocol, array $exercises = array() ): array {
+		$labels = self::get_area_labels();
+		$alias  = array(
+			'nakke'        => 'nakke',
+			'skulder'      => 'skulder',
+			'rygg'         => 'rygg',
+			'korsrygg'     => 'rygg',
+			'hofte'        => 'hofte',
+			'kne'          => 'kne',
+			'fot'          => 'fot-ankel',
+			'ankel'        => 'fot-ankel',
+			'fot-ankel'    => 'fot-ankel',
+			'fot-og-ankel' => 'fot-ankel',
+		);
+
+		foreach ( $exercises as $ex ) {
+			$raw_areas = $ex['area'] ?? array();
+			if ( is_string( $raw_areas ) && '' !== $raw_areas ) {
+				$raw_areas = array( $raw_areas );
+			}
+			if ( is_array( $raw_areas ) ) {
+				foreach ( $raw_areas as $raw_area ) {
+					$key = sanitize_title( (string) $raw_area );
+					if ( isset( $alias[ $key ] ) ) {
+						$canon = $alias[ $key ];
+						return array(
+							'slug'  => $canon,
+							'label' => $labels[ $canon ],
+						);
+					}
+				}
+			}
+		}
+
+		$haystack = mb_strtolower(
+			(string) ( $protocol['slug'] ?? '' ) . ' ' .
+			(string) ( $protocol['name'] ?? '' ) . ' ' .
+			(string) ( $protocol['summary'] ?? '' ),
+			'UTF-8'
+		);
+
+		$keyword_map = array(
+			'nakke'     => array( 'nakke', 'cervikal' ),
+			'skulder'   => array( 'skulder', 'saps', 'subakromial', 'rotator' ),
+			'rygg'      => array( 'rygg', 'lumbago', 'korsrygg', 'isjias' ),
+			'hofte'     => array( 'hofte', 'trokanter', 'gtps', 'bekken' ),
+			'kne'       => array( 'kne', 'loperkne', 'løperkne', 'patello', 'pfps', 'menisk' ),
+			'fot-ankel' => array( 'fot', 'ankel', 'plantar', 'akilles', 'hæl', 'hael' ),
+		);
+
+		foreach ( $keyword_map as $canon => $keywords ) {
+			foreach ( $keywords as $kw ) {
+				if ( false !== mb_strpos( $haystack, $kw ) ) {
+					return array(
+						'slug'  => $canon,
+						'label' => $labels[ $canon ],
+					);
+				}
+			}
+		}
+
+		return array(
+			'slug'  => 'annet',
+			'label' => __( 'Opptreningsprogram', 'gear-engine' ),
+		);
+	}
+
+	/**
 	 * Approved protocols that have at least one exercise (used by the index view).
 	 *
 	 * @return array<int, array<string, mixed>>
@@ -609,11 +699,37 @@ class Gear_Engine_Protocol_Viewer {
 			if ( Gear_Engine_Protocols::GEAR_ENGINE_STATUS_APPROVED !== Gear_Engine_Protocols::get_status( (int) $term->term_id ) ) {
 				continue;
 			}
-			if ( ! Gear_Engine_Exercise_Service::search_exercises( array( 'protocol' => (string) $term->slug, 'limit' => 1 ) ) ) {
+			$exercises = Gear_Engine_Exercise_Service::search_exercises(
+				array(
+					'protocol' => (string) $term->slug,
+					'limit'    => self::EXERCISE_LIMIT,
+				)
+			);
+			if ( ! $exercises ) {
 				continue;
 			}
-			$list[] = Gear_Engine_Protocols::get_protocol_data( $term );
+			$data                   = Gear_Engine_Protocols::get_protocol_data( $term );
+			$area                   = self::resolve_protocol_area( $data, $exercises );
+			$data['area_slug']      = $area['slug'];
+			$data['area_label']     = $area['label'];
+			$data['exercise_count'] = count( $exercises );
+			$list[]                 = $data;
 		}
+
+		// Sort anatomically (top-to-toe) first, then alphabetically by title.
+		$area_order = array_flip( array_keys( self::get_area_labels() ) );
+		usort(
+			$list,
+			static function ( array $a, array $b ) use ( $area_order ): int {
+				$order_a = $area_order[ $a['area_slug'] ?? '' ] ?? 99;
+				$order_b = $area_order[ $b['area_slug'] ?? '' ] ?? 99;
+				if ( $order_a !== $order_b ) {
+					return $order_a <=> $order_b;
+				}
+				return strcasecmp( (string) ( $a['name'] ?? '' ), (string) ( $b['name'] ?? '' ) );
+			}
+		);
+
 		return $list;
 	}
 

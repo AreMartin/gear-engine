@@ -545,90 +545,222 @@
 }
 
 /* =========================================================
-   7. Protocol Index View
+   7. Protocol Index View (Hub Harmonized with Picker & Live Site)
    ========================================================= */
+.gear-engine-program__hub-header {
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	padding: 8px 0 16px;
+	box-shadow: none;
+	margin-bottom: 8px;
+	text-align: left;
+}
+
+.gear-engine-program__hub-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+	color: var(--gep-navy);
+	margin-bottom: 6px;
+}
+
+.gear-engine-program__hub-badge-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--gep-green);
+	display: inline-block;
+}
+
+.gear-engine-program__hub-title {
+	margin: 0 0 8px;
+	color: var(--gep-heading);
+	font-size: 28px;
+	line-height: 36px;
+	font-weight: 700;
+	letter-spacing: -0.5px;
+}
+
+.gear-engine-program__hub-ingress {
+	margin: 0;
+	max-width: 60ch;
+	color: var(--gep-muted);
+	font-size: 15px;
+	line-height: 22px;
+}
+
+/* Filter Pill Navigation (Identical M3 Chip Pattern as Gear Picker & Price Comparison) */
+.gear-engine-program__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 20px;
+}
+
+.gear-engine-program__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid var(--gep-border);
+	border-radius: var(--gep-radius-full);
+	background: #FFFFFF;
+	color: var(--gep-heading);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	letter-spacing: 0.05px;
+	cursor: pointer;
+	box-shadow: none;
+	white-space: nowrap;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	user-select: none;
+}
+
+.gear-engine-program__chip:hover:not(.gear-engine-program__chip--active):not([aria-pressed="true"]) {
+	border-color: var(--gep-border);
+	background: #F2F4F7;
+	color: var(--gep-heading);
+}
+
+.gear-engine-program__chip--active,
+.gear-engine-program__chip[aria-pressed="true"] {
+	padding: 0 16px 0 12px;
+	border-color: transparent !important;
+	background: var(--gep-green-bg, #DCF5E8) !important;
+	color: var(--gep-green, #005236) !important;
+	font-weight: 600;
+}
+
+.gear-engine-program__chip--active:hover,
+.gear-engine-program__chip[aria-pressed="true"]:hover {
+	background: #D5F1E2 !important;
+	color: var(--gep-green, #005236) !important;
+}
+
+.gear-engine-program__chip-check {
+	display: none !important;
+	width: 15px;
+	height: 15px;
+	color: var(--gep-green, #005236);
+	flex-shrink: 0;
+}
+
+.gear-engine-program__chip--active .gear-engine-program__chip-check,
+.gear-engine-program__chip[aria-pressed="true"] .gear-engine-program__chip-check {
+	display: inline-block !important;
+}
+
+/* Protocol Cards Grid */
 .gear-engine-program__index {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-	gap: 16px;
-	margin: 0;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	margin: 18px 0 0;
 	padding: 0;
 	list-style: none;
+}
+
+.gear-engine-program__index-item {
+	display: flex;
+	margin: 0;
+	padding: 0;
 }
 
 .gear-engine-program__card {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 16px;
-	padding: 22px 24px;
-	border: 1px solid var(--gep-border);
-	border-radius: var(--gep-radius-lg);
+	gap: 14px;
+	width: 100%;
+	padding: 16px 18px;
+	border: 1px solid #EAECF0;
+	border-radius: 14px;
 	background: var(--gep-surface);
 	color: inherit;
 	text-decoration: none;
-	box-shadow: var(--gep-shadow-1);
-	transition: border-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-	            box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-	            transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+	box-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .gear-engine-program__card:hover {
-	border-color: var(--ge-navy-200, #CBD7E6);
-	box-shadow: var(--gep-shadow-2);
-	transform: translateY(-2px);
+	background: #F4F6F9;
+	border-color: #DDE3EA;
 }
 
-.gear-engine-program__card-content {
+.gear-engine-program__card-body {
 	flex: 1;
 	min-width: 0;
 }
 
-.gear-engine-program__card-pill {
-	display: inline-block;
-	padding: 3px 10px;
-	margin-bottom: 8px;
-	background: var(--gep-navy-container);
-	border: 1px solid var(--gep-navy-border);
-	border-radius: var(--gep-radius-full);
-	color: var(--gep-navy);
-	font-size: 0.72rem;
-	font-weight: 600;
-}
-
-.gear-engine-program__card-title {
+.gear-engine-program__index-title {
 	display: block;
 	color: var(--gep-heading);
-	font-weight: 700;
-	font-size: 1.15rem;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 1.35;
+	letter-spacing: -0.01em;
+	white-space: normal;
+	overflow: visible;
+}
+
+.gear-engine-program__card-sub {
+	display: block;
+	margin-top: 3px;
+	color: var(--gep-muted);
+	font-size: 13px;
+	font-weight: 400;
 	line-height: 1.3;
 }
 
-.gear-engine-program__card-summary {
-	display: block;
-	margin-top: 6px;
-	color: var(--gep-muted);
-	font-size: 0.9rem;
-	line-height: 1.5;
-}
-
 .gear-engine-program__card-arrow {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
-	background: var(--gep-bg);
-	color: var(--gep-navy);
+	color: #98A2B3;
 	flex-shrink: 0;
-	transition: background 0.18s ease, transform 0.18s ease;
+	transition: color 0.15s ease;
 }
 
 .gear-engine-program__card:hover .gear-engine-program__card-arrow {
-	background: var(--gep-navy);
-	color: #FFFFFF;
-	transform: translateX(2px);
+	color: var(--gep-navy);
+}
+
+/* Trust Signals Footer (Harmonized with Triage & Gear Picker Hubs) */
+.gear-engine-program__trust-banner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 32px;
+	margin-top: 36px;
+	padding-top: 24px;
+	border-top: 1px solid var(--gep-border);
+	flex-wrap: wrap;
+}
+
+.gear-engine-program__trust-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13.5px;
+	color: var(--gep-muted);
+}
+
+.gear-engine-program__trust-item strong {
+	color: var(--gep-heading);
+	font-weight: 600;
+}
+
+.gear-engine-program__trust-item svg {
+	color: var(--gep-green);
+	flex-shrink: 0;
 }
 
 /* =========================================================
@@ -750,12 +882,23 @@
 		font-size: 1.45rem;
 	}
 
+	.gear-engine-program__hub-title {
+		font-size: 24px;
+		line-height: 32px;
+	}
+
 	.gear-engine-program__exercise {
 		padding: 18px 16px;
 	}
 
 	.gear-engine-program__index {
 		grid-template-columns: 1fr;
+	}
+
+	.gear-engine-program__trust-banner {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
 	}
 
 	.gear-engine-program__actions {
