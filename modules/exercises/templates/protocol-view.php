@@ -19,9 +19,16 @@ $total_exercises = 0;
 foreach ( $groups as $grp ) {
 	$total_exercises += count( $grp['exercises'] );
 }
+$hub_url = ( function_exists( 'home_url' ) && function_exists( 'trailingslashit' ) && function_exists( 'get_option' ) )
+	? trailingslashit( home_url( Gear_Engine_Protocol_Viewer::get_page_path() ) )
+	: '/treningsprogram/';
 ?>
 <div class="gear-engine-program" data-active-mode="stepper">
 	<header class="gear-engine-program__head">
+		<a class="gear-engine-program__back-link gear-engine-program__noprint" href="<?php echo esc_url( $hub_url ); ?>">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+			<span><?php esc_html_e( 'Alle treningsprogrammer', 'gear-engine' ); ?></span>
+		</a>
 		<div class="gear-engine-program__badge">
 			<span class="gear-engine-program__badge-dot"></span>
 			<?php esc_html_e( 'Kvalitetssikret treningsprogram', 'gear-engine' ); ?>

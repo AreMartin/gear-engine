@@ -71,30 +71,50 @@
 }
 
 /* =========================================================
-   2. Header & Hero Tonal Container
+   2. Header (Harmonized Open Minimalist Layout)
    ========================================================= */
 .gear-engine-program__head {
-	background: var(--gep-navy-container);
-	border: 1px solid var(--gep-navy-border);
-	border-radius: var(--gep-radius-xl);
-	padding: 24px 28px;
-	margin-bottom: 32px;
-	box-shadow: var(--gep-shadow-1);
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #EAECF0;
+	border-radius: 0;
+	padding: 8px 0 20px;
+	margin-bottom: 20px;
+	box-shadow: none;
+}
+
+.gear-engine-program__back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 14px;
+	color: var(--gep-muted);
+	font-size: 13.5px;
+	font-weight: 500;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.gear-engine-program__back-link:hover {
+	color: var(--gep-navy);
+	text-decoration: none;
 }
 
 .gear-engine-program__badge {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 8px;
-	padding: 4px 12px;
-	background: var(--gep-surface);
-	border: 1px solid #D0DBE5;
-	border-radius: var(--gep-radius-full);
+	gap: 6px;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: 0;
 	color: var(--gep-navy);
 	font-size: 12px;
-	font-weight: 600;
-	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.04);
-	margin-bottom: 12px;
+	font-weight: 700;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+	box-shadow: none;
+	margin-bottom: 6px;
 }
 
 .gear-engine-program__badge-dot {
@@ -106,69 +126,82 @@
 }
 
 .gear-engine-program__title {
-	margin: 0 0 10px;
+	margin: 0 0 8px;
 	color: var(--gep-heading);
-	font-size: 1.75rem;
+	font-size: 28px;
 	font-weight: 700;
-	line-height: 1.25;
-	letter-spacing: -0.02em;
+	line-height: 36px;
+	letter-spacing: -0.5px;
 }
 
 .gear-engine-program__summary {
-	margin: 0 0 16px;
-	color: var(--gep-text);
-	font-size: 1rem;
-	line-height: 1.6;
+	margin: 0;
+	max-width: 62ch;
+	color: var(--gep-muted);
+	font-size: 15px;
+	line-height: 22px;
 }
 
 .gear-engine-program__dosage {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	margin: 0 0 12px;
-	padding: 10px 14px;
-	background: var(--gep-surface);
-	border: 1px solid var(--gep-navy-border);
-	border-radius: var(--gep-radius-sm);
-	color: var(--gep-navy);
-	font-size: 0.9rem;
-	font-weight: 500;
+	gap: 7px;
+	margin: 14px 0 0;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	color: var(--gep-text);
+	font-size: 13.5px;
+	font-weight: 400;
+}
+
+.gear-engine-program__dosage svg {
+	color: var(--gep-muted);
 }
 
 .gear-engine-program__dosage strong {
-	color: var(--gep-navy);
-	font-weight: 700;
+	color: var(--gep-heading);
+	font-weight: 600;
 }
 
 .gear-engine-program__warning {
 	display: flex;
 	align-items: flex-start;
-	gap: 12px;
-	margin: 16px 0 0;
-	padding: 14px 18px;
-	border: 1px solid var(--gep-coral-border);
-	border-radius: var(--gep-radius-md);
-	background: var(--gep-coral-bg);
-	color: var(--gep-coral-text);
+	gap: 10px;
+	margin: 14px 0 0;
+	padding: 11px 14px;
+	border: 1px solid #EAECF0;
+	border-radius: 12px;
+	background: #F8FAFC;
+	color: var(--gep-text);
 }
 
 .gear-engine-program__warning-icon {
-	margin-top: 2px;
-	color: #B42318;
+	margin-top: 1px;
+	color: #D97706;
+	flex-shrink: 0;
+}
+
+.gear-engine-program__warning-icon svg {
+	width: 17px;
+	height: 17px;
 }
 
 .gear-engine-program__warning strong {
-	display: block;
-	font-size: 0.92rem;
-	font-weight: 700;
-	color: #912018;
+	display: inline;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--gep-heading);
+	margin-right: 4px;
 }
 
 .gear-engine-program__warning p {
-	margin: 4px 0 0;
-	font-size: 0.88rem;
+	display: inline;
+	margin: 0;
+	font-size: 13px;
 	line-height: 1.5;
-	color: #B42318;
+	color: var(--gep-muted);
 }
 
 /* =========================================================
@@ -874,12 +907,13 @@
 	}
 
 	.gear-engine-program__head {
-		padding: 20px 18px;
-		border-radius: var(--gep-radius-lg);
+		padding: 8px 0 16px;
+		border-radius: 0;
 	}
 
 	.gear-engine-program__title {
-		font-size: 1.45rem;
+		font-size: 24px;
+		line-height: 32px;
 	}
 
 	.gear-engine-program__hub-title {
@@ -980,93 +1014,86 @@
 
 .gear-engine-program__phase-tabs {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
-	overflow-x: auto;
-	padding-bottom: 6px;
-	margin-bottom: 24px;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
-}
-
-.gear-engine-program__phase-tabs::-webkit-scrollbar {
-	display: none;
+	margin-bottom: 16px;
 }
 
 .gear-engine-program__phase-tab {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	padding: 8px 16px;
+	gap: 6px;
+	height: 36px;
+	padding: 0 16px;
 	border-radius: var(--gep-radius-full);
-	background: var(--gep-bg);
+	background: #FFFFFF;
 	border: 1px solid var(--gep-border);
-	color: var(--gep-text);
-	font-size: 13px;
-	font-weight: 600;
+	color: var(--gep-heading);
+	font-size: 13.5px;
+	font-weight: 500;
 	cursor: pointer;
 	white-space: nowrap;
-	transition: all 0.2s ease;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.gear-engine-program__phase-tab:hover {
-	border-color: var(--gep-navy-border);
-	color: var(--gep-navy);
+.gear-engine-program__phase-tab:hover:not(.gear-engine-program__phase-tab--active) {
+	background: #F2F4F7;
+	border-color: var(--gep-border);
+	color: var(--gep-heading);
 }
 
 .gear-engine-program__phase-tab--active {
-	background: var(--gep-navy);
-	color: #ffffff;
-	border-color: var(--gep-navy);
-	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.15);
+	background: var(--gep-green-bg, #DCF5E8);
+	color: var(--gep-green, #005236);
+	border-color: transparent;
+	font-weight: 600;
+	box-shadow: none;
 }
 
 .gear-engine-program__phase-tab--active:hover {
-	background: #111c27;
-	color: #ffffff;
+	background: #D5F1E2;
+	color: var(--gep-green, #005236);
 }
 
 .gear-engine-program__phase-tab-dot {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background: var(--gep-green);
+	background: currentColor;
+	opacity: 0.45;
 	display: inline-block;
 }
 
-.gear-engine-program__phase-count {
-	background: rgba(0, 0, 0, 0.07);
-	padding: 1px 6px;
-	border-radius: var(--gep-radius-full);
-	font-size: 11px;
-	font-weight: 700;
+.gear-engine-program__phase-tab--active .gear-engine-program__phase-tab-dot {
+	background: var(--gep-green, #005236);
+	opacity: 1;
 }
 
-.gear-engine-program__phase-tab--active .gear-engine-program__phase-count {
-	background: rgba(255, 255, 255, 0.2);
-	color: #ffffff;
+.gear-engine-program__phase-count {
+	display: none;
 }
 
 .gear-engine-program__phase-callout {
 	display: flex;
 	align-items: flex-start;
-	gap: 12px;
-	background: #F0FDF4;
-	border: 1px solid #DCFCE7;
-	border-left: 4px solid var(--ge-green-600, #00A878);
-	border-radius: var(--gep-radius-sm);
-	padding: 14px 18px;
-	margin-bottom: 20px;
+	gap: 10px;
+	background: #F8FAFC;
+	border: 1px solid #EAECF0;
+	border-radius: 12px;
+	padding: 11px 14px;
+	margin-bottom: 18px;
 }
 
 .gear-engine-program__phase-callout-icon {
-	color: var(--ge-green-600, #00A878);
+	color: var(--gep-muted);
 	margin-top: 1px;
+	flex-shrink: 0;
 }
 
 .gear-engine-program__phase-callout p {
 	margin: 0;
-	font-size: 14px;
-	color: #166534;
+	font-size: 13.5px;
+	color: var(--gep-text);
 	line-height: 1.5;
 }
 
