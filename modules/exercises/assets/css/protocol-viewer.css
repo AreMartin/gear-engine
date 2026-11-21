@@ -691,14 +691,26 @@
 	display: inline-block !important;
 }
 
-/* Protocol Cards Grid */
+/* Protocol Cards Grid (1 column when < 860px container width, 2 columns if widened >= 860px) */
+.gear-engine-program--hub {
+	container-type: inline-size;
+	container-name: gep-hub;
+}
+
 .gear-engine-program__index {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 10px;
-	margin: 18px 0 0;
+	grid-template-columns: 1fr;
+	gap: 12px;
+	margin: 22px 0 0;
 	padding: 0;
 	list-style: none;
+}
+
+@container gep-hub (min-width: 860px) {
+	.gear-engine-program__index {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px;
+	}
 }
 
 .gear-engine-program__index-item {
@@ -711,21 +723,21 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 14px;
+	gap: 16px;
 	width: 100%;
-	padding: 16px 18px;
-	border: 1px solid #EAECF0;
-	border-radius: 14px;
-	background: var(--gep-surface);
+	padding: 16px 20px;
+	border: none;
+	border-radius: 22px;
+	background: #FFFFFF;
 	color: inherit;
 	text-decoration: none;
-	box-shadow: none;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.025);
+	transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .gear-engine-program__card:hover {
-	background: #F4F6F9;
-	border-color: #DDE3EA;
+	background: #FAFBFD;
+	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.06);
 }
 
 .gear-engine-program__card-body {
@@ -737,8 +749,8 @@
 	display: block;
 	color: var(--gep-heading);
 	font-weight: 600;
-	font-size: 15px;
-	line-height: 1.35;
+	font-size: 16px;
+	line-height: 1.3;
 	letter-spacing: -0.01em;
 	white-space: normal;
 	overflow: visible;
@@ -746,18 +758,45 @@
 
 .gear-engine-program__card-sub {
 	display: block;
-	margin-top: 3px;
+	margin-top: 4px;
 	color: var(--gep-muted);
 	font-size: 13px;
 	font-weight: 400;
-	line-height: 1.3;
+	line-height: 1.35;
 }
+
+.gear-engine-program__card-right {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.gear-engine-program__card-pill {
+	display: inline-flex;
+	align-items: center;
+	height: 26px;
+	padding: 0 11px;
+	border-radius: 999px;
+	background: #EAF0F6;
+	color: #0C2340;
+	font-size: 12px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.gear-engine-program__index-item[data-area="nakke"] .gear-engine-program__card-pill     { background: #E6F2FA; color: #0C2340; }
+.gear-engine-program__index-item[data-area="skulder"] .gear-engine-program__card-pill   { background: #EAEAF8; color: #1E293B; }
+.gear-engine-program__index-item[data-area="rygg"] .gear-engine-program__card-pill      { background: #E3F5EC; color: #005236; }
+.gear-engine-program__index-item[data-area="hofte"] .gear-engine-program__card-pill     { background: #FEF0E6; color: #7C2D12; }
+.gear-engine-program__index-item[data-area="kne"] .gear-engine-program__card-pill       { background: #E6F2FA; color: #0C2340; }
+.gear-engine-program__index-item[data-area="fot-ankel"] .gear-engine-program__card-pill { background: #E3F5EC; color: #005236; }
 
 .gear-engine-program__card-arrow {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	color: #98A2B3;
+	color: #667085;
 	flex-shrink: 0;
 	transition: color 0.15s ease;
 }
@@ -927,6 +966,16 @@
 
 	.gear-engine-program__index {
 		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.gear-engine-program__card {
+		padding: 15px 16px;
+		border-radius: 18px;
+	}
+
+	.gear-engine-program__index-title {
+		font-size: 15px;
 	}
 
 	.gear-engine-program__trust-banner {

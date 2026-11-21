@@ -123,6 +123,7 @@
 		'antonsport':      'antonsport.no',
 		'tights':          'tights.no',
 		'milrab':          'milrab.no',
+		'farmasiet':       'farmasiet.no',
 		'proteinfabrikken':'proteinfabrikken.no'
 	};
 
@@ -145,7 +146,7 @@
 			try {
 				var u = new URL( item.url );
 				var host = u.hostname.replace( /^www\./, '' );
-				if ( host && host.indexOf( 'adtr.co' ) === -1 && host.indexOf( 'tradetracker' ) === -1 && host.indexOf( 'example.com' ) === -1 ) {
+				if ( host && host.indexOf( 'adtr.co' ) === -1 && host.indexOf( 'tradetracker' ) === -1 && host.indexOf( 'tradedoubler' ) === -1 && host.indexOf( 'example.com' ) === -1 ) {
 					domain = host;
 				}
 			} catch ( e ) {}
@@ -466,32 +467,41 @@
 
 			h += '</div></header>';
 
-			if ( deals.length ) {
-				h += '<div class="sec-head"><h3 class="title-l">Mest populære tilbud</h3><button type="button" class="btn text sl" data-action="deals">Se alle</button></div>';
-				h += '<div class="deal-grid">';
-				deals.forEach( function ( d ) {
-					var disc = d.old > d.price ? Math.round( ( ( d.old - d.price ) / d.old ) * 100 ) : 0;
-
-					h += '<div class="card elevated stack">' +
-						'<div class="art" style="height:150px">' +
-							( disc ? '<span class="pill err disc">−' + disc + '%</span>' : '' ) +
-							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
-						'</div>' +
-						'<div class="head-row" style="margin:14px 0 4px"><span class="body-s muted" style="font-weight:700;letter-spacing:0.3px;text-transform:uppercase">' + esc( cleanShopName( d.shop ) ) + '</span><span class="pill warn">Populær</span></div>' +
-						'<h4 class="title-m" style="margin:0 0 8px">' + esc( d.name ) + '</h4>' +
-						'<div class="specs">' + renderProductPills( config, d, true ) + '</div>' +
-						'<div class="pricebar row" style="margin-top:16px"><div class="price"><b class="num">' + money( d.price, d.cur ) + '</b>' + ( d.old > d.price ? '<s class="num">' + money( d.old, d.cur ) + '</s>' : '' ) + '</div>' +
-						'<a class="btn filled sl" href="' + safeUrl( d.url ) + '" target="_blank" rel="noopener nofollow sponsored">Se deal' + ic( 'ext', 16 ) + '</a></div>' +
-						'</div>';
-				} );
-				h += '</div>';
-			}
-
 			if ( config.presets && config.presets.length ) {
 				h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +
 					'<div class="tiles">';
 				config.presets.forEach( function ( pr ) {
-					h += '<button type="button" class="tile sl" data-action="quick" data-preset="' + esc( pr.key ) + '"><span class="ti">' + ic( pr.icon || 'sliders', 22 ) + '</span><span><b>' + esc( pr.label ) + '</b><small>' + esc( pr.desc ) + '</small></span></button>';
+					h += '<button type="button" class="tile" data-action="quick" data-preset="' + esc( pr.key ) + '">' +
+						'<span class="ti">' + ic( pr.icon || 'sliders', 20 ) + '</span>' +
+						'<span class="tile-body"><b>' + esc( pr.label ) + '</b><small>' + esc( pr.desc ) + '</small></span>' +
+						'<span class="tile-arrow">' + ic( 'chevR', 18 ) + '</span>' +
+					'</button>';
+				} );
+				h += '</div>';
+			}
+
+			if ( deals.length ) {
+				h += '<div class="sec-head" style="margin-top:34px"><h3 class="title-l">Mest populære tilbud</h3><button type="button" class="btn text sl" data-action="deals">Se alle →</button></div>';
+				h += '<div class="deal-grid">';
+				deals.forEach( function ( d ) {
+					var disc = d.old > d.price ? Math.round( ( ( d.old - d.price ) / d.old ) * 100 ) : ( d.discount || 0 );
+					var save = ( d.old && d.old > d.price ) ? ( d.old - d.price ) : 0;
+
+					h += '<a class="fp-deal-card" href="' + safeUrl( d.url ) + '" target="_blank" rel="noopener nofollow sponsored">' +
+						'<div class="fp-deal-card__media">' +
+							( disc ? '<span class="fp-deal-card__badge">-' + disc + ' %</span>' : '' ) +
+							( d.img ? '<img src="' + esc( d.img ) + '" alt="' + esc( d.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
+						'</div>' +
+						'<div class="fp-deal-card__title">' + esc( d.name ) + '</div>' +
+						'<div class="fp-deal-card__price-row">' +
+							'<span class="fp-deal-card__price num">' + money( d.price, d.cur ) + '</span>' +
+							( d.old > d.price ? '<span class="fp-deal-card__old-price num">' + money( d.old, d.cur ) + '</span>' : '' ) +
+						'</div>' +
+						'<div class="fp-deal-card__meta-row">' +
+							( save > 0 ? '<span class="fp-deal-card__save num">Spar ' + money( save, d.cur ) + '</span>' : '<span></span>' ) +
+							'<span class="fp-deal-card__merchant">' + esc( cleanShopName( d.shop ) ) + ' ' + ic( 'ext', 13 ) + '</span>' +
+						'</div>' +
+					'</a>';
 				} );
 				h += '</div>';
 			}

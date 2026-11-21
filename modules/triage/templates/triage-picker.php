@@ -20,8 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="region-grid">
 		<?php foreach ( $cards as $card ) : ?>
-			<?php if ( ! empty( $card['image_url'] ) ) : ?>
-				<a class="region-tile region-card has-image" href="<?php echo esc_url( $card['url'] ); ?>">
+			<?php
+			$subtitle = ! empty( $card['subtitle'] ) ? (string) $card['subtitle'] : (string) ( $card['summary'] ?? '' );
+			?>
+			<a class="region-tile region-card <?php echo ! empty( $card['image_url'] ) ? 'has-image' : 'is-text-only'; ?>" href="<?php echo esc_url( $card['url'] ); ?>">
+				<?php if ( ! empty( $card['image_url'] ) ) : ?>
 					<div class="tile-img-box">
 						<?php
 						$img_pos    = ! empty( $card['image_position'] ) ? $card['image_position'] : 'center center';
@@ -35,13 +38,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 						echo apply_filters( 'gear_engine_triage_region_card_media', $media_html, $card ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						?>
 					</div>
-					<div class="tile-caption"><?php echo esc_html( $card['label'] ); ?></div>
-				</a>
-			<?php else : ?>
-				<a class="region-tile region-card is-text-only" href="<?php echo esc_url( $card['url'] ); ?>">
+				<?php endif; ?>
+				<div class="region-tile__body">
 					<span class="region-tile__label"><?php echo esc_html( $card['label'] ); ?></span>
-				</a>
-			<?php endif; ?>
+					<?php if ( '' !== $subtitle ) : ?>
+						<span class="region-tile__sub"><?php echo esc_html( $subtitle ); ?></span>
+					<?php endif; ?>
+				</div>
+				<div class="region-tile__right">
+					<span class="region-tile__pill"><?php esc_html_e( '2 min', 'gear-engine' ); ?></span>
+					<span class="rc-action" aria-hidden="true">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+					</span>
+				</div>
+			</a>
 		<?php endforeach; ?>
 	</div>
 

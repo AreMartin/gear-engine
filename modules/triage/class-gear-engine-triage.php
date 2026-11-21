@@ -193,10 +193,19 @@ class Gear_Engine_Triage {
 			/**
 			 * Filters whether region cards in the picker render images or pure minimal typography.
 			 *
-			 * @param bool $show Default false (pure typography).
+			 * @param bool $show Default true (photo thumbnail cards).
 			 */
-			$show_images = (bool) apply_filters( 'gear_engine_triage_show_images', false );
+			$show_images = (bool) apply_filters( 'gear_engine_triage_show_images', true );
 		}
+
+		$default_subtitles = array(
+			'nakke'     => __( 'Stivhet, kink eller utstråling', 'gear-engine' ),
+			'skulder'   => __( 'Smerter ved løft eller hvile', 'gear-engine' ),
+			'rygg'      => __( 'Kink, verking eller isjias', 'gear-engine' ),
+			'hofte'     => __( 'Smerter på utsiden eller i lysken', 'gear-engine' ),
+			'kne'       => __( 'Løping, trappegang eller hevelse', 'gear-engine' ),
+			'fot-ankel' => __( 'Hæl, akilles eller overtråkk', 'gear-engine' ),
+		);
 
 		$cards = array();
 		foreach ( self::get_regions() as $region ) {
@@ -261,6 +270,7 @@ class Gear_Engine_Triage {
 				'region'         => $region,
 				'label'          => isset( $config['label'] ) ? (string) $config['label'] : ucfirst( $region ),
 				'summary'        => isset( $config['summary'] ) ? (string) $config['summary'] : '',
+				'subtitle'       => $default_subtitles[ $region ] ?? ( ! empty( $chips ) ? implode( ', ', $chips ) : '' ),
 				'chips'          => $chips,
 				'badge'          => 'rygg' === $region ? 'Vanligst' : '',
 				'order'          => isset( $config['order'] ) ? (int) $config['order'] : 100,

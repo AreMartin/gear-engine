@@ -302,61 +302,166 @@
 	margin: 28px 0 14px;
 }
 
-/* Deal Grid on Intro */
+/* Deal Grid on Intro (Live-site Fysionett campaign deal card style) */
 .gear-engine-picker .deal-grid {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 14px;
+	gap: 18px;
 }
 @media (min-width: 580px) {
 	.gear-engine-picker .deal-grid { grid-template-columns: 1fr 1fr; }
 }
+.gear-engine-picker .fp-deal-card {
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+	color: inherit;
+}
+.gear-engine-picker .fp-deal-card__media {
+	position: relative;
+	width: 100%;
+	height: 190px;
+	background: #FFFFFF;
+	border-radius: 18px;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.025);
+	transition: box-shadow 0.15s ease;
+}
+.gear-engine-picker .fp-deal-card:hover .fp-deal-card__media {
+	box-shadow: 0 6px 16px rgba(12, 35, 64, 0.06);
+}
+.gear-engine-picker .fp-deal-card__media img,
+.gear-engine-picker .fp-deal-card__media svg {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	mix-blend-mode: multiply;
+	display: block;
+}
+.gear-engine-picker .fp-deal-card__badge {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	background: #FEF3C7;
+	color: #78350F;
+	font-size: 12px;
+	font-weight: 700;
+	padding: 3px 10px;
+	border-radius: 999px;
+}
+.gear-engine-picker .fp-deal-card__title {
+	margin-top: 12px;
+	font-size: 15.5px;
+	font-weight: 700;
+	color: var(--md-sys-color-primary, #0C2340);
+	line-height: 1.35;
+}
+.gear-engine-picker .fp-deal-card:hover .fp-deal-card__title {
+	text-decoration: underline;
+}
+.gear-engine-picker .fp-deal-card__price-row {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-top: 10px;
+}
+.gear-engine-picker .fp-deal-card__price {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--md-sys-color-primary, #0C2340);
+	letter-spacing: -0.02em;
+}
+.gear-engine-picker .fp-deal-card__old-price {
+	font-size: 13.5px;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	text-decoration: line-through;
+}
+.gear-engine-picker .fp-deal-card__meta-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 8px;
+}
+.gear-engine-picker .fp-deal-card__save {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: #DCF5E8;
+	color: #005236;
+	font-size: 12px;
+	font-weight: 600;
+}
+.gear-engine-picker .fp-deal-card__merchant {
+	font-size: 12.5px;
+	font-weight: 500;
+	color: #475467;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
 
-/* Quick Tiles (Velg etter bruksområde) */
+/* Quick Tiles (Velg etter bruksområde - M3 Health-App Card Style) */
 .gear-engine-picker .tiles {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 12px;
+	gap: 14px;
 }
-@media (min-width: 500px) {
+@media (min-width: 560px) {
 	.gear-engine-picker .tiles { grid-template-columns: 1fr 1fr; }
 }
 .gear-engine-picker .tile {
 	display: flex;
 	align-items: center;
-	gap: 14px;
-	padding: 16px;
-	border-radius: var(--md-sys-shape-md, 14px);
-	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
+	gap: 16px;
+	width: 100%;
+	padding: 16px 20px;
+	border-radius: 22px;
+	border: none;
 	background: #FFFFFF;
 	text-align: left;
 	color: var(--md-sys-color-on-surface, #0C2340);
-	transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
-	box-shadow: var(--md-sys-elevation-1, 0 1px 3px rgba(0,0,0,0.04));
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.025);
+	transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .gear-engine-picker .tile:hover {
-	transform: translateY(-2px);
-	background: #F1F8F4;
-	border-color: #BEE3D0;
-	box-shadow: 0 6px 20px -4px rgba(0,82,54,.08), 0 2px 6px rgba(12,35,64,.04);
+	background: #FAFBFD;
+	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.06);
 }
 .gear-engine-picker .tile .ti {
-	width: 44px;
-	height: 44px;
+	width: 48px;
+	height: 48px;
 	border-radius: 50%;
-	display: grid;
-	place-items: center;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	flex: none;
-	background: var(--md-sys-color-surface-container-high, #ECEFF2);
+	background: #E6F2FA;
 	color: var(--md-sys-color-primary, #0C2340);
-	transition: background 0.2s, color 0.2s;
 }
-.gear-engine-picker .tile:hover .ti {
-	background: var(--md-sys-color-tertiary, #005236);
-	color: #FFFFFF;
+.gear-engine-picker .tile:nth-child(4n+2) .ti { background: #E3F5EC; color: #005236; }
+.gear-engine-picker .tile:nth-child(4n+3) .ti { background: #FEF0E6; color: #7C2D12; }
+.gear-engine-picker .tile:nth-child(4n+4) .ti { background: #EAEAF8; color: #1E293B; }
+.gear-engine-picker .tile .tile-body {
+	flex: 1;
+	min-width: 0;
 }
-.gear-engine-picker .tile b { display: block; font-size: 14.5px; line-height: 20px; color: var(--md-sys-color-primary, #0C2340); }
-.gear-engine-picker .tile small { display: block; font-size: 12.5px; line-height: 17px; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 2px; }
+.gear-engine-picker .tile b { display: block; font-size: 15.5px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-picker .tile small { display: block; font-size: 13px; line-height: 1.35; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 3px; }
+.gear-engine-picker .tile .tile-arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #667085;
+	flex-shrink: 0;
+	transition: color 0.15s ease;
+}
+.gear-engine-picker .tile:hover .tile-arrow {
+	color: var(--md-sys-color-primary, #0C2340);
+}
 
 /* Options (Question Choices) */
 .gear-engine-picker .opts {

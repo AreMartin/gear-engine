@@ -602,6 +602,25 @@ class Gear_Engine_Protocol_Viewer {
 	}
 
 	/**
+	 * Return a clean inline SVG icon for a body area.
+	 *
+	 * @param string $area_slug Canonical body area slug.
+	 * @return string SVG markup.
+	 */
+	public static function get_area_icon( string $area_slug ): string {
+		$icons = array(
+			'nakke'     => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><path d="M9 11a4 4 0 0 1 6 0l1.5 6.5h-9L9 11z"/><path d="M12 7.5v2"/></svg>',
+			'skulder'   => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M5 9l7 2 7-2"/><path d="M12 11v8"/><path d="M9 21l3-4 3 4"/></svg>',
+			'rygg'      => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M9 6h6"/><path d="M8.5 10h7"/><path d="M8.5 14h7"/><path d="M9 18h6"/></svg>',
+			'hofte'     => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M8 10h8l1.5 5-2.5 5.5"/><path d="M8 10l-1.5 5 2.5 5.5"/></svg>',
+			'kne'       => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13" cy="4.5" r="2"/><path d="M10 9l3.5 1.5 2.5 3.5"/><path d="M11 10.5L8.5 15l1.5 5.5"/><path d="M13.5 13l3 2.5-1.5 5"/></svg>',
+			'fot-ankel' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13c-1.5 0-2.5-1.5-2.5-4S6.5 4 8 4s2.5 2 2.5 5-1 4-2.5 4z"/><path d="M7.5 16.5c0 1.2.8 2 1.8 2s1.7-.8 1.7-2"/><path d="M16 15c-1.5 0-2.5-1.5-2.5-4s1-5 2.5-5 2.5 2 2.5 5-1 4-2.5 4z"/><path d="M14.5 18.5c0 1.2.8 2 1.8 2s1.7-.8 1.7-2"/></svg>',
+		);
+
+		return $icons[ $area_slug ] ?? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
+	}
+
+	/**
 	 * Resolve canonical area slug and label for a protocol from its exercises or metadata.
 	 *
 	 * @param array<string, mixed>             $protocol  Protocol data array.

@@ -83,12 +83,11 @@ if ( ! empty( $area_counts['annet'] ) ) {
 				$ex_count   = (int) ( $protocol['exercise_count'] ?? 0 );
 				$sub_text   = $ex_count > 0
 					? sprintf(
-						/* translators: 1: body area label, 2: number of exercises */
-						__( '%1$s · %2$d øvelser', 'gear-engine' ),
-						$area_label,
+						/* translators: %d: number of exercises */
+						__( '%d øvelser · 3 faser', 'gear-engine' ),
 						$ex_count
 					)
-					: $area_label;
+					: __( '3 faser · Videoveiledet', 'gear-engine' );
 				?>
 				<li class="gear-engine-program__index-item" data-area="<?php echo esc_attr( $area_slug ); ?>">
 					<a class="gear-engine-program__card" href="<?php echo esc_url( Gear_Engine_Protocol_Viewer::get_program_url( $protocol['slug'] ) ); ?>">
@@ -96,9 +95,12 @@ if ( ! empty( $area_counts['annet'] ) ) {
 							<span class="gear-engine-program__index-title"><?php echo esc_html( $protocol['name'] ); ?></span>
 							<span class="gear-engine-program__card-sub"><?php echo esc_html( $sub_text ); ?></span>
 						</div>
-						<span class="gear-engine-program__card-arrow" aria-hidden="true">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-						</span>
+						<div class="gear-engine-program__card-right">
+							<span class="gear-engine-program__card-pill"><?php echo esc_html( $area_label ); ?></span>
+							<span class="gear-engine-program__card-arrow" aria-hidden="true">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+							</span>
+						</div>
 					</a>
 				</li>
 			<?php endforeach; ?>
