@@ -414,13 +414,11 @@
 	TriageApp.prototype.startAnalyzing = function () {
 		var self = this;
 		var el = null;
-		ANALYZING_TEXTS.slice(1).forEach(function (text, i) {
-			self.later(function () {
-				el = self.el.querySelector('[data-role="analyzing-text"]');
-				if (el) { el.textContent = text; }
-			}, (i + 1) * 1000);
-		});
-		this.later(function () { self.go(self.stepIndex + 1, 'forward'); }, 3200);
+		this.later(function () {
+			el = self.el.querySelector('[data-role="analyzing-text"]');
+			if (el && ANALYZING_TEXTS[1]) { el.textContent = ANALYZING_TEXTS[1]; }
+		}, 500);
+		this.later(function () { self.go(self.stepIndex + 1, 'forward'); }, 1100);
 	};
 
 	TriageApp.prototype.toggleNote = function () {
@@ -742,17 +740,17 @@
 	};
 
 	TriageApp.prototype.renderDisclaimer = function () {
-		return '<div class="card xl" style="background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);border-radius:24px;padding:32px 24px;box-shadow:var(--md-sys-elevation-1);margin-top:20px">' +
+		return '<div class="card xl" style="background:#FFFFFF;border:none;border-radius:24px;padding:32px 28px;box-shadow:0 2px 10px rgba(12,35,64,0.04);margin-top:20px">' +
 			'<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">' +
-			'<div style="width:44px;height:44px;border-radius:50%;background:#FEF3C7;color:#92400E;display:grid;place-items:center;flex:none;border:1px solid #FDE68A">' +
-			icon('AlertTriangle', 24) +
+			'<div style="width:44px;height:44px;border-radius:50%;background:#FEF3C7;color:#78350F;display:grid;place-items:center;flex:none">' +
+			icon('AlertTriangle', 22) +
 			'</div>' +
 			'<div><h3 class="headline-s" style="margin:0">Viktig informasjon</h3><span class="body-s muted">Før du ser din vurdering</span></div>' +
 			'</div>' +
 			'<p class="body-m" style="line-height:22px;color:var(--md-sys-color-on-surface-variant,#475467)">' +
 			'Dette er et digitalt kartleggingsverktøy basert på anerkjente faglige retningslinjer for primærhelsetjenesten. Resultatet er kun ment som et informativt hjelpemiddel, og erstatter ikke en individuell undersøkelse hos lege eller fysioterapeut.' +
 			'</p>' +
-			'<label class="sl" style="display:flex;align-items:center;gap:12px;margin:24px 0;padding:14px 16px;border-radius:12px;background:var(--md-sys-color-surface-container-low,#F8F9FA);border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);cursor:pointer">' +
+			'<label class="sl" style="display:flex;align-items:center;gap:12px;margin:24px 0;padding:16px 18px;border-radius:16px;background:var(--md-sys-color-surface-container-low,#F5F7FA);border:1.5px solid ' + (this.disclaimerAccepted ? 'var(--md-sys-color-primary,#0C2340)' : 'transparent') + ';cursor:pointer;transition:border-color 0.15s ease">' +
 			'<input type="checkbox" data-role="disclaimer"' + (this.disclaimerAccepted ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--md-sys-color-primary,#0C2340);cursor:pointer">' +
 			'<span class="body-m" style="font-weight:600;color:var(--md-sys-color-on-surface,#0C2340)">Jeg forstår og aksepterer dette.</span>' +
 			'</label>' +
@@ -784,67 +782,56 @@
 			? '<span class="pill err">Bør undersøkes</span>'
 			: (isMod ? '<span class="pill warn">Moderat</span>' : '<span class="pill tert">Lav alvorlighet</span>');
 
+		var flagPill = flagCount > 0
+			? '<span class="pill err">' + flagCount + ' røde flagg</span>'
+			: '<span class="pill tert">Ingen røde flagg</span>';
+
+		var painPill = typeof painVal === 'number'
+			? '<span class="pill sec num">Smerte: ' + painVal + ' / 10</span>'
+			: '';
+
 		var html = '<div class="get-result">';
 
-		// App bar (with back arrow on left and share icon on right, matching prototype)
+		// Top App bar
 		html += '<div class="appbar get-noprint">' +
 			'<button type="button" class="ibtn sl" data-action="back" title="Tilbake til kartlegging" aria-label="Tilbake">' + icon('ChevronLeft', 22) + '</button>' +
 			'<h1 class="title-l" style="flex:1">Ditt resultat</h1>' +
-			'<button type="button" class="ibtn sl" data-action="open-share" title="Del eller skriv ut" aria-label="Del eller skriv ut">' + icon('Share', 22) + '</button>' +
+			'<button type="button" class="btn text sl" data-action="open-share" style="height:36px;padding:0 12px;font-size:13px;font-weight:600;color:var(--md-sys-color-on-surface-variant,#475467)">' + icon('Share', 16) + '<span>Del / skriv ut</span></button>' +
+			'<button type="button" class="btn text sl" data-action="reset" style="height:36px;padding:0 12px;font-size:13px;font-weight:600;color:var(--md-sys-color-on-surface-variant,#475467)">' + icon('RotateCcw', 16) + '<span>Start på nytt</span></button>' +
 			'</div>';
 
-		// Hero
-		html += '<div class="hero' + (isHigh ? ' high' : '') + '">' +
-			'<span class="pill outl" style="border-color:currentColor;color:inherit;gap:6px">' + icon('Check', 14) + ' Vurdering fullført</span>' +
-			'<h2>' + esc(res.title) + '</h2>' +
-			'<p>' + esc(res.patientDesc) + '</p>' +
-			'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' +
-			'<span class="pill sec">Kategori: ' + esc(res.category) + '</span>' +
+		// Main Diagnosis Card (Clean white M3 surface with status pills & optional differential row)
+		html += '<div class="hero' + (isHigh ? ' high' : '') + '" style="background:#FFFFFF;box-shadow:0 2px 10px rgba(12,35,64,0.04);border-radius:24px;padding:28px">' +
+			'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
 			sevPill +
+			flagPill +
+			painPill +
+			'<span class="pill sec">' + esc(res.category) + '</span>' +
 			'</div>' +
+			'<h2 style="margin:14px 0 8px;font-size:24px;font-weight:700;line-height:1.25;color:var(--md-sys-color-primary,#0C2340)">' + esc(res.title) + '</h2>' +
+			'<p style="font-size:15px;line-height:1.6;color:var(--md-sys-color-on-surface-variant,#475467)">' + esc(res.patientDesc) + '</p>' +
+			(res.patientDiff
+				? '<div style="margin-top:16px;padding-top:14px;border-top:1px solid #EEF2F6;font-size:13.5px;color:var(--md-sys-color-on-surface-variant,#475467)"><strong style="color:var(--md-sys-color-primary,#0C2340)">Kan også ligne på:</strong> ' + esc(res.patientDiff) + '</div>'
+				: '') +
 			'</div>';
 
 		// High severity or red flags alert (Legevakt 116 117 and Nødnummer 113)
 		if (isHigh || flagCount > 0) {
-			html += '<div style="margin-top:14px;padding:20px;border-radius:16px;background:var(--md-sys-color-error-container,#FEE2E2);color:var(--md-sys-color-on-error-container,#991B1B);border:1px solid #FCA5A5">' +
+			html += '<div style="margin-top:14px;padding:22px 24px;border-radius:22px;background:var(--md-sys-color-error-container,#FEE2E2);color:var(--md-sys-color-on-error-container,#991B1B);border:1px solid #FCA5A5">' +
 				'<h3 class="title-m" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">' +
-				icon('AlertTriangle', 20) + ' Bli undersøkt' +
+				icon('AlertTriangle', 20) + ' Bli undersøkt av lege' +
 				'</h3>' +
 				'<p class="body-m" style="margin-bottom:16px;line-height:22px">' +
 				esc(res.phase1 || 'Ved akutte eller vedvarende sterke smerter bør du oppsøke lege eller legevakt for en fysisk undersøkelse.') +
 				'</p>' +
-				'<div style="display:grid;gap:10px">' +
-				'<a class="btn err sl block" href="tel:116117" style="display:flex;background:#B42318;color:#FFFFFF;text-decoration:none;height:44px;font-size:15px;font-weight:600">' +
+				'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
+				'<a class="btn err sl" href="tel:116117" style="display:flex;background:#B42318;color:#FFFFFF;text-decoration:none;height:44px;font-size:14.5px;font-weight:600">' +
 				icon('Phone', 18) + ' Ring Legevakt 116 117' +
 				'</a>' +
-				'<a class="btn outlined sl block" href="tel:113" style="display:flex;background:#FFFFFF;color:#991B1B;border:1.5px solid #991B1B;text-decoration:none;height:44px;font-size:15px;font-weight:600">' +
+				'<a class="btn outlined sl" href="tel:113" style="display:flex;background:#FFFFFF;color:#991B1B;border:1.5px solid #991B1B;text-decoration:none;height:44px;font-size:14.5px;font-weight:600">' +
 				icon('Phone', 18) + ' Nødnummer 113 (Akutt)' +
 				'</a>' +
 				'</div>' +
-				'</div>';
-		}
-
-		// Mini stats
-		html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px">' +
-			'<div style="background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);border-radius:16px;padding:16px;box-shadow:var(--md-sys-elevation-1)">' +
-			'<div class="body-s muted" style="font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Røde flagg</div>' +
-			'<div class="headline-s" style="color:' + (flagCount > 0 ? 'var(--md-sys-color-error,#D92D20)' : 'var(--ge-green-800,#005236)') + ';margin-top:4px">' +
-			(flagCount > 0 ? flagCount + ' funnet' : 'Ingen') +
-			'</div>' +
-			'</div>' +
-			'<div style="background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);border-radius:16px;padding:16px;box-shadow:var(--md-sys-elevation-1)">' +
-			'<div class="body-s muted" style="font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Smertenivå</div>' +
-			'<div class="headline-s num" style="color:var(--md-sys-color-primary,#0C2340);margin-top:4px">' +
-			(typeof painVal === 'number' ? painVal + ' / 10' : '–') +
-			'</div>' +
-			'</div>' +
-			'</div>';
-
-		// Differential diagnosis
-		if (res.patientDiff) {
-			html += '<div style="margin-top:14px;padding:16px 20px;border-radius:16px;background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);box-shadow:var(--md-sys-elevation-1)">' +
-				'<div class="body-s muted" style="font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Kan forveksles med</div>' +
-				'<p class="body-m" style="margin-top:4px;color:var(--md-sys-color-on-surface,#0C2340)">' + esc(res.patientDiff) + '</p>' +
 				'</div>';
 		}
 
@@ -862,20 +849,20 @@
 			var programTitle = program.title || 'Åpne treningsprogram';
 			var programDesc = program.description || 'Et kvalitetssikret treningsprogram som bygger direkte på denne vurderingen.';
 
-			html += '<div class="get-noprint" style="margin-top:18px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid var(--ge-navy-border,#D5E1ED);box-shadow:var(--md-sys-elevation-1);border-radius:24px;padding:24px">' +
-				'<span class="pill" style="background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);border:1px solid #D0DBE5;font-weight:600;box-shadow:0 1px 2px rgba(12,35,64,0.04);gap:6px">' +
+			html += '<div class="get-noprint" style="margin-top:16px;background:#FFFFFF;box-shadow:0 2px 10px rgba(12,35,64,0.04);border-radius:24px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">' +
+				'<div style="flex:1;min-width:240px">' +
+				'<span class="pill tert" style="font-weight:600;gap:6px;margin-bottom:10px">' +
 				'<span style="width:6px;height:6px;border-radius:50%;background:var(--ge-green-800,#005236);display:inline-block"></span>' +
-				'Neste steg · Treningsprogram' +
+				'Anbefalt treningsprogram' +
 				'</span>' +
-				'<h3 class="headline-s" style="margin:14px 0 6px;color:var(--md-sys-color-primary,#0C2340)">Klar for å komme i gang?</h3>' +
-				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px">' +
+				'<h3 class="headline-s" style="margin:0 0 4px;font-size:20px;color:var(--md-sys-color-primary,#0C2340)">Klar for skånsomme øvelser?</h3>' +
+				'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:1.5;margin:0">' +
 				esc(programDesc) +
-				'</p>' +
-				'<div style="display:flex;justify-content:flex-end;margin-top:20px">' +
-				'<a class="btn filled primary sl" style="height:48px;font-size:15px;font-weight:600;padding:0 24px;text-decoration:none" href="' + esc(programUrl) + '"' + (/^https?:\/\//i.test(programUrl) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
-				esc(programTitle) + ' ' + icon('ExternalLink', 18) +
+				'</p></div>' +
+				'<a class="btn filled primary sl" style="height:46px;font-size:14.5px;font-weight:600;padding:0 22px;text-decoration:none;flex-shrink:0" href="' + esc(programUrl) + '"' + (/^https?:\/\//i.test(programUrl) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
+				esc(programTitle) + ' ' + icon('ChevronRight', 18) +
 				'</a>' +
-				'</div></div>';
+				'</div>';
 		}
 
 		// Ethical aids & conditioning gear bridge (strictly non-critical only: 0 sales pressure on red flags)
@@ -883,25 +870,15 @@
 			html += this.renderAids(res);
 		}
 
-		// Actions bar (Del / skriv ut triggers share sheet; Helsepersonell toggles clinical note)
-		html += '<div class="get-noprint" style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
-			'<button type="button" class="btn outlined sl" data-action="open-share" style="height:44px;font-size:14px">' +
-			icon('Share', 18) + ' Del / skriv ut' +
-			'</button>' +
-			'<button type="button" class="btn outlined sl" data-action="toggle-note" aria-expanded="false" aria-controls="get-note-' + esc(this.region) + '" style="height:44px;font-size:14px">' +
-			icon('Medical', 18) + ' Helsepersonell ' + icon('ChevronDown', 18) +
+		// Secondary utility row: Helsepersonell (clinical note toggle)
+		html += '<div class="get-noprint" style="margin-top:18px;display:flex;justify-content:center">' +
+			'<button type="button" class="btn outlined sl" data-action="toggle-note" aria-expanded="false" aria-controls="get-note-' + esc(this.region) + '" style="height:42px;font-size:13.5px;background:#FFFFFF">' +
+			icon('Medical', 17) + ' Vis klinisk notat (for lege / fysioterapeut) ' + icon('ChevronDown', 17) +
 			'</button>' +
 			'</div>';
 
 		// Clinical note (initially hidden, expands on click)
 		html += this.renderNote(res);
-
-		// Reset button
-		html += '<div class="get-noprint" style="display:flex;justify-content:center;margin-top:20px">' +
-			'<button type="button" class="btn text sl" data-action="reset" style="color:var(--md-sys-color-on-surface-variant,#475467)">' +
-			icon('RotateCcw', 18) + ' Start kartleggingen på nytt' +
-			'</button>' +
-			'</div>';
 
 		html += '</div>';
 		return html;
@@ -929,7 +906,7 @@
 				'</li>';
 		};
 
-		var html = '<div class="card elevated" style="margin-top:16px;padding:24px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);border-radius:20px;background:#FFFFFF">' +
+		var html = '<div class="card elevated" style="margin-top:16px;padding:24px 28px;border:none;border-radius:24px;background:#FFFFFF;box-shadow:0 2px 10px rgba(12,35,64,0.04)">' +
 			'<h3 class="title-l">Din plan</h3>' +
 			'<ol class="timeline">';
 
@@ -1052,26 +1029,22 @@
 		var aids = AIDS_MAP[reg] || AIDS_MAP.kne;
 		var hubUrl = (this.config.pickerHubUrl || '/kjopsveiledere/') + '?kategori=rehab';
 
-		var html = '<div class="get-aids-box get-noprint" style="margin-top:18px;background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);box-shadow:var(--md-sys-elevation-1);border-radius:24px;padding:24px">' +
-			'<span class="pill" style="background:var(--md-sys-color-primary-container,#EAF0F6);color:var(--md-sys-color-primary,#0C2340);border:1px solid var(--ge-navy-border,#D5E1ED);font-weight:600;gap:6px">' +
-			'<span style="width:6px;height:6px;border-radius:50%;background:var(--ge-green-800,#005236);display:inline-block"></span>' +
-			'Faglige råd · Hjelpemidler' +
-			'</span>' +
-			'<h3 class="headline-s" style="margin:14px 0 6px;color:var(--md-sys-color-primary,#0C2340)">Nyttige hjelpemidler for opptreningen</h3>' +
-			'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:22px;margin-bottom:16px">' +
-			'Disse enkle hjelpemidlene kan gjøre øvelsene mer skånsomme og effektive. Du kan også fint starte med gratis hverdagsting du har hjemme.' +
+		var html = '<div class="get-aids-box get-noprint" style="margin-top:16px;background:#FFFFFF;border:none;box-shadow:0 2px 10px rgba(12,35,64,0.04);border-radius:24px;padding:24px 28px">' +
+			'<h3 class="title-l" style="margin:0 0 6px;color:var(--md-sys-color-primary,#0C2340)">Nyttige hjelpemidler for opptreningen</h3>' +
+			'<p class="body-m" style="color:var(--md-sys-color-on-surface-variant,#475467);line-height:1.5;margin-bottom:16px">' +
+			'Enkle hjelpemidler som kan gjøre øvelsene mer skånsomme – inkludert gratis alternativer du har hjemme.' +
 			'</p>' +
 			'<div style="display:grid;gap:12px">';
 
 		aids.forEach(function (aid) {
-			html += '<div style="padding:16px;border-radius:16px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);background:var(--ge-grey-25,#FAFBFC)">' +
+			html += '<div style="padding:16px 18px;border-radius:18px;background:var(--md-sys-color-surface-container-low,#F5F7FA)">' +
 				'<div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--md-sys-color-primary,#0C2340);font-size:15px">' +
 				'<span style="color:var(--ge-green-800,#005236)">' + icon('Check', 16) + '</span>' +
 				'<span>' + esc(aid.title) + '</span>' +
 				'</div>' +
-				'<p class="body-s" style="color:var(--md-sys-color-on-surface-variant,#475467);margin:6px 0 10px;line-height:20px">' + esc(aid.desc) + '</p>' +
-				'<div style="display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #D5E1ED;font-size:12.5px;color:var(--ge-grey-700,#344054)">' +
-				'<b style="color:var(--ge-green-800,#005236)">Gratis-alternativ:</b> ' + esc(aid.free) +
+				'<p class="body-s" style="color:var(--md-sys-color-on-surface-variant,#475467);margin:4px 0 10px;line-height:1.45">' + esc(aid.desc) + '</p>' +
+				'<div style="display:inline-flex;align-items:baseline;gap:6px;padding:5px 11px;border-radius:999px;background:#FFFFFF;font-size:12.5px;color:var(--ge-grey-700,#344054)">' +
+				'<b style="color:var(--ge-green-800,#005236)">Gratis hjemme:</b> ' + esc(aid.free) +
 				'</div>' +
 				'</div>';
 		});
@@ -1079,18 +1052,15 @@
 		html += '</div>';
 
 		// Bridge to Gear Picker for gentle conditioning equipment
-		html += '<div style="margin-top:16px;padding:18px 20px;border-radius:16px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid var(--ge-navy-border,#D5E1ED);display:flex;flex-direction:column;gap:12px">' +
-			'<div style="display:flex;align-items:center;gap:8px;color:var(--md-sys-color-primary,#0C2340);font-weight:700;font-size:15px">' +
-			icon('Activity', 18) + ' Trenger du et skånsomt apparat for kondisjonstrening?' +
+		html += '<div style="margin-top:14px;padding:18px 20px;border-radius:18px;background:#EAF0F6;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">' +
+			'<div style="flex:1;min-width:220px">' +
+			'<strong style="display:block;color:var(--md-sys-color-primary,#0C2340);font-size:14.5px;margin-bottom:2px">Trenger du et skånsomt treningsapparat?</strong>' +
+			'<span class="body-s" style="color:var(--md-sys-color-on-surface-variant,#475467)">Finn ergometersykkel, romaskin eller utstyr tilpasset leddene dine.</span>' +
 			'</div>' +
-			'<p class="body-m" style="margin:0;color:var(--md-sys-color-on-surface-variant,#475467);line-height:20px;font-size:13.5px">' +
-			'For leddplager i knær, hofter eller rygg anbefales sykkel eller romaskin med jevn motstand for å bygge utholdenhet og sirkulasjon uten støtbelastning.' +
-			'</p>' +
-			'<div style="display:flex;justify-content:flex-end">' +
-			'<a href="' + esc(hubUrl) + '" class="btn filled primary sl" style="height:40px;font-size:13.5px;font-weight:600;padding:0 18px;text-decoration:none">' +
-			'Finn leddskånsomt utstyr i kjøpsveilederen ' + icon('ArrowRight', 16) +
+			'<a href="' + esc(hubUrl) + '" class="btn filled primary sl" style="height:40px;font-size:13.5px;font-weight:600;padding:0 18px;text-decoration:none;flex-shrink:0">' +
+			'Åpne kjøpsveileder ' + icon('ChevronRight', 16) +
 			'</a>' +
-			'</div></div>';
+			'</div>';
 
 		html += '</div>';
 		return html;

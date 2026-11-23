@@ -1022,8 +1022,9 @@
    ========================================================= */
 .gear-engine-program__toolbar {
 	display: flex;
-	justify-content: flex-start;
+	justify-content: space-between;
 	align-items: center;
+	gap: 12px;
 	margin-bottom: 20px;
 }
 

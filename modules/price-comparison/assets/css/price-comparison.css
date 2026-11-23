@@ -2093,8 +2093,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	padding: 0 10px;
 	border: none;
 	border-radius: var(--md-sys-shape-corner-full, 9999px);
-	background: var(--ge-green-600, #00A86B); /* theme: var(--md-sys-color-error-container) */
-	color: #FFFFFF;
+	background: #FEF3C7;
+	color: #78350F;
 	font-family: inherit;
 	font-size: 12px;
 	font-weight: 700;
@@ -2107,8 +2107,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	left: 12px;
 	height: 24px;
 	padding: 0 10px;
-	background: var(--ge-green-600, #00A86B); /* theme: var(--md-sys-color-error-container) */
-	color: #FFFFFF;
+	background: #FEF3C7;
+	color: #78350F;
 	border: none;
 	border-radius: 9999px;
 	font-size: 12px;
@@ -2436,10 +2436,10 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	align-items: center;
 	height: 24px;
 	padding: 0 10px;
-	border: 1px solid var(--ge-green-200, #BEE3D0);
+	border: none;
 	border-radius: 9999px;
-	background: var(--ge-green-50, #F1F8F4);
-	color: var(--ge-green-800, #005236);
+	background: #DCF5E8;
+	color: #005236;
 	font-size: 12px;
 	font-weight: 600;
 	letter-spacing: 0.2px;
@@ -2857,8 +2857,8 @@ body:has(.ge-m3-standalone-search) #fysionett-prissok-root:not([data-show-search
 	padding: 0 10px;
 	border: none;
 	border-radius: 9999px;
-	background: var(--ge-green-600, #00A86B);
-	color: #FFFFFF;
+	background: #FEF3C7;
+	color: #78350F;
 	font-size: 12px;
 	font-weight: 700;
 	letter-spacing: 0.2px;

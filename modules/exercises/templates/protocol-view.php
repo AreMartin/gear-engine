@@ -56,7 +56,7 @@ $hub_url = ( function_exists( 'home_url' ) && function_exists( 'trailingslashit'
 		<?php endif; ?>
 	</header>
 
-	<!-- View Mode Switcher (Steg for steg vs Full oversikt) -->
+	<!-- View Mode Switcher (Steg for steg vs Full oversikt) + Print Action -->
 	<div class="gear-engine-program__toolbar gear-engine-program__noprint">
 		<div class="gear-engine-program__view-modes" role="tablist" aria-label="<?php esc_attr_e( 'Visningsmodus', 'gear-engine' ); ?>">
 			<button type="button" class="gear-engine-program__mode-btn gear-engine-program__mode-btn--active" data-view-mode="stepper" role="tab" aria-selected="true">
@@ -68,6 +68,9 @@ $hub_url = ( function_exists( 'home_url' ) && function_exists( 'trailingslashit'
 				<span><?php esc_html_e( 'Full oversikt', 'gear-engine' ); ?></span>
 			</button>
 		</div>
+		<button type="button" onclick="window.print()" class="gear-engine-program__card-print-btn" title="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>" aria-label="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>">
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+		</button>
 	</div>
 
 	<?php if ( count( $groups ) > 1 ) : ?>
@@ -99,19 +102,8 @@ $hub_url = ( function_exists( 'home_url' ) && function_exists( 'trailingslashit'
 					</div>
 				<?php endif; ?>
 
-				<!-- App-style Workout Card Container (Identical to AI Chat Modal) -->
+				<!-- App-style Workout Card Container -->
 				<div class="gear-engine-program__workout-card">
-					<!-- Card Top Header -->
-					<div class="gear-engine-program__card-header">
-						<div class="gear-engine-program__card-header-main">
-							<span class="gear-engine-program__card-badge"><?php esc_html_e( 'Kvalitetssikret treningsprogram', 'gear-engine' ); ?></span>
-							<h3 class="gear-engine-program__card-title"><?php echo esc_html( $protocol['name'] ); ?></h3>
-						</div>
-						<button type="button" onclick="window.print()" class="gear-engine-program__card-print-btn" title="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>" aria-label="<?php esc_attr_e( 'Skriv ut øvelser', 'gear-engine' ); ?>">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-						</button>
-					</div>
-
 					<!-- Horizontal Exercise Navigation Tabs -->
 					<div class="gear-engine-program__stepper-tabs no-scrollbar" role="tablist">
 						<?php foreach ( $group['exercises'] as $ex_idx => $exercise ) : ?>
