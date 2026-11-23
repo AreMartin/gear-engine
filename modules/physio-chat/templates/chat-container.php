@@ -168,29 +168,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<!-- TEMPLATES FOR DYNAMIC CARDS -->
 	<div id="tpl-grid" style="display:none;">
-		<div class="flex flex-col mt-4 w-full max-w-full">
-			<h3 class="fysio-grid-title">{GRID_TITTEL}</h3>
+		<div class="fysio-deal-section mt-4 w-full max-w-full">
+			<div class="fysio-deal-head">
+				<h3 class="fysio-grid-title">{GRID_TITTEL}</h3>
+				<span class="fysio-sponsored-note">Sponsede lenker</span>
+			</div>
 			<div class="fysio-grid-container w-full">{GRID_ITEMS}</div>
 		</div>
 	</div>
 	
 	<div id="tpl-grid-item" style="display:none;">
-		<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="bg-white border border-gray-200 rounded-[1.25rem] overflow-hidden hover:border-gray-300 transition-all shadow-sm hover:shadow-md flex flex-col no-underline text-inherit group relative p-1.5 sm:p-2">
-			{RABATT_PILL}
-			<div class="w-full aspect-square bg-gray-50 relative overflow-hidden rounded-[1rem] shrink-0">
-				<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgZmlsbD0iI2QxZDVkYiIvPgogIDxyZWN0IHg9IjYwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSI0MCIgeT0iMTMwIiB3aWR0aD0iMjUiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSIjNmI3MjgwIi8+CiAgPHJlY3QgeD0iMjEwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSIyMzUiIHk9IjEzMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iIzZiNzI4MCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzljYTNhZiIgZm9udC13ZWlnaHQ9IjYwMCI+UHJvZHVrdGJpbGRlPC90ZXh0PgogIDx0ZXh0IHg9IjE1MCIgeT0iMjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZmlsbD0iI2M0YzlkMCI+bWFuZ2xlcjwvdGV4dD4KPC9zdmc+'">
+		<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="fysio-fp-deal-card">
+			<div class="fysio-fp-deal-card__media">
+				{RABATT_PILL}
+				<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgZmlsbD0iI2QxZDVkYiIvPgogIDxyZWN0IHg9IjYwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSI0MCIgeT0iMTMwIiB3aWR0aD0iMjUiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSIjNmI3MjgwIi8+CiAgPHJlY3QgeD0iMjEwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSIyMzUiIHk9IjEzMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iIzZiNzI4MCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzljYTNhZiIgZm9udC13ZWlnaHQ9IjYwMCI+UHJvZHVrdGJpbGRlPC90ZXh0PgogIDx0ZXh0IHg9IjE1MCIgeT0iMjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZmlsbD0iI2M0YzlkMCI+bWFuZ2xlcjwvdGV4dD4KPC9zdmc+'">
 			</div>
-			<div class="p-3 sm:p-4 flex flex-col flex-grow bg-white">
-				<h4 style="font-size: 14px !important; font-weight: 700 !important; color: #1f2937 !important; line-height: 1.25 !important; margin-bottom: 4px !important;" class="group-hover:text-[#1A2A3A] transition-colors line-clamp-2">{TITTEL}</h4>
-				<div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">{BUTIKK}</div>
-				<div class="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
-					<div class="flex items-baseline">
-						<span style="color: #111827 !important; font-weight: 700 !important; font-size: 15px !important;">{PRIS}</span>{FORPRIS_HTML}
-					</div>
-					<div class="w-7 h-7 rounded-full bg-gray-50 group-hover:bg-[#1A2A3A] flex items-center justify-center transition-colors">
-						<i class="fa-solid fa-chevron-right text-[10px] text-gray-400 group-hover:text-white translate-x-[1px] transition-colors"></i>
-					</div>
-				</div>
+			<div class="fysio-fp-deal-card__title">{TITTEL}</div>
+			<div class="fysio-fp-deal-card__price-row">
+				<span class="fysio-fp-deal-card__price">{PRIS}</span>{FORPRIS_HTML}
+			</div>
+			<div class="fysio-fp-deal-card__meta-row">
+				{SPAR_HTML}
+				<span class="fysio-fp-deal-card__merchant">
+					{BUTIKK}
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+				</span>
 			</div>
 		</a>
 	</div>
@@ -213,24 +215,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div id="tpl-lite-kort" style="display:none;">
-		<div class="flex flex-col gap-3 mt-2 w-full sm:w-[360px] max-w-full relative">
-			<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="bg-white border border-gray-200 rounded-[1.25rem] p-3 flex gap-3.5 items-center cursor-pointer hover:bg-gray-50 transition-all shadow-sm no-underline text-inherit block group relative" style="border-radius: 1.25rem; background: white;">
-				<div class="w-[60px] h-[60px] bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 relative">
+		<div class="fysio-deal-section mt-3 w-full sm:w-[340px] max-w-full relative">
+			<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="fysio-fp-deal-card">
+				<div class="fysio-fp-deal-card__media">
 					{RABATT_PILL_LITE}
-					<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" class="w-full h-full object-cover mix-blend-multiply transition-transform group-hover:scale-105" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgZmlsbD0iI2QxZDVkYiIvPgogIDxyZWN0IHg9IjYwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSI0MCIgeT0iMTMwIiB3aWR0aD0iMjUiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSIjNmI3MjgwIi8+CiAgPHJlY3QgeD0iMjEwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSIyMzUiIHk9IjEzMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iIzZiNzI4MCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzljYTNhZiIgZm9udC13ZWlnaHQ9IjYwMCI+UHJvZHVrdGJpbGRlPC90ZXh0PgogIDx0ZXh0IHg9IjE1MCIgeT0iMjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZmlsbD0iI2M0YzlkMCI+bWFuZ2xlcjwvdGV4dD4KPC9zdmc+'">
+					<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgZmlsbD0iI2QxZDVkYiIvPgogIDxyZWN0IHg9IjYwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSI0MCIgeT0iMTMwIiB3aWR0aD0iMjUiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSIjNmI3MjgwIi8+CiAgPHJlY3QgeD0iMjEwIiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IiM5Y2EzYWYiLz4KICA8cmVjdCB4PSIyMzUiIHk9IjEzMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iIzZiNzI4MCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzljYTNhZiIgZm9udC13ZWlnaHQ9IjYwMCI+UHJvZHVrdGJpbGRlPC90ZXh0PgogIDx0ZXh0IHg9IjE1MCIgeT0iMjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZmlsbD0iI2M0YzlkMCI+bWFuZ2xlcjwvdGV4dD4KPC9zdmc+'">
 				</div>
-				<div class="flex-1 overflow-hidden py-1">
-					<h4 style="font-size: 14px !important; font-weight: 700 !important; color: #1f2937 !important; margin: 0 0 4px 0 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="group-hover:text-[#1A2A3A] transition-colors">{TITTEL}</h4>
-					<div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{BUTIKK}</div>
-					<p style="font-size: 11px !important; color: #6b7280 !important; margin: 4px 0 0 0 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{BESKRIVELSE}</p>
-					<div class="flex items-baseline mt-1.5">
-						<span style="color: #111827 !important; font-weight: 700 !important; font-size: 13px !important;">{PRIS}</span>{FORPRIS_HTML}
-					</div>
+				<div class="fysio-fp-deal-card__title">{TITTEL}</div>
+				<p class="fysio-fp-deal-card__desc">{BESKRIVELSE}</p>
+				<div class="fysio-fp-deal-card__price-row">
+					<span class="fysio-fp-deal-card__price">{PRIS}</span>{FORPRIS_HTML}
 				</div>
-				<div class="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-[#1A2A3A] flex items-center justify-center flex-shrink-0 transition-colors text-gray-400 mr-1">
-					<i class="fa-solid fa-chevron-right text-xs translate-x-[1px]"></i>
+				<div class="fysio-fp-deal-card__meta-row">
+					{SPAR_HTML}
+					<span class="fysio-fp-deal-card__merchant">
+						{BUTIKK}
+						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+					</span>
 				</div>
 			</a>
+			<span class="fysio-sponsored-note fysio-sponsored-note--bottom">Sponset lenke</span>
 		</div>
 	</div>
 
@@ -265,27 +269,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div id="tpl-stort-kort" style="display:none;">
-		<div class="flex flex-col mt-3 w-full sm:w-[380px] max-w-full">
-			<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="bg-white border border-gray-200 rounded-[1.5rem] overflow-hidden cursor-pointer hover:border-gray-300 transition-all shadow-sm hover:shadow-md no-underline text-inherit block group relative p-1.5 sm:p-2" style="border-radius: 1.5rem; background: white;">
-				{RABATT_PILL}
-				<div class="w-full h-[180px] bg-gray-50 rounded-[1rem] relative overflow-hidden">
-					<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" class="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-105" onerror="this.style.backgroundColor='#f9fafb'; this.src=''">
-					<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-800 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">Annonse</div>
+		<div class="fysio-deal-section mt-3 w-full sm:w-[340px] max-w-full">
+			<a href="{URL}" target="_blank" rel="sponsored nofollow noopener" class="fysio-fp-deal-card">
+				<div class="fysio-fp-deal-card__media">
+					{RABATT_PILL}
+					<img src="{BILDE_URL}" alt="{TITTEL}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.backgroundColor='#f9fafb'; this.src=''">
 				</div>
-				<div class="p-5 relative">
-					<h4 style="font-size: 16px !important; font-weight: 700 !important; color: #1f2937 !important; margin: 0 0 6px 0 !important; line-height: 1.25 !important;" class="group-hover:text-[#1A2A3A] transition-colors">{TITTEL}</h4>
-					<div class="text-[12px] text-gray-400 font-bold uppercase tracking-wider mb-2">{BUTIKK}</div>
-					<p style="font-size: 12px !important; color: #6b7280 !important; margin: 0 !important; line-height: 1.6 !important;" class="line-clamp-2">{BESKRIVELSE}</p>
-					<div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-50">
-						<div class="flex items-baseline">
-							<span style="color: #111827 !important; font-weight: 700 !important; font-size: 15px !important;">{PRIS}</span>{FORPRIS_HTML}
-						</div>
-						<div class="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-[#1A2A3A] flex items-center justify-center transition-colors">
-							<i class="fa-solid fa-chevron-right text-[12px] text-gray-400 group-hover:text-white translate-x-[1px] transition-colors"></i>
-						</div>
-					</div>
+				<div class="fysio-fp-deal-card__title">{TITTEL}</div>
+				<p class="fysio-fp-deal-card__desc">{BESKRIVELSE}</p>
+				<div class="fysio-fp-deal-card__price-row">
+					<span class="fysio-fp-deal-card__price">{PRIS}</span>{FORPRIS_HTML}
+				</div>
+				<div class="fysio-fp-deal-card__meta-row">
+					{SPAR_HTML}
+					<span class="fysio-fp-deal-card__merchant">
+						{BUTIKK}
+						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+					</span>
 				</div>
 			</a>
+			<span class="fysio-sponsored-note fysio-sponsored-note--bottom">Sponset lenke</span>
 		</div>
 	</div>
 	

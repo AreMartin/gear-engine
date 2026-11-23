@@ -376,19 +376,19 @@
         let forprisNum = parseFloat((forprisStr || '').replace(/[^0-9,.]/g, '').replace(',', '.'));
         let rabattPill = '';
         let forprisHtml = '';
+        let sparHtml = '<span></span>';
         if (forprisNum > prisNum && prisNum > 0) {
             let rabattProsent = Math.round(((forprisNum - prisNum) / forprisNum) * 100);
+            let sparBelop = Math.round(forprisNum - prisNum);
             if (rabattProsent > 0) {
-                if (isLite) {
-                    rabattPill = `<div class="absolute top-1 left-1 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-sm z-20" style="background-color: #00A878 !important;">-${rabattProsent}%</div>`;
-                    forprisHtml = `<span class="text-gray-400 line-through text-[10px] font-medium ml-1.5">${forprisStr}</span>`;
-                } else {
-                    rabattPill = `<div class="absolute top-3 left-3 text-white text-[12px] font-bold px-2.5 py-1 rounded-full shadow-sm z-20" style="background-color: #00A878 !important;">-${rabattProsent}%</div>`;
-                    forprisHtml = `<span class="text-gray-400 line-through text-[11px] sm:text-[12px] font-medium ml-1.5">${forprisStr}</span>`;
-                }
+                rabattPill = `<span class="fysio-fp-deal-card__badge">-${rabattProsent} %</span>`;
+                forprisHtml = `<span class="fysio-fp-deal-card__old-price">${forprisStr}</span>`;
+            }
+            if (sparBelop > 0) {
+                sparHtml = `<span class="fysio-fp-deal-card__save">Spar ${sparBelop.toLocaleString('nb-NO')},-</span>`;
             }
         }
-        return { rabattPill, forprisHtml };
+        return { rabattPill, forprisHtml, sparHtml };
     }
 
     function safeReplace(str, find, replace) {
@@ -459,6 +459,7 @@
                                 tpl = safeReplace(tpl, '{PRIS}', i.pris || '');
                                 tpl = safeReplace(tpl, '{FORPRIS_HTML}', prisData.forprisHtml);
                                 tpl = safeReplace(tpl, '{RABATT_PILL}', prisData.rabattPill);
+                                tpl = safeReplace(tpl, '{SPAR_HTML}', prisData.sparHtml);
                                 tpl = safeReplace(tpl, '{URL}', cleanFakeUrl(i.url, false));
                                 tpl = safeReplace(tpl, '{BILDE_URL}', cleanFakeUrl(i.bilde_url, true));
                                 itemsHTML += tpl;
@@ -498,6 +499,7 @@
                         tplLite = safeReplace(tplLite, '{PRIS}', c.pris || '');
                         tplLite = safeReplace(tplLite, '{FORPRIS_HTML}', prisDataLite.forprisHtml);
                         tplLite = safeReplace(tplLite, '{RABATT_PILL_LITE}', prisDataLite.rabattPill);
+                        tplLite = safeReplace(tplLite, '{SPAR_HTML}', prisDataLite.sparHtml);
                         tplLite = safeReplace(tplLite, '{URL}', cleanFakeUrl(c.url, false));
                         tplLite = safeReplace(tplLite, '{BILDE_URL}', cleanFakeUrl(c.bilde_url, true));
                         extraHTML = tplLite;
@@ -512,6 +514,7 @@
                         tplStort = safeReplace(tplStort, '{PRIS}', c.pris || '');
                         tplStort = safeReplace(tplStort, '{FORPRIS_HTML}', prisDataStort.forprisHtml);
                         tplStort = safeReplace(tplStort, '{RABATT_PILL}', prisDataStort.rabattPill);
+                        tplStort = safeReplace(tplStort, '{SPAR_HTML}', prisDataStort.sparHtml);
                         tplStort = safeReplace(tplStort, '{URL}', cleanFakeUrl(c.url, false));
                         tplStort = safeReplace(tplStort, '{BILDE_URL}', cleanFakeUrl(c.bilde_url, true));
                         extraHTML = tplStort;

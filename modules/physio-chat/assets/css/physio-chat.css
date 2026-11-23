@@ -521,13 +521,177 @@ button#btn-finish:hover * {
 /* =========================================================
    4. LAYOUT, GRIDS & SCROLLBAR
    ========================================================= */
+.fysio-deal-section {
+	display: flex !important;
+	flex-direction: column !important;
+}
+
+.fysio-deal-head {
+	display: flex !important;
+	align-items: baseline !important;
+	justify-content: space-between !important;
+	gap: 12px !important;
+	margin-bottom: 14px !important;
+	padding: 0 2px !important;
+}
+
 .fysio-grid-title {
-	font-size: 16px !important;
+	font-size: 16.5px !important;
 	font-weight: 700 !important;
-	color: #1A2A3A !important;
-	margin-bottom: 16px !important;
-	padding-left: 4px !important;
+	color: #0C2340 !important;
+	margin: 0 !important;
 	display: block !important;
+	letter-spacing: -0.01em !important;
+}
+
+.fysio-sponsored-note {
+	font-size: 11.5px !important;
+	font-weight: 500 !important;
+	color: #667085 !important;
+	white-space: nowrap !important;
+}
+
+.fysio-sponsored-note--bottom {
+	display: block !important;
+	margin-top: 8px !important;
+	font-size: 11px !important;
+	color: #667085 !important;
+}
+
+/* Product Deal Card (Matches Gear Picker 'Mest populære tilbud' & fysionett.no frontpage) */
+a.fysio-fp-deal-card {
+	display: flex !important;
+	flex-direction: column !important;
+	text-decoration: none !important;
+	color: inherit !important;
+}
+
+.fysio-fp-deal-card__media {
+	position: relative !important;
+	width: 100% !important;
+	height: 175px !important;
+	background: #FFFFFF !important;
+	border-radius: 18px !important;
+	padding: 18px !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.03) !important;
+	transition: box-shadow 0.15s ease !important;
+	overflow: hidden !important;
+}
+
+a.fysio-fp-deal-card:hover .fysio-fp-deal-card__media {
+	box-shadow: 0 6px 16px rgba(12, 35, 64, 0.07) !important;
+}
+
+.fysio-fp-deal-card__media img {
+	max-width: 100% !important;
+	max-height: 100% !important;
+	width: auto !important;
+	height: auto !important;
+	object-fit: contain !important;
+	mix-blend-mode: multiply !important;
+	display: block !important;
+}
+
+.fysio-fp-deal-card__badge {
+	position: absolute !important;
+	top: 12px !important;
+	left: 12px !important;
+	z-index: 2 !important;
+	background: #FEF3C7 !important;
+	color: #78350F !important;
+	font-size: 12px !important;
+	font-weight: 700 !important;
+	padding: 3px 10px !important;
+	border-radius: 999px !important;
+	line-height: 1.3 !important;
+}
+
+.fysio-fp-deal-card__title {
+	margin-top: 12px !important;
+	font-size: 15px !important;
+	font-weight: 700 !important;
+	color: #0C2340 !important;
+	line-height: 1.35 !important;
+	display: -webkit-box !important;
+	-webkit-line-clamp: 2 !important;
+	-webkit-box-orient: vertical !important;
+	overflow: hidden !important;
+}
+
+a.fysio-fp-deal-card:hover .fysio-fp-deal-card__title {
+	text-decoration: underline !important;
+}
+
+.fysio-fp-deal-card__desc {
+	margin: 4px 0 0 !important;
+	font-size: 12.5px !important;
+	color: #667085 !important;
+	line-height: 1.4 !important;
+	display: -webkit-box !important;
+	-webkit-line-clamp: 2 !important;
+	-webkit-box-orient: vertical !important;
+	overflow: hidden !important;
+}
+
+.fysio-fp-deal-card__desc:empty {
+	display: none !important;
+}
+
+.fysio-fp-deal-card__price-row {
+	display: flex !important;
+	align-items: baseline !important;
+	flex-wrap: wrap !important;
+	gap: 8px !important;
+	margin-top: 8px !important;
+}
+
+.fysio-fp-deal-card__price {
+	font-size: 19px !important;
+	font-weight: 700 !important;
+	color: #0C2340 !important;
+	letter-spacing: -0.02em !important;
+	font-variant-numeric: tabular-nums !important;
+}
+
+.fysio-fp-deal-card__old-price {
+	font-size: 13px !important;
+	color: #667085 !important;
+	text-decoration: line-through !important;
+	font-variant-numeric: tabular-nums !important;
+}
+
+.fysio-fp-deal-card__meta-row {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: space-between !important;
+	gap: 8px !important;
+	margin-top: 8px !important;
+}
+
+.fysio-fp-deal-card__save {
+	display: inline-flex !important;
+	align-items: center !important;
+	padding: 3px 10px !important;
+	border-radius: 999px !important;
+	background: #DCF5E8 !important;
+	color: #005236 !important;
+	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	white-space: nowrap !important;
+	font-variant-numeric: tabular-nums !important;
+}
+
+.fysio-fp-deal-card__merchant {
+	font-size: 12.5px !important;
+	font-weight: 500 !important;
+	color: #475467 !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	gap: 4px !important;
+	margin-left: auto !important;
 }
 
 .fysio-header-grid {
@@ -539,15 +703,22 @@ button#btn-finish:hover * {
 
 .fysio-grid-container {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 0.75rem;
+	grid-template-columns: 1fr;
+	gap: 1.15rem;
 	width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 540px) {
 	.fysio-grid-container {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 1rem;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.15rem;
+	}
+}
+
+@media (min-width: 820px) {
+	.fysio-grid-container {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.25rem;
 	}
 }
 
