@@ -257,8 +257,10 @@
 			};
 		}
 
+		var initialStep = parseInt( root.getAttribute( 'data-initial-step' ), 10 ) || 0;
+
 		var state = {
-			step: 0, // 0 = intro, 1..N = quiz steps, N+1 = results
+			step: initialStep, // 0 = intro, 1..N = quiz steps, N+1 = results
 			dir: 'forward',
 			busy: false,
 			sheet: null, // null | 'compare' | 'ranking'
@@ -455,19 +457,10 @@
 				'<div class="intro-actions">' +
 					'<button type="button" class="btn filled primary sl intro-cta" data-action="start">' +
 					esc( intro.start || 'Start kjøpsveileder' ) + ms( 'chevR', 18 ) + '</button>' +
+					'<button type="button" class="btn outlined sl intro-deals-btn" data-action="deals">' +
+					ic( 'tag', 17 ) + '<span>Dagens tilbud</span></button>' +
 				'</div>' +
-				'<div class="intro-quick">' +
-					'<span class="intro-quick-label">Eller hopp rett til:</span>' +
-					'<button type="button" class="chip sl" data-action="deals">' + ms( 'tag', 18 ) + 'Dagens tilbud</button>';
-
-			if ( config.presets && config.presets.length ) {
-				config.presets.slice( 0, 2 ).forEach( function ( pr ) {
-					h += '<button type="button" class="chip sl" data-action="quick" data-preset="' + esc( pr.key ) + '">' +
-						ms( pr.icon || 'sliders', 18 ) + esc( pr.label ) + '</button>';
-				} );
-			}
-
-			h += '</div></header>';
+			'</header>';
 
 			if ( config.presets && config.presets.length ) {
 				h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +

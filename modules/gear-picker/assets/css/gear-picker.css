@@ -257,7 +257,13 @@
 	font-size: 1rem;
 	line-height: 1.6;
 }
-.gear-engine-picker .intro-actions { margin-top: 20px; }
+.gear-engine-picker .intro-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 20px;
+}
 .gear-engine-picker .intro-cta {
 	height: 48px;
 	padding: 0 24px;
@@ -265,25 +271,24 @@
 	font-weight: 600;
 	letter-spacing: 0.01em;
 }
-.gear-engine-picker .intro-quick {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 8px;
-	margin-top: 20px;
+.gear-engine-picker .intro-deals-btn {
+	height: 48px;
+	padding: 0 20px;
+	background: var(--md-sys-color-surface, #FFFFFF);
+	border: 1px solid var(--md-sys-color-outline-variant, #D0DBE5);
+	color: var(--md-sys-color-primary, #0C2340);
+	font-size: 14.5px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(12, 35, 64, 0.03);
 }
-.gear-engine-picker .intro-quick-label {
-	margin-right: 4px;
-	color: var(--md-sys-color-on-surface-variant, #475467);
-	font-size: 13px;
-	font-weight: 500;
+.gear-engine-picker .intro-deals-btn:hover {
+	background: #FAFBFD;
+	border-color: var(--md-sys-color-primary, #0C2340);
 }
-/* Soft grey hover (matches the rest of the site); no dark state layer on these chips. */
-.gear-engine-picker .intro-quick .chip:hover { background: #F4F7FA; color: var(--md-sys-color-primary, #0C2340); }
-.gear-engine-picker .intro-quick .chip.sl:hover::after { opacity: 0; }
 @media (max-width: 600px) {
 	.gear-engine-picker .intro-title { font-size: 1.5rem; }
-	.gear-engine-picker .intro-cta { width: 100%; justify-content: center; }
+	.gear-engine-picker .intro-cta,
+	.gear-engine-picker .intro-deals-btn { flex: 1 1 auto; justify-content: center; }
 }
 
 /* Badges & Pills */
