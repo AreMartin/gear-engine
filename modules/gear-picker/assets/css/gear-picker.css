@@ -17,6 +17,7 @@
 	font-family: var(--ge-font-family, 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif);
 	line-height: 1.5;
 	position: relative;
+	--ge-hairline-strong: #E4E7EC;
 }
 .gear-engine-picker *,
 .gear-engine-picker *::before,
@@ -305,9 +306,9 @@
 }
 .gear-engine-picker .pill.tert { background: var(--md-sys-color-tertiary-container, #DCF5E8); color: var(--md-sys-color-tertiary, #005236); }
 .gear-engine-picker .pill.sec { background: var(--md-sys-color-secondary-container, #EAF0F6); color: var(--md-sys-color-secondary, #143154); }
-.gear-engine-picker .pill.warn { background: var(--md-ext-color-warning-container, #FEF3C7); color: var(--md-ext-color-on-warning-container, #92400E); border: 1px solid #FDE68A; }
+.gear-engine-picker .pill.warn { background: var(--ge-amber-deal-bg, #FEF3C7); color: var(--ge-amber-deal-text, #92400E); border: 1px solid var(--ge-amber-deal-border, #FDE68A); }
 .gear-engine-picker .pill.err { background: var(--md-sys-color-error-container, #FDE8E8); color: var(--md-sys-color-on-error-container, #9B1C1C); }
-.gear-engine-picker .pill.deal { background: var(--md-ext-color-warning-container, #FEF3C7); color: var(--md-ext-color-on-warning-container, #92400E); border: 1px solid #FDE68A; }
+.gear-engine-picker .pill.deal { background: var(--ge-amber-deal-bg, #FEF3C7); color: var(--ge-amber-deal-text, #92400E); border: 1px solid var(--ge-amber-deal-border, #FDE68A); }
 .gear-engine-picker .pill.best { background: var(--md-sys-color-primary, #0C2340); color: #FFFFFF; }
 
 /* Cards & Surfaces */
@@ -1465,7 +1466,6 @@
 	box-sizing: border-box;
 	padding: 18px;
 	transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
-	will-change: background-color;
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-media {
@@ -1479,7 +1479,6 @@
 	object-fit: contain;
 	mix-blend-mode: multiply;
 	transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
-	will-change: transform;
 }
 
 .gear-engine-hub__card:hover:not(.gear-engine-hub__card--upcoming) .gear-engine-hub__card-img {

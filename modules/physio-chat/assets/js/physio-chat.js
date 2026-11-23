@@ -54,7 +54,23 @@
 
     window.fysioSoftReset = function() {
         clearSession();
-        window.modalDataStore = [];
+    window.modalDataStore = [];
+
+    function escHtml(s) {
+        if (s === undefined || s === null) return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function isSafeUrl(url) {
+        if (!url) return false;
+        const val = String(url).trim();
+        return /^https?:\/\//i.test(val) && !/["'<>`\s\\]/.test(val);
+    }
         const msgContainer = document.getElementById('fysio-message-container');
         if (msgContainer) msgContainer.innerHTML = '';
         
@@ -73,7 +89,7 @@
         const lines = desc.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let html = '<ul style="list-style-type: disc !important; padding-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.75rem !important;">';
         lines.forEach(line => {
-            let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1A2A3A !important; font-weight: 700 !important;">$1</strong>');
+            let formattedLine = escHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1A2A3A !important; font-weight: 700 !important;">$1</strong>');
             formattedLine = formattedLine.replace(/^[-*•]\s*/, '');
             html += `<li style="display: list-item !important; margin-bottom: 0.5rem !important; color: #4b5563 !important;">${formattedLine}</li>`;
         });
@@ -135,13 +151,13 @@
         
         let title = programData.tittel || programData.fase_navn || "Treningsprogram";
         let subtitle = programData.hovedtittel || 'Klinisk protokoll';
-        let html = `<div class="print-header"><div><div class="print-meta-title">${subtitle}</div><h1 class="print-main-title">${title}</h1></div><div class="print-logo"><span style="color:#00A878 !important;">fysio</span>nett</div></div>`;
+        let html = `<div class="print-header"><div><div class="print-meta-title">${escHtml(subtitle)}</div><h1 class="print-main-title">${escHtml(title)}</h1></div><div class="print-logo"><span style="color:#00A878 !important;">fysio</span>nett</div></div>`;
         
         if (programData.ovelser) {
             programData.ovelser.forEach((ovelse, index) => {
                 let desc = ovelse.beskrivelse || ovelse.fokus || "";
-                let formatertBeskrivelse = desc.replace(/\n\n/g, '<br><br>').replace(/\*\*(.*?)\*\*\n?/g, '<strong>$1</strong><br>').replace(/\n/g, '<br>');
-                html += `<div class="print-exercise"><div class="print-ex-header"><h3 class="print-ex-title">${index + 1}. ${ovelse.navn}</h3>${ovelse.reps ? `<span class="print-ex-reps">${ovelse.reps}</span>` : ''}</div><div class="print-ex-desc">${formatertBeskrivelse}</div></div>`;
+                let formatertBeskrivelse = escHtml(desc).replace(/\n\n/g, '<br><br>').replace(/\*\*(.*?)\*\*\n?/g, '<strong>$1</strong><br>').replace(/\n/g, '<br>');
+                html += `<div class="print-exercise"><div class="print-ex-header"><h3 class="print-ex-title">${index + 1}. ${escHtml(ovelse.navn)}</h3>${ovelse.reps ? `<span class="print-ex-reps">${escHtml(ovelse.reps)}</span>` : ''}</div><div class="print-ex-desc">${formatertBeskrivelse}</div></div>`;
             });
         }
         html += `<div class="print-footer">Generert av Digital Fysio • Gear Engine</div>`;
@@ -282,10 +298,10 @@
                     videoPlayer.innerHTML = `<iframe src="${vimeoUrl.href}" class="w-full h-full absolute top-0 left-0 border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     if (videoThumb) {
-                        videoThumb.src = ovelse.bilde_url || '';
+                        videoThumb.src = isSafeUrl(ovelse.bilde_url) ? ovelse.bilde_url.trim() : '';
                         videoThumb.style.display = 'block';
                     }
-                    if (vidUrl.trim() !== '' && playOverlay && videoPlayer) {
+                    if (vidUrl.trim() !== '' && isSafeUrl(vidUrl) && playOverlay && videoPlayer) {
                         playOverlay.style.setProperty('display', 'flex', 'important');
                         playOverlay.onclick = function() {
                             playOverlay.style.setProperty('display', 'none', 'important');
@@ -364,9 +380,9 @@
         const container = document.getElementById('fysio-message-container');
         if (!container) return;
         if (isUser) {
-            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[85%] sm:max-w-[70%] message-enter print-hidden" style="align-self: flex-end !important; display: flex !important; max-width: 85% !important; margin-bottom: 0.5rem !important;"><div class="text-white shadow-sm leading-relaxed w-full fysio-user-msg-bubble" style="background-color: #1A2A3A !important; color: #ffffff !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-bottom-right-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${text}</div></div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[85%] sm:max-w-[70%] message-enter print-hidden" style="align-self: flex-end !important; display: flex !important; max-width: 85% !important; margin-bottom: 0.5rem !important;"><div class="text-white shadow-sm leading-relaxed w-full fysio-user-msg-bubble" style="background-color: #1A2A3A !important; color: #ffffff !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-bottom-right-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${escHtml(text)}</div></div>`);
         } else {
-            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important; max-width: 90% !important; margin-bottom: 0.5rem !important;"><div class="bg-white border shadow-sm leading-relaxed w-full fysio-bot-msg-bubble" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-top-left-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${text}</div></div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col max-w-[90%] sm:max-w-[75%] message-enter print-hidden" style="align-self: flex-start !important; display: flex !important; max-width: 90% !important; margin-bottom: 0.5rem !important;"><div class="bg-white border shadow-sm leading-relaxed w-full fysio-bot-msg-bubble" style="background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; font-size: 15px !important; padding: 0.875rem 1.25rem !important; border-radius: 1.5rem !important; border-top-left-radius: 8px !important; line-height: 1.6 !important; width: 100% !important;">${escHtml(text)}</div></div>`);
         }
         scrollToSmart();
     }
@@ -382,7 +398,7 @@
             let sparBelop = Math.round(forprisNum - prisNum);
             if (rabattProsent > 0) {
                 rabattPill = `<span class="fysio-fp-deal-card__badge">-${rabattProsent} %</span>`;
-                forprisHtml = `<span class="fysio-fp-deal-card__old-price">${forprisStr}</span>`;
+                forprisHtml = `<span class="fysio-fp-deal-card__old-price">${escHtml(forprisStr)}</span>`;
             }
             if (sparBelop > 0) {
                 sparHtml = `<span class="fysio-fp-deal-card__save">Spar ${sparBelop.toLocaleString('nb-NO')},-</span>`;
@@ -402,6 +418,7 @@
         if (val === '' || val === '#') return isImage ? '' : '#';
         if (val.toLowerCase().includes('bilde_url') || val === 'URL' || val.toLowerCase() === 'url') return isImage ? '' : '#';
         if (!/^https?:\/\//i.test(val)) return isImage ? '' : '#';
+        if (/["'<>`\s\\]/.test(val)) return isImage ? '' : '#';
         return val;
     }
 
@@ -419,7 +436,7 @@
             triageResult: (document.getElementById('tpl-triage-result') || {}).innerHTML || ''
         };
 
-        let msgHtml = data.message ? data.message.replace(/\*(.*?)\*/g, '<strong style="color: #1A2A3A !important; font-weight: 700 !important;">$1</strong>') : '';
+        let msgHtml = data.message ? escHtml(data.message).replace(/\*(.*?)\*/g, '<strong style="color: #1A2A3A !important; font-weight: 700 !important;">$1</strong>') : '';
         let extraHTML = '';
         let choicesHTML = '';
         const isMulti = data.multiselect === true;
@@ -427,7 +444,7 @@
         if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
             let btnsStr = '';
             data.choices.forEach(valg => {
-                btnsStr += `<button class="fysio-dyn-btn shadow-sm cursor-pointer transition-colors" data-text="${valg}" style="background-color: ${isMulti ? '#ffffff' : '#00A878'} !important; color: ${isMulti ? '#00A878' : '#ffffff'} !important; border-radius: 9999px !important; padding: 8px 18px !important; font-size: 13.5px !important; font-weight: 500 !important; border: ${isMulti ? '1px solid #00A878' : 'none'} !important; margin-right: 8px !important; margin-top: 8px !important;">${valg}</button>`;
+                btnsStr += `<button class="fysio-dyn-btn shadow-sm cursor-pointer transition-colors" data-text="${escHtml(valg)}" style="background-color: ${isMulti ? '#ffffff' : '#00A878'} !important; color: ${isMulti ? '#00A878' : '#ffffff'} !important; border-radius: 9999px !important; padding: 8px 18px !important; font-size: 13.5px !important; font-weight: 500 !important; border: ${isMulti ? '1px solid #00A878' : 'none'} !important; margin-right: 8px !important; margin-top: 8px !important;">${escHtml(valg)}</button>`;
             });
             if (isMulti) {
                 btnsStr += `<div class="w-full mt-3"><button class="fysio-confirm-multi-btn shadow-sm cursor-pointer transition-all w-full" style="border-radius: 9999px !important; padding: 10px 18px !important; font-size: 14px !important; font-weight: 600 !important; border: none !important; background-color: #e5e7eb !important; color: #374151 !important;">Ingen av disse</button></div>`;
@@ -444,7 +461,7 @@
                         let dataIndex = window.modalDataStore.push(c) - 1;
                         let tplEx = templates.exorliveBtn;
                         tplEx = safeReplace(tplEx, '{INDEX}', dataIndex);
-                        tplEx = safeReplace(tplEx, '{TITTEL}', c.tittel || 'Treningsprogram');
+                        tplEx = safeReplace(tplEx, '{TITTEL}', escHtml(c.tittel || 'Treningsprogram'));
                         extraHTML = tplEx;
                         break;
 
@@ -454,9 +471,9 @@
                             c.items.forEach(i => {
                                 let prisData = lagPrisInfo(i.pris, i.forpris);
                                 let tpl = templates.gridItem;
-                                tpl = safeReplace(tpl, '{TITTEL}', i.tittel || '');
-                                tpl = safeReplace(tpl, '{BUTIKK}', i.butikk || '');
-                                tpl = safeReplace(tpl, '{PRIS}', i.pris || '');
+                                tpl = safeReplace(tpl, '{TITTEL}', escHtml(i.tittel || ''));
+                                tpl = safeReplace(tpl, '{BUTIKK}', escHtml(i.butikk || ''));
+                                tpl = safeReplace(tpl, '{PRIS}', escHtml(i.pris || ''));
                                 tpl = safeReplace(tpl, '{FORPRIS_HTML}', prisData.forprisHtml);
                                 tpl = safeReplace(tpl, '{RABATT_PILL}', prisData.rabattPill);
                                 tpl = safeReplace(tpl, '{SPAR_HTML}', prisData.sparHtml);
@@ -465,7 +482,7 @@
                                 itemsHTML += tpl;
                             });
                         }
-                        extraHTML = safeReplace(safeReplace(templates.grid, '{GRID_TITTEL}', c.tittel || 'Anbefalt utstyr'), '{GRID_ITEMS}', itemsHTML);
+                        extraHTML = safeReplace(safeReplace(templates.grid, '{GRID_TITTEL}', escHtml(c.tittel || 'Anbefalt utstyr')), '{GRID_ITEMS}', itemsHTML);
                         break;
 
                     case 'liste':
@@ -475,28 +492,30 @@
                                 let fallbackSvg = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Q0ZWFkZiIvPjwvc3ZnPg==';
                                 let rawImg = cleanFakeUrl(i.bilde_url, true);
                                 let bildeUrl = rawImg !== '' ? rawImg : fallbackSvg;
-                                let phoneBtn = i.telefon ? `<a href="tel:${i.telefon}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors shadow-sm" style="background-color: #f9fafb !important; border: 1px solid #f3f4f6 !important; color: #1A2A3A !important; text-decoration: none !important; display: flex !important;" title="Ring"><i class="fa-solid fa-phone text-sm" style="color: #1A2A3A !important;"></i></a>` : '';
+                                const telRaw = String(i.telefon || '').trim();
+                                const telDigits = /^[+0-9 ().-]+$/.test(telRaw) ? telRaw.replace(/[^\d+]/g, '') : '';
+                                let phoneBtn = telDigits ? `<a href="tel:${escHtml(telDigits)}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors shadow-sm" style="background-color: #f9fafb !important; border: 1px solid #f3f4f6 !important; color: #1A2A3A !important; text-decoration: none !important; display: flex !important;" title="Ring"><i class="fa-solid fa-phone text-sm" style="color: #1A2A3A !important;"></i></a>` : '';
                                 
                                 let tpl = templates.klinikkListe;
-                                tpl = safeReplace(tpl, '{TITTEL}', i.tittel || 'Klinikk');
-                                tpl = safeReplace(tpl, '{RATING}', String(i.rating || 'Ny'));
-                                tpl = safeReplace(tpl, '{ADRESSE}', i.adresse || 'Adresse ikke oppgitt');
+                                tpl = safeReplace(tpl, '{TITTEL}', escHtml(i.tittel || 'Klinikk'));
+                                tpl = safeReplace(tpl, '{RATING}', escHtml(String(i.rating || 'Ny')));
+                                tpl = safeReplace(tpl, '{ADRESSE}', escHtml(i.adresse || 'Adresse ikke oppgitt'));
                                 tpl = safeReplace(tpl, '{PHONE_BTN}', phoneBtn);
                                 tpl = safeReplace(tpl, '{URL}', cleanFakeUrl(i.url, false));
                                 tpl = safeReplace(tpl, '{BILDE_URL}', bildeUrl);
                                 listeHTML += tpl;
                             });
                         }
-                        extraHTML = `<div class="flex flex-col w-full mt-1"><h3 style="font-size: 14px !important; font-weight: 700 !important; color: #6b7280 !important; margin: 0 0 8px 0 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; display: flex !important; align-items: center !important; gap: 8px !important;"><i class="fa-solid fa-map-location-dot" style="color: #00A878 !important;"></i> ${c.tittel || 'Klinikker i nærheten'}</h3>${listeHTML}<div class="mt-1 px-2 sm:w-[480px]"><span style="font-size: 11px !important; color: #9ca3af !important; display: flex !important; align-items: center !important; gap: 6px !important; margin: 0 !important;"><i class="fa-brands fa-google" style="color: #d1d5db !important;"></i> Resultater fra Google Places</span></div></div>`;
+                        extraHTML = `<div class="flex flex-col w-full mt-1"><h3 style="font-size: 14px !important; font-weight: 700 !important; color: #6b7280 !important; margin: 0 0 8px 0 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; display: flex !important; align-items: center !important; gap: 8px !important;"><i class="fa-solid fa-map-location-dot" style="color: #00A878 !important;"></i> ${escHtml(c.tittel || 'Klinikker i nærheten')}</h3>${listeHTML}<div class="mt-1 px-2 sm:w-[480px]"><span style="font-size: 11px !important; color: #9ca3af !important; display: flex !important; align-items: center !important; gap: 6px !important; margin: 0 !important;"><i class="fa-brands fa-google" style="color: #d1d5db !important;"></i> Resultater fra Google Places</span></div></div>`;
                         break;
 
                     case 'lite_kort':
                         let prisDataLite = lagPrisInfo(c.pris, c.forpris, true);
                         let tplLite = templates.liteKort;
-                        tplLite = safeReplace(tplLite, '{TITTEL}', c.tittel || '');
-                        tplLite = safeReplace(tplLite, '{BUTIKK}', c.butikk || '');
-                        tplLite = safeReplace(tplLite, '{BESKRIVELSE}', c.beskrivelse || '');
-                        tplLite = safeReplace(tplLite, '{PRIS}', c.pris || '');
+                        tplLite = safeReplace(tplLite, '{TITTEL}', escHtml(c.tittel || ''));
+                        tplLite = safeReplace(tplLite, '{BUTIKK}', escHtml(c.butikk || ''));
+                        tplLite = safeReplace(tplLite, '{BESKRIVELSE}', escHtml(c.beskrivelse || ''));
+                        tplLite = safeReplace(tplLite, '{PRIS}', escHtml(c.pris || ''));
                         tplLite = safeReplace(tplLite, '{FORPRIS_HTML}', prisDataLite.forprisHtml);
                         tplLite = safeReplace(tplLite, '{RABATT_PILL_LITE}', prisDataLite.rabattPill);
                         tplLite = safeReplace(tplLite, '{SPAR_HTML}', prisDataLite.sparHtml);
@@ -508,10 +527,10 @@
                     case 'stort_kort':
                         let prisDataStort = lagPrisInfo(c.pris, c.forpris);
                         let tplStort = templates.stortKort;
-                        tplStort = safeReplace(tplStort, '{TITTEL}', c.tittel || '');
-                        tplStort = safeReplace(tplStort, '{BUTIKK}', c.butikk || '');
-                        tplStort = safeReplace(tplStort, '{BESKRIVELSE}', c.beskrivelse || '');
-                        tplStort = safeReplace(tplStort, '{PRIS}', c.pris || '');
+                        tplStort = safeReplace(tplStort, '{TITTEL}', escHtml(c.tittel || ''));
+                        tplStort = safeReplace(tplStort, '{BUTIKK}', escHtml(c.butikk || ''));
+                        tplStort = safeReplace(tplStort, '{BESKRIVELSE}', escHtml(c.beskrivelse || ''));
+                        tplStort = safeReplace(tplStort, '{PRIS}', escHtml(c.pris || ''));
                         tplStort = safeReplace(tplStort, '{FORPRIS_HTML}', prisDataStort.forprisHtml);
                         tplStort = safeReplace(tplStort, '{RABATT_PILL}', prisDataStort.rabattPill);
                         tplStort = safeReplace(tplStort, '{SPAR_HTML}', prisDataStort.sparHtml);
@@ -526,15 +545,15 @@
                         if (c.alvorlighetsgrad === 'Høy') { sevBg = 'red-50'; sevText = 'red-600'; }
                         else if (c.alvorlighetsgrad === 'Moderat') { sevBg = 'orange-50'; sevText = 'orange-600'; }
                         
-                        let diffHtml = c.differensial ? `<div class="mt-4 pt-4 border-t border-gray-100 text-[13px]"><span style="font-weight: 700 !important; color: #1A2A3A !important;">Kan forveksles med:</span> <span style="color: #4b5563 !important;">${c.differensial}</span></div>` : '';
+                        let diffHtml = c.differensial ? `<div class="mt-4 pt-4 border-t border-gray-100 text-[13px]"><span style="font-weight: 700 !important; color: #1A2A3A !important;">Kan forveksles med:</span> <span style="color: #4b5563 !important;">${escHtml(c.differensial)}</span></div>` : '';
                         
                         let anamneseRows = '';
                         if (typeof c.notat_anamnese === 'string') {
-                            anamneseRows = `<div class="flex flex-col sm:grid sm:grid-cols-2 gap-1 sm:gap-4 p-3 sm:p-4 print-force-bg"><div style="color: #6b7280 !important; font-weight: 500 !important;">Sammendrag</div><div style="font-weight: 700 !important; color: #1A2A3A !important;">${c.notat_anamnese}</div></div>`;
+                            anamneseRows = `<div class="flex flex-col sm:grid sm:grid-cols-2 gap-1 sm:gap-4 p-3 sm:p-4 print-force-bg"><div style="color: #6b7280 !important; font-weight: 500 !important;">Sammendrag</div><div style="font-weight: 700 !important; color: #1A2A3A !important;">${escHtml(c.notat_anamnese)}</div></div>`;
                         } else if (c.notat_anamnese && Array.isArray(c.notat_anamnese)) {
                             c.notat_anamnese.forEach((row, idx) => {
                                 let border = idx !== c.notat_anamnese.length - 1 ? 'border-b border-gray-100' : '';
-                                anamneseRows += `<div class="flex flex-col sm:grid sm:grid-cols-2 gap-1 sm:gap-4 p-3 sm:p-4 ${border} print-force-bg"><div style="color: #6b7280 !important; font-weight: 500 !important;">${row.sporsmal}</div><div style="font-weight: 700 !important; color: #1A2A3A !important;">${row.svar}</div></div>`;
+                                anamneseRows += `<div class="flex flex-col sm:grid sm:grid-cols-2 gap-1 sm:gap-4 p-3 sm:p-4 ${border} print-force-bg"><div style="color: #6b7280 !important; font-weight: 500 !important;">${escHtml(row.sporsmal)}</div><div style="font-weight: 700 !important; color: #1A2A3A !important;">${escHtml(row.svar)}</div></div>`;
                             });
                         }
 
@@ -546,24 +565,24 @@
                         
                         let tplTriage = templates.triageResult;
                         tplTriage = safeReplace(tplTriage, '{ID}', cardIdCounter);
-                        tplTriage = safeReplace(tplTriage, '{TITTEL}', c.tittel || 'Oppsummering');
-                        tplTriage = safeReplace(tplTriage, '{KATEGORI}', c.kategori || 'Generell');
-                        tplTriage = safeReplace(tplTriage, '{ALVORLIGHET}', c.alvorlighetsgrad || 'Lav');
+                        tplTriage = safeReplace(tplTriage, '{TITTEL}', escHtml(c.tittel || 'Oppsummering'));
+                        tplTriage = safeReplace(tplTriage, '{KATEGORI}', escHtml(c.kategori || 'Generell'));
+                        tplTriage = safeReplace(tplTriage, '{ALVORLIGHET}', escHtml(c.alvorlighetsgrad || 'Lav'));
                         tplTriage = safeReplace(tplTriage, '{SEV_BG}', sevBg);
                         tplTriage = safeReplace(tplTriage, '{SEV_TEXT}', sevText);
-                        tplTriage = safeReplace(tplTriage, '{FORKLARING}', c.forklaring || '');
+                        tplTriage = safeReplace(tplTriage, '{FORKLARING}', escHtml(c.forklaring || ''));
                         tplTriage = safeReplace(tplTriage, '{DIFFERENSIAL_HTML}', diffHtml);
-                        tplTriage = safeReplace(tplTriage, '{TILTAK_NA}', c.tiltak_na || '');
-                        tplTriage = safeReplace(tplTriage, '{TILTAK_VIDERE}', c.tiltak_videre || '');
+                        tplTriage = safeReplace(tplTriage, '{TILTAK_NA}', escHtml(c.tiltak_na || ''));
+                        tplTriage = safeReplace(tplTriage, '{TILTAK_VIDERE}', escHtml(c.tiltak_videre || ''));
                         tplTriage = safeReplace(tplTriage, '{ANAMNESE_ROWS}', anamneseRows);
                         tplTriage = safeReplace(tplTriage, '{FLAG_BG}', flagBg);
                         tplTriage = safeReplace(tplTriage, '{FLAG_BORDER}', flagBorder);
                         tplTriage = safeReplace(tplTriage, '{FLAG_TEXT}', flagText);
                         tplTriage = safeReplace(tplTriage, '{FLAG_ICON}', flagIcon);
-                        tplTriage = safeReplace(tplTriage, '{RODE_FLAGG}', c.notat_rode_flagg || 'Ingen varselsymptomer avdekket.');
-                        tplTriage = safeReplace(tplTriage, '{HYPOTESE}', c.notat_hypotese || 'Uspesifisert plage.');
-                        tplTriage = safeReplace(tplTriage, '{ICPC2}', c.notat_icpc2 || 'Uspesifisert');
-                        tplTriage = safeReplace(tplTriage, '{ICD10}', c.notat_icd10 || 'Uspesifisert');
+                        tplTriage = safeReplace(tplTriage, '{RODE_FLAGG}', escHtml(c.notat_rode_flagg || 'Ingen varselsymptomer avdekket.'));
+                        tplTriage = safeReplace(tplTriage, '{HYPOTESE}', escHtml(c.notat_hypotese || 'Uspesifisert plage.'));
+                        tplTriage = safeReplace(tplTriage, '{ICPC2}', escHtml(c.notat_icpc2 || 'Uspesifisert'));
+                        tplTriage = safeReplace(tplTriage, '{ICD10}', escHtml(c.notat_icd10 || 'Uspesifisert'));
                         tplTriage = safeReplace(tplTriage, '{NOTE_ID}', noteId);
                         tplTriage = safeReplace(tplTriage, '{DATO}', dateStr);
                         extraHTML = tplTriage;
@@ -585,8 +604,11 @@
     function setInputLocked(locked) {
         const input = document.getElementById('fysio-input');
         const sendBtn = document.getElementById('fysio-send-btn');
+        const micBtn = document.getElementById('fysio-mic-btn');
         if (!input || !sendBtn) return;
         input.disabled = locked;
+        sendBtn.setAttribute('aria-disabled', locked ? 'true' : 'false');
+        if (micBtn) micBtn.disabled = locked;
         if (locked) {
             sendBtn.classList.add('fysio-send-disabled');
             sendBtn.classList.remove('fysio-send-active');
@@ -700,6 +722,22 @@
         let recognition = null;
         let isListening = false;
 
+        function flashPlaceholder(msg) {
+            if (!input.getAttribute('data-orig-placeholder')) {
+                input.setAttribute('data-orig-placeholder', input.placeholder || '');
+            }
+            const orig = input.getAttribute('data-orig-placeholder');
+            input.placeholder = msg;
+            setTimeout(function() {
+                input.placeholder = orig;
+            }, 3500);
+        }
+
+        if (micBtn && !SpeechRec) {
+            micBtn.style.display = 'none';
+            micBtn.setAttribute('aria-hidden', 'true');
+        }
+
         function stopListening() {
             isListening = false;
             if (!micBtn) return;
@@ -747,12 +785,17 @@
 
                 recognition.onerror = function(event) {
                     stopListening();
-                    if (event && event.error === 'not-allowed') {
-                        const origP = input.getAttribute('data-orig-placeholder') || input.placeholder;
-                        input.placeholder = 'Mikrofontilgang ble avvist';
-                        setTimeout(function() {
-                            input.placeholder = origP;
-                        }, 3500);
+                    const err = (event && event.error) || '';
+                    const micErrors = {
+                        'not-allowed': 'Mikrofontilgang ble avvist',
+                        'service-not-allowed': 'Talesøk er blokkert av nettleseren',
+                        'no-speech': 'Hørte ingenting – prøv igjen',
+                        'audio-capture': 'Fant ingen mikrofon',
+                        'network': 'Nettverksfeil under talesøk',
+                        'language-not-supported': 'Språk støttes ikke av talesøk'
+                    };
+                    if (micErrors[err]) {
+                        flashPlaceholder(micErrors[err]);
                     }
                 };
 
@@ -768,11 +811,7 @@
             micBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (!recognition) {
-                    const origVal = input.getAttribute('data-orig-placeholder') || input.placeholder;
-                    input.placeholder = 'Talesøk krever Chrome, Edge eller Safari';
-                    setTimeout(function() {
-                        input.placeholder = origVal;
-                    }, 3500);
+                    flashPlaceholder('Talesøk krever Chrome, Edge eller Safari');
                     return;
                 }
                 if (isListening) {
@@ -814,9 +853,11 @@
             if (this.value.trim().length > 0) {
                 sendBtn.classList.remove('fysio-send-disabled');
                 sendBtn.classList.add('fysio-send-active');
+                sendBtn.setAttribute('aria-disabled', 'false');
             } else {
                 sendBtn.classList.add('fysio-send-disabled');
                 sendBtn.classList.remove('fysio-send-active');
+                sendBtn.setAttribute('aria-disabled', 'true');
             }
         });
         
@@ -871,7 +912,7 @@
                     const val = btn.dataset.text;
                     btn.style.setProperty('background-color', '#00A878', 'important');
                     btn.style.setProperty('color', 'white', 'important');
-                    btn.innerHTML = `<i class="fa-solid fa-check" style="margin-right: 6px;"></i> ${val}`;
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="margin-right: 6px;"></i> ${escHtml(val)}`;
                     btn.classList.add('fysio-pop-anim');
                     setTimeout(() => {
                         container.remove();

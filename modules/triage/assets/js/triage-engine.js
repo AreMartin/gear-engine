@@ -659,7 +659,7 @@
 		var html = this.renderResumeBanner();
 
 		if (isFlags) {
-			html += '<div class="overline" style="margin-top:4px;color:var(--ge-green-800,#005236)">Viktig sikkerhetssjekk</div>';
+			html += '<div class="overline" style="margin-top:4px;color:var(--ge-amber,#B5770A)">Viktig sikkerhetssjekk</div>';
 		}
 		html += '<h2 class="headline-s quiz-question-title">' + esc(step.title) + '</h2>';
 
@@ -843,7 +843,7 @@
 			var program = res.trainingProgram || {};
 			var programUrl = safeUrl(program.url);
 			if (!programUrl) {
-				var pageUrl = this.config.programPageUrl || '/treningsprogram/';
+				var pageUrl = safeUrl(this.config.programPageUrl) || '/treningsprogram/';
 				programUrl = pageUrl + (pageUrl.indexOf('?') === -1 ? '?' : '&') + 'region=' + encodeURIComponent(this.region) + '&dx=' + encodeURIComponent(res.id || '');
 			}
 			var programTitle = program.title || 'Åpne treningsprogram';
@@ -1027,7 +1027,7 @@
 
 		var reg = (this.region || '').toLowerCase();
 		var aids = AIDS_MAP[reg] || AIDS_MAP.kne;
-		var hubUrl = (this.config.pickerHubUrl || '/kjopsveiledere/') + '?kategori=rehab';
+		var hubUrl = (safeUrl(this.config.pickerHubUrl) || '/kjopsveiledere/') + '?kategori=rehab';
 
 		var html = '<div class="get-aids-box get-noprint" style="margin-top:16px;background:#FFFFFF;border:none;box-shadow:0 2px 10px rgba(12,35,64,0.04);border-radius:24px;padding:24px 28px">' +
 			'<h3 class="title-l" style="margin:0 0 6px;color:var(--md-sys-color-primary,#0C2340)">Nyttige hjelpemidler for opptreningen</h3>' +

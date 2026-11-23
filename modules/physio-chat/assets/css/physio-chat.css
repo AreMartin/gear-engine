@@ -93,6 +93,19 @@
 	background-color: transparent !important;
 }
 
+/* Visible keyboard focus indicators (WCAG 2.4.7) — the scoped resets above
+   remove default outlines, so restore them for :focus-visible only. */
+.fysio-app-container :is(button, a, textarea, [tabindex]):focus-visible,
+#fysio-modal-overlay :is(button, a, textarea, [tabindex]):focus-visible {
+	outline: 2px solid #1A2A3A !important;
+	outline-offset: 2px !important;
+}
+
+.fysio-input-bar:focus-within {
+	outline: 2px solid #1A2A3A !important;
+	outline-offset: 2px !important;
+}
+
 .fysio-app-container a {
 	text-decoration: none !important;
 }

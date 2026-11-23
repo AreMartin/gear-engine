@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 ?>
-<div class="gear-engine-triage-picker" aria-label="<?php esc_attr_e( 'Velg område for symptomsjekk', 'gear-engine' ); ?>">
+<div class="gear-engine-triage-picker" role="group" aria-label="<?php esc_attr_e( 'Velg område for symptomsjekk', 'gear-engine' ); ?>">
 	<div class="gear-engine-triage-picker__header">
 		<div class="overline"><?php esc_html_e( 'Digital triage · ca. 2 minutter', 'gear-engine' ); ?></div>
 		<h1 class="headline-l" style="margin-top:4px"><?php esc_html_e( 'Hvor har du vondt?', 'gear-engine' ); ?></h1>
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div class="tile-img-box">
 						<?php
 						$img_pos    = ! empty( $card['image_position'] ) ? $card['image_position'] : 'center center';
-						$media_html = '<img src="' . esc_url( $card['image_url'] ) . '" alt="' . esc_attr( $card['label'] ) . '" class="tile-image" style="object-position:' . esc_attr( $img_pos ) . ';" loading="lazy">';
+						$media_html = '<img src="' . esc_url( $card['image_url'] ) . '" alt="' . esc_attr( $card['label'] ) . '" class="tile-image" width="256" height="253" style="object-position:' . esc_attr( $img_pos ) . ';" loading="lazy">';
 						/**
 						 * Filters the media HTML rendered inside a region tile.
 						 *

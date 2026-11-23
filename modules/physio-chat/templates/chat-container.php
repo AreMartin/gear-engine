@@ -61,7 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 			<!-- Dynamic Messages Injection Container -->
-			<div id="fysio-message-container" class="flex flex-col gap-6 w-full pb-2"></div>
+			<div id="fysio-message-container" class="flex flex-col gap-6 w-full pb-2" role="log" aria-live="polite"></div>
 			
 			<!-- Typing Animated Indicator -->
 			<div id="fysio-typing" class="print-hidden hidden message-enter self-start" style="display: none !important;">
@@ -80,17 +80,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<footer class="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 print-hidden w-[calc(100%-2rem)] max-w-[860px]" style="position: absolute !important; bottom: 1.5rem !important; left: 50% !important; transform: translateX(-50%) !important; width: calc(100% - 2rem) !important; max-width: 860px !important; z-index: 40 !important;">
 		<form id="fysio-form" class="w-full m-0 p-0" style="margin: 0 !important; padding: 0 !important; width: 100% !important;">
 			<div class="fysio-input-bar">
-				<textarea id="fysio-input" rows="1" placeholder="Beskriv plagene dine eller spør om øvelser og utstyr..." aria-label="Melding til Digital Fysio"
+				<textarea id="fysio-input" rows="1" placeholder="<?php echo esc_attr__( 'Beskriv plagene dine eller spør om øvelser og utstyr...', 'gear-engine' ); ?>" aria-label="<?php echo esc_attr__( 'Melding til Digital Fysio', 'gear-engine' ); ?>"
 					class="w-full bg-transparent border-none outline-none resize-none m-0 min-h-[44px] max-h-[120px] no-scrollbar"></textarea>
 
 				<div class="fysio-input-actions">
-					<button id="fysio-mic-btn" type="button" class="fysio-mic-btn" aria-label="Snakk inn melding" title="Snakk inn melding">
+					<button id="fysio-mic-btn" type="button" class="fysio-mic-btn" aria-label="<?php echo esc_attr__( 'Snakk inn melding', 'gear-engine' ); ?>" title="<?php echo esc_attr__( 'Snakk inn melding', 'gear-engine' ); ?>">
 						<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false">
 							<path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
 						</svg>
 					</button>
 
-					<button id="fysio-send-btn" type="submit" aria-label="Send melding" title="Send melding"
+					<button id="fysio-send-btn" type="submit" aria-label="<?php echo esc_attr__( 'Send melding', 'gear-engine' ); ?>" title="<?php echo esc_attr__( 'Send melding', 'gear-engine' ); ?>" aria-disabled="true"
 						class="fysio-send-disabled w-[40px] h-[40px] rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer">
 						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 							<path d="M12 19V5M5 12l7-7 7 7"/>
@@ -171,7 +171,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="fysio-deal-section mt-4 w-full max-w-full">
 			<div class="fysio-deal-head">
 				<h3 class="fysio-grid-title">{GRID_TITTEL}</h3>
-				<span class="fysio-sponsored-note">Sponsede lenker</span>
+				<span class="fysio-sponsored-note"><?php echo esc_html__( 'Sponsede lenker', 'gear-engine' ); ?></span>
 			</div>
 			<div class="fysio-grid-container w-full">{GRID_ITEMS}</div>
 		</div>
@@ -234,7 +234,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</span>
 				</div>
 			</a>
-			<span class="fysio-sponsored-note fysio-sponsored-note--bottom">Sponset lenke</span>
+			<span class="fysio-sponsored-note fysio-sponsored-note--bottom"><?php echo esc_html__( 'Sponset lenke', 'gear-engine' ); ?></span>
 		</div>
 	</div>
 
@@ -288,7 +288,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</span>
 				</div>
 			</a>
-			<span class="fysio-sponsored-note fysio-sponsored-note--bottom">Sponset lenke</span>
+			<span class="fysio-sponsored-note fysio-sponsored-note--bottom"><?php echo esc_html__( 'Sponset lenke', 'gear-engine' ); ?></span>
 		</div>
 	</div>
 	

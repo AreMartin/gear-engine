@@ -171,7 +171,11 @@
 	}
 
 	function safeUrl( url ) {
-		return /^https?:\/\//i.test( url ) ? url : '#';
+		var s = String( url == null ? '' : url ).trim();
+		if ( ! /^https?:\/\//i.test( s ) || /["'<>`\s\\]/.test( s ) ) {
+			return '#';
+		}
+		return esc( s );
 	}
 
 	function getSpec( item, key ) {
@@ -528,7 +532,7 @@
 				if ( s.subtitle ) {
 					h += '<p class="body-m muted quiz-question-sub">' + esc( s.subtitle ) + '</p>';
 				}
-				h += '<div class="opts" role="radiogroup">';
+				h += '<div class="opts" role="group" aria-label="' + esc( s.title ) + '">';
 				( s.options || [] ).forEach( function ( o ) {
 					var on = filters[ s.id ] === o.val;
 
@@ -826,11 +830,11 @@
 			// Interactive sort toggles
 			var isAmountSort = state.dealSort === 'amount';
 			h += '<div class="criteria-bar">' +
-				'<div class="chips-row">' +
-					'<button type="button" class="chip sl' + ( ! isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="pct" title="Sorter etter prosentvis prisavslag">' +
+				'<div class="chips-row" role="group" aria-label="Sortering av tilbud">' +
+					'<button type="button" class="chip sl' + ( ! isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="pct" aria-pressed="' + ( ! isAmountSort ) + '" title="Sorter etter prosentvis prisavslag">' +
 						'% Størst rabatt' +
 					'</button>' +
-					'<button type="button" class="chip sl' + ( isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="amount" title="Sorter etter kroner spart">' +
+					'<button type="button" class="chip sl' + ( isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="amount" aria-pressed="' + isAmountSort + '" title="Sorter etter kroner spart">' +
 						'kr Størst kroneavslag' +
 					'</button>' +
 				'</div></div>';

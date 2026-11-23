@@ -98,7 +98,7 @@ class Gear_Engine_Physio_Chat {
 		wp_register_style(
 			'gae-physio-chat-css',
 			$plugin_url . 'modules/physio-chat/assets/css/physio-chat.css',
-			array( 'gae-fontawesome', 'gae-poppins-font' ),
+			array( 'gear-engine-tokens', 'gear-engine-google-sans', 'gae-fontawesome', 'gae-poppins-font' ),
 			GEAR_ENGINE_VERSION
 		);
 

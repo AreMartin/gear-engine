@@ -56,13 +56,12 @@ if ( ! empty( $area_counts['annet'] ) ) {
 		<p class="gear-engine-program__hub-ingress"><?php esc_html_e( 'Strukturerte opptreningsforløp utarbeidet etter kliniske retningslinjer for trygg fremgang.', 'gear-engine' ); ?></p>
 
 		<?php if ( count( $filter_tabs ) > 1 ) : ?>
-			<div class="gear-engine-program__chips" role="tablist" aria-label="<?php esc_attr_e( 'Filtrer etter kroppsområde', 'gear-engine' ); ?>">
+			<div class="gear-engine-program__chips" role="group" aria-label="<?php esc_attr_e( 'Filtrer etter kroppsområde', 'gear-engine' ); ?>">
 				<?php foreach ( $filter_tabs as $tab_slug => $tab ) : ?>
 					<?php $is_active = ( 'all' === $tab_slug ); ?>
 					<button type="button"
 						class="gear-engine-program__chip<?php echo $is_active ? ' gear-engine-program__chip--active' : ''; ?>"
 						data-area="<?php echo esc_attr( $tab_slug ); ?>"
-						role="tab"
 						aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
 						<svg class="gear-engine-program__chip-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
 						<span class="gear-engine-program__chip-label"><?php echo esc_html( $tab['label'] ); ?></span>
