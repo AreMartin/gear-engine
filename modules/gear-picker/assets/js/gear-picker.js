@@ -392,7 +392,11 @@
 				rightHtml = '<span class="appbar-step num">Steg ' + state.step + ' av ' + steps.length + '</span>' +
 					'<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt og gå til start" title="Avslutt og gå til start">' + ic( 'close', 20 ) + '</button>';
 			} else if ( mode === 'results' ) {
-				rightHtml = '<button type="button" class="btn text sl appbar-reset" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 16 ) + '<span>Start på nytt</span></button>';
+				rightHtml = '<button type="button" class="btn text sl appbar-reset" data-action="how-we-rank" aria-label="Slik rangerer vi" title="Slik rangerer vi">' + ic( 'info', 16 ) + '<span>Slik rangerer vi</span></button>' +
+					'<button type="button" class="btn text sl appbar-reset" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 16 ) + '<span>Start på nytt</span></button>';
+			} else if ( mode === 'deals' ) {
+				rightHtml = '<button type="button" class="btn filled primary sl" data-action="start" style="height:34px;padding:0 14px;font-size:13px;gap:5px;font-weight:600">' +
+					'Start kjøpsveileder' + ic( 'chevR', 14 ) + '</button>';
 			} else {
 				rightHtml = '<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt" title="Gå til start">' + ic( 'close', 20 ) + '</button>';
 			}
@@ -658,19 +662,15 @@
 			var others = results.slice( 1 );
 
 			var h = renderAppbar( config.label || 'Kjøpsveileder', 'results' ) +
-				'<div class="head-row" style="margin-top:14px;align-items:center">' +
-					'<div style="display:flex;align-items:center;gap:10px">' +
+				'<div class="results-head">' +
+					'<div class="results-head__title">' +
 						'<h2 class="headline-s" style="margin:0">Dine anbefalinger</h2>' +
 						'<span class="pill tert num">' + results.length + ' treff</span>' +
 					'</div>' +
-					'<button type="button" class="btn text sl" data-action="how-we-rank" style="height:32px;padding:0 8px;font-size:12.5px;color:var(--md-sys-color-primary,#0C2340);gap:5px;font-weight:600">' +
-						ic( 'info', 16 ) + 'Slik rangerer vi' +
-					'</button>' +
 				'</div>';
 
-			// Active filter criteria chips with clear affordance and edit indication
-			h += '<div style="margin-top:14px">' +
-				'<div class="overline muted" style="font-size:11.5px;letter-spacing:0.4px;margin-bottom:6px">Dine kriterier · Trykk for å endre:</div>' +
+			// Active filter criteria chips (clean icon-free pills with subtle edit icon)
+			h += '<div class="criteria-bar">' +
 				'<div class="chips-row">';
 
 			steps.forEach( function ( s, idx ) {
@@ -680,7 +680,6 @@
 				}
 				var stepNum = idx + 1;
 				var chipLabel = '';
-				var chipIcon = 'sliders';
 
 				if ( s.type === 'choice' ) {
 					var opt = null;
@@ -690,21 +689,8 @@
 					if ( ! opt ) { return; }
 					chipLabel = opt.title;
 
-					if ( val === 'walk' ) { chipIcon = 'speedLow'; }
-					else if ( val === 'run' ) { chipIcon = 'speedMid'; }
-					else if ( val === 'interval' ) { chipIcon = 'speedHigh'; }
-					else if ( val === 'foldable' ) { chipIcon = 'fold'; }
-					else if ( val === 'yes' ) { chipIcon = 'incline'; }
-					else if ( val === 'no' ) { chipIcon = 'flat'; }
-					else if ( val === 'screen' ) { chipIcon = 'screen'; }
-					else if ( val === 'app' ) { chipIcon = 'app'; }
-					else if ( val === 'rehab' || val === 'soft' ) { chipIcon = 'medical'; }
-					else if ( val === 'quiet' ) { chipIcon = 'speedLow'; }
-					else if ( val === 'air' || val === 'water' ) { chipIcon = 'speedMid'; }
-					else { chipIcon = 'check'; }
-
-					h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + stepNum + '" title="Trykk for å endre ' + esc( s.title ) + '">' +
-						ic( chipIcon, 15 ) + '<span>' + esc( chipLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
+					h += '<button type="button" class="chip sl sel criteria-chip" data-action="jump" data-step="' + stepNum + '" title="Trykk for å endre: ' + esc( s.title ) + '">' +
+						'<span>' + esc( chipLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 				} else if ( s.type === 'slider' ) {
 					if ( s.id === 'b' ) {
 						if ( state.presetApplied && val >= ( s.max || 80000 ) ) {
@@ -717,24 +703,27 @@
 						chipLabel = val + ( s.unit ? ' ' + s.unit : '' );
 					}
 
-					var sTitle = ( state.presetApplied && s.id === 'w' ) ? 'Trykk for å oppgi din faktiske vekt' : ( 'Trykk for å endre ' + s.title );
-					h += '<button type="button" class="chip sl sel" data-action="jump" data-step="' + stepNum + '" title="' + esc( sTitle ) + '">' +
+					var sTitle = ( state.presetApplied && s.id === 'w' ) ? 'Trykk for å oppgi din faktiske vekt' : ( 'Trykk for å endre: ' + s.title );
+					h += '<button type="button" class="chip sl sel criteria-chip" data-action="jump" data-step="' + stepNum + '" title="' + esc( sTitle ) + '">' +
 						'<span>' + esc( chipLabel ) + '</span><span class="chip-edit">' + ic( 'edit', 12 ) + '</span></button>';
 				}
 			} );
 			h += '</div></div>';
 
 			if ( state.presetApplied ) {
-				h += '<div class="card filled" style="margin-top:12px;padding:12px 16px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;display:flex;align-items:center;gap:12px">' +
-					'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340)">' + ic( 'info', 18 ) + '</span>' +
-					'<span class="body-s" style="color:var(--md-sys-color-on-surface,#0C2340);flex:1">' +
-						'<b>Beregnet med standardvekt (' + ( filters.w || 80 ) + ' kg):</b> Veier du mer? <button type="button" class="btn text sl" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" style="padding:0;text-decoration:underline;height:auto;font-size:13px;display:inline;font-weight:600;color:var(--md-sys-color-primary,#0C2340)">Juster vekten din her</button> for å sikre at utstyret har optimal kapasitet og sikkerhetsmargin.' +
+				h += '<div class="results-notice results-notice--info">' +
+					'<span class="results-notice__icon">' + ic( 'info', 18 ) + '</span>' +
+					'<span class="body-s">' +
+						'<b>Beregnet med standardvekt (' + ( filters.w || 80 ) + ' kg):</b> Veier du mer? <button type="button" class="btn text sl" data-action="jump" data-step="' + getStepIndex( 'w' ) + '" style="padding:0;text-decoration:underline;height:auto;font-size:13px;display:inline;font-weight:600;color:var(--md-sys-color-primary,#0C2340)">Juster vekten din her</button> for optimal sikkerhetsmargin.' +
 					'</span>' +
 				'</div>';
 			}
 
 			if ( ranked.isFallback && results.length ) {
-				h += '<div class="card filled" style="margin-top:14px;background:var(--md-ext-color-warning-container,#FEF3C7);color:var(--md-ext-color-on-warning-container,#92400E);border:1px solid #FDE68A"><b>Ingen perfekt match.</b> Vi har utvidet søket litt slik at du likevel får modeller som dekker vekten din og budsjettet.</div>';
+				h += '<div class="results-notice results-notice--warn">' +
+					'<span class="results-notice__icon">' + ic( 'info', 18 ) + '</span>' +
+					'<span class="body-s"><b>Utvidet søk:</b> Ingen modell oppfylte absolutt alle enkeltkrav samtidig, så vi viser det nærmeste alternativet som dekker vekt og budsjett.</span>' +
+				'</div>';
 			}
 
 			if ( ! best ) {
@@ -742,10 +731,11 @@
 			}
 
 			// Best Match featured card
-			var dDisc = best.discount || 0;
+			var dDisc = best.discount || ( ( best.old && best.old > best.price ) ? Math.round( ( ( best.old - best.price ) / best.old ) * 100 ) : 0 );
+			var bestSave = ( best.old && best.old > best.price ) ? ( best.old - best.price ) : 0;
 			var whyList = generateWhyPoints( best, filters );
 
-			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
+			h += '<article class="card elevated xl result-card-featured">' +
 				'<div class="head-row">' +
 					'<div class="shop">' + renderShopAvatar( best ) + '<div><b>' + esc( cleanShopName( best.shop ) ) + '</b></div></div>' +
 					'<span class="pill tert num">' + best.matchPercentage + '% Match</span>' +
@@ -753,12 +743,10 @@
 				'<div class="best-grid">' +
 					'<div class="art">' +
 						'<span class="pill best badge-top-left">Beste match</span>' +
-						( dDisc ? '<span class="pill err disc">−' + dDisc + '%</span>' : '' ) +
+						( dDisc ? '<span class="pill disc">-' + dDisc + ' %</span>' : '' ) +
 						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 					'</div>' +
-					'<div><h3 class="title-l" style="line-height:28px">' + esc( best.name ) + '</h3>' +
-						'<div class="specs">' + renderProductPills( config, best, false ) + '</div>' +
-						'<div class="note">' + esc( best.note || 'Vår toppanbefaling basert på dine kriterier. Optimal kombinasjon av byggekvalitet, ytelse og pris.' ) + '</div>' +
+					'<div class="best-body"><h3 class="title-l" style="line-height:1.35;margin:0">' + esc( best.name ) + '</h3>' +
 						'<ul class="why">' +
 							whyList.map( function ( x ) {
 								return '<li class="' + ( x.neutral ? 'neutral' : '' ) + '">' + ic( x.neutral ? 'minus' : 'check', 18 ) + '<span>' + esc( x.t ) + '</span></li>';
@@ -767,7 +755,11 @@
 					'</div>' +
 				'</div>' +
 				'<div class="pricebar row">' +
-					'<div class="price">' + ( best.old > best.price ? '<s class="num">' + money( best.old, best.cur ) + '</s>' : '' ) + '<b class="num">' + money( best.price, best.cur ) + '</b></div>' +
+					'<div class="price">' +
+						'<b class="num">' + money( best.price, best.cur ) + '</b>' +
+						( best.old > best.price ? '<s class="num">' + money( best.old, best.cur ) + '</s>' : '' ) +
+						( bestSave > 0 ? '<span class="pill tert num">Spar ' + money( bestSave, best.cur ) + '</span>' : '' ) +
+					'</div>' +
 					'<div class="actions">' +
 						( others.length ? '<button type="button" class="btn outlined sl" data-action="cmp" data-id="' + ( others[ 0 ] ? others[ 0 ].id : '' ) + '">' + ic( 'compare', 18 ) + 'Sammenlign</button>' : '' ) +
 						'<a class="btn filled sl" href="' + safeUrl( best.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til butikk' + ic( 'ext', 16 ) + '</a>' +
@@ -779,38 +771,40 @@
 			if ( others.length ) {
 				h += '<h3 class="title-l" style="margin:28px 0 14px">Gode alternativer innen budsjett</h3><div class="alt-grid">';
 				others.forEach( function ( o ) {
-					var oDisc = o.discount || 0;
+					var oDisc = o.discount || ( ( o.old && o.old > o.price ) ? Math.round( ( ( o.old - o.price ) / o.old ) * 100 ) : 0 );
+					var oSave = ( o.old && o.old > o.price ) ? ( o.old - o.price ) : 0;
 
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
 							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
 							'<span class="pill tert num">' + o.matchPercentage + '% Match</span>' +
 						'</div>' +
-						'<div class="art" style="height:150px">' +
+						'<div class="art" style="height:155px">' +
 							( o.isBestOffer ? '<span class="pill deal badge-top-left">Beste tilbud</span>' : '' ) +
-							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
+							( oDisc ? '<span class="pill disc">-' + oDisc + ' %</span>' : '' ) +
 							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
 						'<h4>' + esc( o.name ) + '</h4>' +
 						'<div class="specs">' + renderProductPills( config, o, true ) + '</div></div>' +
-						'<div class="pricebar"><div class="price">' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '<b class="num" style="font-size:22px;line-height:28px">' + money( o.price, o.cur ) + '</b></div>' +
-						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
+						'<div class="pricebar">' +
+							'<div class="price">' +
+								'<b class="num" style="font-size:21px;line-height:26px">' + money( o.price, o.cur ) + '</b>' +
+								( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) +
+								( oSave > 0 ? '<span class="pill tert num" style="margin-left:auto">Spar ' + money( oSave, o.cur ) + '</span>' : '' ) +
+							'</div>' +
+							'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div>' +
+						'</div></div>';
 				} );
 				h += '</div>';
-			} else {
-				h += '<div class="card filled" style="margin-top:20px;padding:16px 20px;text-align:left;background:var(--md-sys-color-surface-container-low,#F5F7FA);border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
-					'<div style="font-weight:600;color:var(--md-sys-color-primary,#0C2340);margin-bottom:4px">Kun 1 modell oppfyller alle dine krav</div>' +
-					'<p class="body-s muted">Dette er den eneste modellen i vårt utvalg som matcher alle dine spesifikke valg (inkludert budsjett på ' + money( filters.b || 35000 ) + ( filters.w ? ' og vektkapasitet på ' + filters.w + ' kg' : '' ) + ').</p>' +
-					'<div style="margin-top:10px"><button type="button" class="btn outlined sl" style="height:36px;font-size:13px;padding:0 14px" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Juster budsjett eller krav</button></div>' +
-					'</div>';
+			} else if ( ! ranked.isFallback ) {
+				h += '<div class="results-notice results-notice--subtle">' +
+					'<span>Kun 1 modell oppfyller alle valgene dine innenfor ' + money( filters.b || 35000 ) + '.</span>' +
+					'<button type="button" class="btn text sl" style="height:30px;font-size:13px;padding:0 10px;font-weight:600" data-action="jump" data-step="' + getStepIndex( 'b' ) + '">Juster budsjett →</button>' +
+				'</div>';
 			}
 
-			// Disclosure and restart button
-			h += '<div class="card outlined" style="margin-top:24px;display:flex;gap:12px;font-size:13px;line-height:19px;color:var(--md-sys-color-on-surface-variant,#475467)">' +
-				'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340)">' + ic( 'info', 20 ) + '</span>' +
-				'<span><b style="color:var(--md-sys-color-primary,#0C2340)">Uavhengig veiledning:</b> Rangeringen beregnes algoritmisk. Lenkene til nettbutikkene er annonselenker som gir oss en liten provisjon, uten ekstra kostnad for deg.</span>' +
-				'</div>' +
-				'<div style="display:flex;justify-content:center;margin-top:16px"><button type="button" class="btn text sl" data-action="reset">' + ic( 'refresh', 18 ) + 'Start på nytt</button></div>';
+			// Compact disclosure line
+			h += '<p class="results-disclosure">Prisene oppdateres automatisk fra forhandlerne. Lenkene er annonselenker uten ekstra kostnad for deg.</p>';
 
 			return h;
 		}
@@ -821,22 +815,18 @@
 			var best = deals[ 0 ] || null;
 			var others = deals.slice( 1 );
 
-			var h = renderAppbar( 'Dagens tilbud', 'results' ) +
-				'<div class="head-row" style="margin-top:14px;align-items:center">' +
-					'<div style="display:flex;align-items:center;gap:10px">' +
+			var h = renderAppbar( 'Dagens tilbud', 'deals' ) +
+				'<div class="results-head">' +
+					'<div class="results-head__title">' +
 						'<h2 class="headline-s" style="margin:0">Dagens beste tilbud</h2>' +
 						'<span class="pill warn num" style="font-weight:700">' + deals.length + ' tilbud</span>' +
 					'</div>' +
-					'<button type="button" class="btn filled primary sl" data-action="start" style="height:32px;padding:0 12px;font-size:12.5px;gap:5px;font-weight:600">' +
-						'Start kjøpsveileder' + ic( 'chevR', 14 ) +
-					'</button>' +
 				'</div>';
 
-			// Context tags and interactive sort toggles
+			// Interactive sort toggles
 			var isAmountSort = state.dealSort === 'amount';
-			h += '<div style="margin-top:14px">' +
+			h += '<div class="criteria-bar">' +
 				'<div class="chips-row">' +
-					'<span class="chip sl" style="cursor:default;gap:6px">' + ic( 'tag', 15 ) + 'Kun nedsatte modeller</span>' +
 					'<button type="button" class="chip sl' + ( ! isAmountSort ? ' sel' : '' ) + '" data-action="deal-sort" data-sort="pct" title="Sorter etter prosentvis prisavslag">' +
 						'% Størst rabatt' +
 					'</button>' +
@@ -844,24 +834,6 @@
 						'kr Størst kroneavslag' +
 					'</button>' +
 				'</div></div>';
-
-			// Guide & safety prompt
-			h += '<div class="card filled" style="margin-top:16px;background:var(--md-sys-color-primary-container,#EAF0F6);border:1px solid #D5E1ED;display:flex;flex-direction:column;gap:12px">' +
-				'<div style="display:flex;align-items:flex-start;gap:12px">' +
-					'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340);margin-top:2px">' + ic( 'info', 20 ) + '</span>' +
-					'<div style="flex:1">' +
-						'<b style="color:var(--md-sys-color-primary,#0C2340);font-size:13.5px;display:block">Usikker på om tilbudet dekker dine behov?</b>' +
-						'<span class="body-s muted" style="line-height:19px;display:block;margin-top:2px">' +
-							'En god pris er vel og bra, men feil dimensjonering eller for tung belastning kan gi unødig slitasje og dårlig opplevelse. Svar på noen raske spørsmål for å finne den tryggeste modellen for din kroppsvekt og treningsform.' +
-						'</span>' +
-					'</div>' +
-				'</div>' +
-				'<div style="display:flex;justify-content:flex-end">' +
-					'<button type="button" class="btn outlined sl" data-action="start" style="background:#FFFFFF;height:34px;font-size:13px;padding:0 14px">' +
-						'Finn modell for min vekt' + ic( 'chevR', 14 ) +
-					'</button>' +
-				'</div>' +
-			'</div>';
 
 			if ( ! best ) {
 				return h + '<div class="card filled xl" style="margin-top:20px;text-align:center"><h3 class="title-l">Ingen aktive tilbud akkurat nå</h3><p class="body-m muted" style="margin:8px 0 16px">Bruk kjøpsveilederen for å finne de beste modellene til ordinær pris.</p><button type="button" class="btn filled sl" data-action="start">Start veileder</button></div>';
@@ -873,18 +845,14 @@
 			var topWhyPoints = generateWhyPoints( best, filters );
 
 			var topBadgeLabel = isAmountSort
-				? ( 'Dagens største kroneavslag' + ( bestSave ? ' (Spar ' + money( bestSave, best.cur ) + ')' : '' ) )
-				: ( 'Dagens største prosentkutt (−' + bestDisc + '%)' );
-
-			var topNoteText = isAmountSort
-				? ( bestSave ? 'Du sparer hele ' + money( bestSave, best.cur ) + ' (' + bestDisc + '% rabatt) i forhold til veiledende førpris.' : 'Sterkt nedsatt kampanjepris hos ' + esc( cleanShopName( best.shop ) ) + '.' )
-				: ( bestSave ? 'Du sparer ' + money( bestSave, best.cur ) + ' (' + bestDisc + '% rabatt) i forhold til veiledende førpris.' : 'Sterkt nedsatt kampanjepris hos ' + esc( cleanShopName( best.shop ) ) + '.' );
+				? ( 'Størst kroneavslag' + ( bestSave ? ' (-' + money( bestSave, best.cur ) + ')' : '' ) )
+				: ( 'Størst rabatt (-' + bestDisc + ' %)' );
 
 			var topWhyPoint = isAmountSort
 				? ( 'Største besparelse i kroner og øre i dag (Spar ' + money( bestSave, best.cur ) + ')' )
-				: ( 'Største prosentvise priskutt i dag (−' + bestDisc + '%)' );
+				: ( 'Største prosentvise priskutt i dag (-' + bestDisc + ' %)' );
 
-			h += '<article class="card elevated xl" style="margin-top:18px;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC)">' +
+			h += '<article class="card elevated xl result-card-featured">' +
 				'<div class="head-row">' +
 					'<div class="shop">' + renderShopAvatar( best ) + '<div><b>' + esc( cleanShopName( best.shop ) ) + '</b></div></div>' +
 					'<span class="pill warn num" style="font-weight:700">' + esc( topBadgeLabel ) + '</span>' +
@@ -892,14 +860,10 @@
 				'<div class="best-grid">' +
 					'<div class="art">' +
 						'<span class="pill deal badge-top-left">Beste tilbud</span>' +
-						( bestDisc ? '<span class="pill err disc">−' + bestDisc + '%</span>' : '' ) +
+						( bestDisc ? '<span class="pill disc">-' + bestDisc + ' %</span>' : '' ) +
 						( best.img ? '<img src="' + esc( best.img ) + '" alt="' + esc( best.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 					'</div>' +
-					'<div><h3 class="title-l" style="line-height:28px">' + esc( best.name ) + '</h3>' +
-						'<div class="specs">' + renderProductPills( config, best, false ) + '</div>' +
-						'<div class="note" style="border-left-color:var(--md-ext-color-on-warning-container,#92400E)">' +
-							esc( topNoteText ) +
-						'</div>' +
+					'<div class="best-body"><h3 class="title-l" style="line-height:1.35;margin:0">' + esc( best.name ) + '</h3>' +
 						'<ul class="why">' +
 							( bestSave ? '<li>' + ic( 'check', 18 ) + '<span>' + esc( topWhyPoint ) + '</span></li>' : '' ) +
 							topWhyPoints.map( function ( x ) {
@@ -909,7 +873,11 @@
 					'</div>' +
 				'</div>' +
 				'<div class="pricebar row">' +
-					'<div class="price">' + ( best.old > best.price ? '<s class="num">' + money( best.old, best.cur ) + '</s>' : '' ) + '<b class="num">' + money( best.price, best.cur ) + '</b>' + ( bestSave ? '<span class="pill err" style="margin-left:6px">Spar ' + money( bestSave, best.cur ) + '</span>' : '' ) + '</div>' +
+					'<div class="price">' +
+						'<b class="num">' + money( best.price, best.cur ) + '</b>' +
+						( best.old > best.price ? '<s class="num">' + money( best.old, best.cur ) + '</s>' : '' ) +
+						( bestSave ? '<span class="pill tert num">Spar ' + money( bestSave, best.cur ) + '</span>' : '' ) +
+					'</div>' +
 					'<div class="actions">' +
 						( others.length ? '<button type="button" class="btn outlined sl" data-action="cmp" data-id="' + ( others[ 0 ] ? others[ 0 ].id : '' ) + '">' + ic( 'compare', 18 ) + 'Sammenlign</button>' : '' ) +
 						'<a class="btn filled sl" href="' + safeUrl( best.url ) + '" target="_blank" rel="noopener nofollow sponsored">Til butikk' + ic( 'ext', 16 ) + '</a>' +
@@ -927,26 +895,22 @@
 					h += '<div class="card elevated alt"><div>' +
 						'<div class="head-row">' +
 							'<div class="shop">' + renderShopAvatar( o, true ) + '<div><b>' + esc( cleanShopName( o.shop ) ) + '</b></div></div>' +
-							( oSave ? '<span class="pill sec num" style="font-weight:600;font-size:11.5px;color:var(--md-sys-color-primary,#0C2340)">Spar ' + money( oSave, o.cur ) + '</span>' : '' ) +
+							( oSave ? '<span class="pill tert num">Spar ' + money( oSave, o.cur ) + '</span>' : '' ) +
 						'</div>' +
-						'<div class="art" style="height:150px">' +
-							( oDisc ? '<span class="pill err disc">−' + oDisc + '%</span>' : '' ) +
+						'<div class="art" style="height:155px">' +
+							( oDisc ? '<span class="pill disc">-' + oDisc + ' %</span>' : '' ) +
 							( o.img ? '<img src="' + esc( o.img ) + '" alt="' + esc( o.name ) + '" loading="lazy">' : PLACEHOLDER_SVG ) +
 						'</div>' +
 						'<h4>' + esc( o.name ) + '</h4>' +
 						'<div class="specs">' + renderProductPills( config, o, true ) + '</div></div>' +
-						'<div class="pricebar"><div class="price">' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '<b class="num" style="font-size:22px;line-height:28px">' + money( o.price, o.cur ) + '</b></div>' +
+						'<div class="pricebar"><div class="price"><b class="num" style="font-size:21px;line-height:26px">' + money( o.price, o.cur ) + '</b>' + ( o.old > o.price ? '<s class="num">' + money( o.old, o.cur ) + '</s>' : '' ) + '</div>' +
 						'<div class="actions"><button type="button" class="btn outlined sl" data-action="cmp" data-id="' + o.id + '">' + ic( 'compare', 18 ) + 'Sammenlign</button><a class="btn filled sl" href="' + safeUrl( o.url ) + '" target="_blank" rel="noopener nofollow sponsored">Butikk' + ic( 'ext', 16 ) + '</a></div></div></div>';
 				} );
 				h += '</div>';
 			}
 
-			// Disclosure and restart button
-			h += '<div class="card outlined" style="margin-top:24px;display:flex;gap:12px;font-size:13px;line-height:19px;color:var(--md-sys-color-on-surface-variant,#475467)">' +
-				'<span style="flex:none;color:var(--md-sys-color-primary,#0C2340)">' + ic( 'info', 20 ) + '</span>' +
-				'<span><b style="color:var(--md-sys-color-primary,#0C2340)">Priser og tilbud:</b> Prisene hentes automatisk fra forhandlernes produktfeeder og oppdateres jevnlig. Lenkene er annonselenker som gir oss en provisjon.</span>' +
-				'</div>' +
-				'<div style="display:flex;justify-content:center;margin-top:16px"><button type="button" class="btn text sl" data-action="reset">' + ic( 'refresh', 18 ) + 'Gå til forsiden</button></div>';
+			// Compact disclosure line
+			h += '<p class="results-disclosure">Prisene oppdateres automatisk fra forhandlerne. Lenkene er annonselenker uten ekstra kostnad for deg.</p>';
 
 			return h;
 		}
@@ -1014,7 +978,7 @@
 			}
 
 			var metricRow = state.view === 'deals'
-				? row( 'Rabatt', '<span class="pill err num">−' + ( p1.discount || Math.round( ( ( p1.old - p1.price ) / p1.old ) * 100 ) || 0 ) + '%</span>', '<span class="pill err num">−' + ( p2.discount || Math.round( ( ( p2.old - p2.price ) / p2.old ) * 100 ) || 0 ) + '%</span>' )
+				? row( 'Rabatt', '<span class="pill warn num">-' + ( p1.discount || Math.round( ( ( p1.old - p1.price ) / p1.old ) * 100 ) || 0 ) + ' %</span>', '<span class="pill warn num">-' + ( p2.discount || Math.round( ( ( p2.old - p2.price ) / p2.old ) * 100 ) || 0 ) + ' %</span>' )
 				: row( 'Match', '<span class="pill tert">' + ( p1.matchPercentage || '–' ) + '%</span>', '<span class="pill sec">' + ( p2.matchPercentage || '–' ) + '%</span>' );
 
 			return '<div class="scrim" data-action="close-sheet"></div>' +
