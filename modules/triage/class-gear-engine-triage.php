@@ -453,10 +453,7 @@ class Gear_Engine_Triage {
 						__( 'Symptomsjekk: %s', 'gear-engine' ),
 						$label
 					);
-					$content = '<!-- wp:paragraph -->' . "\n" .
-						'<p>' . esc_html( sprintf( __( 'Rask, digital vurdering for %s. Svar på spørsmålene for å få råd og veiledning.', 'gear-engine' ), strtolower( $label ) ) ) . '</p>' . "\n" .
-						'<!-- /wp:paragraph -->' . "\n\n" .
-						'<!-- wp:shortcode -->[' . self::SHORTCODE_TAG . ' region="' . esc_attr( $region ) . '"]<!-- /wp:shortcode -->';
+					$content = '<!-- wp:shortcode -->[' . self::SHORTCODE_TAG . ' region="' . esc_attr( $region ) . '"]<!-- /wp:shortcode -->';
 
 					wp_insert_post(
 						array(

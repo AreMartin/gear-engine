@@ -81,6 +81,10 @@
 		var self = this;
 		this.savedState = this.loadState();
 		this.updateVisibleSteps();
+		if (this.stepIndex === 0 && this.visibleSteps.length > 0) {
+			this.stepIndex = 1;
+		}
+		this.hideRedundantPageLead();
 
 		this.el.addEventListener('click', function (event) {
 			var target = event.target.closest('[data-action]');
@@ -104,6 +108,14 @@
 		});
 		this.bindSwipe();
 		this.render();
+	};
+
+	TriageApp.prototype.hideRedundantPageLead = function () {
+		// Hide the auto-generated boilerplate paragraph above the triage container and page H1 (since the appbar displays the title)
+		var prev = this.el.previousElementSibling;
+		if (prev && prev.tagName === 'P' && /Rask,\s*digital\s*vurdering\s*for/i.test(prev.textContent || '')) {
+			prev.style.display = 'none';
+		}
 	};
 
 	/* ---------- State ---------- */
@@ -228,6 +240,11 @@
 				this.answers = clone(this.config.defaultAnswers || {});
 				this.go(1, 'forward');
 				break;
+			case 'dismiss-resume':
+				this.clearState();
+				this.direction = 'none';
+				this.render();
+				break;
 			case 'resume':
 				if (this.savedState) {
 					this.answers = Object.assign(clone(this.config.defaultAnswers || {}), this.savedState.answers);
@@ -238,8 +255,15 @@
 				}
 				break;
 			case 'back':
-				if (!this.busy && this.stepIndex > 0) {
-					this.go(this.stepIndex - 1, 'backward');
+				if (!this.busy) {
+					if (this.stepIndex > 1) {
+						this.go(this.stepIndex - 1, 'backward');
+					} else {
+						var backLink = this.el.querySelector('.gear-engine-triage__back');
+						if (backLink && backLink.href) {
+							window.location.href = backLink.href;
+						}
+					}
 				}
 				break;
 			case 'single':
@@ -509,7 +533,7 @@
 		this.snackbar = null;
 		this.noteId = '';
 		this.clearState();
-		this.go(0, 'backward');
+		this.go(1, 'backward');
 	};
 
 	/* ---------- Result helpers ---------- */
@@ -575,42 +599,42 @@
 	TriageApp.prototype.renderProgress = function () {
 		var n = this.visibleSteps.length;
 		var pct = Math.round((this.stepIndex / n) * 100);
+		var backLink = this.el.querySelector('.gear-engine-triage__back');
+		var hasBack = this.stepIndex > 1 || (backLink && backLink.href);
+		var backTitle = this.stepIndex === 1 ? 'Tilbake til alle tester' : 'Forrige spørsmål';
+
 		return '<div class="appbar">' +
-			'<button type="button" class="ibtn sl" data-action="back" title="Forrige steg" aria-label="Forrige steg">' +
-			icon('ChevronLeft', 22) +
-			'</button>' +
+			(hasBack
+				? '<button type="button" class="ibtn sl" data-action="back" title="' + esc(backTitle) + '" aria-label="' + esc(backTitle) + '">' +
+				icon('ChevronLeft', 22) +
+				'</button>'
+				: '') +
 			'<span class="title-l">' + esc(this.config.title || this.config.label || 'Symptomsjekker') + '</span>' +
-			'<span class="body-s muted num" style="font-weight:600">' + this.stepIndex + ' / ' + n + '</span>' +
+			'<span class="appbar-step num">Spørsmål ' + this.stepIndex + ' av ' + n + '</span>' +
 			'</div>' +
 			'<div class="steps-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '">' +
 			'<div class="steps-fill" style="width:' + pct + '%"></div>' +
 			'</div>';
 	};
 
-	TriageApp.prototype.renderWelcome = function () {
-		var c = this.config;
-		var resume = '';
-		if (this.savedState) {
-			resume = '<div class="card elevated" style="margin-bottom:16px;display:flex;gap:14px;align-items:center;background:#FFFFFF;border:1px solid var(--md-sys-color-outline-variant,#E4E7EC);border-radius:16px;padding:16px 20px">' +
-				'<div style="color:var(--md-sys-color-primary,#0C2340);flex:none">' + icon('Clock', 26) + '</div>' +
-				'<div style="flex:1"><strong>Du har en påbegynt kartlegging</strong><p class="body-s muted" style="margin-top:2px">Vil du fortsette der du slapp?</p></div>' +
-				'<button type="button" class="btn filled primary sl" data-action="resume" style="height:38px;padding:0 16px;font-size:13.5px">Fortsett</button>' +
-				'</div>';
+	TriageApp.prototype.renderResumeBanner = function () {
+		if (!this.savedState || this.stepIndex !== 1 || this.savedState.stepIndex <= 1) {
+			return '';
 		}
-		return resume +
-			'<div class="hero" style="text-align:center;padding:36px 24px">' +
-			'<div style="width:56px;height:56px;border-radius:50%;background:#FFFFFF;color:var(--md-sys-color-primary,#0C2340);display:grid;place-items:center;margin:0 auto 16px;box-shadow:var(--md-sys-elevation-1)">' +
-			icon('Activity', 28) +
-			'</div>' +
-			'<h2 class="headline-s" style="margin-bottom:8px">' + esc(c.title) + '</h2>' +
-			'<p class="body-m" style="margin-bottom:24px;opacity:0.9">' + esc(c.description) + '</p>' +
-			'<button type="button" class="btn filled primary sl" data-action="start" style="height:48px;font-size:15px;font-weight:600;padding:0 32px">' +
-			(this.savedState ? 'Start på nytt' : 'Start kartlegging') + ' ' + icon('ChevronRight', 20) +
-			'</button>' +
-			'</div>';
+		return '<div class="resume-banner">' +
+			'<div class="resume-banner__text"><strong>Påbegynt kartlegging funnet</strong><span>Vil du fortsette der du slapp (spørsmål ' + this.savedState.stepIndex + ')?</span></div>' +
+			'<div class="resume-banner__actions">' +
+			'<button type="button" class="btn text sl" data-action="dismiss-resume" style="height:34px;padding:0 12px;font-size:13px">Start på nytt</button>' +
+			'<button type="button" class="btn filled primary sl" data-action="resume" style="height:34px;padding:0 16px;font-size:13px">Fortsett</button>' +
+			'</div></div>';
 	};
 
-	TriageApp.prototype.renderOption = function (step, opt, active, isFlags) {
+	TriageApp.prototype.renderWelcome = function () {
+		var firstStep = this.visibleSteps[0];
+		return firstStep ? this.renderStep(firstStep) : '';
+	};
+
+	TriageApp.prototype.renderOption = function (step, opt, active) {
 		var multi = step.type === 'multiple';
 		var isNone = NONE_IDS.indexOf(opt.id) !== -1;
 		var cls = 'opt sl';
@@ -620,7 +644,6 @@
 
 		return '<button type="button" class="' + cls + '" data-action="' + (multi ? 'multi' : 'single') +
 			'" data-step="' + esc(step.id) + '" data-option="' + esc(opt.id) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
-			'<span class="oi">' + icon(opt.icon || (isFlags && !isNone ? 'AlertTriangle' : 'Activity'), 20) + '</span>' +
 			'<span class="ot"><b>' + esc(opt.title) + '</b>' +
 			(opt.subtitle ? '<small>' + esc(opt.subtitle) + '</small>' : '') + '</span>' +
 			'<span class="ctl">' + (active ? icon('Check', 14) : '') + '</span>' +
@@ -632,16 +655,22 @@
 		var n = this.visibleSteps.length;
 		var isLast = this.stepIndex === n;
 		var isFlags = step.flags || (step.id && step.id.toLowerCase().indexOf('flag') !== -1);
+		var backLink = this.el.querySelector('.gear-engine-triage__back');
+		var backLabel = this.stepIndex === 1 ? 'Alle tester' : 'Forrige spørsmål';
 
-		var html = '<div class="overline" style="margin-top:4px">' + (isFlags ? 'Sikkerhet' : 'Spørsmål ' + this.stepIndex + ' av ' + n) + '</div>' +
-			'<h2 class="headline-s" style="margin-top:4px">' + esc(step.title) + '</h2>';
+		var html = this.renderResumeBanner();
+
+		if (isFlags) {
+			html += '<div class="overline" style="margin-top:4px;color:var(--ge-green-800,#005236)">Viktig sikkerhetssjekk</div>';
+		}
+		html += '<h2 class="headline-s quiz-question-title">' + esc(step.title) + '</h2>';
 
 		if (step.description) {
 			html += '<p class="body-m muted" style="margin-top:6px">' + esc(step.description) + '</p>';
 		}
 		if (step.helpText) {
-			html += '<div style="margin-top:14px;padding:12px 16px;border-radius:12px;background:var(--md-sys-color-secondary-container,#F2F4F7);display:flex;gap:12px;align-items:flex-start">' +
-				'<span style="color:var(--md-sys-color-primary,#0C2340);flex:none;margin-top:2px">' + icon('Info', 20) + '</span>' +
+			html += '<div style="margin-top:14px;padding:12px 16px;border-radius:14px;background:var(--md-sys-color-secondary-container,#F2F4F7);display:flex;gap:12px;align-items:flex-start">' +
+				'<span style="color:var(--md-sys-color-primary,#0C2340);flex:none;margin-top:2px">' + icon('Info', 18) + '</span>' +
 				'<span class="body-m" style="color:var(--md-sys-color-on-surface,#0C2340)">' + esc(step.helpText) + '</span></div>';
 		}
 
@@ -678,18 +707,20 @@
 		}
 
 		// Bottom dock: Show 'Neste' button only on multiple choice or slider.
-		// On single-choice questions, tapping an option auto-advances (Løsning A).
+		// On single-choice questions, tapping an option auto-advances.
 		var isAutoSingle = step.type !== 'multiple' && step.type !== 'slider';
 		if (isAutoSingle) {
-			html += '<div class="dock dock--auto">' +
-				'<button type="button" class="btn text btn-back sl" data-action="back" title="Forrige steg">' +
-				icon('ChevronLeft', 18) + ' <span>Forrige steg</span>' +
-				'</button>' +
-				'</div>';
+			if (this.stepIndex > 1 || (backLink && backLink.href)) {
+				html += '<div class="dock dock--auto">' +
+					'<button type="button" class="btn text btn-back sl" data-action="back" title="' + esc(backLabel) + '">' +
+					icon('ChevronLeft', 18) + ' <span>' + esc(backLabel) + '</span>' +
+					'</button>' +
+					'</div>';
+			}
 		} else {
 			html += '<div class="dock">' +
-				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' +
-				icon('ChevronLeft', 18) + ' <span>Forrige</span>' +
+				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="' + esc(backLabel) + '">' +
+				icon('ChevronLeft', 18) + ' <span>' + (this.stepIndex === 1 ? 'Alle tester' : 'Forrige') + '</span>' +
 				'</button>' +
 				'<button type="button" class="btn filled primary sl" data-action="next"' + (hasAnswer ? '' : ' disabled') + '>' +
 				(isLast ? 'Fullfør vurdering' : 'Neste steg') + ' ' + icon('ChevronRight', 18) +

@@ -89,7 +89,7 @@
 .gear-engine-triage .sl:hover::after, .gear-engine-triage-picker .sl:hover::after { opacity: 0.06; }
 .gear-engine-triage .sl:active::after, .gear-engine-triage-picker .sl:active::after { opacity: 0.12; }
 
-/* Top App Bar */
+/* Top App Bar (Clean borderless M3 web-app style) */
 .gear-engine-triage .appbar {
 	position: relative;
 	top: 0;
@@ -98,12 +98,26 @@
 	align-items: center;
 	gap: 8px;
 	height: 48px;
-	margin: 0 0 12px;
+	margin: 0 0 8px;
 	padding: 0;
 	background: transparent;
 	border-bottom: none;
 }
-.gear-engine-triage .appbar .title-l { flex: 1; font-size: 18px; font-weight: 700; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-triage .appbar .title-l {
+	flex: 1;
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-triage .appbar-step {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: var(--md-sys-color-surface-container-low, #F2F4F7);
+}
 .gear-engine-triage .ibtn {
 	width: 40px;
 	height: 40px;
@@ -115,7 +129,7 @@
 	border: 0;
 	background: none;
 	cursor: pointer;
-	transition: background 0.2s;
+	transition: background 0.15s;
 }
 .gear-engine-triage .ibtn:hover { background: var(--md-sys-color-primary-container, #EAF0F6); }
 
@@ -123,15 +137,54 @@
 .gear-engine-triage .steps-track {
 	height: 6px;
 	border-radius: 999px;
-	background: var(--md-sys-color-surface-container-high, #EAECF0);
+	background: var(--md-sys-color-surface-container-high, #E5E9EE);
 	overflow: hidden;
-	margin: 8px 0 24px;
+	margin: 4px 0 24px;
 }
 .gear-engine-triage .steps-fill {
 	height: 100%;
 	border-radius: 999px;
 	background: var(--md-sys-color-primary, #0C2340);
 	transition: width 0.35s var(--md-sys-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+}
+
+/* Question Heading & Resume Banner */
+.gear-engine-triage .quiz-question-title {
+	margin: 4px 0 0;
+	font-size: 24px;
+	line-height: 1.3;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-triage .resume-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 18px;
+	padding: 12px 18px;
+	border-radius: 16px;
+	background: #FFFFFF;
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.035);
+}
+.gear-engine-triage .resume-banner__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	font-size: 13.5px;
+	color: var(--md-sys-color-on-surface-variant, #475467);
+}
+.gear-engine-triage .resume-banner__text strong {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-triage .resume-banner__actions {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 }
 
 /* Buttons */
@@ -205,33 +258,32 @@
 .gear-engine-triage .dock .btn { flex: 1; height: 48px; font-size: 15px; font-weight: 600; }
 .gear-engine-triage .dock .btn-back { flex: 0 0 auto; width: auto; padding: 0 20px; }
 
-/* Choice Cards (M3 Options) */
-.gear-engine-triage .opts { display: grid; gap: 10px; margin-top: 20px; }
+/* Choice Cards (Clean Icon-Free M3 Options — matching Gear Picker) */
+.gear-engine-triage .opts { display: grid; gap: 12px; margin-top: 20px; }
 .gear-engine-triage .opt {
 	display: flex;
 	align-items: center;
 	gap: 16px;
 	width: 100%;
-	padding: 16px 20px;
-	border-radius: var(--md-sys-shape-lg, 16px);
+	padding: 18px 22px;
+	border-radius: 20px;
 	background: var(--md-sys-color-surface, #FFFFFF);
-	border: 1px solid var(--md-sys-color-outline-variant, #E4E7EC);
-	box-shadow: var(--md-sys-elevation-1);
+	border: 1.5px solid transparent;
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.03);
 	text-align: left;
 	color: var(--md-sys-color-on-surface, #0C2340);
-	transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .gear-engine-triage .opt:hover {
-	border-color: var(--ge-green-600, #00A86B);
-	background: var(--ge-green-50, #F1F8F4);
-	transform: translateY(-1px);
+	background: #FAFBFD;
+	border-color: var(--md-sys-color-outline-variant, #D5DCE4);
+	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.06);
 }
 .gear-engine-triage .opt.is-active,
 .gear-engine-triage .opt[aria-pressed=true] {
-	background: var(--ge-green-50, #F1F8F4);
-	border-color: var(--ge-green-600, #00A86B);
-	box-shadow: 0 0 0 1.5px var(--ge-green-600, #00A86B);
-	transform: scale(0.99);
+	background: var(--ge-navy-selected-bg, #F0F4F8);
+	border-color: var(--md-sys-color-primary, #0C2340);
+	box-shadow: 0 0 0 1px var(--md-sys-color-primary, #0C2340), 0 4px 12px rgba(12, 35, 64, 0.07);
 }
 .gear-engine-triage .opt .oi {
 	width: 40px;
@@ -242,35 +294,29 @@
 	background: var(--md-sys-color-secondary-container, #F2F4F7);
 	color: var(--md-sys-color-primary, #0C2340);
 	flex: none;
-	transition: background 0.2s, color 0.2s;
-}
-.gear-engine-triage .opt.is-active .oi,
-.gear-engine-triage .opt[aria-pressed=true] .oi {
-	background: var(--ge-green-600, #00A86B);
-	color: #FFFFFF;
 }
 .gear-engine-triage .opt .ot { flex: 1; min-width: 0; }
-.gear-engine-triage .opt .ot b { display: block; font-size: 15.5px; line-height: 22px; font-weight: 600; }
-.gear-engine-triage .opt.is-active .ot b,
-.gear-engine-triage .opt[aria-pressed=true] .ot b {
-	color: var(--ge-green-800, #005236) !important;
-}
-.gear-engine-triage .opt .ot small { display: block; font-size: 13.5px; line-height: 19px; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 2px; }
+.gear-engine-triage .opt .ot b { display: block; font-size: 16px; line-height: 1.35; font-weight: 600; letter-spacing: -0.01em; color: var(--md-sys-color-primary, #0C2340); }
+.gear-engine-triage .opt .ot small { display: block; font-size: 13.5px; line-height: 1.4; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 3px; }
 .gear-engine-triage .opt .ctl {
 	width: 22px;
 	height: 22px;
-	border: 2px solid var(--md-sys-color-outline, #98A2B3);
+	border: 2px solid var(--md-sys-color-outline, #CBD5E1);
 	border-radius: 50%;
 	display: grid;
 	place-items: center;
 	flex: none;
 	color: #FFFFFF;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.gear-engine-triage .opt.multi .ctl { border-radius: 4px; }
+.gear-engine-triage .opt:hover .ctl {
+	border-color: var(--md-sys-color-primary, #0C2340);
+}
+.gear-engine-triage .opt.multi .ctl { border-radius: 6px; }
 .gear-engine-triage .opt.is-active .ctl,
 .gear-engine-triage .opt[aria-pressed=true] .ctl {
-	background: var(--ge-green-600, #00A86B);
-	border-color: var(--ge-green-600, #00A86B);
+	background: var(--md-sys-color-primary, #0C2340);
+	border-color: var(--md-sys-color-primary, #0C2340);
 }
 
 /* Pain Slider Card */
@@ -634,8 +680,9 @@
 	color: var(--md-sys-color-primary, #0C2340);
 	text-decoration: none;
 }
-.gear-engine-triage__back:hover {
-	text-decoration: underline;
+/* Hide standalone back link once JS appbar takes over */
+.gear-engine-triage[data-steps] > .gear-engine-triage__back {
+	display: none;
 }
 
 /* =========================================================
