@@ -266,6 +266,7 @@
 			view: 'quiz', // 'quiz' | 'deals'
 			dealSort: 'pct', // 'pct' | 'amount'
 			presetApplied: false,
+			editingFromResults: false,
 			advanceTimer: null
 		};
 
@@ -356,6 +357,7 @@
 			}
 			state.view = 'quiz';
 			state.presetApplied = true;
+			state.editingFromResults = false;
 			filters = Scoring.defaults( config );
 			var p = PRESETS[ key ] || PRESETS.budget;
 			Object.assign( filters, p );
@@ -366,6 +368,7 @@
 
 		function openDeals() {
 			state.view = 'deals';
+			state.editingFromResults = false;
 			state.dir = 'forward';
 			state.sheet = null;
 			saveSession();
@@ -381,14 +384,25 @@
 		   HTML Generators
 		   ========================================================= */
 
-		function renderAppbar( title, isResults ) {
+		function renderAppbar( title, mode ) {
+			var rightHtml = '';
+			if ( mode === 'step' ) {
+				rightHtml = '<span class="appbar-step num">Steg ' + state.step + ' av ' + steps.length + '</span>' +
+					'<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt og gå til start" title="Avslutt og gå til start">' + ic( 'close', 20 ) + '</button>';
+			} else if ( mode === 'results' ) {
+				rightHtml = '<button type="button" class="btn text sl appbar-reset" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 16 ) + '<span>Start på nytt</span></button>';
+			} else {
+				rightHtml = '<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt" title="Gå til start">' + ic( 'close', 20 ) + '</button>';
+			}
+
+			var backTitle = state.step === 1
+				? 'Tilbake til start'
+				: ( state.editingFromResults ? 'Tilbake til anbefalinger' : 'Tilbake' );
+
 			return '<div class="appbar">' +
-				'<button type="button" class="ibtn sl" data-action="back" aria-label="Tilbake"' + ( state.step === 0 ? ' disabled' : '' ) + '>' + ic( 'back', 20 ) + '</button>' +
+				'<button type="button" class="ibtn sl" data-action="back" aria-label="' + esc( backTitle ) + '" title="' + esc( backTitle ) + '"' + ( state.step === 0 && state.view !== 'deals' ? ' disabled' : '' ) + '>' + ic( 'back', 20 ) + '</button>' +
 				'<div class="title-l">' + esc( title ) + '</div>' +
-				( isResults
-					? '<button type="button" class="ibtn sl" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 20 ) + '</button>'
-					: '<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt" title="Gå til start">' + ic( 'close', 20 ) + '</button>'
-				) +
+				'<div class="appbar-actions">' + rightHtml + '</div>' +
 				'</div>';
 		}
 
@@ -397,14 +411,6 @@
 			var pct = Math.round( ( state.step / n ) * 100 );
 			return '<div class="steps-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
 				'<div class="steps-fill" style="width:' + pct + '%"></div>' +
-				'</div>';
-		}
-
-		function renderLiveStats() {
-			var live = getLiveCount();
-			return '<div class="grid2">' +
-				'<div class="card outlined"><div class="headline-m num" id="ge-live-c" style="color:var(--md-sys-color-primary,#0C2340)">' + live.count + '</div><div class="body-s muted" id="ge-live-c-label">' + ( live.count === 1 ? 'Matchende modell' : 'Matchende modeller' ) + '</div></div>' +
-				'<div class="card outlined"><div class="headline-m num" style="color:var(--md-sys-color-primary,#0C2340)">' + ( uniqueShops.length || 6 ) + '</div><div class="body-s muted">Verifiserte butikker</div></div>' +
 				'</div>';
 		}
 
@@ -421,12 +427,8 @@
 		function updateLiveElements() {
 			var live = getLiveCount();
 			var total = items.length;
-			var c = root.querySelector( '#ge-live-c' );
-			var cLabel = root.querySelector( '#ge-live-c-label' );
 			var lbl = root.querySelector( '#ge-live-lbl' );
 			var bar = root.querySelector( '#ge-live-bar' );
-			if ( c ) { c.textContent = live.count; }
-			if ( cLabel ) { cLabel.textContent = live.count === 1 ? 'Matchende modell' : 'Matchende modeller'; }
 			if ( lbl ) {
 				lbl.textContent = live.count === 1 ? '1 modell matcher valgene dine' : live.count + ' av ' + total + ' matcher valgene dine';
 			}
@@ -515,46 +517,46 @@
 			var n = steps.length;
 			var isLast = state.step === n;
 			var hasAnswer = filters[ s.id ] !== undefined && filters[ s.id ] !== null;
+			var guideTitle = config.label || 'Kjøpsveileder';
+			var backLabel = state.editingFromResults
+				? 'Tilbake til anbefalinger'
+				: ( state.step === 1 ? 'Tilbake til start' : 'Forrige spørsmål' );
 
-			var h = renderAppbar( 'Steg ' + state.step + ' av ' + n ) +
-				renderProgressBar() +
-				renderLiveStats();
+			var h = renderAppbar( guideTitle, 'step' ) +
+				renderProgressBar();
 
-			h += '<div class="overline" style="margin-top:24px">Steg ' + state.step + ' av ' + n + '</div>' +
-				'<h2 class="headline-s" style="margin-top:4px">' + esc( s.title ) + '</h2>';
+			h += '<h2 class="headline-s quiz-question-title">' + esc( s.title ) + '</h2>';
 
 			if ( s.type === 'choice' ) {
+				if ( s.subtitle ) {
+					h += '<p class="body-m muted quiz-question-sub">' + esc( s.subtitle ) + '</p>';
+				}
 				h += '<div class="opts" role="radiogroup">';
 				( s.options || [] ).forEach( function ( o ) {
 					var on = filters[ s.id ] === o.val;
-					// Map icon
-					var iconKey = 'speedMid';
-					if ( o.val === 'walk' ) { iconKey = 'speedLow'; }
-					else if ( o.val === 'interval' ) { iconKey = 'speedHigh'; }
-					else if ( o.val === 'foldable' ) { iconKey = 'fold'; }
-					else if ( o.val === 'any' ) { iconKey = 'fixed'; }
-					else if ( o.val === 'yes' ) { iconKey = 'incline'; }
-					else if ( o.val === 'no' ) { iconKey = 'flat'; }
-					else if ( o.val === 'screen' ) { iconKey = 'screen'; }
-					else if ( o.val === 'app' ) { iconKey = 'app'; }
-					else if ( o.val === 'rehab' || o.val === 'soft' ) { iconKey = 'medical'; }
-					else if ( o.val === 'light' ) { iconKey = 'speedLow'; }
-					else if ( o.val === 'heavy' ) { iconKey = 'speedHigh'; }
 
 					h += '<button type="button" class="opt sl' + ( on ? ' is-active' : '' ) + '" data-action="choice" data-id="' + s.id + '" data-val="' + esc( o.val ) + '" aria-pressed="' + on + '">' +
-						'<span class="oi">' + ic( iconKey, 20 ) + '</span>' +
 						'<span class="ot"><b>' + esc( o.title ) + '</b>' + ( o.desc ? '<small>' + esc( o.desc ) + '</small>' : '' ) + '</span>' +
 						'<span class="ctl">' + ( on ? ic( 'check', 14 ) : '' ) + '</span>' +
 						'</button>';
 				} );
 				h += '</div>' + renderLiveCard();
+
+				// Single-choice steps auto-advance on click, so keep bottom nav lightweight & uncluttered
+				h += '<div class="dock dock--auto">' +
+					'<button type="button" class="btn text btn-back sl" data-action="back">' + ic( 'back', 18 ) + '<span>' + esc( backLabel ) + '</span></button>' +
+					( hasAnswer
+						? '<button type="button" class="btn text btn-next-inline sl" data-action="next"><span>' + ( state.editingFromResults || isLast ? 'Se anbefalinger' : 'Neste' ) + '</span>' + ic( 'chevR', 18 ) + '</button>'
+						: ''
+					) +
+					'</div>';
 			} else {
 				var val = filters[ s.id ] != null ? filters[ s.id ] : ( s.default || s.min );
 				var pct = Math.max( 0, Math.min( 100, ( ( val - s.min ) / ( s.max - s.min ) ) * 100 ) );
 				var formatted = s.format ? Number( val ).toLocaleString( 'nb-NO' ) : val;
 
-				h += ( s.subtitle ? '<p class="body-m muted" style="margin-top:8px">' + esc( s.subtitle ) + '</p>' : '' ) +
-					'<div class="card outlined" style="margin-top:20px;padding:12px 18px 20px">' +
+				h += ( s.subtitle ? '<p class="body-m muted quiz-question-sub">' + esc( s.subtitle ) + '</p>' : '' ) +
+					'<div class="card outlined slider-card">' +
 						'<div class="big-val">' +
 							'<div class="overline muted" style="margin-bottom:4px">' + ( s.id === 'b' ? 'Valgt maksgrense' : 'Valgt vekt' ) + '</div>' +
 							'<div class="display-m num"><span id="ge-slider-display">' + formatted + '</span><small>' + esc( s.unit ) + '</small></div>' +
@@ -572,13 +574,12 @@
 				}
 
 				h += renderLiveCard();
-			}
 
-			// Dock: Material 3 anchored bottom dock with explicit 'Neste steg' and 'Forrige' controls
-			h += '<div class="dock">' +
-				'<button type="button" class="btn outlined btn-back sl" data-action="back" title="Forrige steg">' + ic( 'back', 20 ) + '</button>' +
-				'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
-				'</div>';
+				h += '<div class="dock">' +
+					'<button type="button" class="btn outlined btn-back sl" data-action="back">' + ic( 'back', 18 ) + '<span>' + ( state.editingFromResults ? 'Avbryt' : 'Forrige' ) + '</span></button>' +
+					'<button type="button" class="btn filled primary sl" data-action="next"' + ( hasAnswer ? '' : ' disabled' ) + '>' + ( state.editingFromResults || isLast ? 'Se dine anbefalinger' : 'Neste steg' ) + ' ' + ic( 'chevR', 18 ) + '</button>' +
+					'</div>';
+			}
 
 			return h;
 		}
@@ -663,7 +664,7 @@
 			var best = results[ 0 ] || null;
 			var others = results.slice( 1 );
 
-			var h = renderAppbar( 'Kjøpsveileder', true ) +
+			var h = renderAppbar( config.label || 'Kjøpsveileder', 'results' ) +
 				'<div class="head-row" style="margin-top:14px;align-items:center">' +
 					'<div style="display:flex;align-items:center;gap:10px">' +
 						'<h2 class="headline-s" style="margin:0">Dine anbefalinger</h2>' +
@@ -827,7 +828,7 @@
 			var best = deals[ 0 ] || null;
 			var others = deals.slice( 1 );
 
-			var h = renderAppbar( 'Dagens tilbud', true ) +
+			var h = renderAppbar( 'Dagens tilbud', 'results' ) +
 				'<div class="head-row" style="margin-top:14px;align-items:center">' +
 					'<div style="display:flex;align-items:center;gap:10px">' +
 						'<h2 class="headline-s" style="margin:0">Dagens beste tilbud</h2>' +
@@ -1107,6 +1108,7 @@
 					filters = Scoring.defaults( config );
 					state.view = 'quiz';
 					state.presetApplied = false;
+					state.editingFromResults = false;
 					clearSession();
 					go( 1, 'forward' );
 				} else if ( act === 'deals' ) {
@@ -1129,7 +1131,11 @@
 					}
 					if ( state.view === 'deals' ) {
 						state.view = 'quiz';
+						state.editingFromResults = false;
 						go( 0, 'backward' );
+					} else if ( state.editingFromResults ) {
+						state.editingFromResults = false;
+						go( steps.length + 1, 'forward' );
 					} else if ( state.presetApplied && state.step > steps.length ) {
 						state.presetApplied = false;
 						go( 0, 'backward' );
@@ -1141,7 +1147,10 @@
 						window.clearTimeout( state.advanceTimer );
 						state.advanceTimer = null;
 					}
-					if ( state.step <= steps.length ) {
+					if ( state.editingFromResults ) {
+						state.editingFromResults = false;
+						go( steps.length + 1, 'forward' );
+					} else if ( state.step <= steps.length ) {
 						go( state.step + 1, 'forward' );
 					}
 				} else if ( act === 'reset' ) {
@@ -1152,6 +1161,7 @@
 					filters = Scoring.defaults( config );
 					state.view = 'quiz';
 					state.presetApplied = false;
+					state.editingFromResults = false;
 					clearSession();
 					go( 0, 'backward' );
 				} else if ( act === 'quick' ) {
@@ -1163,6 +1173,7 @@
 						state.advanceTimer = null;
 					}
 					state.view = 'quiz';
+					state.editingFromResults = ( state.step > steps.length );
 					var stepIdx = parseInt( target.getAttribute( 'data-step' ), 10 ) || 0;
 					go( stepIdx, 'backward' );
 				} else if ( act === 'cmp' ) {
@@ -1220,16 +1231,19 @@
 					updateLiveElements();
 					saveSession();
 
-					// Smooth, deliberate pacing (550ms gives user time to see selection register)
+					// Smooth, deliberate pacing (450ms gives user time to see selection register)
 					if ( state.advanceTimer ) {
 						window.clearTimeout( state.advanceTimer );
 					}
 					state.advanceTimer = window.setTimeout( function () {
 						state.advanceTimer = null;
-						if ( state.step <= steps.length ) {
+						if ( state.editingFromResults ) {
+							state.editingFromResults = false;
+							go( steps.length + 1, 'forward' );
+						} else if ( state.step <= steps.length ) {
 							go( state.step + 1, 'forward' );
 						}
-					}, 550 );
+					}, 450 );
 				}
 			} );
 
@@ -1240,7 +1254,7 @@
 					var qId = sliderInput.getAttribute( 'data-id' );
 					var numVal = Number( sliderInput.value );
 					filters[ qId ] = numVal;
-					if ( qId === 'w' ) {
+					if ( qId === 'w' && ! state.editingFromResults ) {
 						state.presetApplied = false;
 					}
 
@@ -1295,6 +1309,13 @@
 			var stage = document.createElement( 'div' );
 			stage.className = 'gear-engine-picker__stage gear-engine-picker__stage--' + state.dir;
 			stage.tabIndex = -1;
+
+			var isIntro = ( state.view !== 'deals' && state.step === 0 );
+			root.classList.toggle( 'is-in-flow', ! isIntro );
+			var hubBackBar = root.previousElementSibling;
+			if ( hubBackBar && hubBackBar.classList && hubBackBar.classList.contains( 'gear-engine-hub__back-bar' ) ) {
+				hubBackBar.style.display = isIntro ? '' : 'none';
+			}
 
 			if ( state.view === 'deals' ) {
 				stage.innerHTML = renderDeals();
