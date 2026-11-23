@@ -109,20 +109,107 @@
 }
 
 .fysio-input-bar {
-	border-radius: 2rem !important;
-	background: rgba(255, 255, 255, 0.9) !important;
-	backdrop-filter: blur(20px) !important;
-	-webkit-backdrop-filter: blur(20px) !important;
-	border: 1px solid rgba(255, 255, 255, 0.7) !important;
-	box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.1) !important;
+	border-radius: 9999px !important;
+	background: var(--md-sys-color-surface-container-high, #ECEFF3) !important;
+	border: none !important;
+	box-shadow: 0 4px 16px rgba(12, 35, 64, 0.06) !important;
 	display: flex !important;
-	align-items: flex-end !important;
-	padding: 6px 8px !important;
-	transition: all 0.2s ease !important;
+	align-items: center !important;
+	min-height: 56px !important;
+	padding: 6px 8px 6px 22px !important;
+	transition: background-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
+.fysio-input-bar:hover,
 .fysio-input-bar:focus-within {
-	box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.15), 0 0 0 4px rgba(0, 168, 120, 0.2) !important;
+	background: var(--md-sys-color-surface-container-highest, #E2E6EC) !important;
+	box-shadow: 0 6px 20px rgba(12, 35, 64, 0.09) !important;
+}
+
+textarea#fysio-input {
+	flex: 1 1 auto !important;
+	width: 100% !important;
+	background: transparent !important;
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+	resize: none !important;
+	margin: 0 !important;
+	padding: 10px 8px 10px 0 !important;
+	font-size: 16px !important;
+	font-weight: 400 !important;
+	line-height: 24px !important;
+	letter-spacing: 0.15px !important;
+	color: var(--md-sys-color-on-surface, #101828) !important;
+	min-height: 44px !important;
+	max-height: 120px !important;
+	font-family: var(--ge-font-family, 'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif) !important;
+}
+
+textarea#fysio-input::placeholder {
+	color: var(--md-sys-color-on-surface-variant, #475467) !important;
+	opacity: 0.85 !important;
+}
+
+.fysio-input-actions {
+	display: inline-flex !important;
+	align-items: center !important;
+	gap: 4px !important;
+	flex-shrink: 0 !important;
+	align-self: flex-end !important;
+	margin-bottom: 2px !important;
+}
+
+button.fysio-mic-btn {
+	width: 40px !important;
+	height: 40px !important;
+	min-width: 40px !important;
+	min-height: 40px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: 9999px !important;
+	background: transparent !important;
+	color: var(--md-sys-color-on-surface-variant, #475467) !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	flex-shrink: 0 !important;
+	cursor: pointer !important;
+	transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
+}
+
+button.fysio-mic-btn:hover {
+	background-color: rgba(12, 35, 64, 0.08) !important;
+	color: var(--md-sys-color-on-surface, #101828) !important;
+}
+
+button.fysio-mic-btn svg {
+	width: 20px !important;
+	height: 20px !important;
+	fill: currentColor !important;
+	display: block !important;
+}
+
+button.fysio-mic-btn.is-listening {
+	background-color: rgba(186, 26, 26, 0.14) !important;
+	color: #ba1a1a !important;
+	animation: fysio-mic-pulse 1.2s infinite ease-in-out !important;
+}
+
+@keyframes fysio-mic-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(186, 26, 26, 0.35);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 0 0 7px rgba(186, 26, 26, 0);
+		transform: scale(1.08);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(186, 26, 26, 0);
+		transform: scale(1);
+	}
 }
 
 .fysio-user-msg-bubble {
@@ -170,9 +257,10 @@ button.fysio-header-btn:hover * {
 }
 
 button#fysio-send-btn {
-	background-color: #1A2A3A !important;
+	background-color: var(--md-sys-color-primary, #0C2340) !important;
+	color: #ffffff !important;
 	border: none !important;
-	box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;
+	box-shadow: none !important;
 	width: 40px !important;
 	height: 40px !important;
 	min-width: 40px !important;
@@ -182,19 +270,18 @@ button#fysio-send-btn {
 	align-items: center !important;
 	justify-content: center !important;
 	flex-shrink: 0 !important;
-	margin-left: 4px !important;
+	margin-left: 2px !important;
 	cursor: pointer !important;
-	transition: all 0.2s ease !important;
+	transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
 }
 
 button#fysio-send-btn:hover {
-	background-color: #111c27 !important;
+	background-color: #143154 !important;
 	border: none !important;
-	transform: scale(1.05);
 }
 
-button#fysio-send-btn i,
-button#fysio-send-btn:hover i {
+button#fysio-send-btn svg,
+button#fysio-send-btn i {
 	color: #ffffff !important;
 }
 
@@ -355,11 +442,20 @@ button#btn-finish:hover * {
 }
 
 .fysio-send-disabled {
-	opacity: 0.5;
+	background-color: rgba(12, 35, 64, 0.12) !important;
+	color: rgba(12, 35, 64, 0.38) !important;
+	opacity: 1 !important;
 	pointer-events: none;
 }
 
+.fysio-send-disabled svg,
+.fysio-send-disabled i {
+	color: rgba(12, 35, 64, 0.38) !important;
+}
+
 .fysio-send-active {
+	background-color: var(--md-sys-color-primary, #0C2340) !important;
+	color: #ffffff !important;
 	opacity: 1;
 	pointer-events: auto !important;
 	cursor: pointer;

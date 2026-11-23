@@ -684,12 +684,105 @@
     document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('fysio-input');
         const sendBtn = document.getElementById('fysio-send-btn');
+        const micBtn = document.getElementById('fysio-mic-btn');
         const msgContainer = document.getElementById('fysio-message-container');
         const defGreeting = document.getElementById('default-greeting');
         const qrContainer = document.getElementById('quick-replies');
         const fysioForm = document.getElementById('fysio-form');
         
         if (!input || !msgContainer) return;
+
+        // Web Speech API (Speech-to-Text for Digital Fysio input bar)
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
+        function stopListening() {
+            isListening = false;
+            if (!micBtn) return;
+            micBtn.classList.remove('is-listening');
+            micBtn.setAttribute('aria-pressed', 'false');
+            micBtn.setAttribute('aria-label', 'Snakk inn melding');
+            const orig = input.getAttribute('data-orig-placeholder');
+            if (orig) {
+                input.placeholder = orig;
+            }
+        }
+
+        if (SpeechRec && micBtn) {
+            try {
+                recognition = new SpeechRec();
+                recognition.lang = 'nb-NO';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    micBtn.classList.add('is-listening');
+                    micBtn.setAttribute('aria-pressed', 'true');
+                    micBtn.setAttribute('aria-label', 'Lytter... Klikk for å stoppe');
+                    if (!input.getAttribute('data-orig-placeholder')) {
+                        input.setAttribute('data-orig-placeholder', input.placeholder || '');
+                    }
+                    input.placeholder = 'Lytter... Snakk nå';
+                };
+
+                recognition.onresult = function(event) {
+                    let transcript = '';
+                    if (event.results && event.results.length > 0 && event.results[0][0]) {
+                        transcript = event.results[0][0].transcript || '';
+                    }
+                    if (transcript) {
+                        const existing = input.value.trim();
+                        input.value = existing ? (existing + ' ' + transcript) : transcript;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        if (typeof input.focus === 'function') {
+                            input.focus();
+                        }
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    stopListening();
+                    if (event && event.error === 'not-allowed') {
+                        const origP = input.getAttribute('data-orig-placeholder') || input.placeholder;
+                        input.placeholder = 'Mikrofontilgang ble avvist';
+                        setTimeout(function() {
+                            input.placeholder = origP;
+                        }, 3500);
+                    }
+                };
+
+                recognition.onend = function() {
+                    stopListening();
+                };
+            } catch (err) {
+                recognition = null;
+            }
+        }
+
+        if (micBtn) {
+            micBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!recognition) {
+                    const origVal = input.getAttribute('data-orig-placeholder') || input.placeholder;
+                    input.placeholder = 'Talesøk krever Chrome, Edge eller Safari';
+                    setTimeout(function() {
+                        input.placeholder = origVal;
+                    }, 3500);
+                    return;
+                }
+                if (isListening) {
+                    try { recognition.stop(); } catch (err) {}
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (err) {
+                        stopListening();
+                    }
+                }
+            });
+        }
 
         if (loadSession() && chatHistory.length > 0) {
             if (defGreeting) defGreeting.style.setProperty('display', 'none', 'important');

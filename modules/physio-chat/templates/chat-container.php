@@ -76,17 +76,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</main>
 
-	<!-- Input Floating Pill Bar -->
+	<!-- Input Floating Pill Bar (Material 3 Omnisearch-aligned with Speech-to-Text Mic) -->
 	<footer class="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 print-hidden w-[calc(100%-2rem)] max-w-[860px]" style="position: absolute !important; bottom: 1.5rem !important; left: 50% !important; transform: translateX(-50%) !important; width: calc(100% - 2rem) !important; max-width: 860px !important; z-index: 40 !important;">
 		<form id="fysio-form" class="w-full m-0 p-0" style="margin: 0 !important; padding: 0 !important; width: 100% !important;">
-			<div class="glass-pill rounded-[2rem] flex items-end p-1.5 sm:p-2 focus-within:ring-4 focus-within:ring-[#00A878]/20 transition-all shadow-float fysio-input-bar" style="border-radius: 2rem !important; display: flex !important; align-items: flex-end !important; padding: 6px 8px !important; background: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; box-shadow: 0 15px 35px -5px rgba(10, 37, 88, 0.1) !important;">
-				<textarea id="fysio-input" rows="1" placeholder="Skriv her..." 
-					class="w-full bg-transparent border-none outline-none resize-none m-0 px-4 sm:px-5 py-2.5 text-[16px] font-medium leading-relaxed text-gray-800 placeholder-gray-400 min-h-[44px] max-h-[120px] no-scrollbar" style="width: 100% !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; resize: none !important; margin: 0 !important; padding: 10px 18px !important; font-size: 16px !important; font-weight: 500 !important; line-height: 1.5 !important; color: #1f2937 !important; min-height: 44px !important; max-height: 120px !important; font-family: inherit !important;"></textarea>
-				
-				<button id="fysio-send-btn" type="submit"
-					class="fysio-send-disabled w-[40px] h-[40px] rounded-full flex items-center justify-center shrink-0 transition-all ml-1 cursor-pointer" style="width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important; border-radius: 9999px !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; margin-left: 4px !important; background-color: #1A2A3A !important; border: none !important; cursor: pointer !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;">
-					<i class="fa-solid fa-arrow-up text-[16px]" style="color: #ffffff !important; font-size: 16px !important;"></i>
-				</button>
+			<div class="fysio-input-bar">
+				<textarea id="fysio-input" rows="1" placeholder="Beskriv plagene dine eller spør om øvelser og utstyr..." aria-label="Melding til Digital Fysio"
+					class="w-full bg-transparent border-none outline-none resize-none m-0 min-h-[44px] max-h-[120px] no-scrollbar"></textarea>
+
+				<div class="fysio-input-actions">
+					<button id="fysio-mic-btn" type="button" class="fysio-mic-btn" aria-label="Snakk inn melding" title="Snakk inn melding">
+						<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false">
+							<path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+						</svg>
+					</button>
+
+					<button id="fysio-send-btn" type="submit" aria-label="Send melding" title="Send melding"
+						class="fysio-send-disabled w-[40px] h-[40px] rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M12 19V5M5 12l7-7 7 7"/>
+						</svg>
+					</button>
+				</div>
 			</div>
 		</form>
 	</footer>
