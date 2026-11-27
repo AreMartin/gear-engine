@@ -460,10 +460,17 @@
 }
 
 /* Quick Tiles (Velg etter bruksområde - M3 Health-App Card Style) */
+.gear-engine-picker .sec-sub {
+	margin: 3px 0 0;
+	font-size: 13.5px;
+	line-height: 1.4;
+	color: var(--md-sys-color-on-surface-variant, #667085);
+}
 .gear-engine-picker .tiles {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 14px;
+	align-items: stretch;
 }
 @media (min-width: 560px) {
 	.gear-engine-picker .tiles { grid-template-columns: 1fr 1fr; }
@@ -473,48 +480,89 @@
 	align-items: center;
 	gap: 16px;
 	width: 100%;
-	padding: 16px 20px;
+	height: 100%;
+	padding: 18px 20px;
 	border-radius: 22px;
 	border: none;
 	background: #FFFFFF;
 	text-align: left;
 	color: var(--md-sys-color-on-surface, #0C2340);
-	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.025);
+	box-shadow: 0 2px 6px rgba(12, 35, 64, 0.03);
 	transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .gear-engine-picker .tile:hover {
 	background: #FAFBFD;
-	box-shadow: 0 4px 14px rgba(12, 35, 64, 0.06);
+	box-shadow: 0 6px 18px rgba(12, 35, 64, 0.07);
+}
+.gear-engine-picker .tile[disabled] {
+	opacity: 0.55;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+.gear-engine-picker .tile[disabled]:hover {
+	background: #FFFFFF;
+	box-shadow: none;
 }
 .gear-engine-picker .tile .ti {
-	width: 48px;
-	height: 48px;
+	width: 52px;
+	height: 52px;
 	border-radius: 50%;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	flex: none;
-	background: #E6F2FA;
-	color: var(--md-sys-color-primary, #0C2340);
+	background: var(--tile-soft, #E3F0FB);
+	color: var(--tile-strong, #1B5E96);
+	transition: background-color 0.18s ease, color 0.18s ease;
 }
-.gear-engine-picker .tile:nth-child(4n+2) .ti { background: #E3F5EC; color: #005236; }
-.gear-engine-picker .tile:nth-child(4n+3) .ti { background: #FEF0E6; color: #7C2D12; }
-.gear-engine-picker .tile:nth-child(4n+4) .ti { background: #EAEAF8; color: #1E293B; }
+.gear-engine-picker .tile .ti svg {
+	width: 24px;
+	height: 24px;
+	display: block;
+}
+.gear-engine-picker .tile:hover:not([disabled]) .ti {
+	background: var(--tile-strong, #1B5E96);
+	color: #FFFFFF;
+}
+.gear-engine-picker .tile[data-tone="blue"]   { --tile-soft: #E3F0FB; --tile-strong: #1B5E96; }
+.gear-engine-picker .tile[data-tone="green"]  { --tile-soft: #DCF5E8; --tile-strong: #00734A; }
+.gear-engine-picker .tile[data-tone="amber"]  { --tile-soft: #FEEBDD; --tile-strong: #B54708; }
+.gear-engine-picker .tile[data-tone="purple"] { --tile-soft: #ECE9FB; --tile-strong: #5B3FC4; }
+.gear-engine-picker .tile[data-tone="teal"]   { --tile-soft: #E0F4F4; --tile-strong: #0E7C7B; }
+.gear-engine-picker .tile[data-tone="navy"]   { --tile-soft: #E6EEF7; --tile-strong: #0C2340; }
 .gear-engine-picker .tile .tile-body {
 	flex: 1;
 	min-width: 0;
 }
+.gear-engine-picker .tile .tile-head {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+.gear-engine-picker .tile .tile-empty {
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	padding: 0 9px;
+	border-radius: 999px;
+	background: #F2F4F7;
+	color: #667085;
+	font-size: 11.5px;
+	font-weight: 600;
+	white-space: nowrap;
+}
 .gear-engine-picker .tile b { display: block; font-size: 15.5px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--md-sys-color-primary, #0C2340); }
-.gear-engine-picker .tile small { display: block; font-size: 13px; line-height: 1.35; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 3px; }
+.gear-engine-picker .tile small { display: block; font-size: 13px; line-height: 1.35; color: var(--md-sys-color-on-surface-variant, #667085); margin-top: 4px; }
 .gear-engine-picker .tile .tile-arrow {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	color: #667085;
+	color: #98A2B3;
 	flex-shrink: 0;
 	transition: color 0.15s ease;
 }
-.gear-engine-picker .tile:hover .tile-arrow {
+.gear-engine-picker .tile:hover:not([disabled]) .tile-arrow {
 	color: var(--md-sys-color-primary, #0C2340);
 }
 

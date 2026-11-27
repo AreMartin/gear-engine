@@ -72,6 +72,59 @@
 		return '<span class="material-symbols-outlined" aria-hidden="true" style="font-size:' + ( size || 18 ) + 'px">' + sym + '</span>';
 	}
 
+	/* Filled inline SVGs for preset use-case tiles (no external icon font dependency). */
+	var TILE_ICONS = {
+		compact:  '<path d="M17 11V3H7v4H3v14h8v-4h2v4h8V11h-4zM7 19H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm4 4H9v-2h2v2zm0-4H9V9h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm4 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/>',
+		budget:   '<path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>',
+		sprint:   '<path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/>',
+		gentle:   '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+		water:    '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+		quiet:    '<path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>',
+		shield:   '<path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 14l-3.5-3.5 1.41-1.41L11 13.17l4.59-4.59L17 10l-6 6z"/>',
+		target:   '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>',
+		flame:    '<path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>',
+		heavy:    '<path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>'
+	};
+
+	function tileMeta( pr ) {
+		var key = ( pr && pr.key ) || '';
+		var icon = ( pr && pr.icon ) || '';
+		var byKey = {
+			compact:      { icon: 'compact', tone: 'blue' },
+			foldable_15k: { icon: 'compact', tone: 'blue' },
+			quiet:        { icon: 'quiet',   tone: 'blue' },
+			budget:       { icon: 'budget',  tone: 'green' },
+			sprint:       { icon: 'sprint',  tone: 'amber' },
+			speed_20:     { icon: 'sprint',  tone: 'amber' },
+			air:          { icon: 'sprint',  tone: 'amber' },
+			rehab:        { icon: 'gentle',  tone: 'purple' },
+			gentle:       { icon: 'gentle',  tone: 'purple' },
+			knee_support: { icon: 'shield',  tone: 'purple' },
+			water:        { icon: 'water',   tone: 'teal' },
+			circulation:  { icon: 'gentle',  tone: 'teal' },
+			balance:      { icon: 'target',  tone: 'blue' },
+			heavy:        { icon: 'heavy',   tone: 'navy' }
+		};
+		var byIcon = {
+			fold:      { icon: 'compact', tone: 'blue' },
+			sliders:   { icon: 'budget',  tone: 'green' },
+			tag:       { icon: 'budget',  tone: 'green' },
+			speedHigh: { icon: 'sprint',  tone: 'amber' },
+			zap:       { icon: 'sprint',  tone: 'amber' },
+			flame:     { icon: 'flame',   tone: 'amber' },
+			medical:   { icon: 'gentle',  tone: 'purple' },
+			activity:  { icon: 'gentle',  tone: 'teal' },
+			shield:    { icon: 'shield',  tone: 'purple' },
+			target:    { icon: 'target',  tone: 'blue' }
+		};
+		var meta = byKey[ key ] || byIcon[ icon ] || { icon: 'budget', tone: 'blue' };
+		var path = TILE_ICONS[ meta.icon ] || TILE_ICONS.budget;
+		return {
+			tone: meta.tone,
+			svg: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + path + '</svg>'
+		};
+	}
+
 	function decodeEntities( s ) {
 		if ( typeof s !== 'string' || s.indexOf( '&' ) === -1 ) {
 			return s;
@@ -248,7 +301,7 @@
 		var PRESETS = {};
 		if ( Array.isArray( config.presets ) && config.presets.length ) {
 			config.presets.forEach( function ( p ) {
-				PRESETS[ p.key ] = p.filters || {};
+				PRESETS[ p.key ] = p.filters || p.answers || {};
 			} );
 		} else {
 			PRESETS = {
@@ -471,12 +524,22 @@
 			'</header>';
 
 			if ( config.presets && config.presets.length ) {
-				h += '<div class="sec-head"><h3 class="title-l">Velg etter bruksområde</h3></div>' +
+				h += '<div class="sec-head"><div><h3 class="title-l">Velg etter bruksområde</h3>' +
+					'<p class="sec-sub">Hopp rett til anbefalinger som passer ditt behov.</p></div></div>' +
 					'<div class="tiles">';
 				config.presets.forEach( function ( pr ) {
-					h += '<button type="button" class="tile" data-action="quick" data-preset="' + esc( pr.key ) + '">' +
-						'<span class="ti">' + ic( pr.icon || 'sliders', 20 ) + '</span>' +
-						'<span class="tile-body"><b>' + esc( pr.label ) + '</b><small>' + esc( pr.desc ) + '</small></span>' +
+					var meta = tileMeta( pr );
+					var presetFilters = Object.assign( {}, Scoring.defaults( config ), pr.filters || pr.answers || {} );
+					var ranked = items.length ? Scoring.rank( config, items, presetFilters ) : null;
+					var count = ( ranked && ranked.items ) ? ranked.items.length : items.length;
+					var isEmpty = items.length > 0 && count === 0;
+					var desc = pr.desc || pr.lead || '';
+					h += '<button type="button" class="tile" data-action="quick" data-preset="' + esc( pr.key ) + '" data-tone="' + esc( meta.tone ) + '"' + ( isEmpty ? ' disabled' : '' ) + '>' +
+						'<span class="ti">' + meta.svg + '</span>' +
+						'<span class="tile-body">' +
+							'<span class="tile-head"><b>' + esc( pr.label ) + '</b>' + ( isEmpty ? '<span class="tile-empty">Ingen treff</span>' : '' ) + '</span>' +
+							'<small>' + esc( desc ) + '</small>' +
+						'</span>' +
 						'<span class="tile-arrow">' + ic( 'chevR', 18 ) + '</span>' +
 					'</button>';
 				} );
