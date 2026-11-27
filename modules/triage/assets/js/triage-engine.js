@@ -1027,7 +1027,7 @@
 
 		var reg = (this.region || '').toLowerCase();
 		var aids = AIDS_MAP[reg] || AIDS_MAP.kne;
-		var hubUrl = (safeUrl(this.config.pickerHubUrl) || '/kjopsveiledere/') + '?kategori=rehab';
+		var hubUrl = (safeUrl(this.config.pickerHubUrl) || '/utstyrsvelgere/') + '?kategori=rehab';
 
 		var html = '<div class="get-aids-box get-noprint" style="margin-top:16px;background:#FFFFFF;border:none;box-shadow:0 2px 10px rgba(12,35,64,0.04);border-radius:24px;padding:24px 28px">' +
 			'<h3 class="title-l" style="margin:0 0 6px;color:var(--md-sys-color-primary,#0C2340)">Nyttige hjelpemidler for opptreningen</h3>' +
@@ -1058,7 +1058,7 @@
 			'<span class="body-s" style="color:var(--md-sys-color-on-surface-variant,#475467)">Finn ergometersykkel, romaskin eller utstyr tilpasset leddene dine.</span>' +
 			'</div>' +
 			'<a href="' + esc(hubUrl) + '" class="btn filled primary sl" style="height:40px;font-size:13.5px;font-weight:600;padding:0 18px;text-decoration:none;flex-shrink:0">' +
-			'Åpne kjøpsveileder ' + icon('ChevronRight', 16) +
+			'Åpne utstyrsvelger ' + icon('ChevronRight', 16) +
 			'</a>' +
 			'</div>';
 

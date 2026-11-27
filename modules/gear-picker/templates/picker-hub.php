@@ -27,7 +27,7 @@ if ( ! function_exists( 'gear_engine_hub_icon' ) ) {
 	<header class="gear-engine-hub__header">
 		<div class="gear-engine-hub__badge">
 			<span class="gear-engine-hub__badge-dot"></span>
-			<?php esc_html_e( 'Smarte kjøpsveiledere · 1 minutt', 'gear-engine' ); ?>
+			<?php esc_html_e( 'Smarte utstyrsvelgere · 1 minutt', 'gear-engine' ); ?>
 		</div>
 		<h1 class="gear-engine-hub__title"><?php esc_html_e( 'Finn riktig treningsutstyr for kroppen din', 'gear-engine' ); ?></h1>
 		<p class="gear-engine-hub__ingress">

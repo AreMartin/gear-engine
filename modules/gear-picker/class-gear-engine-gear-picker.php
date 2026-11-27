@@ -534,7 +534,7 @@ class Gear_Engine_Gear_Picker {
 			'all'       => array(
 				'id'    => 'all',
 				'label' => __( 'Alle', 'gear-engine' ),
-				'desc'  => __( 'Alle tilgjengelige kjøpsveiledere.', 'gear-engine' ),
+				'desc'  => __( 'Alle tilgjengelige utstyrsvelgere.', 'gear-engine' ),
 			),
 			'kondisjon' => array(
 				'id'    => 'kondisjon',
@@ -768,7 +768,7 @@ class Gear_Engine_Gear_Picker {
 			if ( ! is_wp_error( $type_config ) ) {
 				$back_url = esc_url( remove_query_arg( 'type' ) );
 				$output   = '<nav class="gear-engine-hub__back-bar" aria-label="' . esc_attr__( 'Navigasjon', 'gear-engine' ) . '">'
-					. '<a href="' . $back_url . '" class="gear-engine-hub__back-btn" aria-label="' . esc_attr__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '" title="' . esc_attr__( 'Tilbake til alle kjøpsveiledere', 'gear-engine' ) . '">'
+					. '<a href="' . $back_url . '" class="gear-engine-hub__back-btn" aria-label="' . esc_attr__( 'Tilbake til alle utstyrsvelgere', 'gear-engine' ) . '" title="' . esc_attr__( 'Tilbake til alle utstyrsvelgere', 'gear-engine' ) . '">'
 					. '<span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>'
 					. '</a>'
 					. '<span class="gear-engine-hub__back-title">' . esc_html( (string) ( $type_config['label'] ?? '' ) ) . '</span>'

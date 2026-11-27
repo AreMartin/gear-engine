@@ -28,7 +28,7 @@ class Gear_Engine_Equipment_Registry {
 			return $registry;
 		}
 
-		$hub_base = function_exists( 'home_url' ) ? home_url( '/kjopsveiledere/' ) : '/kjopsveiledere/';
+		$hub_base = function_exists( 'home_url' ) ? home_url( '/utstyrsvelgere/' ) : '/utstyrsvelgere/';
 
 		$registry = array(
 			'strikk' => array(

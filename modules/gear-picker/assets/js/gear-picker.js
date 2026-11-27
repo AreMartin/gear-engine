@@ -453,7 +453,7 @@
 					'<button type="button" class="btn text sl appbar-reset" data-action="reset" aria-label="Start på nytt" title="Start på nytt">' + ic( 'refresh', 16 ) + '<span>Start på nytt</span></button>';
 			} else if ( mode === 'deals' ) {
 				rightHtml = '<button type="button" class="btn filled primary sl" data-action="start" style="height:34px;padding:0 14px;font-size:13px;gap:5px;font-weight:600">' +
-					'Start kjøpsveileder' + ic( 'chevR', 14 ) + '</button>';
+					'Start utstyrsvelger' + ic( 'chevR', 14 ) + '</button>';
 			} else {
 				rightHtml = '<button type="button" class="ibtn sl" data-action="reset" aria-label="Avslutt" title="Gå til start">' + ic( 'close', 20 ) + '</button>';
 			}
@@ -512,12 +512,12 @@
 			var introTitle = String( intro.title || ( 'Finn riktig ' + ( config.label || 'utstyr' ).toLowerCase() ) ).replace( /\.\s*$/, '' );
 
 			var h = '<header class="intro-head">' +
-				'<div class="intro-badge"><span class="intro-dot"></span>Kjøpsveileder · 1 minutt</div>' +
+				'<div class="intro-badge"><span class="intro-dot"></span>Utstyrsvelger · 1 minutt</div>' +
 				'<h1 class="intro-title">' + esc( introTitle ) + '</h1>' +
 				'<p class="intro-ingress">' + esc( intro.desc || 'Svar på noen enkle spørsmål om behov og budsjett. Vår algoritme finner de beste modellene for deg.' ) + '</p>' +
 				'<div class="intro-actions">' +
 					'<button type="button" class="btn filled primary sl intro-cta" data-action="start">' +
-					esc( intro.start || 'Start kjøpsveileder' ) + ms( 'chevR', 18 ) + '</button>' +
+					esc( intro.start || 'Start utstyrsvelger' ) + ms( 'chevR', 18 ) + '</button>' +
 					'<button type="button" class="btn outlined sl intro-deals-btn" data-action="deals">' +
 					ic( 'tag', 17 ) + '<span>Dagens tilbud</span></button>' +
 				'</div>' +
@@ -581,7 +581,7 @@
 			var n = steps.length;
 			var isLast = state.step === n;
 			var hasAnswer = filters[ s.id ] !== undefined && filters[ s.id ] !== null;
-			var guideTitle = config.label || 'Kjøpsveileder';
+			var guideTitle = config.label || 'Utstyrsvelger';
 			var backLabel = state.editingFromResults
 				? 'Tilbake til anbefalinger'
 				: ( state.step === 1 ? 'Tilbake til start' : 'Forrige spørsmål' );
@@ -728,7 +728,7 @@
 			var best = results[ 0 ] || null;
 			var others = results.slice( 1 );
 
-			var h = renderAppbar( config.label || 'Kjøpsveileder', 'results' ) +
+			var h = renderAppbar( config.label || 'Utstyrsvelger', 'results' ) +
 				'<div class="results-head">' +
 					'<div class="results-head__title">' +
 						'<h2 class="headline-s" style="margin:0">Dine anbefalinger</h2>' +
@@ -903,7 +903,7 @@
 				'</div></div>';
 
 			if ( ! best ) {
-				return h + '<div class="card filled xl" style="margin-top:20px;text-align:center"><h3 class="title-l">Ingen aktive tilbud akkurat nå</h3><p class="body-m muted" style="margin:8px 0 16px">Bruk kjøpsveilederen for å finne de beste modellene til ordinær pris.</p><button type="button" class="btn filled sl" data-action="start">Start veileder</button></div>';
+				return h + '<div class="card filled xl" style="margin-top:20px;text-align:center"><h3 class="title-l">Ingen aktive tilbud akkurat nå</h3><p class="body-m muted" style="margin:8px 0 16px">Bruk utstyrsvelgeren for å finne de beste modellene til ordinær pris.</p><button type="button" class="btn filled sl" data-action="start">Start utstyrsvelger</button></div>';
 			}
 
 			// Featured top deal card

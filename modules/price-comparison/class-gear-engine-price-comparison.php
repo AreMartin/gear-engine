@@ -888,8 +888,8 @@ class Gear_Engine_Price_Comparison {
 		$program_base = class_exists( 'Gear_Engine_Protocol_Viewer' ) ? Gear_Engine_Protocol_Viewer::get_page_path() : 'treningsprogram';
 
 		$hub_url = self::resolve_page_url(
-			'kjopsveiledere',
-			array( 'kjopsveileder', 'utstyrsvelger', 'kjopsguide', 'veiledere', 'kjopshjelp' ),
+			'utstyrsvelgere',
+			array( 'utstyrsvelger', 'kjopsveiledere', 'kjopsveileder', 'kjopsguide', 'veiledere', 'kjopshjelp' ),
 			array( 'gear_engine_gear_picker_hub', 'gear_engine_gear_picker', 'fysionett_kjopsveileder' )
 		);
 		$hub_url = (string) apply_filters( 'gear_engine_hub_url', $hub_url );
@@ -938,41 +938,41 @@ class Gear_Engine_Price_Comparison {
 			),
 			array(
 				'type'     => 'tool',
-				'title'    => __( 'Kjøpsveiledere (Oversikt)', 'gear-engine' ),
-				'subtitle' => __( 'Interaktive guider tilpasset leddbelastning, plass og budsjett', 'gear-engine' ),
-				'keywords' => 'kjøpsveileder guide anbefaling velger utstyr',
+				'title'    => __( 'Utstyrsvelgere (Oversikt)', 'gear-engine' ),
+				'subtitle' => __( 'Interaktive velgere tilpasset leddbelastning, plass og budsjett', 'gear-engine' ),
+				'keywords' => 'utstyrsvelger kjøpsveileder guide anbefaling velger utstyr',
 				'icon'     => 'explore',
 				'url'      => $hub_url,
 			),
 			array(
 				'type'     => 'tool',
-				'title'    => __( 'Kjøpsveileder: Tredemølle', 'gear-engine' ),
+				'title'    => __( 'Utstyrsvelger: Tredemølle', 'gear-engine' ),
 				'subtitle' => __( 'Finn riktig demping, motorstyrke og løpeflate', 'gear-engine' ),
-				'keywords' => 'tredemølle kjøpsveileder løpebånd kondisjon',
+				'keywords' => 'tredemølle utstyrsvelger kjøpsveileder løpebånd kondisjon',
 				'icon'     => 'directions_run',
 				'url'      => add_query_arg( 'type', 'treadmill', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
-				'title'    => __( 'Kjøpsveileder: Romaskin', 'gear-engine' ),
+				'title'    => __( 'Utstyrsvelger: Romaskin', 'gear-engine' ),
 				'subtitle' => __( 'Sammenlign luft-, vann- og magnetmotstand', 'gear-engine' ),
-				'keywords' => 'romaskin kjøpsveileder roing kondisjon',
+				'keywords' => 'romaskin utstyrsvelger kjøpsveileder roing kondisjon',
 				'icon'     => 'rowing',
 				'url'      => add_query_arg( 'type', 'romaskin', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
-				'title'    => __( 'Kjøpsveileder: Ergometersykkel', 'gear-engine' ),
+				'title'    => __( 'Utstyrsvelger: Ergometersykkel', 'gear-engine' ),
 				'subtitle' => __( 'Skånsom trening for kne og hofte med lavt innsteg', 'gear-engine' ),
-				'keywords' => 'ergometersykkel treningssykkel sykkel kjøpsveileder kne',
+				'keywords' => 'ergometersykkel treningssykkel sykkel utstyrsvelger kjøpsveileder kne',
 				'icon'     => 'pedal_bike',
 				'url'      => add_query_arg( 'type', 'ergometersykkel', $hub_url ),
 			),
 			array(
 				'type'     => 'tool',
-				'title'    => __( 'Kjøpsveileder: Rehab & Hjelpemidler', 'gear-engine' ),
+				'title'    => __( 'Utstyrsvelger: Rehab & Hjelpemidler', 'gear-engine' ),
 				'subtitle' => __( 'Støtter, strikker og hjelpemidler ved skade og opptrening', 'gear-engine' ),
-				'keywords' => 'rehab rehabilitering hjelpemidler støtte kjøpsveileder',
+				'keywords' => 'rehab rehabilitering hjelpemidler støtte utstyrsvelger kjøpsveileder',
 				'icon'     => 'healing',
 				'url'      => add_query_arg( 'type', 'rehab-guide', $hub_url ),
 			),

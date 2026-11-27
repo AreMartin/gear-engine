@@ -94,11 +94,11 @@ class Gear_Engine_Shortcode_Guide {
 				'group'       => __( 'Produkter', 'gear-engine' ),
 				'tag'         => Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG,
 				'example'     => '[' . Gear_Engine_Gear_Picker::HUB_SHORTCODE_TAG . ']',
-				'description' => __( 'Kjøpsveileder Hub med faneinndeling (Kondisjon, Styrke, Rehab & Helse) og dagsaktuelle tilbud.', 'gear-engine' ),
-				'note'        => __( 'Hovedveileder på /kjopsveiledere/ siden. Lenket fra forsiden og Hero-knappen.', 'gear-engine' ),
+				'description' => __( 'Utstyrsvelger Hub med faneinndeling (Kondisjon, Styrke, Rehab & Helse) og dagsaktuelle tilbud.', 'gear-engine' ),
+				'note'        => __( 'Hovedvelger på /utstyrsvelgere/ siden. Lenket fra forsiden og Hero-knappen.', 'gear-engine' ),
 			),
 			array(
-				'group'       => __( 'Kjøpsveiledere (Enkeltvelger)', 'gear-engine' ),
+				'group'       => __( 'Utstyrsvelgere (Enkeltvelger)', 'gear-engine' ),
 				'tag'         => Gear_Engine_Gear_Picker::SHORTCODE_TAG,
 				'example'     => '[' . Gear_Engine_Gear_Picker::SHORTCODE_TAG . ' type="treadmill"]',
 				'description' => __( 'Guided gear picker built from the imported exercise gear. Options: type (config in modules/gear-picker/configs), category (gear_category slugs, comma separated).', 'gear-engine' ),
@@ -257,8 +257,8 @@ class Gear_Engine_Shortcode_Guide {
 
 		$map[] = array(
 			'level'   => 0,
-			'title'   => __( 'Kjøpsveiledere (Hub)', 'gear-engine' ),
-			'path'    => 'kjopsveiledere',
+			'title'   => __( 'Utstyrsvelgere (Hub)', 'gear-engine' ),
+			'path'    => 'utstyrsvelgere',
 			'tag'     => $hub_tag,
 			'example' => '[' . $hub_tag . ']',
 			'hint'    => __( 'Hovedsiden for alle utstyrsvelgere (Kondisjon, Styrke, Rehab). Lenket fra forsiden og Hero.', 'gear-engine' ),
@@ -267,23 +267,23 @@ class Gear_Engine_Shortcode_Guide {
 		$guides = array(
 			array(
 				'slug'  => 'treadmill',
-				'title' => __( 'Kjøpsveileder: Tredemølle', 'gear-engine' ),
+				'title' => __( 'Utstyrsvelger: Tredemølle', 'gear-engine' ),
 				'hint'  => __( 'Løpebånd, motorstyrke og demping. Inkludert i Huben (?type=treadmill).', 'gear-engine' ),
 			),
 			array(
 				'slug'  => 'romaskin',
-				'title' => __( 'Kjøpsveileder: Romaskin', 'gear-engine' ),
+				'title' => __( 'Utstyrsvelger: Romaskin', 'gear-engine' ),
 				'hint'  => __( 'Vann-, luft- og magnetmotstand for helkropp. Inkludert i Huben (?type=romaskin).', 'gear-engine' ),
 			),
 			array(
 				'slug'  => 'ergometersykkel',
-				'title' => __( 'Kjøpsveileder: Ergometersykkel', 'gear-engine' ),
+				'title' => __( 'Utstyrsvelger: Ergometersykkel', 'gear-engine' ),
 				'hint'  => __( 'Leddvennlig tråkk, lavt innsteg og spinning. Inkludert i Huben (?type=ergometersykkel).', 'gear-engine' ),
 			),
 			array(
 				'slug'  => 'rehab-guide',
-				'title' => __( 'Kjøpsveileder: Rehab & Hjelpemidler', 'gear-engine' ),
-				'hint'  => __( 'Bred guide for leddavlastning, balanse og pedaltrener. Inkludert i Huben (?type=rehab-guide).', 'gear-engine' ),
+				'title' => __( 'Utstyrsvelger: Rehab & Hjelpemidler', 'gear-engine' ),
+				'hint'  => __( 'Bred velger for leddavlastning, balanse og pedaltrener. Inkludert i Huben (?type=rehab-guide).', 'gear-engine' ),
 			),
 		);
 
@@ -291,7 +291,7 @@ class Gear_Engine_Shortcode_Guide {
 			$map[] = array(
 				'level'    => 1,
 				'title'    => $guide['title'],
-				'path'     => 'kjopsveiledere/' . $guide['slug'],
+				'path'     => 'utstyrsvelgere/' . $guide['slug'],
 				'tag'      => $picker_tag,
 				'example'  => '[' . $picker_tag . ' type="' . $guide['slug'] . '"]',
 				'hint'     => $guide['hint'],
@@ -309,7 +309,7 @@ class Gear_Engine_Shortcode_Guide {
 			'hint'    => __( 'Fasettert prissammenligning med avansert filtrering, sammenligningsmodal og avdelingstabs.', 'gear-engine' ),
 		);
 
-		$hub_status = self::get_page_status( 'kjopsveiledere', $hub_tag );
+		$hub_status = self::get_page_status( 'utstyrsvelgere', $hub_tag );
 
 		foreach ( $map as $index => $row ) {
 			if ( '' !== $row['path'] ) {
@@ -362,7 +362,7 @@ class Gear_Engine_Shortcode_Guide {
 	public static function get_action_link( array $row ): array {
 		if ( 'in_hub' === ( $row['state'] ?? '' ) && ! empty( $row['hub_type'] ) ) {
 			return array(
-				home_url( '/kjopsveiledere/?type=' . rawurlencode( (string) $row['hub_type'] ) ),
+				home_url( '/utstyrsvelgere/?type=' . rawurlencode( (string) $row['hub_type'] ) ),
 				__( 'Åpne i Hub', 'gear-engine' ),
 			);
 		}
@@ -456,8 +456,8 @@ class Gear_Engine_Shortcode_Guide {
 
 		$core_pages = array(
 			array(
-				'slug'    => 'kjopsveiledere',
-				'title'   => __( 'Kjøpsveiledere', 'gear-engine' ),
+				'slug'    => 'utstyrsvelgere',
+				'title'   => __( 'Utstyrsvelgere', 'gear-engine' ),
 				'content' => '<!-- wp:shortcode -->[' . $hub_tag . ']<!-- /wp:shortcode -->',
 				'tag'     => $hub_tag,
 			),

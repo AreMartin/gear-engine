@@ -303,11 +303,11 @@
 			{ type: 'triage', title: 'Symptomsjekk: Nakke', subtitle: 'Stiv nakke, spenningshodepine eller utstråling i arm', keywords: 'symptomsjekk triage smerter vondt nakke hodepine stiv', icon: 'clinical_notes', url: '/symptomsjekk/nakke/' },
 			{ type: 'triage', title: 'Symptomsjekk: Hofte og lyske', subtitle: 'Smerter på utsiden av hoften, i lysken eller setet', keywords: 'symptomsjekk triage smerter vondt hofte lyske sete', icon: 'clinical_notes', url: '/symptomsjekk/hofte/' },
 			{ type: 'triage', title: 'Symptomsjekk: Fot og ankel', subtitle: 'Overtråkk, akillesplager eller smerter under foten', keywords: 'symptomsjekk triage smerter vondt fot ankel overtråkk akilles plantar', icon: 'clinical_notes', url: '/symptomsjekk/fot-ankel/' },
-			{ type: 'tool', title: 'Kjøpsveiledere (Oversikt)', subtitle: 'Interaktive guider tilpasset leddbelastning, plass og budsjett', keywords: 'kjøpsveileder guide anbefaling velger utstyr', icon: 'explore', url: '/kjopsveiledere/' },
-			{ type: 'tool', title: 'Kjøpsveileder: Tredemølle', subtitle: 'Finn riktig demping, motorstyrke og løpeflate', keywords: 'tredemølle kjøpsveileder løpebånd kondisjon', icon: 'directions_run', url: '/kjopsveiledere/?type=treadmill' },
-			{ type: 'tool', title: 'Kjøpsveileder: Romaskin', subtitle: 'Sammenlign luft-, vann- og magnetmotstand', keywords: 'romaskin kjøpsveileder roing kondisjon', icon: 'rowing', url: '/kjopsveiledere/?type=romaskin' },
-			{ type: 'tool', title: 'Kjøpsveileder: Ergometersykkel', subtitle: 'Skånsom trening for kne og hofte med lavt innsteg', keywords: 'ergometersykkel treningssykkel sykkel kjøpsveileder kne', icon: 'pedal_bike', url: '/kjopsveiledere/?type=ergometersykkel' },
-			{ type: 'tool', title: 'Kjøpsveileder: Rehab & Hjelpemidler', subtitle: 'Støtter, strikker og hjelpemidler ved skade og opptrening', keywords: 'rehab rehabilitering hjelpemidler støtte kjøpsveileder', icon: 'healing', url: '/kjopsveiledere/?type=rehab-guide' }
+			{ type: 'tool', title: 'Utstyrsvelgere (Oversikt)', subtitle: 'Interaktive velgere tilpasset leddbelastning, plass og budsjett', keywords: 'utstyrsvelger kjøpsveileder guide anbefaling velger utstyr', icon: 'explore', url: '/utstyrsvelgere/' },
+			{ type: 'tool', title: 'Utstyrsvelger: Tredemølle', subtitle: 'Finn riktig demping, motorstyrke og løpeflate', keywords: 'tredemølle utstyrsvelger kjøpsveileder løpebånd kondisjon', icon: 'directions_run', url: '/utstyrsvelgere/?type=treadmill' },
+			{ type: 'tool', title: 'Utstyrsvelger: Romaskin', subtitle: 'Sammenlign luft-, vann- og magnetmotstand', keywords: 'romaskin utstyrsvelger kjøpsveileder roing kondisjon', icon: 'rowing', url: '/utstyrsvelgere/?type=romaskin' },
+			{ type: 'tool', title: 'Utstyrsvelger: Ergometersykkel', subtitle: 'Skånsom trening for kne og hofte med lavt innsteg', keywords: 'ergometersykkel treningssykkel sykkel utstyrsvelger kjøpsveileder kne', icon: 'pedal_bike', url: '/utstyrsvelgere/?type=ergometersykkel' },
+			{ type: 'tool', title: 'Utstyrsvelger: Rehab & Hjelpemidler', subtitle: 'Støtter, strikker og hjelpemidler ved skade og opptrening', keywords: 'rehab rehabilitering hjelpemidler støtte utstyrsvelger kjøpsveileder', icon: 'healing', url: '/utstyrsvelgere/?type=rehab-guide' }
 		],
 		programs: [
 			{ type: 'program', title: 'Fremre knesmerter (Patellofemoralt smertesyndrom)', subtitle: 'Styrke- og kontrolløvelser for kne og hofte i 3 faser', keywords: 'treningsprogram øvelser opptrening kne knesmerter løpekne hopperkne trapp', icon: 'fitness_center', url: '/treningsprogram/?program=fremre-knesmerter' },
@@ -1080,6 +1080,7 @@
 		'tights':          'tights.no',
 		'milrab':          'milrab.no',
 		'proteinfabrikken':'proteinfabrikken.no',
+		'farmasiet':       'farmasiet.no',
 		'x-life':          'x-life.no',
 		'xlife':           'x-life.no'
 	};
@@ -3156,7 +3157,7 @@
 	// Initial DOM skeleton constructor matching scratch/price-comparison-material3-prototype.html
 	function renderSkeleton(root, state) {
 		var showGuide = root.getAttribute('data-show-guide') !== 'false';
-		var guideUrl = root.getAttribute('data-guide-url') || '/kjopsveiledere/';
+		var guideUrl = root.getAttribute('data-guide-url') || '/utstyrsvelgere/';
 		var showSearchAttr = (root.getAttribute('data-show-search') || 'auto').toLowerCase();
 		var hasStandaloneSearch = !!document.querySelector('.ge-m3-standalone-search');
 		var showSearch = true;
@@ -3180,17 +3181,17 @@
 
 		(showGuide ? (
 			'<aside class="ge-m3-guide-banner ge-price-comp-guide-banner" id="ge-guide-banner" aria-label="Veiledning">' +
-				'<button class="ge-m3-guide-dismiss" id="ge-guide-dismiss" type="button" aria-label="Lukk kjøpsveileder" title="Lukk kjøpsveileder">' +
+				'<button class="ge-m3-guide-dismiss" id="ge-guide-dismiss" type="button" aria-label="Lukk utstyrsvelger" title="Lukk utstyrsvelger">' +
 					'<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
 				'</button>' +
 				'<div class="ge-m3-guide-content">' +
 					'<div class="ge-m3-guide-text">' +
 						'<strong>Usikker på hvilket utstyr som passer best for deg?</strong>' +
-						'<span>Finn optimal modell for leddbelastning, plass og budsjett i vår interaktive veileder.</span>' +
+						'<span>Finn optimal modell for leddbelastning, plass og budsjett i vår interaktive utstyrsvelger.</span>' +
 					'</div>' +
 				'</div>' +
 				'<a href="' + escapeHtml(guideUrl) + '" class="ge-m3-guide-btn ge-m3-btn ge-m3-btn--filled m3-sl">' +
-					'Gå til Kjøpsveileder' +
+					'Gå til Utstyrsvelger' +
 					'<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>' +
 				'</a>' +
 			'</aside>'

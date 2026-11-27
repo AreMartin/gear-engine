@@ -9,7 +9,7 @@
  * @var string $initial_category   Default category tab.
  * @var string $initial_view       Default view mode (grid or list).
  * @var int    $initial_limit      Initial number of items visible.
- * @var bool   $show_guide_link    Whether to render the cross-link banner to Kjøpsveilederne.
+ * @var bool   $show_guide_link    Whether to render the cross-link banner to Utstyrsvelgerne.
  * @var bool   $show_search        Whether to render the in-content search bar.
  */
 
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		data-initial-limit="<?php echo esc_attr( (string) $initial_limit ); ?>"
 		data-show-guide="<?php echo esc_attr( $show_guide_link ? 'true' : 'false' ); ?>"
 		data-show-search="<?php echo esc_attr( $show_search_attr ?? ( ( $show_search ?? true ) ? 'auto' : 'false' ) ); ?>"
-		data-guide-url="<?php echo esc_url( home_url( '/kjopsveiledere/' ) ); ?>"
+		data-guide-url="<?php echo esc_url( home_url( '/utstyrsvelgere/' ) ); ?>"
 	>
 		<p class="ge-m3-affiliate-disclosure">
 			<span class="material-symbols-outlined" aria-hidden="true">info</span>
@@ -38,17 +38,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<?php if ( $show_guide_link ) : ?>
 			<aside class="ge-m3-guide-banner ge-price-comp-guide-banner" id="ge-guide-banner" aria-label="<?php esc_attr_e( 'Veiledning', 'gear-engine' ); ?>">
-				<button class="ge-m3-guide-dismiss" id="ge-guide-dismiss" type="button" aria-label="<?php esc_attr_e( 'Lukk kjøpsveileder', 'gear-engine' ); ?>" title="<?php esc_attr_e( 'Lukk kjøpsveileder', 'gear-engine' ); ?>">
+				<button class="ge-m3-guide-dismiss" id="ge-guide-dismiss" type="button" aria-label="<?php esc_attr_e( 'Lukk utstyrsvelger', 'gear-engine' ); ?>" title="<?php esc_attr_e( 'Lukk utstyrsvelger', 'gear-engine' ); ?>">
 					<span class="material-symbols-outlined" aria-hidden="true">close</span>
 				</button>
 				<div class="ge-m3-guide-content">
 					<div class="ge-m3-guide-text">
 						<strong><?php esc_html_e( 'Usikker på hvilket utstyr som passer best for deg?', 'gear-engine' ); ?></strong>
-						<span><?php esc_html_e( 'Finn optimal modell for leddbelastning, plass og budsjett i vår interaktive veileder.', 'gear-engine' ); ?></span>
+						<span><?php esc_html_e( 'Finn optimal modell for leddbelastning, plass og budsjett i vår interaktive utstyrsvelger.', 'gear-engine' ); ?></span>
 					</div>
 				</div>
-				<a href="<?php echo esc_url( home_url( '/kjopsveiledere/' ) ); ?>" class="ge-m3-guide-btn ge-m3-btn ge-m3-btn--filled m3-sl">
-					<?php esc_html_e( 'Gå til Kjøpsveileder', 'gear-engine' ); ?>
+				<a href="<?php echo esc_url( home_url( '/utstyrsvelgere/' ) ); ?>" class="ge-m3-guide-btn ge-m3-btn ge-m3-btn--filled m3-sl">
+					<?php esc_html_e( 'Gå til Utstyrsvelger', 'gear-engine' ); ?>
 					<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 				</a>
 			</aside>
